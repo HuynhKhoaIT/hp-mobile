@@ -1,0 +1,75 @@
+-- Helper cho test pgTAP. Không phải file test (đuôi .psql nên pg_prove bỏ qua).
+-- Mỗi file test gọi `\ir _helpers.psql` ngay sau `begin;` — mọi thứ rollback cùng transaction.
+--
+--   tests.create_user('user_a')            tạo auth.users (+ profile khi bảng profiles đã có, qua trigger)
+--   tests.authenticate_as('user_a')        role authenticated + JWT claims của user đó
+--   tests.authenticate_as_staff('mod', 'moderator')   như trên, có app_metadata.role
+--   tests.clear_auth()                     về role anon, không claims
+--   tests.get_uid('user_a')                uuid của user test
+
+create extension if not exists pgtap with schema extensions;
+create schema if not exists tests;
+grant usage on schema tests to anon, authenticated;
+
+create table if not exists tests.users (identifier text primary key, id uuid not null);
+grant select on tests.users to anon, authenticated;
+
+create or replace function tests.create_user(p_identifier text, p_role text default 'user')
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_id uuid := gen_random_uuid();
+  v_n int := (select count(*) from tests.users) + 1;
+begin
+  insert into auth.users (id, instance_id, aud, role, phone, phone_confirmed_at,
+                          raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+  values (v_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
+          '8490000' || lpad(v_n::text, 4, '0'), now(),
+          jsonb_build_object('provider', 'phone', 'role', p_role),
+          jsonb_build_object('full_name', 'Test ' || p_identifier), now(), now());
+  insert into tests.users (identifier, id) values (p_identifier, v_id);
+  return v_id;
+end;
+$$;
+
+create or replace function tests.get_uid(p_identifier text)
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$ select id from tests.users where identifier = p_identifier $$;
+
+create or replace function tests.authenticate_as(p_identifier text)
+returns void
+language plpgsql
+as $$
+declare
+  v_id uuid := tests.get_uid(p_identifier);
+  v_role text;
+begin
+  if v_id is null then
+    raise exception 'tests.authenticate_as: chưa có user "%" (gọi tests.create_user trước)', p_identifier;
+  end if;
+  select coalesce(raw_app_meta_data ->> 'role', 'user') into v_role from auth.users where id = v_id;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', v_id, 'role', 'authenticated', 'aal', 'aal1',
+                      'app_metadata', json_build_object('role', v_role))::text, true);
+end;
+$$;
+
+create or replace function tests.clear_auth()
+returns void
+language plpgsql
+as $$
+begin
+  perform set_config('role', 'anon', true);
+  perform set_config('request.jwt.claims', null, true);
+end;
+$$;
+
+grant execute on all functions in schema tests to anon, authenticated;

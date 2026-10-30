@@ -1,1 +1,52 @@
-{}
+{
+  "disclaimer": "Ứng dụng cộng đồng, không thuộc Tập đoàn Hòa Phát",
+  "actions": {
+    "retry": "Thử lại",
+    "cancel": "Huỷ",
+    "save": "Lưu",
+    "post": "Đăng tin",
+    "contact": "Liên hệ",
+    "join": "Tham gia",
+    "share": "Chia sẻ",
+    "report": "Báo cáo",
+    "block": "Chặn"
+  },
+  "category": {
+    "pass_electronics": "Điện thoại, máy tính, điện tử",
+    "pass_vehicle": "Xe cộ",
+    "pass_ppe": "Đồ bảo hộ lao động",
+    "pass_home": "Nội thất, gia dụng",
+    "room_rent": "Phòng trọ",
+    "room_share": "Ở ghép",
+    "job_main": "Việc chính",
+    "job_parttime": "Việc làm thêm ngoài ca",
+    "lost": "Tôi làm mất",
+    "found": "Tôi nhặt được"
+  },
+  "feature": {
+    "pass": "Pass đồ",
+    "room": "Tìm trọ",
+    "job": "Tìm việc",
+    "lostFound": "Đồ thất lạc",
+    "ride": "Ghép xe về quê",
+    "sport": "Ghép trận"
+  },
+  "status": {
+    "draft": "Bản nháp",
+    "pending_review": "Chờ duyệt",
+    "active": "Đang đăng",
+    "sold": "Đã bán",
+    "closed": "Đã đóng",
+    "expired": "Hết hạn",
+    "rejected": "Bị từ chối",
+    "open": "Còn chỗ",
+    "full": "Đã đủ người",
+    "in_progress": "Đang diễn ra",
+    "completed": "Đã xong",
+    "cancelled": "Đã huỷ"
+  },
+  "price": {
+    "negotiable": "Thoả thuận",
+    "free": "Miễn phí"
+  }
+}

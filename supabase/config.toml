@@ -116,7 +116,7 @@ port = 54324
 [storage]
 enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
+file_size_limit = "5MiB"   # trần chung; từng bucket đặt giới hạn riêng trong migration
 
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
@@ -130,8 +130,9 @@ file_size_limit = "50MiB"
 enabled = true
 
 # Image transformation API is available to Supabase Pro plan.
-# [storage.image_transformation]
-# enabled = true
+# Bật ở local để dev giống prod (Pro). Staging (Free) sẽ trả ảnh gốc.
+[storage.image_transformation]
+enabled = true
 
 # Store analytical data in S3 for running ETL jobs over Iceberg Catalog
 # This feature is only available on the hosted platform.
@@ -157,11 +158,12 @@ max_indexes = 5
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+site_url = "http://localhost:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# Local only. Staging / prod đặt trên Dashboard (Auth → URL Configuration): https://tenapp.vn/**, https://*.vercel.app/**, hoaphat://**
+additional_redirect_urls = ["http://localhost:3000/**", "http://127.0.0.1:3000/**", "hoaphat://**", "exp://**"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -256,19 +258,24 @@ otp_expiry = 3600
 # content_path = "./supabase/templates/password_changed_notification.html"
 
 [auth.sms]
-# Allow/disallow new user signups via SMS to your project.
-enable_signup = false
+# Đăng ký bằng SĐT + OTP (cách đăng nhập chính). Gửi thật qua hook send-otp (ZNS) — tuần 2.
+enable_signup = true
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
 # Template for sending OTP to users
-template = "Your code is {{ .Code }}"
+template = "Ma xac thuc Nguoi Dung Quat: {{ .Code }}"
 # Controls the minimum amount of time that must pass before sending another sms otp.
 max_frequency = "5s"
 
 # Use pre-defined map of phone number to OTP for testing.
 # Keys are the phone number with country code and without the + prefix.
-# [auth.sms.test_otp]
-# 14152127777 = "123456"
+# SĐT test cho dev / seed (không gửi SMS thật). Khớp tests.create_user trong supabase/tests/_helpers.psql.
+[auth.sms.test_otp]
+84900000001 = "123456"
+84900000002 = "123456"
+84900000003 = "123456"
+84900000004 = "123456"
+84900000005 = "123456"
 
 # Configure logged in session timeouts.
 # [auth.sessions]
@@ -288,12 +295,13 @@ max_frequency = "5s"
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
+# LOCAL ONLY: provider giả để GoTrue bật đăng nhập SĐT; chỉ số trong [auth.sms.test_otp] dùng được (không gọi Twilio).
+# Tuần 2 thay bằng [auth.hook.send_sms] → Edge Function send-otp (Zalo ZNS). Không phải secret thật.
 [auth.sms.twilio]
-enabled = false
-account_sid = ""
-message_service_sid = ""
-# DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
-auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
+enabled = true
+account_sid = "local-dev-not-real"
+message_service_sid = "local-dev-not-real"
+auth_token = "local-dev-not-real"
 
 # Multi-factor-authentication is available to Supabase Pro plan.
 [auth.mfa]
@@ -302,8 +310,9 @@ max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+# Bắt buộc cho khu /admin (apps/web).
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]

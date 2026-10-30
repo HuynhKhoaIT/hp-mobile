@@ -37,6 +37,11 @@ pnpm exec supabase db push --linked
 ```
 Prod: chỉ qua GitHub Actions khi gắn tag `v*` (cần approval). Không chạy `db push` lên prod từ máy dev.
 
+### Đăng nhập thử ở local
+SĐT test `84900000001` … `84900000005`, OTP luôn là `123456` (`[auth.sms.test_otp]` trong `supabase/config.toml`). Số khác không nhận được SMS ở local. Email tự động (nếu có) xem tại Mailpit http://127.0.0.1:54324. Studio: http://127.0.0.1:54323.
+
+Trên Windows, container `supabase_vector` (thu log) có thể khởi động lại liên tục — không ảnh hưởng DB / Auth / API.
+
 ## 3. Biến môi trường
 
 | Nơi | Biến | Lấy từ |

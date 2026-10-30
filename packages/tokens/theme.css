@@ -1,0 +1,67 @@
+/* SINH TỰ ĐỘNG từ packages/tokens/src/index.ts — không sửa tay. Chạy: pnpm --filter @hp/tokens build */
+
+@theme {
+  --color-primary: #0B4F9C;
+  --color-primary-light: #E6EFFA;
+  --color-accent: #F2762E;
+  --color-success: #1E9E5A;
+  --color-warning: #E0A100;
+  --color-danger: #D93025;
+  --color-bg: #F6F7F9;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EEF0F3;
+  --color-border: #E2E5EA;
+  --color-fg: #111827;
+  --color-muted: #6B7280;
+  --color-disabled: #9CA3AF;
+  --color-on-primary: #FFFFFF;
+  --color-service-pass: #F97316;
+  --color-service-room: #8B5CF6;
+  --color-service-job: #16A34A;
+  --color-service-ride: #0D9488;
+  --color-service-sport: #DC2626;
+  --color-service-lost-found: #EAB308;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --text-xs: 12px;
+  --text-xs--line-height: 1.4;
+  --text-sm: 14px;
+  --text-sm--line-height: 1.4;
+  --text-md: 16px;
+  --text-md--line-height: 1.4;
+  --text-lg: 18px;
+  --text-lg--line-height: 1.4;
+  --text-xl: 20px;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 1.4;
+  --text-3xl: 28px;
+  --text-3xl--line-height: 1.4;
+
+  --shadow-card: 0px 1px 3px rgba(0,0,0,0.06);
+  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
+  --font-zh: var(--font-noto-sans-sc), var(--font-be-vietnam-pro), sans-serif;
+}
+
+/* Dark mode bằng class `dark` trên <html> (next-themes). */
+.dark {
+  --color-primary: #5B9BE6;
+  --color-primary-light: #15283F;
+  --color-accent: #F58A4C;
+  --color-success: #3CBF78;
+  --color-warning: #F0B429;
+  --color-danger: #F05252;
+  --color-bg: #0F1115;
+  --color-surface: #171A20;
+  --color-surface-2: #1F232B;
+  --color-border: #2A2F38;
+  --color-fg: #F3F4F6;
+  --color-muted: #9CA3AF;
+  --color-disabled: #6B7280;
+  --color-on-primary: #0F1115;
+}

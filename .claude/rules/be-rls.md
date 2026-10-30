@@ -9,7 +9,7 @@ paths:
 ## Nguyên tắc
 - Mọi bảng bật RLS trong migration tạo bảng. Không policy = không ai truy cập (đúng cho bảng nội bộ: `rate_limits`, `moderation_queue` cho user, `audit_log` cho user).
 - Client chỉ ẩn / hiện; RLS là nơi duy nhất quyết định quyền. Không "tin" cột client gửi (`owner_id`, `host_id`, `role`, `is_banned`, `status` nhạy cảm) → ép bằng `with check` hoặc trigger.
-- Helper (`security definer`, `stable`, `set search_path = public`): `is_staff()`, `is_admin()`, `is_banned()`, `is_blocked(a uuid, b uuid)`, `is_member(conversation_id uuid)`.
+- Helper (`security definer`, `stable`, `set search_path = ''`): `is_staff()`, `is_admin()`, `is_banned()`, `is_blocked(a uuid, b uuid)`, `is_member(conversation_id uuid)`.
 - Tách policy theo lệnh (`for select` / `insert` / `update` / `delete`), tên `<table>_<cmd>_<ai>`: `listings_select_owner`, `listings_update_staff`. Mặc định `to authenticated`.
 - `anon` chỉ `select` trên view `public_listings`, `public_profiles`, `public_groups`, bảng `sites`, `venues` (approved), `banners` (đang hiệu lực) và RPC công khai.
 - View công khai: không cột nhạy cảm (`phone`, `push_tokens`, `notification_prefs`, email); vị trí làm tròn ~300 m (`ST_SnapToGrid(location::geometry, 0.003)::geography`); `full_name` → tên + chữ cái họ; chỉ `status = 'active' and deleted_at is null`. Dùng `security_invoker = false` + lọc chặt, hoặc `security_invoker = true` khi bảng gốc đã có policy đủ.
@@ -41,7 +41,7 @@ create policy listings_update_staff on public.listings for update to authenticat
 ```sql
 begin;
 select plan(8);
--- helper đổi vai trò: supabase/tests/_helpers.sql (tests.authenticate_as('user_a'), tests.clear_auth())
+-- helper đổi vai trò: supabase/tests/_helpers.psql (tests.authenticate_as('user_a'), tests.clear_auth())
 
 -- anon
 select tests.clear_auth();

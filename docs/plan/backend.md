@@ -49,7 +49,7 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 
 | Tuần | Việc | Đầu ra kiểm chứng được | Skill |
 |---|---|---|---|
-| 1 | `supabase init`; `config.toml` (auth phone hook, Google, MFA, redirect URLs, storage limit); extensions `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`; `set_updated_at`, `slugify`; pnpm workspace `packages/{db,shared,tokens,core}` khung + build; `@hp/tokens` đầy đủ + preset Tailwind; `@hp/shared` enums, constants, `format.ts`, `slug.ts`, i18n 9 ns khung; script `i18n:check`; `supabase/tests/_helpers.sql`; CI (db reset + test + gen types diff + build + i18n:check); `.env.example` | `supabase start` + `pnpm -r build` + CI xanh | — |
+| 1 | `supabase init`; `config.toml` (auth phone hook, Google, MFA, redirect URLs, storage limit); extensions `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`; `set_updated_at`, `slugify`; pnpm workspace `packages/{db,shared,tokens,core}` khung + build; `@hp/tokens` đầy đủ + preset Tailwind; `@hp/shared` enums, constants, `format.ts`, `slug.ts`, i18n 9 ns khung; script `i18n:check`; `supabase/tests/_helpers.psql`; CI (db reset + test + gen types diff + build + i18n:check); `.env.example` | `supabase start` + `pnpm -r build` + CI xanh | — |
 | 2 | Core: `profiles` (+ trigger từ `auth.users`, consent, guard cột), `sites`, `notifications`, `bookmarks`, `ratings` (+ trigger avg / count / reputation), `badge_requests`, `blocks`, `rate_limits` + `assert_rate_limit`, `audit_log`; helper RLS; `public_profiles`; RLS + pgTAP; `send-otp` (ZNS + fallback SMS, 5 / giờ); `custom-claims` hook; seed user 5 vai trò; gen types; `@hp/core` `SupabaseProvider`, `keys`, `profile.ts`, `notifications.ts`, `bookmarks.ts` | **Cổng 1** | `/new-migration`, `/rls-policy`, `/new-edge-function` |
 | 3 | Listing: enum, `listings` (+ trigger slug / short_id / guard status / expires_at mặc định, `search_vector`, 5 index), `listing_translations`, `listing_views`, `search_logs`; `public_listings` (PII, vị trí 300 m, khoảng cách tới site); RLS + pgTAP; bucket `listing-images`, `avatars` + policy; RPC `search_listings`, `get_listing_by_slug`, `similar_listings`, `log_search`; Zod `pass_*`, `job_*`; `@hp/core` `listings.ts` + hooks + `urls.ts` + `capabilities.ts`; seed 50 tin / category | mobile + web list / detail chạy từ seed; `explain` dùng index | `/new-rpc` |
 | 4 | `createListing` / `updateListing` / `markSold` (RPC `mark_sold_tx`) / `renewListing`; `moderate-listing` (webhook: `banned_keywords`, tài khoản < 7 ngày, giá < 30% trung vị, từ khoá đặt cọc, ảnh trùng hash, > 10 tin / ngày) + `moderation_queue`; `reveal_contact`; `sitemap_listings`, `public_stats` + `stats_cache`; webhook revalidate → web; `check_rate_limit` | Đăng tin từ hai client; tin rủi ro vào hàng chờ; web ISR cập nhật khi đổi trạng thái | `/new-edge-function`, `/new-rpc` |
@@ -61,6 +61,16 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 | 10 | `request-badge` + bucket `verification` + policy + cron `purge-verification-files`; `translate-content` (cache `listing_translations`); cron `purge-deleted-accounts` (Nghị định 13); `admin_stats`; `/be-done-check --pentest` lần 1 | **Cổng 3**: pen-test pass | `/be-done-check` |
 | 11 | Marketing: `marketing_leads` (insert service role, rate limit IP), `banners`; catalog: `sites` / `venues` / `banned_keywords` ghi cho admin; RPC xuất CSV audit (admin, ghi audit); nạp 50k tin giả → `explain analyze` mọi RPC công khai, thêm index thiếu; review schema + RLS bởi người thứ hai (ARCHITECTURE mục 12) | Mọi RPC công khai < 50 ms p95 trên 50k tin | `/be-done-check` |
 | 12 | Production project (Singapore): migrate, `secrets set`, Auth redirect domain thật, webhook prod, PITR 7 ngày, Sentry; `docs/RUNBOOK.md` (deploy, rollback, khôi phục backup, xoay secret, thêm moderator); thử khôi phục backup; `/be-done-check --pentest` lần 2 trên staging | **Cổng 4** | `/be-done-check` |
+
+### Tiến độ tuần 1 (cập nhật 2026-10-30)
+- [x] `supabase init`, link `dungquat-staging`; Supabase local chạy (Postgres 17.11, khớp staging)
+- [x] `config.toml` local: OTP SĐT + số test 84900000001–05 (OTP `123456`), TOTP, redirect URLs, storage 5 MiB, image transformation
+- [x] Migration 0001: `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`; `set_updated_at`, `slugify`, `gen_short_id`; bỏ quyền mặc định
+- [x] `supabase/tests/_helpers.psql` + `000_foundation.test.sql` (18 assertion)
+- [x] `@hp/tokens` đầy đủ + `theme.css`; `@hp/shared` enums, constants, `format.ts`, `slug.ts`, i18n 9 ns; `node --test` (9 test)
+- [x] CI: job `db` (reset, pgTAP, type diff) + unit test + kiểm tra file sinh
+- [ ] Đăng nhập Google (cần OAuth client) · `[auth.hook.send_sms]` → `send-otp` · `custom-claims` → tuần 2
+- [ ] Màu dịch vụ `serviceColors` là đề xuất, chờ duyệt
 
 ## 5. Thứ tự migration dự kiến
 `0001_extensions_helpers` → `0002_core_profiles_sites` → `0003_core_notifications_bookmarks_ratings` → `0004_core_moderation_tables` → `0005_rls_helpers_core_policies` → `0006_listings` → `0007_listings_public_view_rpc` → `0008_storage_buckets_listing_avatars` → `0009_listing_write_rpc_moderation_webhook` → `0010_chat` → `0011_realtime_publication_chat_storage` → `0012_push_webhook_notification_prefs` → `0013_groups` → `0014_group_rpc_join` → `0015_cron_expire_remind` → `0016_venues` → `0017_lost_found_match_webhook` → `0018_home_feed_reports_auto_hide` → `0019_verification_translations_purge` → `0020_marketing_catalog_admin` → `0021_app_settings_local`. Tên thật theo timestamp của `supabase migration new`.
@@ -76,7 +86,9 @@ Ghi mỗi khi mục 2 đổi. Client đọc bảng này để biết phải cậ
 
 | Ngày | Mục | Thay đổi | Việc ở mobile | Việc ở web | Trạng thái |
 |---|---|---|---|---|---|
-| — | — | — | — | — | — |
+| 2026-10-30 | `@hp/shared` | Mới: `LOCALES`, enums (`LISTING_CATEGORIES`, `GROUP_SUB_KINDS`…), `APP_NAME`, `EXPIRES_DAYS`, `RATE_LIMITS`, `NOTIFICATION_SCREENS`, `format*`, `toSlug` / `buildSlug` / `parseShortId`; i18n 9 ns (`common` có `category.*`, `status.*`, `feature.*`, `actions.*`, `disclaimer`; `errors` mã chung) | dùng `@hp/shared/format` trong `src/lib/format.ts` | dùng `@hp/shared/format`, `parseShortId` cho `/tin/[slug]` | xong |
+| 2026-10-30 | `@hp/tokens` | Mới: token TS + `theme.css` (Tailwind v4). Tên class: `text-fg`, `text-muted`, `bg-surface-2`, `bg-primary-light` (xem `.claude/rules/be-shared-packages.md`) | NativeWind chưa nối — chọn bản NativeWind hợp Tailwind v4 | đã nối `globals.css` | xong (web) |
+| 2026-10-30 | DB | Migration `20261030090000_extensions_helpers`: extensions, `slugify`, `gen_short_id`, `set_updated_at`; **bỏ quyền mặc định** (mọi bảng / function mới cần `grant` rõ) | — | — | xong |
 
 ## 8. Rủi ro riêng backend
 | Rủi ro | Giảm thiểu |

@@ -35,5 +35,37 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Unit tests
+        run: pnpm test
+
       - name: Build
         run: pnpm build
+
+      - name: File sinh tự động đã cập nhật (theme.css …)
+        run: git diff --exit-code -- packages/tokens/theme.css
+
+  db:
+    name: supabase · migrations · pgTAP · types
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.0
+
+      - name: Khởi động Supabase (bỏ dịch vụ không cần cho test)
+        run: supabase start -x studio,imgproxy,mailpit,logflare,vector,supavisor,edge-runtime,realtime
+
+      - name: Migration chạy sạch từ đầu
+        run: supabase db reset
+
+      - name: pgTAP
+        run: supabase test db
+
+      - name: Type DB khớp migration
+        run: |
+          supabase gen types typescript --local > /tmp/database.types.ts
+          diff -u packages/db/database.types.ts /tmp/database.types.ts || {
+            echo "::error::packages/db/database.types.ts chưa sinh lại. Chạy: pnpm db:types"; exit 1; }

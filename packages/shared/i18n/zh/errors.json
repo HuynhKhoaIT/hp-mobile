@@ -1,0 +1,10 @@
+{
+  "unknown": "出错了，请重试",
+  "network": "网络连接中断，请重试",
+  "invalid_input": "信息无效",
+  "auth_required": "请登录后继续",
+  "forbidden": "您无权执行此操作",
+  "not_found": "未找到内容",
+  "rate_limited": "操作过于频繁，请稍后再试",
+  "banned": "账号已被锁定"
+}

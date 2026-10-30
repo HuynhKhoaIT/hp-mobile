@@ -19,7 +19,7 @@ import { useTheme, useReducedMotion } from './theme';
 
 const styles = cva('rounded-md items-center justify-center', {
   variants: {
-    variant: { primary: 'bg-primary', secondary: 'bg-primaryLight', outline: 'border border-primary bg-transparent' },
+    variant: { primary: 'bg-primary', secondary: 'bg-primary-light', outline: 'border border-primary bg-transparent' },
     size: { sm: 'h-9 px-3', md: 'h-11 px-4', lg: 'h-13 px-5' },
   },
   defaultVariants: { variant: 'primary', size: 'md' },

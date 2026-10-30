@@ -1,1 +1,52 @@
-{}
+{
+  "disclaimer": "社区应用，与和发集团无关",
+  "actions": {
+    "retry": "重试",
+    "cancel": "取消",
+    "save": "保存",
+    "post": "发布",
+    "contact": "联系",
+    "join": "加入",
+    "share": "分享",
+    "report": "举报",
+    "block": "屏蔽"
+  },
+  "category": {
+    "pass_electronics": "手机、电脑、电子产品",
+    "pass_vehicle": "车辆",
+    "pass_ppe": "劳保用品",
+    "pass_home": "家具、家居",
+    "room_rent": "租房",
+    "room_share": "合租",
+    "job_main": "全职工作",
+    "job_parttime": "下班兼职",
+    "lost": "我丢了东西",
+    "found": "我捡到东西"
+  },
+  "feature": {
+    "pass": "二手交易",
+    "room": "找房",
+    "job": "找工作",
+    "lostFound": "失物招领",
+    "ride": "拼车回家",
+    "sport": "约球"
+  },
+  "status": {
+    "draft": "草稿",
+    "pending_review": "待审核",
+    "active": "展示中",
+    "sold": "已售出",
+    "closed": "已关闭",
+    "expired": "已过期",
+    "rejected": "已拒绝",
+    "open": "可加入",
+    "full": "已满员",
+    "in_progress": "进行中",
+    "completed": "已结束",
+    "cancelled": "已取消"
+  },
+  "price": {
+    "negotiable": "面议",
+    "free": "免费"
+  }
+}

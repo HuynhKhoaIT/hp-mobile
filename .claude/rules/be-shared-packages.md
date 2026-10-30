@@ -27,8 +27,19 @@ paths:
 - Input Edge Function và Server Action định nghĩa một lần ở `schemas/functions`, `schemas/actions`; Edge Function re-export, web import.
 - i18n: 9 namespace; `pnpm i18n:check` so khoá 3 ngôn ngữ, fail khi thiếu (ns `admin` cho phép `zh` thiếu). Key `snake_case`; placeholder `{{x}}` (i18next) — web next-intl dùng adapter chuyển `{{x}}` → `{x}` lúc build (`scripts/i18n-to-next-intl.ts`).
 - `format.ts`: `formatMoney(n, locale)` → `1.500.000 ₫` / `₫1,500,000` / `1,500,000 越南盾`; `formatDistance(m, locale)`; `formatRelative(date, locale)`; `formatDate(date, locale, style)`. Chỉ `Intl`, không `dayjs`.
-- `slug.ts`: `toSlug(title) + '-' + short_id` cùng thuật toán với trigger SQL `slugify()` (test so sánh 20 tiêu đề mẫu).
+- `slug.ts`: `toSlug(title) + '-' + short_id` cùng thuật toán với trigger SQL `slugify()` (bộ ví dụ chung trong `slug.test.ts` và `supabase/tests/000_foundation.test.sql`).
 
 ## Phát hành
-- Mỗi gói: `package.json` (`name`, `version`, `exports`, `types`, `sideEffects: false`), build `tsc -b`, test `vitest`.
+- Mỗi gói: `package.json` (`name`, `version`, `exports`, `types`, `sideEffects: false`), gói xuất thẳng mã TS (không bước build, trừ `@hp/tokens` sinh `theme.css`); test bằng `node --test` có sẵn trong Node 22 — không thêm vitest khi chưa hỏi.
 - Đổi API công khai (xoá / đổi tên hàm, đổi kiểu trả về, đổi key i18n) → `docs/plan/backend.md` mục "Thay đổi hợp đồng" kèm việc ở `apps/mobile` và `apps/web`; build cả hai app trước khi coi là xong (`/shared-package-change`).
+
+## Tên class sinh từ `@hp/tokens` (`packages/tokens/theme.css`)
+| Token | Class (web Tailwind v4, app NativeWind) |
+|---|---|
+| `primary`, `primaryLight`, `accent`, `success`, `warning`, `danger` | `bg-primary`, `bg-primary-light`, `text-accent`, `border-danger`… |
+| `bg`, `surface`, `surface2`, `border` | `bg-bg`, `bg-surface`, `bg-surface-2`, `border-border` |
+| `text`, `textMuted`, `textDisabled`, `onPrimary` | `text-fg`, `text-muted`, `text-disabled`, `text-on-primary` |
+| `serviceColors.*` | `bg-service-pass`, `text-service-lost-found`… |
+| `radius.*`, `font.size.*`, `shadow.card` | `rounded-sm/md/lg/xl/full`, `text-xs … text-3xl`, `shadow-card` |
+| spacing 4/8/12/16/20/24/32 | `p-1 p-2 p-3 p-4 p-5 p-6 p-8` (thang mặc định Tailwind, khớp token) |
+Sửa token → `pnpm --filter @hp/tokens build` để sinh lại `theme.css`; CI báo lỗi nếu file chưa sinh lại.

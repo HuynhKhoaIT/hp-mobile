@@ -1,3 +1,12 @@
 @import "tailwindcss";
+/* Token dùng chung với app — sinh từ packages/tokens. Không khai báo màu / cỡ chữ tại đây. */
+@import "@hp/tokens/theme.css";
 
-/* Tuần 1: thay bằng preset sinh từ @hp/tokens (docs/plan/web.md). Không khai báo màu tại đây. */
+/* Dark mode theo class `dark` trên <html> (next-themes), không theo prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-sans text-md;
+  }
+}

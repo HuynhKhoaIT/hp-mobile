@@ -1,1 +1,52 @@
-{}
+{
+  "disclaimer": "A community app, not affiliated with Hoa Phat Group",
+  "actions": {
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "post": "Post",
+    "contact": "Contact",
+    "join": "Join",
+    "share": "Share",
+    "report": "Report",
+    "block": "Block"
+  },
+  "category": {
+    "pass_electronics": "Phones, computers & electronics",
+    "pass_vehicle": "Vehicles",
+    "pass_ppe": "Safety gear",
+    "pass_home": "Furniture & home",
+    "room_rent": "Rooms for rent",
+    "room_share": "Room sharing",
+    "job_main": "Full-time jobs",
+    "job_parttime": "Side jobs after shift",
+    "lost": "I lost something",
+    "found": "I found something"
+  },
+  "feature": {
+    "pass": "Buy & sell",
+    "room": "Find a room",
+    "job": "Find a job",
+    "lostFound": "Lost & found",
+    "ride": "Ride sharing home",
+    "sport": "Find a game"
+  },
+  "status": {
+    "draft": "Draft",
+    "pending_review": "Pending review",
+    "active": "Active",
+    "sold": "Sold",
+    "closed": "Closed",
+    "expired": "Expired",
+    "rejected": "Rejected",
+    "open": "Open",
+    "full": "Full",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "price": {
+    "negotiable": "Negotiable",
+    "free": "Free"
+  }
+}

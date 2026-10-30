@@ -27,13 +27,13 @@ grant select, insert, update, delete on public.<name> to authenticated;   -- ch�
 create trigger trg_<name>_updated_at before update on public.<name>
   for each row execute function public.set_updated_at();
 ```
-- Migration đầu tiên (`0001_extensions_helpers`) chạy `alter default privileges in schema public revoke all on tables, functions, sequences from anon, authenticated;` để Supabase local giống staging/prod (local mặc định vẫn tự cấp quyền). Không có bước này, test pgTAP pass ở local nhưng client lỗi `42501` trên staging.
+- Migration đầu tiên (`20261030090000_extensions_helpers.sql`) đã `alter default privileges for role postgres` bỏ quyền mặc định trên bảng / sequence / function cho `anon`, `authenticated` (và `execute` cho `public`), để Supabase local giống staging/prod. Hệ quả: bảng / view / function mới **không ai dùng được** cho tới khi migration `grant` rõ — thiếu grant thì client nhận lỗi `42501`.
 - Sequence của bảng `bigserial` (vd `audit_log`) cần `grant usage on sequence ... to authenticated` nếu user được insert.
 - Enum: Postgres `enum type`; thêm giá trị bằng `alter type ... add value` trong migration riêng (không dùng giá trị mới trong cùng transaction).
 - Vị trí `geography(point, 4326)`; tiền `numeric(14,0)` VND; ngôn ngữ `text check (lang in ('vi','en','zh'))`.
 - FK có `on delete` rõ ràng. Cột `jsonb` có `comment on column` trỏ tới Zod schema trong `packages/shared`.
 - Index theo truy vấn thật: list `(category, status, created_at desc)`, GIST cho geography, GIN cho tsvector / jsonb / trigram. Mỗi RPC công khai phải có index phủ (xác nhận bằng `explain analyze` trên seed).
-- `security definer` chỉ cho helper RLS (`is_staff`, `is_member`, `is_blocked`, `is_banned`), `reveal_contact`, RPC transaction cho Edge Function; luôn kèm `set search_path = public` và `revoke execute ... from public` khi không cho anon.
+- `security definer` chỉ cho helper RLS (`is_staff`, `is_member`, `is_blocked`, `is_banned`), `reveal_contact`, RPC transaction cho Edge Function; luôn kèm `set search_path = ''` (khi đó ghi đủ schema: `public.profiles`, `auth.uid()`, `extensions.unaccent(...)`) và `revoke execute ... from public` khi không cho anon.
 - Không `grant` gì cho `anon` ngoài view / RPC công khai liệt kê ở `supabase/CLAUDE.md` mục 5.
 
 ## Sau mỗi migration

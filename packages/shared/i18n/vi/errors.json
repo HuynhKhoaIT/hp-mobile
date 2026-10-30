@@ -1,0 +1,10 @@
+{
+  "unknown": "Có lỗi xảy ra, vui lòng thử lại",
+  "network": "Mất kết nối mạng, vui lòng thử lại",
+  "invalid_input": "Thông tin chưa hợp lệ",
+  "auth_required": "Vui lòng đăng nhập để tiếp tục",
+  "forbidden": "Bạn không có quyền làm việc này",
+  "not_found": "Không tìm thấy nội dung",
+  "rate_limited": "Bạn thao tác quá nhanh, vui lòng thử lại sau",
+  "banned": "Tài khoản đang bị khoá"
+}

@@ -5,10 +5,14 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./format": "./src/format.ts",
+    "./slug": "./src/slug.ts",
+    "./i18n/*": "./i18n/*"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --disable-warning=ExperimentalWarning \"src/**/*.test.ts\""
   },
   "devDependencies": {
     "typescript": "~6.0.3"

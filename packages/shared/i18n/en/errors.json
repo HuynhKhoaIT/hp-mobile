@@ -1,0 +1,10 @@
+{
+  "unknown": "Something went wrong, please try again",
+  "network": "No connection, please try again",
+  "invalid_input": "Some information is not valid",
+  "auth_required": "Please sign in to continue",
+  "forbidden": "You don't have permission to do this",
+  "not_found": "Content not found",
+  "rate_limited": "You're going too fast, please try again later",
+  "banned": "This account is locked"
+}

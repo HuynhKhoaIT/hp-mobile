@@ -6,12 +6,12 @@ argument-hint: "<tên_rpc> <đọc|ghi> [tham số]"
 
 # RPC mới
 
-1. Đọc `.claude/rules/be-rpc-triggers-cron.md`. Đọc → `stable security invoker`; ghi transaction → `security definer`, hậu tố `_tx`, `revoke execute from public, anon` và chỉ grant cho `authenticated` nếu user gọi trực tiếp; luôn `set search_path = public`.
+1. Đọc `.claude/rules/be-rpc-triggers-cron.md`. Đọc → `stable security invoker`; ghi transaction → `security definer`, hậu tố `_tx`, `revoke execute from public, anon` và chỉ grant cho `authenticated` nếu user gọi trực tiếp; luôn `set search_path = ''`.
 2. Migration mới (`/new-migration`):
 ```sql
 create or replace function public.<name>(p_... default ...)
 returns setof public.public_listings   -- hoặc table(...) / jsonb
-language sql stable security invoker set search_path = public as $$
+language sql stable security invoker set search_path = '' as $$
   select ... limit least(coalesce(p_limit, 20), 50);
 $$;
 comment on function public.<name> is '...';
