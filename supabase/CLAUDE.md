@@ -176,7 +176,7 @@ RPC `search_listings(p_category[], p_query, p_lat, p_lng, p_radius_m=10000, p_pr
 
 - Local: `supabase start`; đổi schema bằng file migration mới (`supabase migration new <tên>`), **không** sửa trên Studio rồi quên.
 - Sau mỗi migration: `supabase gen types typescript --local > packages/db/database.types.ts` và commit cùng nhau.
-- Môi trường: local → `hoaphat-staging` → `hoaphat-prod`. GitHub Actions chạy `supabase db push` + `supabase functions deploy` khi merge `main`.
+- Môi trường: local → `dungquat-staging` → `dungquat-prod`. GitHub Actions chạy `supabase db push` + `supabase functions deploy` khi merge `main`.
 - Có thể chuyển sang tự host Supabase trên VPS (docker-compose chính thức) mà không đổi code; backup `pg_dump` hàng ngày ra nơi khác, giữ 7 ngày, thử khôi phục mỗi quý.
 - Secrets: `supabase secrets set` (ZNS, Goong, Expo access token, API dịch, Sentry DSN). Không có trong git. Service role key chỉ ở Edge Functions và server admin.
 

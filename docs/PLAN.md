@@ -10,7 +10,7 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` mục 12, 13 · Kế
 ## 2. Việc cần chốt tuần 1
 | Việc | Ảnh hưởng |
 |---|---|
-| Tên app (không dùng "Hòa Phát" làm tên), `APP_NAME` trong `packages/shared` | store, landing, disclaimer |
+| ~~Tên app~~ **Đã chốt 2026-10-30: "Người Dung Quất"** (`APP_NAME` trong `packages/shared`). Còn chốt: định danh kỹ thuật (slug, bundle id, scheme thay `hoaphat`) | store, landing, disclaimer |
 | Domain thật thay `tenapp.vn` | deep link, `.well-known`, Auth redirect, sitemap |
 | Bundle id iOS / package Android | `.well-known`, Goong key, EAS |
 | Nhà cung cấp OTP (ZNS hay SMS brandname) và API dịch | `send-otp`, `translate-content`, chi phí |

@@ -4,3 +4,7 @@
 export const LOCALES = ['vi', 'en', 'zh'] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = 'vi';
+
+// Tên hiển thị (store, tiêu đề trang, push). Định danh kỹ thuật (slug, bundle id, domain, scheme) chưa chốt — xem docs/PLAN.md mục 2.
+export const APP_NAME = 'Người Dung Quất';
+export const APP_DISCLAIMER_KEY = 'common.disclaimer'; // "Ứng dụng cộng đồng, không thuộc Tập đoàn Hòa Phát"

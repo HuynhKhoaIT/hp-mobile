@@ -1011,8 +1011,8 @@ Dùng Image Transformation: `?width=400&quality=75` cho thumbnail, `?width=1280`
 | Môi trường | Supabase project | App |
 | --- | --- | --- |
 | local | Supabase CLI (Docker) | Expo Go / dev build |
-| staging | project `hoaphat-staging` | EAS build internal, kênh update `staging` |
-| production | project `hoaphat-prod` | Store + EAS Update kênh `production` |
+| staging | project `dungquat-staging` | EAS build internal, kênh update `staging` |
+| production | project `dungquat-prod` | Store + EAS Update kênh `production` |
 
 Migration qua `supabase db diff` → file trong `supabase/migrations/`, chạy bằng GitHub Actions khi merge vào `main`; type TypeScript sinh bằng `supabase gen types` commit vào `packages/db`.
 

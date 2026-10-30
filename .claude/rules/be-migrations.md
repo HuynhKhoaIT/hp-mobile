@@ -21,9 +21,14 @@ create table public.<name> (
   deleted_at timestamptz                      -- nếu là dữ liệu người dùng
 );
 alter table public.<name> enable row level security;   -- NGAY trong migration tạo bảng
+-- Project staging/prod tắt "Automatically expose new tables": quyền phải cấp rõ, RLS lọc tiếp.
+grant select, insert, update, delete on public.<name> to authenticated;   -- chỉ lệnh bảng thật sự cần
+-- KHÔNG grant bảng gốc cho anon; anon chỉ đọc view / RPC công khai.
 create trigger trg_<name>_updated_at before update on public.<name>
   for each row execute function public.set_updated_at();
 ```
+- Migration đầu tiên (`0001_extensions_helpers`) chạy `alter default privileges in schema public revoke all on tables, functions, sequences from anon, authenticated;` để Supabase local giống staging/prod (local mặc định vẫn tự cấp quyền). Không có bước này, test pgTAP pass ở local nhưng client lỗi `42501` trên staging.
+- Sequence của bảng `bigserial` (vd `audit_log`) cần `grant usage on sequence ... to authenticated` nếu user được insert.
 - Enum: Postgres `enum type`; thêm giá trị bằng `alter type ... add value` trong migration riêng (không dùng giá trị mới trong cùng transaction).
 - Vị trí `geography(point, 4326)`; tiền `numeric(14,0)` VND; ngôn ngữ `text check (lang in ('vi','en','zh'))`.
 - FK có `on delete` rõ ràng. Cột `jsonb` có `comment on column` trỏ tới Zod schema trong `packages/shared`.
