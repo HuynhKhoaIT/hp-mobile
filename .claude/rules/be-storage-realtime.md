@@ -29,7 +29,7 @@ Policy trên `storage.objects` theo bucket:
 
 ## `config.toml`
 - `[auth]`: `enable_signup = true`, `jwt_expiry = 3600`, `enable_refresh_token_rotation = true`; `[auth.sms]` bật + `[auth.hook.send_sms]` trỏ `send-otp`; `[auth.external.google]` bật; `[auth.mfa.totp]` bật (admin web); `site_url` + `additional_redirect_urls` gồm `http://localhost:3000/**`, `https://tenapp.vn/**`, `https://*.vercel.app/**`, `hoaphat://**`, `exp://**`.
-- Custom claim `app_metadata.role` qua Auth Hook `custom_access_token` (function `custom-claims`) để web middleware đọc role không cần query.
+- Custom claim `app_metadata.role` qua Auth Hook `custom_access_token` → Postgres function `public.custom_access_token_hook` (`pg-functions://postgres/public/custom_access_token_hook`); staging / prod bật trên Dashboard → Auth → Hooks.
 - `[storage]` `file_size_limit` khớp bảng trên; image transformation bật.
 - `[functions.<name>] verify_jwt = false` chỉ cho webhook / cron / auth hook (tự kiểm tra secret trong `handler`).
 - `[db.pooler]` bật transaction mode cho Edge Functions.

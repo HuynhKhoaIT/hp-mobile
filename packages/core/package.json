@@ -8,9 +8,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --disable-warning=ExperimentalWarning \"src/**/*.test.ts\""
   },
   "devDependencies": {
     "typescript": "~6.0.3"
+  },
+  "dependencies": {
+    "@hp/db": "workspace:*",
+    "@hp/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.118.0"
   }
 }

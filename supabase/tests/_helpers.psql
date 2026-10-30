@@ -1,11 +1,15 @@
 -- Helper cho test pgTAP. Không phải file test (đuôi .psql nên pg_prove bỏ qua).
 -- Mỗi file test gọi `\ir _helpers.psql` ngay sau `begin;` — mọi thứ rollback cùng transaction.
 --
---   tests.create_user('user_a')            tạo auth.users (+ profile khi bảng profiles đã có, qua trigger)
---   tests.authenticate_as('user_a')        role authenticated + JWT claims của user đó
---   tests.authenticate_as_staff('mod', 'moderator')   như trên, có app_metadata.role
---   tests.clear_auth()                     về role anon, không claims
---   tests.get_uid('user_a')                uuid của user test
+--   tests.create_user('user_a')                 tạo auth.users (trigger tạo profiles), role 'user'
+--   tests.create_user('mod', 'moderator')       … với vai trò moderator / admin
+--   tests.ban_user('bad')                       đặt profiles.is_banned = true
+--   tests.authenticate_as('user_a')             role authenticated + JWT claims của user đó
+--   tests.clear_auth()                          về role anon
+--   tests.get_uid('user_a')                     uuid của user test
+--   reset role;                                 quay về postgres để chuẩn bị dữ liệu giữa các bước
+--
+-- SĐT test: 8491000xxxx (không trùng user seed 8490000000x).
 
 create extension if not exists pgtap with schema extensions;
 create schema if not exists tests;
@@ -27,11 +31,26 @@ begin
   insert into auth.users (id, instance_id, aud, role, phone, phone_confirmed_at,
                           raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
   values (v_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
-          '8490000' || lpad(v_n::text, 4, '0'), now(),
-          jsonb_build_object('provider', 'phone', 'role', p_role),
+          '8491000' || lpad(v_n::text, 4, '0'), now(),
+          jsonb_build_object('provider', 'phone'),
           jsonb_build_object('full_name', 'Test ' || p_identifier), now(), now());
   insert into tests.users (identifier, id) values (p_identifier, v_id);
+  if p_role <> 'user' and to_regclass('public.profiles') is not null then
+    execute 'update public.profiles set role = $1 where id = $2' using p_role, v_id;
+  end if;
   return v_id;
+end;
+$$;
+
+create or replace function tests.ban_user(p_identifier text)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  execute 'update public.profiles set is_banned = true where id = $1'
+    using (select id from tests.users where identifier = p_identifier);
 end;
 $$;
 
@@ -49,16 +68,13 @@ language plpgsql
 as $$
 declare
   v_id uuid := tests.get_uid(p_identifier);
-  v_role text;
 begin
   if v_id is null then
     raise exception 'tests.authenticate_as: chưa có user "%" (gọi tests.create_user trước)', p_identifier;
   end if;
-  select coalesce(raw_app_meta_data ->> 'role', 'user') into v_role from auth.users where id = v_id;
   perform set_config('role', 'authenticated', true);
   perform set_config('request.jwt.claims',
-    json_build_object('sub', v_id, 'role', 'authenticated', 'aal', 'aal1',
-                      'app_metadata', json_build_object('role', v_role))::text, true);
+    json_build_object('sub', v_id, 'role', 'authenticated', 'aal', 'aal1')::text, true);
 end;
 $$;
 
@@ -68,7 +84,7 @@ language plpgsql
 as $$
 begin
   perform set_config('role', 'anon', true);
-  perform set_config('request.jwt.claims', null, true);
+  perform set_config('request.jwt.claims', '{"role":"anon"}', true);
 end;
 $$;
 

@@ -6,5 +6,6 @@
   "forbidden": "您无权执行此操作",
   "not_found": "未找到内容",
   "rate_limited": "操作过于频繁，请稍后再试",
-  "banned": "账号已被锁定"
+  "banned": "账号已被锁定",
+  "conflict": "内容已存在"
 }

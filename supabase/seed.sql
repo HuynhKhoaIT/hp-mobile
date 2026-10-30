@@ -1,4 +1,48 @@
 -- Dữ liệu mẫu cho local / CI (chạy sau migration khi `supabase db reset`). Không có dữ liệu người thật.
--- Tuần 2: sites (dung_quat, hai_duong, hung_yen), user test 5 vai trò (SĐT 84900000001–05, OTP 123456 trong config.toml).
--- Tuần 3: 50 tin mẫu mỗi category. Xem .claude/rules/be-migrations.md mục seed.sql.
-select 1;
+-- Đăng nhập thử: SĐT 84900000001–05, OTP 123456 ([auth.sms.test_otp] trong config.toml).
+
+-- ── Khu liên hợp (toạ độ gần đúng khu vực nhà máy, đủ cho lọc khoảng cách) ───────
+insert into public.sites (code, name, location) values
+  ('dung_quat', 'Khu liên hợp Dung Quất (Quảng Ngãi)', extensions.st_setsrid(extensions.st_makepoint(108.7960, 15.3930), 4326)::extensions.geography),
+  ('hai_duong', 'Khu liên hợp Hải Dương (Kinh Môn)',   extensions.st_setsrid(extensions.st_makepoint(106.5030, 21.0330), 4326)::extensions.geography),
+  ('hung_yen',  'Khu công nghiệp Phố Nối (Hưng Yên)',  extensions.st_setsrid(extensions.st_makepoint(106.0560, 20.9330), 4326)::extensions.geography)
+on conflict (code) do nothing;
+
+-- ── User test: 5 vai trò ────────────────────────────────────────────────────────
+-- Tạo auth.users + auth.identities; trigger trg_auth_users_new_profile tạo profiles.
+-- Các cột token để '' (GoTrue lỗi khi gặp NULL ở đây).
+with seed(id, phone, full_name) as (
+  values
+    ('00000000-0000-4000-8000-000000000001'::uuid, '84900000001', 'Nguyễn Văn An'),
+    ('00000000-0000-4000-8000-000000000002'::uuid, '84900000002', 'Trần Thị Bình'),
+    ('00000000-0000-4000-8000-000000000003'::uuid, '84900000003', 'Lê Văn Cấm'),
+    ('00000000-0000-4000-8000-000000000004'::uuid, '84900000004', 'Phạm Thị Duyệt'),
+    ('00000000-0000-4000-8000-000000000005'::uuid, '84900000005', 'Hoàng Văn Quản')
+)
+insert into auth.users (
+  id, instance_id, aud, role, phone, phone_confirmed_at, encrypted_password,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change,
+  phone_change, phone_change_token, email_change_token_current, reauthentication_token
+)
+select id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', phone, now(), '',
+       '{"provider":"phone","providers":["phone"]}'::jsonb,
+       jsonb_build_object('full_name', full_name, 'locale', 'vi'), now() - interval '30 days', now(),
+       '', '', '', '', '', '', '', ''
+from seed
+on conflict (id) do nothing;
+
+insert into auth.identities (id, provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+select gen_random_uuid(), u.id::text, u.id,
+       jsonb_build_object('sub', u.id::text, 'phone', u.phone, 'phone_verified', true),
+       'phone', now(), now(), now()
+from auth.users u
+where u.id::text like '00000000-0000-4000-8000-00000000000_'
+  and not exists (select 1 from auth.identities i where i.user_id = u.id and i.provider = 'phone');
+
+-- Vai trò và trạng thái (chạy với quyền postgres nên guard trigger cho qua)
+update public.profiles set site = 'dung_quat', consent_at = now(), consent_version = 'seed'
+where id::text like '00000000-0000-4000-8000-00000000000_';
+update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
+update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';
+update public.profiles set role = 'admin' where id = '00000000-0000-4000-8000-000000000005';

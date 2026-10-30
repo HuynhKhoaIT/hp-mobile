@@ -21,11 +21,11 @@ Những gì client được phép phụ thuộc. Đổi bất kỳ mục nào �
 | RPC công khai | `get_listing_by_slug`, `get_group_by_slug`, `search_listings`, `search_groups`, `similar_listings`, `public_stats`, `sitemap_listings`, `home_feed`, `log_search` |
 | RPC đã đăng nhập | `reveal_contact`, `check_rate_limit`, `admin_stats` (staff) |
 | Edge Function (client gọi) | `join-group`, `respond-join`, `request-badge`, `translate-content` |
-| Edge Function (nội bộ) | `send-otp`, `custom-claims`, `send-push`, `match-lost-found`, `moderate-listing`, `expire-content`, `remind-groups` |
+| Edge Function (nội bộ) | `send-otp`, `send-push`, `match-lost-found`, `moderate-listing`, `expire-content`, `remind-groups` |
 | Notification `type` + `data.screen` | `new_message → chat`, `join_request / join_accepted / group_reminder → group`, `listing_approved / listing_rejected / listing_expiring / lost_found_match → listing` |
 | Push payload | `{ screen: 'listing' \| 'group' \| 'chat' \| 'notifications', params: { id } }` |
 | Webhook ra ngoài | `POST {web}/api/revalidate` header `x-revalidate-secret`, body `{ tag }` |
-| JWT claims | `app_metadata.role` (`user \| moderator \| admin`) |
+| JWT claims | `app_metadata.role` (`user \| moderator \| admin`) — hook Postgres `custom_access_token_hook` |
 | `@hp/core` | hàm theo domain, `keys`, hooks, `functions.ts`, `capabilities.appOnly`, `urls.ts` |
 | `@hp/shared` | Zod theo category / kind / function / action, enums, `format.ts`, `slug.ts`, i18n 9 ns |
 | `@hp/tokens` | token màu / chữ / spacing / radius / motion + preset Tailwind |
@@ -69,8 +69,16 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 - [x] `supabase/tests/_helpers.psql` + `000_foundation.test.sql` (18 assertion)
 - [x] `@hp/tokens` đầy đủ + `theme.css`; `@hp/shared` enums, constants, `format.ts`, `slug.ts`, i18n 9 ns; `node --test` (9 test)
 - [x] CI: job `db` (reset, pgTAP, type diff) + unit test + kiểm tra file sinh
-- [ ] Đăng nhập Google (cần OAuth client) · `[auth.hook.send_sms]` → `send-otp` · `custom-claims` → tuần 2
+- [ ] Đăng nhập Google (cần OAuth client) · `[auth.hook.send_sms]` → `send-otp` → tuần 2
 - [ ] Màu dịch vụ `serviceColors` là đề xuất, chờ duyệt
+
+### Tiến độ tuần 2 (cập nhật 2026-10-30)
+- [x] Migration `20261030100000_core`: `sites`, `profiles` (+ trigger tạo từ `auth.users`, guard cột, consent), `ratings` (+ trigger avg / count), `notifications` (Realtime, chỉ sửa `read_at`), `bookmarks`, `badge_requests` (+ trigger duyệt), `blocks`, `rate_limits` + `assert_rate_limit`, `audit_log` (chỉ thêm); helper `is_staff`, `is_admin`, `is_banned`, `is_blocked`, `short_name`; view `public_profiles`
+- [x] Hook JWT `custom_access_token_hook` (Postgres) — đã thử: JWT moderator có `app_metadata.role = moderator`
+- [x] Seed: 3 khu + 5 user (user, user, banned, moderator, admin), SĐT `84900000001–05`
+- [x] pgTAP: `010_profiles` (27) + `020_core_tables` (30), tổng 75 assertion; thử thật qua REST + supabase-js
+- [x] `@hp/core`: `Result` / `toAppError`, `keys`, profile (`getMyProfile`, `updateMyProfile`, `completeOnboarding`, `getPublicProfile`), sites, notifications (cursor), bookmarks, blocks, `shareUrl`, `imageUrl`; `@hp/shared`: Zod `UpdateProfileInput`, `OnboardingInput`
+- [ ] `send-otp` (cần tài khoản Zalo ZNS / SMS brandname) · Google OAuth · `ratings` insert qua RPC (tuần 6 / 8) · bật hook trên staging
 
 ## 5. Thứ tự migration dự kiến
 `0001_extensions_helpers` → `0002_core_profiles_sites` → `0003_core_notifications_bookmarks_ratings` → `0004_core_moderation_tables` → `0005_rls_helpers_core_policies` → `0006_listings` → `0007_listings_public_view_rpc` → `0008_storage_buckets_listing_avatars` → `0009_listing_write_rpc_moderation_webhook` → `0010_chat` → `0011_realtime_publication_chat_storage` → `0012_push_webhook_notification_prefs` → `0013_groups` → `0014_group_rpc_join` → `0015_cron_expire_remind` → `0016_venues` → `0017_lost_found_match_webhook` → `0018_home_feed_reports_auto_hide` → `0019_verification_translations_purge` → `0020_marketing_catalog_admin` → `0021_app_settings_local`. Tên thật theo timestamp của `supabase migration new`.
@@ -88,6 +96,7 @@ Ghi mỗi khi mục 2 đổi. Client đọc bảng này để biết phải cậ
 |---|---|---|---|---|---|
 | 2026-10-30 | `@hp/shared` | Mới: `LOCALES`, enums (`LISTING_CATEGORIES`, `GROUP_SUB_KINDS`…), `APP_NAME`, `EXPIRES_DAYS`, `RATE_LIMITS`, `NOTIFICATION_SCREENS`, `format*`, `toSlug` / `buildSlug` / `parseShortId`; i18n 9 ns (`common` có `category.*`, `status.*`, `feature.*`, `actions.*`, `disclaimer`; `errors` mã chung) | dùng `@hp/shared/format` trong `src/lib/format.ts` | dùng `@hp/shared/format`, `parseShortId` cho `/tin/[slug]` | xong |
 | 2026-10-30 | `@hp/tokens` | Mới: token TS + `theme.css` (Tailwind v4). Tên class: `text-fg`, `text-muted`, `bg-surface-2`, `bg-primary-light` (xem `.claude/rules/be-shared-packages.md`) | NativeWind chưa nối — chọn bản NativeWind hợp Tailwind v4 | đã nối `globals.css` | xong (web) |
+| 2026-10-30 | DB + `@hp/core` | Migration `20261030100000_core` (bảng Core, `public_profiles`, hook JWT). `@hp/core` mới: `Result`, `keys`, profile, sites, notifications, bookmarks, blocks, `shareUrl`, `imageUrl` | dùng `getMyProfile`, `completeOnboarding` ở onboarding; `setBookmark` cho tim lưu tin | dùng `getPublicProfile` cho `/u/[id]`; middleware đọc `app_metadata.role` | xong |
 | 2026-10-30 | DB | Migration `20261030090000_extensions_helpers`: extensions, `slugify`, `gen_short_id`, `set_updated_at`; **bỏ quyền mặc định** (mọi bảng / function mới cần `grant` rõ) | — | — | xong |
 
 ## 8. Rủi ro riêng backend

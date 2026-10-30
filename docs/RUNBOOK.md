@@ -42,6 +42,18 @@ SĐT test `84900000001` … `84900000005`, OTP luôn là `123456` (`[auth.sms.te
 
 Trên Windows, container `supabase_vector` (thu log) có thể khởi động lại liên tục — không ảnh hưởng DB / Auth / API.
 
+### User seed (local)
+| SĐT | Vai trò | Tên |
+|---|---|---|
+| 84900000001 | user | Nguyễn Văn An |
+| 84900000002 | user | Trần Thị Bình |
+| 84900000003 | user **bị cấm** | Lê Văn Cấm |
+| 84900000004 | moderator | Phạm Thị Duyệt |
+| 84900000005 | admin | Hoàng Văn Quản |
+
+### Auth hook trên staging / prod
+Dashboard → Authentication → Hooks → **Customize Access Token (JWT) Claims** → Postgres function `public.custom_access_token_hook`. Bật sau khi migration `20261030100000_core` đã lên project đó.
+
 ## 3. Biến môi trường
 
 | Nơi | Biến | Lấy từ |

@@ -6,5 +6,6 @@
   "forbidden": "Bạn không có quyền làm việc này",
   "not_found": "Không tìm thấy nội dung",
   "rate_limited": "Bạn thao tác quá nhanh, vui lòng thử lại sau",
-  "banned": "Tài khoản đang bị khoá"
+  "banned": "Tài khoản đang bị khoá",
+  "conflict": "Nội dung đã tồn tại"
 }

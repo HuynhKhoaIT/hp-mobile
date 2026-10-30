@@ -24,7 +24,7 @@ paths:
 Chỉ đọc qua view / RPC công khai trong `supabase/` (`public_listings`, `public_profiles`, `public_groups`, `get_listing_by_slug`, `search_listings`…). Trang công khai **không** hiển thị:
 - số điện thoại (chỉ sau đăng nhập, qua RPC `reveal_contact`, nút "Hiện số"),
 - vị trí chính xác nhà trọ / nhà riêng (bản đồ vẽ vòng tròn quanh toạ độ đã làm tròn ~300 m từ view, không marker chính xác),
-- họ tên đầy đủ (view đã rút gọn "Nguyễn V."), email, ảnh giấy tờ.
+- họ tên đầy đủ (view đã rút gọn "An N."), email, ảnh giấy tờ.
 Nếu một query trả thêm cột nhạy cảm, lỗi nằm ở `supabase/`: báo lại, không `select` chọn cột để che.
 
 ## Hiệu năng

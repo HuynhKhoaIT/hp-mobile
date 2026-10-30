@@ -36,7 +36,7 @@ export async function approveListingAction(raw: unknown): Promise<ActionResult> 
 
 ## UI
 - shadcn/ui; `DataTable` chung (`src/components/admin/data-table.tsx`, TanStack Table) với sort / filter / trang trên URL `searchParams`; chọn nhiều + thanh hành động hàng loạt.
-- `ConfirmDialog` ghi rõ hành động + đối tượng ("Từ chối tin 'Xe Wave 2019' của Nguyễn V.?"); nút có chữ cụ thể, không "OK".
+- `ConfirmDialog` ghi rõ hành động + đối tượng ("Từ chối tin 'Xe Wave 2019' của An N.?"); nút có chữ cụ thể, không "OK".
 - `StatusBadge` màu + chữ. Hàng chờ: sắp theo `risk_score desc`; phím tắt `A` duyệt, `R` từ chối, `J` / `K` di chuyển; sau hành động tự chuyển mục kế.
 - Transition tối đa 150ms; không animation trang trí.
 - Chữ admin qua next-intl ns `admin`; đủ `vi`, `en`; `zh` được phép fallback `vi` (ngoại lệ duy nhất, khai báo trong config `i18n:check`).

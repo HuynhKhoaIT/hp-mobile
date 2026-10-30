@@ -53,14 +53,18 @@ Quy ước chung: mọi bảng có `id uuid default gen_random_uuid()`, `created
 
 Extensions: `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`.
 
-### Core
-- `profiles` (id = `auth.users.id`): `phone`, `full_name`, `avatar_url`, `site` → `sites.code`, `department`, `badges text[]` (`phone | worker | landlord | venue | employer`), `locale text default 'vi'`, `reputation_score`, `rating_avg`, `rating_count`, `home_location`, `is_banned`, `role` (`user | moderator | admin`), `push_tokens text[]`, `notification_prefs jsonb`.
-- `sites(code pk, name, location)` — danh mục khu liên hợp.
+### Core (migration `20261030100000_core.sql`)
+- `profiles` (id = `auth.users.id`, tạo bởi trigger `trg_auth_users_new_profile`): `phone` (`849…`, null nếu Google), `full_name ≤80`, `avatar_url`, `site` → `sites.code`, `department`, `badges text[]` (`phone | worker | landlord | venue | employer`; `phone` gán khi đăng ký bằng SĐT), `locale` (`vi|en|zh`), `reputation_score`, `rating_avg`, `rating_count`, `home_location`, `is_banned` (cấm vĩnh viễn, chỉ admin), `banned_until` (khoá tạm, staff), `role` (`user | moderator | admin`, chỉ admin), `push_tokens text[]`, `notification_prefs jsonb`, `consent_at`, `consent_version`, `deleted_at`. Trigger `trg_profiles_guard` chặn client đổi `phone`, `rating_*`, `reputation_score`; `badges` / `banned_until` chỉ staff; `role` / `is_banned` chỉ admin.
+- `sites(code pk, name, location)` — danh mục khu liên hợp; ai cũng đọc, chỉ admin ghi.
 - `venues` — sân thể thao: `name`, `sports text[]`, `location`, `price_ref`, `phone`, `status` (moderator duyệt).
-- `ratings(rater_id, ratee_id, context_type listing|group, context_id, score 1–5, comment)` unique `(rater_id, context_type, context_id)`.
-- `notifications(user_id, type, title, body, data jsonb {screen, params}, read_at)`.
-- `bookmarks(user_id, target_type, target_id)` pk 3 cột.
-- `badge_requests(user_id, badge, document_path, status pending|approved|rejected, reviewed_by)`.
+- `ratings(rater_id, ratee_id, context_type listing|group, context_id, score 1–5, comment ≤500)` unique `(rater_id, context_type, context_id)`; trigger cập nhật `profiles.rating_avg / rating_count`. **Chưa có insert cho client** — mở qua RPC kiểm tra giao dịch khi có listings / groups.
+- `notifications(user_id, type, title_key, body_key, params jsonb, data jsonb {screen, params}, read_at)` — lưu key i18n, client dịch; client chỉ được sửa `read_at` (column grant). Có trong publication Realtime.
+- `bookmarks(user_id default auth.uid(), target_type, target_id)` pk 3 cột.
+- `badge_requests(user_id, badge worker|landlord|venue|employer, document_path, status pending|approved|rejected, reject_reason, reviewed_by, reviewed_at)`; tối đa 1 yêu cầu `pending` / huy hiệu / người; staff duyệt → trigger thêm huy hiệu vào `profiles.badges`.
+- `blocks(blocker_id default auth.uid(), blocked_id)` pk, không tự chặn; `is_blocked(a, b)` tính cả hai chiều.
+- `rate_limits(key, action, window_start, count)` + `assert_rate_limit(key, action, max, window_seconds)` (cửa sổ cố định, lỗi `P0001 rate_limited`, chỉ service role / function definer gọi).
+- `audit_log(id identity, actor_id, action <đối_tượng>.<động_từ>, target_type, target_id text, meta)` — staff insert với `actor_id = auth.uid()`, admin đọc, trigger chặn update / delete.
+- Hook `custom_access_token_hook` (Postgres function, `pg-functions://`) chép `profiles.role` vào JWT `app_metadata.role` cho middleware web. Quyền thật luôn kiểm bằng `is_staff()` / `is_admin()` đọc `profiles`.
 
 ### Listing
 - enum `listing_category`: `pass_electronics, pass_vehicle, pass_ppe, pass_home, room_rent, room_share, job_main, job_parttime, lost, found`.
@@ -98,11 +102,11 @@ Hết hạn mặc định (`expires_at`): pass/room 30 ngày, job 14 ngày, lost
 ## 5. Row Level Security (bắt buộc trên MỌI bảng)
 
 - Bật RLS ngay trong migration tạo bảng. Bảng không có policy = không ai truy cập (đúng ý cho bảng nội bộ).
-- Helper: `is_staff()` (role moderator/admin), `is_blocked(a, b)`, `is_member(conversation_id)`.
+- Helper (`security definer`, `search_path = ''`): `is_staff()`, `is_admin()`, `is_banned()` (cấm, khoá tạm hoặc đã xoá), `is_blocked(a, b)`, `is_member(conversation_id)` (khi có chat).
 - `listings`: select khi `status='active' and deleted_at is null` (cho cả role **anon** — web render trang tin công khai cho Google) **hoặc** chủ tin **hoặc** staff; ẩn tin của người đã chặn mình. Trang công khai đọc qua view `public_listings` (vị trí làm tròn ~300 m, không có SĐT, tên người đăng chỉ tên + chữ cái họ); bảng gốc chỉ cho chủ tin và staff. Insert: `owner_id = auth.uid()` và `not is_banned`. Update/delete: chủ tin hoặc staff; chủ tin không tự đổi sang `active` nếu đang `pending_review`/`rejected`.
 - `messages`, `conversation_members`: chỉ member.
 - `groups`: ai đăng nhập cũng xem; chỉ host sửa. `group_members`: user chỉ insert chính mình qua Edge Function; host duyệt qua `respond-join`.
-- `profiles`: client đọc qua view `public_profiles` (`id, full_name, avatar_url, site, badges, rating_avg, rating_count`). Không expose `phone`, `push_tokens`, `notification_prefs` cho người khác. Số điện thoại người đăng chỉ trả về qua RPC `reveal_contact(listing_id)` có ghi `audit_log` và rate limit.
+- `profiles`: bảng gốc chỉ chủ + staff; người khác (kể cả anon) đọc qua view `public_profiles` (`id`, `display_name` = `short_name(full_name)` dạng "An N.", `avatar_url, site, badges, rating_avg, rating_count, reputation_score, created_at`). Không expose `phone`, `push_tokens`, `notification_prefs` cho người khác. Số điện thoại người đăng chỉ trả về qua RPC `reveal_contact(listing_id)` có ghi `audit_log` và rate limit.
 - Storage policy theo bucket (mục 7).
 - Mỗi migration có RLS phải có test pgTAP trong `supabase/tests/` cho 4 vai trò: khách (anon), user, user bị cấm, moderator.
 
