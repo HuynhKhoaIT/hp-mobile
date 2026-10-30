@@ -42,18 +42,29 @@ export type ColorScheme = keyof typeof colors;
 export type ColorToken = keyof (typeof colors)['light'];
 
 /**
- * Màu nhận diện dịch vụ (icon ServiceTile, chấm màu trên card).
- * ĐỀ XUẤT — tài liệu chỉ ghi tên màu (pass cam, trọ tím, việc xanh lá, ghép xe xanh ngọc, thể thao đỏ, thất lạc vàng); cần designer duyệt.
+ * Màu nhận diện dịch vụ — tông dịu: nền nhạt (`soft`) cho ô ServiceTile / chip, màu đậm vừa (`fg`) cho icon, chấm màu.
+ * Đã chọn 2026-10-30. Tương phản fg / soft ≥ 3:1 (WCAG 1.4.11, thành phần đồ hoạ) ở cả light và dark.
+ * Chữ nhãn dịch vụ luôn dùng text-fg (không dùng màu dịch vụ cho chữ).
  */
 export const serviceColors = {
-  pass: '#F97316',
-  room: '#8B5CF6',
-  job: '#16A34A',
-  ride: '#0D9488',
-  sport: '#DC2626',
-  lostFound: '#EAB308',
+  light: {
+    pass: { fg: '#D9692E', soft: '#FDF0E6' },      // cam đất
+    room: { fg: '#7C5CC4', soft: '#F2EEFB' },      // tím oải hương
+    job: { fg: '#2E9461', soft: '#E8F5EE' },       // xanh lá dịu
+    ride: { fg: '#1B8A86', soft: '#E4F4F3' },      // xanh ngọc
+    sport: { fg: '#D2555A', soft: '#FCECEC' },     // đỏ san hô
+    lostFound: { fg: '#A87A00', soft: '#FBF3D9' }, // vàng mật ong
+  },
+  dark: {
+    pass: { fg: '#F0A070', soft: '#3A2A20' },
+    room: { fg: '#B39DEB', soft: '#2C2640' },
+    job: { fg: '#6CC79A', soft: '#1E3229' },
+    ride: { fg: '#5FC4BF', soft: '#1A3332' },
+    sport: { fg: '#EE8A8D', soft: '#3A2224' },
+    lostFound: { fg: '#E6BE55', soft: '#3A3220' },
+  },
 } as const;
-export type ServiceKey = keyof typeof serviceColors;
+export type ServiceKey = keyof (typeof serviceColors)['light'];
 
 /** Gradient header trang chủ / thương hiệu. */
 export const gradients = {

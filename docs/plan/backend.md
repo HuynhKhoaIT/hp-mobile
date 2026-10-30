@@ -70,7 +70,7 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 - [x] `@hp/tokens` đầy đủ + `theme.css`; `@hp/shared` enums, constants, `format.ts`, `slug.ts`, i18n 9 ns; `node --test` (9 test)
 - [x] CI: job `db` (reset, pgTAP, type diff) + unit test + kiểm tra file sinh
 - [ ] Đăng nhập Google (cần OAuth client) · `[auth.hook.send_sms]` → `send-otp` → tuần 2
-- [ ] Màu dịch vụ `serviceColors` là đề xuất, chờ duyệt
+- [x] Màu dịch vụ `serviceColors`: tông dịu, `fg` + `soft`, light + dark, tương phản ≥ 3:1 (chọn 2026-10-30)
 
 ### Tiến độ tuần 2 (cập nhật 2026-10-30)
 - [x] Migration `20261030100000_core`: `sites`, `profiles` (+ trigger tạo từ `auth.users`, guard cột, consent), `ratings` (+ trigger avg / count), `notifications` (Realtime, chỉ sửa `read_at`), `bookmarks`, `badge_requests` (+ trigger duyệt), `blocks`, `rate_limits` + `assert_rate_limit`, `audit_log` (chỉ thêm); helper `is_staff`, `is_admin`, `is_banned`, `is_blocked`, `short_name`; view `public_profiles`

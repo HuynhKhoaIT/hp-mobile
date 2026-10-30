@@ -1,12 +1,7 @@
 -- Dữ liệu mẫu cho local / CI (chạy sau migration khi `supabase db reset`). Không có dữ liệu người thật.
 -- Đăng nhập thử: SĐT 84900000001–05, OTP 123456 ([auth.sms.test_otp] trong config.toml).
 
--- ── Khu liên hợp (toạ độ gần đúng khu vực nhà máy, đủ cho lọc khoảng cách) ───────
-insert into public.sites (code, name, location) values
-  ('dung_quat', 'Khu liên hợp Dung Quất (Quảng Ngãi)', extensions.st_setsrid(extensions.st_makepoint(108.7960, 15.3930), 4326)::extensions.geography),
-  ('hai_duong', 'Khu liên hợp Hải Dương (Kinh Môn)',   extensions.st_setsrid(extensions.st_makepoint(106.5030, 21.0330), 4326)::extensions.geography),
-  ('hung_yen',  'Khu công nghiệp Phố Nối (Hưng Yên)',  extensions.st_setsrid(extensions.st_makepoint(106.0560, 20.9330), 4326)::extensions.geography)
-on conflict (code) do nothing;
+-- Khu liên hợp (sites) nằm ở migration 20261030110000_sites_data.sql vì cần có ở mọi môi trường.
 
 -- ── User test: 5 vai trò ────────────────────────────────────────────────────────
 -- Tạo auth.users + auth.identities; trigger trg_auth_users_new_profile tạo profiles.

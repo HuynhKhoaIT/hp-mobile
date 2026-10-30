@@ -1,5 +1,5 @@
 // Sinh theme.css (Tailwind v4 @theme) từ src/index.ts. Chạy: pnpm --filter @hp/tokens build
-// Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card, bg-service-pass.
+// Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card, bg-service-pass-soft + text-service-pass.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { colors, font, radius, serviceColors, shadow, type ColorToken } from '../src/index.ts';
@@ -28,12 +28,18 @@ const px = (n: number) => `${n}px`;
 const colorVars = (scheme: 'light' | 'dark', indent: string) =>
   (Object.keys(COLOR_NAME) as ColorToken[]).map((k) => `${indent}--color-${COLOR_NAME[k]}: ${colors[scheme][k]};`).join('\n');
 
+const serviceVars = (scheme: 'light' | 'dark', indent: string) =>
+  Object.entries(serviceColors[scheme]).flatMap(([k, v]) => [
+    `${indent}--color-service-${kebab(k)}: ${v.fg};`,
+    `${indent}--color-service-${kebab(k)}-soft: ${v.soft};`,
+  ]);
+
 const lines = [
   '/* SINH TỰ ĐỘNG từ packages/tokens/src/index.ts — không sửa tay. Chạy: pnpm --filter @hp/tokens build */',
   '',
   '@theme {',
   colorVars('light', '  '),
-  ...Object.entries(serviceColors).map(([k, v]) => `  --color-service-${kebab(k)}: ${v};`),
+  ...serviceVars('light', '  '),
   '',
   ...Object.entries(radius).map(([k, v]) => `  --radius-${k}: ${k === 'full' ? '9999px' : px(v)};`),
   '',
@@ -50,6 +56,7 @@ const lines = [
   '/* Dark mode bằng class `dark` trên <html> (next-themes). */',
   '.dark {',
   colorVars('dark', '  '),
+  ...serviceVars('dark', '  '),
   '}',
   '',
 ];

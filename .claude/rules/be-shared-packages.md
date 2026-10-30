@@ -39,7 +39,7 @@ paths:
 | `primary`, `primaryLight`, `accent`, `success`, `warning`, `danger` | `bg-primary`, `bg-primary-light`, `text-accent`, `border-danger`… |
 | `bg`, `surface`, `surface2`, `border` | `bg-bg`, `bg-surface`, `bg-surface-2`, `border-border` |
 | `text`, `textMuted`, `textDisabled`, `onPrimary` | `text-fg`, `text-muted`, `text-disabled`, `text-on-primary` |
-| `serviceColors.*` | `bg-service-pass`, `text-service-lost-found`… |
+| `serviceColors.{light,dark}.*.fg / .soft` | icon `text-service-pass`, nền ô `bg-service-pass-soft` (… `room`, `job`, `ride`, `sport`, `lost-found`); chữ nhãn luôn `text-fg` |
 | `radius.*`, `font.size.*`, `shadow.card` | `rounded-sm/md/lg/xl/full`, `text-xs … text-3xl`, `shadow-card` |
 | spacing 4/8/12/16/20/24/32 | `p-1 p-2 p-3 p-4 p-5 p-6 p-8` (thang mặc định Tailwind, khớp token) |
 Sửa token → `pnpm --filter @hp/tokens build` để sinh lại `theme.css`; CI báo lỗi nếu file chưa sinh lại.
