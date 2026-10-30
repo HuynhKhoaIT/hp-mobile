@@ -1,0 +1,124 @@
+# Kế hoạch triển khai — apps/mobile (Expo iOS / Android)
+
+Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 8, 9, 12, 13), `apps/mobile/CLAUDE.md` · Tổng quan: `docs/PLAN.md` · Khu khác: `docs/plan/web.md`, `docs/plan/backend.md`
+
+## 1. Mục tiêu và cổng
+
+| Cổng | Thời điểm | Tiêu chí phần mobile |
+|---|---|---|
+| 1. Schema + auth chạy | hết tuần 2 | Đăng nhập OTP thật trên thiết bị; ≥ 10 component trong `ui-gallery`; CI (tsc, lint, i18n:check) xanh; EAS dev build cài được |
+| 2. Beta 100 người | tuần 6 → 8 | Pass đồ, Việc, Chat, Thông báo, Hồ sơ chạy trên build kênh `staging`; crash < 1%; 5 phỏng vấn người dùng |
+| 3. Ra mắt Dung Quất | hết tuần 10 | Đủ 6 tính năng; TTI p75 màn Hub < 1.5s trên Android tầm trung; cold start < 2s; deep link + push đúng |
+| 4. Mở rộng khu vực | hết tuần 12 | Lên App Store + Google Play; đủ 3 ngôn ngữ; EAS Update kênh `production`; Sentry + PostHog có dữ liệu |
+
+Chỉ số MVP (ARCHITECTURE mục 1): 5.000 đăng ký, 2.000 tin pass / tháng, quay lại tuần > 30%, crash < 0.5%, app < 40 MB.
+
+## 2. Phụ thuộc chéo
+
+### 2.1 Mobile cần từ backend
+| Tuần | Cần sẵn ở backend |
+|---|---|
+| 1 | Supabase local chạy; `packages/tokens` (preset NativeWind), `packages/db` types, `packages/shared` khung i18n 6 ns |
+| 2 | `profiles` + trigger tạo từ `auth.users`; `send-otp`; RLS core; `@hp/core` `SupabaseProvider`, `keys`, `profile.ts` |
+| 3 | `listings` + `public_listings`, `search_listings`, `get_listing_by_slug`, `similar_listings`; Storage `listing-images`; `@hp/core` `listings.ts` + hooks; Zod `pass_*`, `job_*`; seed 50 tin / category |
+| 4 | `createListing`, `updateListing`, `markSold`, `bookmarks`; `moderate-listing`; rate limit tin / ngày; `reveal_contact` |
+| 5 | Chat: bảng + trigger + RLS + Realtime publication; bucket `chat-images`; `@hp/core` `chat.ts` |
+| 6 | `notifications` + `send-push` (payload `{screen, params}`); `ratings`; `notification_prefs`; project staging |
+| 7 | `groups` + trigger + `public_groups`, `search_groups`, `get_group_by_slug`; `join-group`; Zod ride / sport |
+| 8 | `respond-join`, `remind-groups`, `expire-content`; `venues` |
+| 9 | Zod `room_*`, `lost` / `found`; `match-lost-found`; khoảng cách tới `sites.location` trong view / RPC |
+| 10 | `request-badge` + bucket `verification`; `translate-content` + `listing_translations` |
+| 12 | Project production, Auth redirect URLs có `hoaphat://**` |
+
+### 2.2 Mobile cần từ web
+| Tuần | Cần sẵn ở web |
+|---|---|
+| 4 | `/tin/[slug]` chạy để link chia sẻ từ app mở được trang web |
+| 11 | `.well-known/apple-app-site-association` và `assetlinks.json` đúng bundle id / fingerprint |
+| 12 | `/tai-app` + trang pháp lý 3 ngôn ngữ (bắt buộc cho store listing) |
+
+### 2.3 Khu khác cần từ mobile
+- Tuần 6: tên event analytics thống nhất với web (`src/core/analytics/events.ts` ↔ `apps/web/src/lib/analytics/events.ts`).
+- Tuần 10: bundle id iOS + Team ID, package name + SHA-256 fingerprint Android gửi web để sinh `.well-known`.
+- Tuần 10: ảnh chụp màn hình app cho landing / store.
+
+## 3. Lộ trình 12 tuần
+
+| Tuần | Việc | Đầu ra kiểm chứng được | Skill |
+|---|---|---|---|
+| 1 | Khởi tạo Expo (SDK mới nhất, TS strict, Expo Router, NativeWind + preset `@hp/tokens`, link `packages/*`); ESLint `no-restricted-imports`; `app/_layout.tsx` providers (Query + persist MMKV, Supabase, Theme, i18n, Toast, BottomSheet, Sentry, PostHog); `src/core/supabase.ts`; font Be Vietnam Pro; `.env.example`; CI; khung `ui-gallery` | `pnpm start` mở Expo Go, gallery trống hiện được, CI xanh | — |
+| 2 | Design system bước 1–5 (mục 5); auth flow `phone` → `otp` → `onboarding` 3 bước (chọn ngôn ngữ, tên + avatar, khu + mối quan tâm, bỏ qua được); `requireAuth`; EAS dev build | **Cổng 1** | `/new-ui-component`, `/new-screen` |
+| 3 | Design system bước 6–7; `features/listing` engine (types, `useListingList` cursor, Detail, `attributeRenderers`); `features/pass/config.ts`; `(tabs)/index` Hub; `listing/[id]` + alias `tin/[slug]`; `(tabs)/_layout` TabBar | Xem danh sách + chi tiết pass đồ từ seed; shared element ảnh | `/configure-feature` |
+| 4 | Form engine (RHF + Zod từ shared, `useDraft`, `useImageUpload` nén + retry); `listing/new/[category]` cho pass; `features/job/config.ts` (list / detail / form); `search`; `(tabs)/post`; bookmark optimistic; `track()` 4 event chính | Đăng tin pass + việc từ app, thấy trên web; "Đăng nhanh" 3 bước | `/optimistic-mutation` |
+| 5 | `features/chat`: `(tabs)/chat/index`, `chat/[conversationId]` Realtime, optimistic send, gửi ảnh, trạng thái gửi / lỗi; hướng dẫn giao dịch an toàn lần đầu; sheet Báo cáo / Chặn ở tin, hồ sơ, chat | Chat 1-1 giữa hai máy realtime; tin chưa gửi giữ lại khi mở lại app | `/new-screen` |
+| 6 | Push: đăng ký token, `routeForNotification`, màn `notifications`; `(tabs)/me` + `profile/[id]`, tin của tôi, đã lưu, sửa tin, đánh dấu đã bán + chọn người mua + đánh giá; Cài đặt (ngôn ngữ, thông báo); EAS internal build kênh `staging` | **Cổng 2 bắt đầu**: phát build cho 100 người | — |
+| 7 | `features/group` engine (types, `GroupCard`, Detail với hàng avatar + join, Form); `features/ride/config.ts`; `MapView` wrapper Goong (lazy), `LocationPicker` có bản đồ + autocomplete; join-group optimistic + animation avatar bay vào; sửa lỗi beta | Tạo / tham gia ghép xe end-to-end | `/configure-feature` |
+| 8 | `features/sport/config.ts` + chọn / đóng góp `venues`; host duyệt (`respond-join`); chat nhóm; nhắc 60 phút qua push; đánh giá sau trận; `(tabs)/explore` | **Cổng 2 kết thúc**: 2 tuần beta, > 200 tin, crash < 1% | — |
+| 9 | `features/room/config.ts`: chế độ bản đồ cluster, filter khoảng cách tới nhà máy, ≥ 3 ảnh, card trọ; `features/lost-found/config.ts` + match tức thì qua push + "Đã nhận lại" | 6 tính năng chạy trên app | `/configure-feature` |
+| 10 | `badge/request` (chụp giấy tờ); nút Dịch; offline: nháp + tin nhắn chưa gửi + hàng đợi upload; coach mark 3 thao tác; nhập giọng nói; perf pass (TTI, 200 item, Sentry Performance) | **Cổng 3**: TTI p75 < 1.5s | `/mobile-done-check` |
+| 11 | Rà toàn bộ màn ở `en` / `zh`, font 150%, Reduce Motion, dark, 360px; `accessibilityLabel`; Lottie đăng tin thành công; test Universal / App Links với `.well-known` của web; store assets 3 ngôn ngữ | Checklist mục 12 pass ở mọi màn | `/mobile-done-check` |
+| 12 | EAS production build + submit; EAS Update kênh `production`; Sentry release; PostHog dashboard; xoá tài khoản trong app; trang Giới thiệu có dòng "ứng dụng cộng đồng, không thuộc Tập đoàn Hòa Phát" | **Cổng 4**: lên store | — |
+
+Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trước (nhu cầu cao, không cần bản đồ); Ghép xe / Ghép trận / Trọ sau khi lõi ổn.
+
+## 4. Danh sách màn hình
+
+| Route | Kiểu | Feature | Tuần | Mở từ |
+|---|---|---|---|---|
+| `(auth)/phone`, `(auth)/otp`, `(auth)/onboarding` | Form | auth | 2 | `requireAuth` |
+| `(tabs)/index` | Hub | — | 3 | cold start |
+| `(tabs)/explore` | List | listing + group | 8 | tab |
+| `(tabs)/post` | Hub (chọn loại tin) | — | 4 | tab, nút Đăng xoay 45° |
+| `(tabs)/chat/index` | List | chat | 5 | tab, push `new_message` không có id |
+| `(tabs)/me` | Hub | profile | 6 | tab |
+| `listing/[id]` + alias `tin/[slug]` | Detail | listing | 3 | card, push `listing_*`, `lost_found_match`, URL web |
+| `listing/new/[category]` | Form | listing | 4 | post, FAB Đăng |
+| `listing/edit/[id]` | Form | listing | 6 | tin của tôi |
+| `group/[id]` + alias `nhom/[slug]` | Detail | group | 7 | card, push `join_*`, `group_reminder`, URL web |
+| `group/new/[kind]` | Form | group | 7 | post |
+| `chat/[conversationId]` | Conversation | chat | 5 | danh sách, push `new_message`, CTA Chat |
+| `search` | List | listing + group | 4 | SearchBar |
+| `notifications` | List | — | 6 | icon chuông, push mở app |
+| `profile/[id]` | Detail | profile | 6 | avatar ở tin / chat |
+| `settings/index`, `settings/language`, `settings/notifications`, `settings/delete-account`, `settings/about` | Form | profile | 6 / 12 | me |
+| `badge/request` | Form | profile | 10 | me |
+| `(dev)/ui-gallery` | Hub | — | 1 | chỉ dev |
+
+## 5. Thứ tự design system (tuần 1–3, ARCHITECTURE mục 9.6)
+1. `theme.tsx` (ThemeProvider đọc light / dark hệ thống, `useTheme`, `useReducedMotion`) + preset NativeWind từ `@hp/tokens`.
+2. `Text`, `Screen`, `Header`, `Row` / `Col` / `Spacer` / `Divider`.
+3. `Button`, `IconButton`, `Input`, `Chip`, `Badge`, `Avatar`, `Card`.
+4. `Skeleton`, `SkeletonListingCard`, `EmptyState`, `ErrorState`, `Toast`.
+5. `BottomSheet`, `Select` / `MultiSelect`, `DateTimePicker`, `PriceInput`.
+6. `ImagePicker`, `LocationPicker`, `MapView` (lazy).
+7. `ListingCard`, `GroupCard`, `ServiceTile`, `SectionHeader`, `SearchBar`, `FilterBar`, `MessageBubble`, `Rating`, `Fab`, `StaggerItem`, `BookmarkButton`, `StickyCta`, `SuccessScreen`.
+8. `ui-gallery` đủ mọi variant; chụp ảnh làm tham chiếu review.
+
+## 6. Hạ tầng kỹ thuật
+- **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
+- **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`. Giá trị thật trong EAS Secrets.
+- **EAS**: profile `development` (dev client, Supabase local / staging), `staging` (internal, channel `staging`, Supabase staging), `production` (store, channel `production`). GitHub Actions: PR → tsc / lint / i18n:check / test; merge `main` → `eas update --channel staging`; tag `v*` → `eas build --profile production`.
+- **Push**: Expo Push; token ghi `profiles.push_tokens` khi đăng nhập và khi token đổi; xoá khi đăng xuất. Payload `{ screen, params }` → `routeForNotification`.
+- **Deep link**: `tenapp.vn/tin/{slug}` → `tin/[slug]` → resolve `short_id` (6 ký tự cuối slug) → `listing/[id]`; `nhom/{slug}` tương tự; `hoaphat://chat/{id}` chỉ cho push.
+- **Offline**: TanStack persist MMKV; `src/core/offline` (nháp tin, tin nhắn chưa gửi, hàng đợi upload); flush khi online.
+- **Theo dõi**: Sentry (crash + Performance `hub`, `listing_list`); PostHog event: `view_listing`, `contact`, `create_listing`, `join_group`, `search`, `save_listing`, `login_success`, `share_listing`.
+
+## 7. Thay đổi hợp đồng với backend (log)
+Ghi mỗi khi `@hp/core` / `@hp/shared` / RPC / Edge Function đổi API và mobile phải theo.
+
+| Ngày | Gói / RPC / Function | Thay đổi | Việc ở mobile | Trạng thái |
+|---|---|---|---|---|
+| — | — | — | — | — |
+
+## 8. Rủi ro riêng mobile
+| Rủi ro | Giảm thiểu |
+|---|---|
+| Metro không resolve `packages/*` trong workspace | `metro.config.js` có `watchFolders` trỏ gốc repo + `nodeModulesPaths`; EAS build từ gốc monorepo |
+| AI sinh màn hình lệch design system | `ui-gallery` làm tham chiếu; `/mobile-done-check` grep hex / import cấm trước mỗi PR |
+| Android tầm trung chậm, mạng 4G yếu | FlashList + expo-image + persist MMKV từ tuần 3; đo TTI tuần 10 trước khi thêm animation |
+| Font Noto Sans SC tăng dung lượng | tải khi chọn `zh`, không bundle |
+| Store từ chối vì nhầm thương hiệu | tên riêng, không logo Hòa Phát, dòng miễn trừ trong app + store listing |
+| Deep link không verify | test `.well-known` của web tuần 11 trên thiết bị thật, cả iOS và Android |
+
+## 9. Sau MVP (tháng 4–6)
+Ví MoMo / ZaloPay cho pass đồ giá trị cao; mini-app đặt cơm ca, lịch xe đưa đón; thêm khu liên hợp bằng dữ liệu `sites`; live location (`capabilities.liveLocation`) cho ghép xe; Meilisearch khi > 500.000 tin.

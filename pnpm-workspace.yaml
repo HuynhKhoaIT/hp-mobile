@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Gói được phép chạy script cài đặt. supabase cần tải binary CLI; sharp / unrs-resolver như mặc định của create-next-app.
+allowBuilds:
+  supabase: true
+  sharp: false
+  unrs-resolver: false

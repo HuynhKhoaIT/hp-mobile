@@ -1,0 +1,6 @@
+// @hp/shared — Zod schemas, enums, constants, i18n vi/en/zh, format tiền/ngày, slug.
+// Không import React, React Native, Expo, Next hay Supabase.
+// Luật: .claude/rules/be-shared-packages.md · Kế hoạch: docs/plan/backend.md tuần 1.
+export const LOCALES = ['vi', 'en', 'zh'] as const;
+export type Locale = (typeof LOCALES)[number];
+export const DEFAULT_LOCALE: Locale = 'vi';

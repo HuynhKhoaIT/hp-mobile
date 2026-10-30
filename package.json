@@ -1,0 +1,24 @@
+{
+  "name": "hp",
+  "private": true,
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "i18n:check": "node scripts/i18n-check.mjs",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:types": "supabase gen types typescript --local > packages/db/database.types.ts"
+  },
+  "devDependencies": {
+    "supabase": "^2",
+    "turbo": "^2",
+    "typescript": "~6.0.3"
+  }
+}
