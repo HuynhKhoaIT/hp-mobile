@@ -30,7 +30,9 @@ pnpm db:test         # pgTAP
 pnpm db:types        # sinh packages/db/database.types.ts từ local
 ```
 
-Đẩy migration lên staging bằng tay (chỉ khi CI chưa có hoặc cần gấp, ghi lại lý do trong PR):
+Đẩy migration lên staging: **mặc định qua GitHub Actions** (`.github/workflows/deploy-staging.yml`) — tự chạy khi `main` có migration mới, hoặc Actions → Deploy staging → Run workflow (bỏ chọn dry_run để áp). Cần 3 secret: `SUPABASE_ACCESS_TOKEN`, `STAGING_PROJECT_REF`, `STAGING_DB_PASSWORD`.
+
+Mạng công ty chặn giao thức Postgres (cổng 5432 / 6543 mở TCP nhưng treo khi bắt tay; HTTPS vẫn đi) — lệnh `db push` từ máy dev chỉ chạy được qua mạng khác (4G hotspot, mạng nhà). Đẩy bằng tay (chỉ khi cần gấp, ghi lý do trong PR):
 ```
 pnpm exec supabase db push --linked --dry-run   # xem trước
 pnpm exec supabase db push --linked
