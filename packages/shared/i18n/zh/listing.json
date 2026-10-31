@@ -137,5 +137,12 @@
     "people_one": "{{count}}人",
     "people_other": "{{count}}人",
     "per_kwh": "{{price}}/度"
+  },
+  "owner_badge": {
+    "phone": "手机号已验证",
+    "worker": "已认证工人",
+    "landlord": "已认证房东",
+    "venue": "已认证场地主",
+    "employer": "已认证雇主"
   }
 }

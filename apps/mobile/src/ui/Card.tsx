@@ -8,12 +8,14 @@ export type CardProps = {
   children?: ReactNode;
   onPress?: () => void;
   accessibilityLabel?: string;
+  /** false: bỏ padding (ảnh tràn mép như ListingCard). */
+  padded?: boolean;
   className?: string;
 };
 
-export function Card({ children, onPress, accessibilityLabel, className }: CardProps) {
+export function Card({ children, onPress, accessibilityLabel, padded = true, className }: CardProps) {
   const press = usePressScale();
-  const box = ['rounded-md bg-surface p-3 shadow-card', className].filter(Boolean).join(' ');
+  const box = ['rounded-md bg-surface shadow-card', padded && 'p-3', className].filter(Boolean).join(' ');
   if (!onPress) return <View className={box}>{children}</View>;
   return (
     <AnimatedView style={press.style}>

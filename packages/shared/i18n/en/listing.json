@@ -137,5 +137,12 @@
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",
     "per_kwh": "{{price}}/kWh"
+  },
+  "owner_badge": {
+    "phone": "Verified phone",
+    "worker": "Verified worker",
+    "landlord": "Verified landlord",
+    "venue": "Verified venue owner",
+    "employer": "Verified employer"
   }
 }

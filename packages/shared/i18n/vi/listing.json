@@ -137,5 +137,12 @@
     "people_one": "{{count}} người",
     "people_other": "{{count}} người",
     "per_kwh": "{{price}}/kWh"
+  },
+  "owner_badge": {
+    "phone": "Đã xác minh SĐT",
+    "worker": "Công nhân đã xác minh",
+    "landlord": "Chủ trọ đã xác minh",
+    "venue": "Chủ sân đã xác minh",
+    "employer": "Nhà tuyển dụng đã xác minh"
   }
 }

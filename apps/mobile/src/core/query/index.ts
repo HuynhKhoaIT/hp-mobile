@@ -7,10 +7,15 @@ import { kv, queryCacheStorage } from '../storage';
 
 const DAY = 24 * 60 * 60 * 1000;
 
+/** Lỗi thử lại cũng không đổi kết quả (AppError.code của @hp/core) → báo ngay (vd "Tin không còn"). */
+const NO_RETRY = new Set(['not_found', 'invalid_input', 'forbidden', 'auth_required', 'banned']);
+const shouldRetry = (failureCount: number, error: unknown) =>
+  failureCount < 2 && !NO_RETRY.has((error as { code?: string } | null)?.code ?? '');
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     // refetchOnWindowFocus bật riêng cho chat và thông báo (.claude/rules/mobile-performance.md).
-    queries: { staleTime: 60_000, gcTime: DAY, retry: 2, refetchOnWindowFocus: false },
+    queries: { staleTime: 60_000, gcTime: DAY, retry: shouldRetry, refetchOnWindowFocus: false },
     mutations: { retry: 0 },
   },
 });
