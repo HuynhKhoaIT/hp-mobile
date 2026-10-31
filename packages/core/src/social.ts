@@ -6,7 +6,10 @@ import { type Client, type Result, clampLimit, fromSupabase, ok } from './result
 export type Site = Pick<Tables<'sites'>, 'code' | 'name'>;
 
 export async function listSites(client: Client): Promise<Result<Site[]>> {
-  return fromSupabase(await client.from('sites').select('code, name').order('name'));
+  // RLS đã ẩn địa điểm is_active = false với người thường; lọc thêm để admin dùng hàm này cũng chỉ thấy khu đang hiện.
+  return fromSupabase(
+    await client.from('sites').select('code, name').eq('is_active', true).order('sort_order').order('name'),
+  );
 }
 
 // ── notifications ──────────────────────────────────────────────────────────────

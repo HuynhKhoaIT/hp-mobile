@@ -10,7 +10,7 @@ Super App Người Hòa Phát là **ứng dụng cá nhân, phát triển độc
 
 **Đối tượng người dùng**
 
-- Công nhân, kỹ sư, nhân viên văn phòng tại các khu liên hợp (Dung Quất, Hải Dương, Hưng Yên...) và nhà thầu, công nhân thời vụ làm việc quanh đó.
+- Công nhân, kỹ sư, nhân viên văn phòng tại khu vực Dung Quất (Quảng Ngãi): Khu liên hợp Hòa Phát Dung Quất, Cảng Dung Quất, KCN VSIP Quảng Ngãi, Hyundai Eco Vina… và nhà thầu, công nhân thời vụ làm việc quanh đó. Danh mục địa điểm do admin quản lý (`/admin/catalog`), mở rộng công ty / khu mới không cần sửa code.
 - Người dân địa phương cung cấp dịch vụ cho họ: chủ trọ, chủ sân, quán ăn, người tuyển việc làm thêm, nhà xe.
 - Độ tuổi 18–55, nhiều người không quen app phức tạp; phần lớn dùng Android tầm trung, mạng 4G không ổn định, thao tác một tay, thời gian rảnh ngắn giữa ca.
 - Quản trị: chính bạn và 1–2 cộng tác viên kiểm duyệt.
@@ -198,7 +198,7 @@ create table profiles (
   avatar_url text,
   badges text[] not null default '{}',     -- phone | worker | landlord | venue | employer
   locale text not null default 'vi',       -- vi | en | zh
-  site text,                               -- khu liên hợp: dung_quat, hai_duong, hung_yen...
+  site text,                               -- địa điểm làm việc (bảng sites, admin quản lý): hoa_phat_dung_quat, cang_dung_quat...
   department text,
   verification verification_status not null default 'pending',
   verified_at timestamptz,

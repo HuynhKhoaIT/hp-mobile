@@ -45,4 +45,4 @@ create trigger trg_<name>_updated_at before update on public.<name>
 6. Đổi `listings` / `groups` → kiểm tra trigger `slug` / `short_id`, view `public_*`, webhook revalidate vẫn đúng.
 
 ## seed.sql
-`sites` (Dung Quất, Hải Dương, Hưng Yên), `venues` mẫu, user test mỗi vai trò (`user_a`, `user_b`, `banned`, `moderator`, `admin`; SĐT giả `+8490000000x`), 50 tin mẫu mỗi category với ảnh placeholder và `lang` đa dạng, 10 nhóm mỗi kind, vài hội thoại và tin nhắn. Không dữ liệu của người thật. Seed phải chạy được với RLS bật (dùng `set role postgres` hoặc insert trước khi bật policy).
+`sites` nằm ở migration (dữ liệu khởi đầu khu Dung Quất), seed không thêm site; `venues` mẫu, user test mỗi vai trò (`user_a`, `user_b`, `banned`, `moderator`, `admin`; SĐT giả `+8490000000x`), 50 tin mẫu mỗi category với ảnh placeholder và `lang` đa dạng, 10 nhóm mỗi kind, vài hội thoại và tin nhắn. Không dữ liệu của người thật. Seed phải chạy được với RLS bật (dùng `set role postgres` hoặc insert trước khi bật policy).
