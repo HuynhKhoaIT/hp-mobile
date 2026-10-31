@@ -1,22 +1,25 @@
-// Header tạm của tuần 1: logo + ngôn ngữ + giao diện. Tuần 2 tách header marketing và header người dùng
-// (tìm kiếm, Đăng tin, tin nhắn, thông báo, avatar) + bottom nav trên điện thoại.
+// Header khu marketing (landing, giới thiệu, pháp lý): logo · "Dùng ngay trên web" · tài khoản.
+// Landing đầy đủ ở tuần 11; header người dùng ở app-header.tsx.
 import { getTranslations } from 'next-intl/server';
-import { LocaleSwitcher } from './locale-switcher';
+import { Suspense } from 'react';
+import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
 import { Logo } from './logo';
-import { ThemeToggle } from './theme-toggle';
+import { UserMenu, UserMenuSkeleton } from './user-menu';
 
 export async function SiteHeader() {
-  const t = await getTranslations('web.header');
+  const t = await getTranslations();
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
-      <nav
-        aria-label={t('main_nav')}
-        className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2"
-      >
+      <nav aria-label={t('web.header.main_nav')} className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2">
         <Logo />
-        <div className="flex flex-wrap items-center gap-2">
-          <LocaleSwitcher />
-          <ThemeToggle />
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild variant="ghost" className="hidden sm:inline-flex">
+            <Link href="/tin">{t('common.nav.explore')}</Link>
+          </Button>
+          <Suspense fallback={<UserMenuSkeleton />}>
+            <UserMenu />
+          </Suspense>
         </div>
       </nav>
     </header>

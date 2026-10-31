@@ -1,16 +1,14 @@
-// Layout gốc theo ngôn ngữ (root param `locale`: vi không tiền tố, /en, /zh).
+// Layout gốc theo ngôn ngữ (root param `locale`: vi không tiền tố, /en, /zh): html, font, providers.
 // Font Be Vietnam Pro (vi / en); Noto Sans SC chỉ gắn khi zh. Dark mode theo class (next-themes).
 // Tạm noindex toàn site cho tới khi ra mắt (bỏ khi có landing + trang pháp lý — tuần 11).
 import '../globals.css';
 import { APP_NAME } from '@hp/shared';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { Be_Vietnam_Pro, Noto_Sans_SC } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { locale as rootLocale } from 'next/root-params';
-import { SiteFooter } from '@/components/shared/site-footer';
-import { SiteHeader } from '@/components/shared/site-header';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
@@ -29,6 +27,9 @@ const notoSansSc = Noto_Sans_SC({
   display: 'swap',
   preload: false,
 });
+
+// viewport-fit=cover để thanh điều hướng dưới chừa được vùng an toàn của iPhone (pb-safe).
+export const viewport: Viewport = { viewportFit: 'cover' };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -57,13 +58,11 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
       className={cn('h-full', beVietnamPro.variable, isZh && [notoSansSc.variable, 'lang-zh'])}
     >
       <body className="flex min-h-full flex-col">
-        {/* Client chỉ nhận namespace cần cho component tương tác. */}
-        <NextIntlClientProvider messages={{ web: messages.web, common: messages.common, errors: messages.errors }}>
-          <ThemeProvider>
-            <SiteHeader />
-            <main className="flex flex-1 flex-col">{children}</main>
-            <SiteFooter />
-          </ThemeProvider>
+        {/* Client chỉ nhận namespace cần cho component tương tác. Header / footer ở layout của (marketing) và (app). */}
+        <NextIntlClientProvider
+          messages={{ web: messages.web, common: messages.common, errors: messages.errors, auth: messages.auth }}
+        >
+          <ThemeProvider>{children}</ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

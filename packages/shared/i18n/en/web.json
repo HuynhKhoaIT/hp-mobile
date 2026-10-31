@@ -44,5 +44,11 @@
   },
   "login": {
     "title": "Sign in"
+  },
+  "me": {
+    "phone": "Phone number",
+    "site": "Workplace",
+    "no_site": "Not selected",
+    "interests": "Interests"
   }
 }

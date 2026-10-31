@@ -44,5 +44,11 @@
   },
   "login": {
     "title": "Đăng nhập"
+  },
+  "me": {
+    "phone": "Số điện thoại",
+    "site": "Nơi làm việc",
+    "no_site": "Chưa chọn",
+    "interests": "Quan tâm"
   }
 }

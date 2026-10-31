@@ -9,7 +9,8 @@
     "join": "Join",
     "share": "Share",
     "report": "Report",
-    "block": "Block"
+    "block": "Block",
+    "close": "Close"
   },
   "category": {
     "pass_electronics": "Phones, computers & electronics",

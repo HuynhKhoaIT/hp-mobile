@@ -44,5 +44,11 @@
   },
   "login": {
     "title": "登录"
+  },
+  "me": {
+    "phone": "手机号",
+    "site": "工作地点",
+    "no_site": "未选择",
+    "interests": "兴趣"
   }
 }
