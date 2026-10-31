@@ -48,5 +48,18 @@
   "price": {
     "negotiable": "面议",
     "free": "免费"
+  },
+  "dev": {
+    "ui_gallery": "界面组件库",
+    "colors": "颜色",
+    "service_colors": "服务颜色",
+    "typography": "文字",
+    "sample": "转让2019款Wave摩托车，九成新，手续齐全",
+    "open_gallery": "打开界面组件库",
+    "theme": "外观",
+    "theme_system": "跟随系统",
+    "theme_light": "浅色",
+    "theme_dark": "深色",
+    "language": "语言"
   }
 }

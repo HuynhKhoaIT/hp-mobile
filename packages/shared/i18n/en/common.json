@@ -48,5 +48,18 @@
   "price": {
     "negotiable": "Negotiable",
     "free": "Free"
+  },
+  "dev": {
+    "ui_gallery": "UI gallery",
+    "colors": "Colors",
+    "service_colors": "Service colors",
+    "typography": "Typography",
+    "sample": "Selling a 2019 Wave motorbike, like new, full papers",
+    "open_gallery": "Open UI gallery",
+    "theme": "Appearance",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "language": "Language"
   }
 }

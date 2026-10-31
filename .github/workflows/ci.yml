@@ -41,8 +41,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: File sinh tự động đã cập nhật (theme.css …)
-        run: git diff --exit-code -- packages/tokens/theme.css
+      - name: File sinh tự động đã cập nhật (theme.css, tailwind.preset.cjs)
+        run: git diff --exit-code -- packages/tokens/theme.css packages/tokens/tailwind.preset.cjs
 
   db:
     name: supabase · migrations · pgTAP · types

@@ -14,7 +14,7 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**",
-        "theme.css"
+        "theme.css", "tailwind.preset.cjs"
       ]
     },
     "lint": {
