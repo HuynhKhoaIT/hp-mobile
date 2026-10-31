@@ -83,7 +83,7 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 - [x] Ảnh đại diện: chọn ảnh ở onboarding bước 2 và đổi ở `/toi` (cắt vuông 512, WebP / JPEG ≤ 1 MB bằng canvas, `uploadAvatar`)
 - [x] Env `NEXT_PUBLIC_IMAGE_TRANSFORM` (false trên staging gói Free); `apps/web/.env.example` trước đây bị `.gitignore` bỏ qua → đã mở lại
 - [x] Đã kiểm `next start` + curl: 5 trang danh sách 200 (vi / en / zh), chi tiết 200, slug sai 308, slug không có 404, không có SĐT / toạ độ trong HTML
-- [ ] Lần truy cập ĐẦU TIÊN của trình duyệt vào slug chưa prerender trả 200 + redirect phía client / `noindex` (App Shell của Partial Prefetching); lần sau và bot chỉ đọc HTML nhận 308 / 404 thật
+- [x] **Quyết định 2026-10-31: giữ nguyên** — lần truy cập ĐẦU TIÊN vào slug chưa prerender trả 200 + redirect phía client / `noindex` (App Shell); lần sau và bot chỉ đọc HTML nhận 308 / 404 thật. Người dùng luôn thấy đúng trang. Đã thử chuyển `UserMenu` sang client: không đổi được mã lần đầu (shell gửi trước vì `params` chưa prerender), nên bỏ. Nếu đo SEO thấy vấn đề → kiểm slug trong `proxy.ts` (thêm 1 lần gọi DB / lượt xem tin)
 - [ ] Còn lại tuần 4: `opengraph-image.tsx`, `/api/revalidate` (`revalidateTag('listing:{id}')`), `sitemap.ts` + `robots.ts`, tin sold / expired 200 + nhãn rồi 410 (RPC hiện trả not_found), `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, `/tim-kiem`, "Xem thêm" không JS (link `?cursor=`), `logSearch`
 - [ ] Chưa kiểm: Lighthouse mobile, xem bằng mắt 360 / 1440 + dark, upload ảnh đại diện thật trên trình duyệt
 
