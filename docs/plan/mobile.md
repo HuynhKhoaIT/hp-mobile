@@ -125,7 +125,8 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - [x] Query không thử lại với lỗi `not_found` / `invalid_input` / `forbidden` / `auth_required` / `banned` (màn "Tin không còn" hiện ngay)
 - [x] i18n mới: `listing.owner_badge.{phone,worker,landlord,venue,employer}` (3 ngôn ngữ)
 - [x] Đã kiểm: `tsc --noEmit`, `lint`, `i18n:check`, `expo export --platform android` (4398 module, Hermes 8,6 MB)
-- [ ] Avatar ở onboarding / hồ sơ: cần `expo-image-picker` (ngoài danh sách stack — chờ duyệt) + `ImagePicker` của `@/ui`; hook `useUploadAvatar` đã có ở `@hp/core`
+- [x] Avatar ở onboarding bước 2: `expo-image-picker` (duyệt 2026-10-31) + `expo-image-manipulator` → cắt vuông 512 px WebP ≤ 1 MB → `useUploadAvatar` (`src/features/profile`); quyền thư viện ảnh khai trong `app.json`. Cần dev build mới (thêm module native). Màn hồ sơ / Cài đặt đổi avatar: tuần 6
+- [x] Font: import từng độ đậm Be Vietnam Pro (4 file thay vì 18, bundle bớt ~1,9 MB)
 - [ ] `(tabs)/_layout` + `TabBar`; ô tìm kiếm ở Hub (khi có màn `search`, tuần 4); header Hub gradient (cần `expo-linear-gradient`, ngoài stack — đang dùng nền `bg-primary`)
 - [ ] Shared element ảnh card → chi tiết; event `view_listing` / `contact` (chờ `src/core/analytics` tuần 4); `associatedDomains` / `intentFilters` cho `tenapp.vn/tin/*` (tuần 11)
 - [ ] Chạy trên máy thật (dev build): 200 item seed cuộn nhanh, light / dark, 360px, font 150%, Reduce Motion, vi / en / zh

@@ -32,7 +32,7 @@ Người dùng: 18–55 tuổi, nhiều người không rành công nghệ, Andr
 - Form: React Hook Form + Zod (schema import từ `@hp/shared`)
 - i18n: `i18next`, `react-i18next`, `expo-localization`
 - Bản đồ: Goong Maps (chỉ qua wrapper `src/ui/MapView`)
-- Khác: `expo-notifications`, `expo-image-manipulator`, `expo-location`, `react-native-mmkv`, Sentry, PostHog
+- Khác: `expo-notifications`, `expo-image-picker` (duyệt 2026-10-31: ảnh đại diện, ảnh tin), `expo-image-manipulator`, `expo-location`, `react-native-mmkv`, Sentry, PostHog
 
 Muốn thêm thư viện mới → hỏi trước, nêu lý do và dung lượng tăng thêm.
 
