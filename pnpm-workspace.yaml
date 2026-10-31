@@ -7,3 +7,5 @@ allowBuilds:
   supabase: true
   sharp: false
   unrs-resolver: false
+  "@parcel/watcher": false
+  "@swc/core": false

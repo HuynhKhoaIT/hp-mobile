@@ -5,7 +5,7 @@ import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 export type TextVariant = 'caption' | 'body' | 'label' | 'title' | 'heading' | 'display' | 'price';
-export type TextTone = 'default' | 'muted' | 'disabled' | 'primary' | 'accent' | 'success' | 'warning' | 'danger' | 'onPrimary';
+export type TextTone = 'default' | 'muted' | 'disabled' | 'primary' | 'accent' | 'success' | 'warning' | 'danger' | 'onPrimary' | 'onAccent';
 
 const SIZE: Record<TextVariant, string> = {
   caption: 'text-sm', // 14 — nhỏ nhất cho nhãn / meta
@@ -48,6 +48,7 @@ const TONE: Record<TextTone, string> = {
   warning: 'text-warning',
   danger: 'text-danger',
   onPrimary: 'text-on-primary',
+  onAccent: 'text-on-accent',
 };
 
 export type TextProps = RNTextProps & {

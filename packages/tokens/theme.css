@@ -15,6 +15,7 @@
   --color-muted: #6B7280;
   --color-disabled: #9CA3AF;
   --color-on-primary: #FFFFFF;
+  --color-on-accent: #111827;
   --color-service-pass: #D9692E;
   --color-service-pass-soft: #FDF0E6;
   --color-service-room: #7C5CC4;
@@ -70,6 +71,7 @@
   --color-muted: #9CA3AF;
   --color-disabled: #6B7280;
   --color-on-primary: #0F1115;
+  --color-on-accent: #0F1115;
   --color-service-pass: #F0A070;
   --color-service-pass-soft: #3A2A20;
   --color-service-room: #B39DEB;

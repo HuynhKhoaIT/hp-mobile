@@ -16,10 +16,10 @@ argument-hint: "<đường dẫn route> <marketing|public|auth|admin> [feature]"
 ## Bước 2 — Tạo file theo khu vực
 | Khu | Tạo | Ghi chú |
 |---|---|---|
-| marketing | `page.tsx` (`force-static`), `generateMetadata`, JSON-LD nếu FAQ / Organization | section là component trong `features/marketing/components` |
-| public | `page.tsx` (SSR + `revalidate`), `loading.tsx`, `error.tsx`, `not-found.tsx` nếu `[slug]`, `generateMetadata` đủ hreflang / canonical / OG, `opengraph-image.tsx` cho chi tiết, JSON-LD đúng loại, `generateStaticParams` cho trang khu vực | đọc qua view / RPC công khai; không lộ PII; slug cũ → 301 |
-| auth | `page.tsx` `force-dynamic`, `loading.tsx`, `error.tsx`, `robots: noindex`; form / chat là client component lá | middleware đã chặn; `queries.ts` vẫn kiểm tra `user` |
-| admin | `page.tsx` `force-dynamic` trong `(dashboard)`, `PageHeader` + `DataTable`, filter / sort / trang qua `searchParams`; action trong `features/admin/<x>/actions.ts` | import chỉ từ `app/[locale]/admin/**` |
+| marketing | `page.tsx` (tĩnh: không đọc cookie / headers; dữ liệu `'use cache'` + `cacheLife`), `generateMetadata`, JSON-LD nếu FAQ / Organization | section là component trong `features/marketing/components` |
+| public | `page.tsx` (query `'use cache'` + `cacheLife({ revalidate: 300 })` + `cacheTag`, phần theo `searchParams` trong `<Suspense>`), `loading.tsx`, `error.tsx`, `not-found.tsx` nếu `[slug]`, `generateMetadata` đủ hreflang / canonical / OG, `opengraph-image.tsx` cho chi tiết, JSON-LD đúng loại, `generateStaticParams` cho trang khu vực | đọc qua view / RPC công khai; không lộ PII; slug cũ → 301 |
+| auth | `page.tsx` (session qua `cookies()`, nội dung trong `<Suspense>`), `loading.tsx`, `error.tsx`, `robots: noindex`; form / chat là client component lá | `proxy.ts` đã chặn; `queries.ts` vẫn kiểm tra `user` |
+| admin | `page.tsx` trong `(dashboard)` (theo request, không `'use cache'`), `PageHeader` + `DataTable`, filter / sort / trang qua `searchParams`; action trong `features/admin/<x>/actions.ts` | import chỉ từ `app/[locale]/admin/**` |
 
 - Chữ → `/add-i18n-key`. Dữ liệu → `queries.ts` gọi `@hp/core`. Ghi → `/server-action`.
 - Component UI dùng chung → `src/components/shared`; thuộc feature → `features/<x>/components`; primitive → shadcn CLI.

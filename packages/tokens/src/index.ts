@@ -19,6 +19,8 @@ export const colors = {
     textMuted: '#6B7280',
     textDisabled: '#9CA3AF',
     onPrimary: '#FFFFFF',
+    /** Chữ trên nút cam (Đăng tin): chữ trắng trên accent chỉ ~2,9:1, chữ tối đạt ≥ 4,5:1. */
+    onAccent: '#111827',
   },
   dark: {
     primary: '#5B9BE6',
@@ -35,6 +37,7 @@ export const colors = {
     textMuted: '#9CA3AF',
     textDisabled: '#6B7280',
     onPrimary: '#0F1115',
+    onAccent: '#0F1115',
   },
 } as const;
 

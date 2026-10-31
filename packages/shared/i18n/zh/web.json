@@ -1,1 +1,35 @@
-{}
+{
+  "meta": {
+    "description": "为 Dung Quất 周边的工人提供二手转让、找房、找工作、拼车和约球服务。"
+  },
+  "header": {
+    "home": "返回首页",
+    "language": "语言",
+    "theme": "外观",
+    "main_nav": "主导航"
+  },
+  "theme": {
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
+  },
+  "footer": {
+    "rights": "© {{year}} {{appName}}"
+  },
+  "home": {
+    "tagline": "在 Dung Quất 周边转让二手、找房、找工作、拼车和约球。",
+    "coming_soon": "正在建设中，即将上线。"
+  },
+  "dev": {
+    "title": "网页界面组件库",
+    "buttons": "按钮",
+    "sizes": "尺寸",
+    "states": "状态",
+    "disabled": "已禁用"
+  }
+}
