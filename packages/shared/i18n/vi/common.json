@@ -61,5 +61,19 @@
     "theme_light": "Sáng",
     "theme_dark": "Tối",
     "language": "Ngôn ngữ"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "explore": "Khám phá",
+    "post": "Đăng",
+    "messages": "Tin nhắn",
+    "me": "Tôi",
+    "notifications": "Thông báo",
+    "search_placeholder": "Tìm xe, phòng trọ, việc làm…"
+  },
+  "states": {
+    "empty_title": "Chưa có gì ở đây",
+    "error_title": "Không tải được dữ liệu",
+    "offline": "Bạn đang ngoại tuyến"
   }
 }

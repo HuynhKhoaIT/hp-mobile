@@ -7,5 +7,10 @@
   "not_found": "Không tìm thấy nội dung",
   "rate_limited": "Bạn thao tác quá nhanh, vui lòng thử lại sau",
   "banned": "Tài khoản đang bị khoá",
-  "conflict": "Nội dung đã tồn tại"
+  "conflict": "Nội dung đã tồn tại",
+  "phone_invalid": "Số điện thoại chưa đúng, ví dụ 0912 345 678",
+  "otp_invalid": "Mã xác nhận không đúng hoặc đã hết hạn",
+  "sms_failed": "Chưa gửi được tin nhắn, vui lòng thử lại sau",
+  "required": "Vui lòng nhập thông tin này",
+  "too_long": "Nội dung quá dài"
 }

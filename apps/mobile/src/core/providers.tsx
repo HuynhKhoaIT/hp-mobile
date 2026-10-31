@@ -2,7 +2,7 @@
 // Thứ tự ngoài → trong: Gesture → SafeArea → Supabase → Query (persist MMKV) → i18n → BottomSheet.
 // Toast, Sentry, PostHog thêm ở bước tiếp theo của tuần 1 (docs/plan/mobile.md).
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { SupabaseProvider } from '@hp/core';
+import { SupabaseProvider } from '@hp/core/react';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { colorScheme } from 'nativewind';
 import { type ReactNode, useEffect } from 'react';

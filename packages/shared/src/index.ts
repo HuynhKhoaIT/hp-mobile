@@ -6,4 +6,6 @@ export * from './constants';
 export * from './enums';
 export * from './format';
 export * from './slug';
+export * from './phone';
+export * from './schemas/auth';
 export * from './schemas/profile';

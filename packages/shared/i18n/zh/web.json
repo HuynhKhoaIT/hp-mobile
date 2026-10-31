@@ -31,5 +31,18 @@
     "sizes": "尺寸",
     "states": "状态",
     "disabled": "已禁用"
+  },
+  "legal": {
+    "about": "关于我们",
+    "privacy": "隐私政策",
+    "terms": "使用条款",
+    "delete_account": "删除账号",
+    "contact": "联系我们",
+    "drafting": "本页内容正在撰写中，将在应用上线前提供。",
+    "about_body": "{{appName}} 是一个社区应用，帮助 Dung Quất 周边的工人转让二手物品、找房、找工作、寻找失物、拼车和约球。",
+    "about_independent": "这是一个独立的个人项目，不隶属于也不代表 Hòa Phát 集团。"
+  },
+  "login": {
+    "title": "登录"
   }
 }

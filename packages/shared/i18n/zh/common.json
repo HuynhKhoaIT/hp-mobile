@@ -61,5 +61,19 @@
     "theme_light": "浅色",
     "theme_dark": "深色",
     "language": "语言"
+  },
+  "nav": {
+    "home": "首页",
+    "explore": "发现",
+    "post": "发布",
+    "messages": "消息",
+    "me": "我的",
+    "notifications": "通知",
+    "search_placeholder": "搜索摩托车、房间、工作…"
+  },
+  "states": {
+    "empty_title": "这里还没有内容",
+    "error_title": "数据加载失败",
+    "offline": "您当前处于离线状态"
   }
 }

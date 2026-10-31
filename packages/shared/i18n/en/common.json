@@ -61,5 +61,19 @@
     "theme_light": "Light",
     "theme_dark": "Dark",
     "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "post": "Post",
+    "messages": "Messages",
+    "me": "Me",
+    "notifications": "Notifications",
+    "search_placeholder": "Search bikes, rooms, jobs…"
+  },
+  "states": {
+    "empty_title": "Nothing here yet",
+    "error_title": "Could not load data",
+    "offline": "You are offline"
   }
 }

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { clampLimit, toAppError } from './result.ts';
 import { imageUrl, shareUrl } from './urls.ts';
 import { keys } from './keys.ts';
+import { toAuthError } from './auth-error.ts';
 
 test('toAppError map mã Postgres / PostgREST sang key i18n', () => {
   assert.equal(toAppError({ code: '42501', message: 'permission denied' }).code, 'forbidden');
@@ -41,4 +42,19 @@ test('keys: key con nằm dưới key cha để invalidate cả nhánh', () => {
   assert.deepEqual(keys.listings({ category: 'pass_home' }).slice(0, 2), keys.listings());
   assert.deepEqual(keys.unreadCount().slice(0, 2), keys.notifications());
   assert.deepEqual(keys.bookmarks('listing').slice(0, 2), keys.bookmarks());
+});
+
+test('toAuthError map lỗi Supabase Auth sang key i18n', () => {
+  assert.equal(toAuthError({ code: 'over_sms_send_rate_limit', status: 429 }).code, 'rate_limited');
+  assert.equal(toAuthError({ status: 429, message: 'Too many' }).code, 'rate_limited');
+  assert.equal(toAuthError({ code: 'otp_expired', status: 403 }).code, 'otp_invalid');
+  assert.equal(toAuthError({ code: 'sms_send_failed' }).code, 'sms_failed');
+  assert.equal(toAuthError({ code: 'user_banned' }).code, 'banned');
+  assert.equal(toAuthError({ name: 'AuthRetryableFetchError', message: 'Failed to fetch' }).code, 'network');
+  assert.equal(toAuthError(undefined).code, 'unknown');
+});
+
+test('keys.me tách theo người dùng', () => {
+  assert.deepEqual(keys.me(), ['hp', 'me']);
+  assert.deepEqual(keys.me('u1'), ['hp', 'me', 'u1']);
 });

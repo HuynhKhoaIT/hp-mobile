@@ -9,7 +9,7 @@
 with seed(id, phone, full_name) as (
   values
     ('00000000-0000-4000-8000-000000000001'::uuid, '84900000001', 'Nguyễn Văn An'),
-    ('00000000-0000-4000-8000-000000000002'::uuid, '84900000002', 'Trần Thị Bình'),
+    ('00000000-0000-4000-8000-000000000002'::uuid, '84900000002', ''),               -- tài khoản mới: chưa onboarding
     ('00000000-0000-4000-8000-000000000003'::uuid, '84900000003', 'Lê Văn Cấm'),
     ('00000000-0000-4000-8000-000000000004'::uuid, '84900000004', 'Phạm Thị Duyệt'),
     ('00000000-0000-4000-8000-000000000005'::uuid, '84900000005', 'Hoàng Văn Quản')
@@ -37,7 +37,8 @@ where u.id::text like '00000000-0000-4000-8000-00000000000_'
 
 -- Vai trò và trạng thái (chạy với quyền postgres nên guard trigger cho qua)
 update public.profiles set site = 'hoa_phat_dung_quat', consent_at = now(), consent_version = 'seed'
-where id::text like '00000000-0000-4000-8000-00000000000_';
+where id::text like '00000000-0000-4000-8000-00000000000_'
+  and id <> '00000000-0000-4000-8000-000000000002';   -- 0900000002 thử luồng onboarding
 update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
 update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';
 update public.profiles set role = 'admin' where id = '00000000-0000-4000-8000-000000000005';

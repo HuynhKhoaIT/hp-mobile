@@ -1,7 +1,7 @@
 // SupabaseProvider / useSupabase — app và web truyền client của mình vào; hook dùng chung đọc qua useSupabase().
 // Viết bằng createElement (không JSX) để gói vẫn là .ts thuần, chạy được với node --test.
 import { createContext, createElement, useContext, type ReactNode } from 'react';
-import type { Client } from './result';
+import type { Client } from '../result';
 
 const SupabaseContext = createContext<Client | null>(null);
 
