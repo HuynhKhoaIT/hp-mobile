@@ -48,5 +48,18 @@
   "price": {
     "negotiable": "Thoả thuận",
     "free": "Miễn phí"
+  },
+  "dev": {
+    "ui_gallery": "Thư viện giao diện",
+    "colors": "Màu",
+    "service_colors": "Màu dịch vụ",
+    "typography": "Chữ",
+    "sample": "Pass xe Wave 2019, còn mới, giấy tờ đầy đủ",
+    "open_gallery": "Mở thư viện giao diện",
+    "theme": "Giao diện",
+    "theme_system": "Theo máy",
+    "theme_light": "Sáng",
+    "theme_dark": "Tối",
+    "language": "Ngôn ngữ"
   }
 }

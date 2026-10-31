@@ -94,6 +94,16 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 7. `ListingCard`, `GroupCard`, `ServiceTile`, `SectionHeader`, `SearchBar`, `FilterBar`, `MessageBubble`, `Rating`, `Fab`, `StaggerItem`, `BookmarkButton`, `StickyCta`, `SuccessScreen`.
 8. `ui-gallery` đủ mọi variant; chụp ảnh làm tham chiếu review.
 
+## 5b. Tiến độ tuần 1 (cập nhật 2026-10-31)
+- [x] NativeWind **4.2.7** (bản ổn định, Tailwind v3) + preset `@hp/tokens/tailwind.preset` sinh từ token: cùng tên class với web (`bg-primary`, `text-muted`, `bg-surface-2`, `bg-service-pass-soft`…), biến màu `:root` sáng / tối, `inlineRem: 16`. Đã kiểm bằng `expo export --platform android`: stylesheet có `rootVariables` đủ light + dark. NativeWind 5 (Tailwind v4) còn RC → nâng sau, tên class giữ nguyên.
+- [x] `src/core`: `env`, `storage` (MMKV v4, 3 instance), `supabase` (session trong MMKV, auto refresh theo AppState, URL polyfill), `query/` (staleTime 60s, persist MMKV 24h, buster theo version), `i18n/` (7 namespace, theo máy rồi lưu MMKV, `setLocale`), `settings` (Zustand: sáng / tối / theo máy), `providers.tsx`.
+- [x] `app/_layout.tsx`: font Be Vietnam Pro 4 weight, splash giữ tới khi font xong, `AppProviders` (Gesture, SafeArea, Supabase, Query persist, i18n, BottomSheet).
+- [x] `@/ui`: `Text` (variant + tone, font theo weight, zh dùng font hệ thống), `Screen`, `Chip`, `useTheme`, `useReducedMotion`; `app/(dev)/ui-gallery.tsx` (chuyển sáng / tối, vi / en / zh, chữ, màu, màu dịch vụ, Chip).
+- [x] ESLint `no-restricted-imports`: cấm `Text` / `Image` / `FlatList` / `SectionList` / `Animated` của react-native; `app/` cấm import supabase.
+- [ ] Toast, Sentry, PostHog (`src/core/analytics`, `sentry.ts`) — cần DSN / key.
+- [ ] EAS: `eas init` gắn project, development build (MMKV là module native → **không chạy trong Expo Go**, cần dev client).
+- Ghi chú phiên bản: Expo SDK 58 đi kèm Reanimated **4.7** (CLAUDE.md ghi Reanimated 3 — API dùng như cũ, worklets tách sang `react-native-worklets`).
+
 ## 6. Hạ tầng kỹ thuật
 - **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
 - **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`. Giá trị thật trong EAS Secrets.
@@ -108,7 +118,7 @@ Ghi mỗi khi `@hp/core` / `@hp/shared` / RPC / Edge Function đổi API và mob
 
 | Ngày | Gói / RPC / Function | Thay đổi | Việc ở mobile | Trạng thái |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 2026-10-31 | `@hp/core`, `@hp/tokens` | Mới: `SupabaseProvider`, `useSupabase` (React peer); `@hp/tokens/tailwind.preset` (NativeWind) | `AppProviders` bọc `SupabaseProvider`; `tailwind.config.js` dùng preset | xong |
 
 ## 8. Rủi ro riêng mobile
 | Rủi ro | Giảm thiểu |

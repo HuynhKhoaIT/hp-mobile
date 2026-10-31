@@ -6,7 +6,8 @@
   "sideEffects": false,
   "exports": {
     ".": "./src/index.ts",
-    "./theme.css": "./theme.css"
+    "./theme.css": "./theme.css",
+    "./tailwind.preset": "./tailwind.preset.cjs"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -17,6 +18,7 @@
   },
   "files": [
     "src",
-    "theme.css"
+    "theme.css",
+    "tailwind.preset.cjs"
   ]
 }

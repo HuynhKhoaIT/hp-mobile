@@ -10,7 +10,7 @@ paths:
 | `@hp/db` | `database.types.ts` sinh tự động; helper type `Tables<'listings'>`, `Enums<'listing_category'>`, `Functions<'search_listings'>` | sửa tay file sinh |
 | `@hp/shared` | Zod schemas (`schemas/listing/<category>.ts`, `schemas/group/<kind>.ts`, `schemas/functions/<name>.ts`, `schemas/actions/*.ts`), enums / constants (`APP_NAME`, `EXPIRES_DAYS`, `RATE_LIMITS`, `NOTIFICATION_TYPES`), i18n `i18n/{vi,en,zh}/{common,listing,group,chat,auth,errors,push,web,admin}.json`, `format.ts` (Intl), `slug.ts` | import React, React Native, Expo, Next, Supabase |
 | `@hp/core` | hàm gọi Supabase (`listings.ts`, `groups.ts`, `chat.ts`, `profile.ts`, `notifications.ts`, `bookmarks.ts`, `ratings.ts`, `reports.ts`, `functions.ts`), `keys.ts`, hooks TanStack (`hooks/*.ts`), `SupabaseProvider` / `useSupabase`, `capabilities.ts`, `urls.ts` (`shareUrl`, `imageUrl`) | import React Native, Expo, Next; tự tạo client; đọc `process.env` |
-| `@hp/tokens` | màu light / dark, `serviceColors`, `space`, `radius`, `font`, `motion`, `shadow`; `tailwind.preset.js` dùng cho cả NativeWind và web | khai báo token ở nơi khác; hex ngoài file này |
+| `@hp/tokens` | màu light / dark, `serviceColors`, `space`, `radius`, `font`, `motion`, `shadow`; `tailwind.preset.cjs` (export `@hp/tokens/tailwind.preset`) cho NativeWind 4 và `theme.css` cho web Tailwind v4 — cả hai sinh từ `src/index.ts`, cùng tên class | khai báo token ở nơi khác; hex ngoài file này |
 
 ## Luật `@hp/core`
 - Mọi hàm: `(client: SupabaseClient<Database>, input) => Promise<Result<T>>` với `Result<T> = { data: T; error: null } | { data: null; error: { code: string; message: string } }`; `code` là key `errors.*`. Không throw.
@@ -42,4 +42,4 @@ paths:
 | `serviceColors.{light,dark}.*.fg / .soft` | icon `text-service-pass`, nền ô `bg-service-pass-soft` (… `room`, `job`, `ride`, `sport`, `lost-found`); chữ nhãn luôn `text-fg` |
 | `radius.*`, `font.size.*`, `shadow.card` | `rounded-sm/md/lg/xl/full`, `text-xs … text-3xl`, `shadow-card` |
 | spacing 4/8/12/16/20/24/32 | `p-1 p-2 p-3 p-4 p-5 p-6 p-8` (thang mặc định Tailwind, khớp token) |
-Sửa token → `pnpm --filter @hp/tokens build` để sinh lại `theme.css`; CI báo lỗi nếu file chưa sinh lại.
+Sửa token → `pnpm --filter @hp/tokens build` để sinh lại `theme.css` và `tailwind.preset.cjs`; CI báo lỗi nếu file chưa sinh lại.
