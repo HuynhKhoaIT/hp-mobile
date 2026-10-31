@@ -40,7 +40,7 @@ pnpm exec supabase db push --linked
 Prod: chỉ qua GitHub Actions khi gắn tag `v*` (cần approval). Không chạy `db push` lên prod từ máy dev.
 
 ### Đăng nhập thử ở local
-SĐT test `84900000001` … `84900000005`, OTP luôn là `123456` (`[auth.sms.test_otp]` trong `supabase/config.toml`). Số khác không nhận được SMS ở local. Email tự động (nếu có) xem tại Mailpit http://127.0.0.1:54324. Studio: http://127.0.0.1:54323.
+OTP cố định `123456` cho các số trong `[auth.sms.test_otp]` (`supabase/config.toml`): `0900000001` … `0900000005` là user seed (bảng dưới), `0900000010` … `0900000019` là tài khoản mới chưa có (mỗi số thử onboarding một lần; `pnpm db:reset` để dùng lại). Số khác không nhận được SMS (báo `sms_failed`). Sửa `config.toml` → `pnpm exec supabase stop` rồi `pnpm db:start` mới có hiệu lực. Email tự động (nếu có) xem tại Mailpit http://127.0.0.1:54324. Studio: http://127.0.0.1:54323.
 
 Trên Windows, container `supabase_vector` (thu log) có thể khởi động lại liên tục — không ảnh hưởng DB / Auth / API.
 
@@ -52,6 +52,15 @@ Trên Windows, container `supabase_vector` (thu log) có thể khởi động l�
 | 84900000003 | user **bị cấm** | Lê Văn Cấm |
 | 84900000004 | moderator | Phạm Thị Duyệt |
 | 84900000005 | admin | Hoàng Văn Quản |
+
+### Đăng nhập SĐT trên staging (chưa có nhà cung cấp SMS)
+Tạm thời OTP cố định qua tính năng số test của Supabase — không code riêng, không gửi SMS. Dashboard `dungquat-staging` → Authentication → Sign In / Providers → **Phone**:
+1. Bật **Enable Phone provider**; SMS provider chọn Twilio, điền giá trị giả bất kỳ (không bao giờ được gọi với số test; số ngoài danh sách sẽ báo lỗi gửi SMS).
+2. **Test Phone Numbers and OTPs**: `84900000001=123456,84900000002=123456,…` — danh sách như `config.toml`; thêm SĐT thật của người thử nếu muốn (dạng `84…`, không dấu +). Danh sách nằm trên Dashboard, không đưa SĐT thật vào git.
+3. **Test OTPs Valid Until**: đặt ngày hết hạn (vd hết beta); quá hạn thì số test ngừng hoạt động.
+4. Tắt **Confirm phone** nếu đang bật (khớp `enable_confirmations = false` ở local).
+
+Không áp dụng cho prod: prod chỉ mở khi `send-otp` gửi OTP thật.
 
 ### Auth hook trên staging / prod
 Dashboard → Authentication → Hooks → **Customize Access Token (JWT) Claims** → Postgres function `public.custom_access_token_hook`. Bật sau khi migration `20261030100000_core` đã lên project đó.

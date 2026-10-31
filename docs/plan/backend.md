@@ -78,6 +78,7 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 - [x] `@hp/shared`: `normalizeVnPhone` / `toE164` / `formatVnPhone` (+ test), `PhoneInput`, `OtpInput`, `FEATURES`, `CONSENT_VERSION`, `OTP_LENGTH`, `OTP_RESEND_SECONDS`; i18n `auth`, lỗi `phone_invalid` / `otp_invalid` / `sms_failed`, `common.nav`, `common.states`, `common.locale`
 - [x] `@hp/core`: `sendPhoneOtp`, `verifyPhoneOtp`, `signInWithGoogle`, `exchangeCodeForSession`, `signOut`, `needsOnboarding`, `toAuthError`; entry `@hp/core/react` (provider + hook). Đã chạy thật với Supabase local: số sai, mã sai, đăng nhập, onboarding, đăng xuất
 - [ ] **`send-otp` (Auth Hook gửi SMS / Zalo ZNS) — chờ chọn nhà cung cấp** (tài khoản Zalo OA + ZNS template, hoặc SMS brandname). Chưa có thì staging không gửi được SMS thật: dùng số test của Supabase (Dashboard → Authentication → Providers → Phone → Test phone numbers)
+- [x] Quyết định 2026-10-31: chưa đăng ký được SMS → **OTP cố định `123456` qua số test của Supabase** (local `[auth.sms.test_otp]`, staging trên Dashboard, xem `docs/RUNBOOK.md`); thêm số `84900000010–19` (tài khoản mới) để thử onboarding. Không code đường đăng nhập riêng; client không đổi gì khi `send-otp` lên. Chặn ra prod cho tới khi có `send-otp`
 - [ ] Google OAuth: chờ OAuth client (Google Cloud) → bật provider trên Supabase local / staging; code app + web đã sẵn
 
 ### Tiến độ tuần 2 (cập nhật 2026-10-30)
