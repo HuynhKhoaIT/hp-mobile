@@ -1,8 +1,9 @@
 name: Deploy staging (Supabase)
 
 # Đẩy migration lên dungquat-staging khi main có migration mới, hoặc chạy tay từ tab Actions.
-# Cần 3 repository secret (Settings → Secrets and variables → Actions):
-#   SUPABASE_ACCESS_TOKEN   Supabase Dashboard → Account → Access Tokens
+# Kết nối thẳng database qua pooler (--db-url), không dùng `supabase link`:
+# link gọi Management API nên token giới hạn quyền bị 403.
+# Cần 2 repository secret (Settings → Secrets and variables → Actions):
 #   STAGING_PROJECT_REF     lyyonoszuuljvbnwbvlk
 #   STAGING_DB_PASSWORD     mật khẩu database lúc tạo dungquat-staging
 # Prod không deploy ở đây (chỉ khi gắn tag v*, workflow riêng, cần duyệt) — docs/RUNBOOK.md.
@@ -30,31 +31,35 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
       PROJECT_REF: ${{ secrets.STAGING_PROJECT_REF }}
+      # Session pooler của project (Dashboard → Connect → Session pooler). Không phải bí mật.
+      POOLER_HOST: aws-0-ap-southeast-1.pooler.supabase.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Kiểm tra secret
         run: |
-          for v in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD PROJECT_REF; do
+          for v in SUPABASE_DB_PASSWORD PROJECT_REF; do
             if [ -z "${!v}" ]; then echo "::error::Thiếu secret cho $v (xem đầu file workflow)"; exit 1; fi
           done
+
+      - name: Tạo chuỗi kết nối
+        run: |
+          pw=$(jq -rn --arg p "$SUPABASE_DB_PASSWORD" '$p|@uri')
+          echo "::add-mask::$pw"
+          echo "DB_URL=postgresql://postgres.${PROJECT_REF}:${pw}@${POOLER_HOST}:5432/postgres" >> "$GITHUB_ENV"
 
       - uses: supabase/setup-cli@v1
         with:
           version: 2.122.0
 
-      - name: Link project
-        run: supabase link --project-ref "$PROJECT_REF"
-
       - name: Xem trước migration
-        run: supabase db push --linked --dry-run
+        run: supabase db push --db-url "$DB_URL" --dry-run
 
       - name: Áp migration
         if: github.event_name == 'push' || inputs.dry_run == false
-        run: supabase db push --linked
+        run: supabase db push --db-url "$DB_URL"
 
       - name: Trạng thái migration
-        run: supabase migration list --linked
+        run: supabase migration list --db-url "$DB_URL"

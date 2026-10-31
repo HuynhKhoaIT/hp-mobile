@@ -30,7 +30,7 @@ pnpm db:test         # pgTAP
 pnpm db:types        # sinh packages/db/database.types.ts từ local
 ```
 
-Đẩy migration lên staging: **mặc định qua GitHub Actions** (`.github/workflows/deploy-staging.yml`) — tự chạy khi `main` có migration mới, hoặc Actions → Deploy staging → Run workflow (bỏ chọn dry_run để áp). Cần 3 secret: `SUPABASE_ACCESS_TOKEN`, `STAGING_PROJECT_REF`, `STAGING_DB_PASSWORD`.
+Đẩy migration lên staging: **mặc định qua GitHub Actions** (`.github/workflows/deploy-staging.yml`) — tự chạy khi `main` có migration mới, hoặc Actions → Deploy staging → Run workflow (bỏ chọn dry_run để áp). Cần 2 secret: `STAGING_PROJECT_REF`, `STAGING_DB_PASSWORD`. Workflow nối thẳng session pooler bằng `--db-url`, không `supabase link`: link gọi Management API, token giới hạn quyền bị 403 "does not have the necessary privileges". `SUPABASE_ACCESS_TOKEN` để dành cho deploy Edge Functions sau này.
 
 Mạng công ty chặn giao thức Postgres (cổng 5432 / 6543 mở TCP nhưng treo khi bắt tay; HTTPS vẫn đi) — lệnh `db push` từ máy dev chỉ chạy được qua mạng khác (4G hotspot, mạng nhà). Đẩy bằng tay (chỉ khi cần gấp, ghi lý do trong PR):
 ```
