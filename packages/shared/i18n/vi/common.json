@@ -12,7 +12,8 @@
     "block": "Chặn",
     "close": "Đóng",
     "back": "Quay lại",
-    "done": "Xong"
+    "done": "Xong",
+    "clear_filter": "Bỏ bộ lọc này"
   },
   "category": {
     "pass_electronics": "Điện thoại, máy tính, điện tử",

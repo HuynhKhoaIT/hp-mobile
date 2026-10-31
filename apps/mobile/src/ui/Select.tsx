@@ -1,5 +1,5 @@
 // Select / MultiSelect — ô chọn trông như Input; chạm mở BottomSheet danh sách (dùng được một tay).
-// Lựa chọn đang chọn có dấu tích + accessibilityState (không chỉ đổi màu).
+// Lựa chọn đang chọn có dấu tích + accessibilityState (không chỉ đổi màu). OptionSheet: chỉ phần sheet (nút mở riêng).
 import { Check, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -103,22 +103,53 @@ export function Select<T extends string>({
       ) : (
         <Field {...field} display={selected?.label ?? null} onPress={() => setOpen(true)} />
       )}
-      <BottomSheet open={open} onClose={() => setOpen(false)} title={field.label}>
-        <View className="gap-1">
-          {options.map((o) => (
-            <OptionRow
-              key={o.value}
-              label={o.label}
-              selected={o.value === value}
-              onPress={() => {
-                onChange(o.value);
-                setOpen(false);
-              }}
-            />
-          ))}
-        </View>
-      </BottomSheet>
+      <OptionSheet open={open} onClose={() => setOpen(false)} title={field.label} value={value} options={options} onChange={onChange} />
     </>
+  );
+}
+
+/**
+ * Sheet chọn một giá trị (không kèm ô kích hoạt) — dùng khi nút mở là thành phần riêng (vd chip khu ở header Hub).
+ * Chọn xong tự đóng. `hint`: một dòng giải thích dưới tiêu đề.
+ */
+export function OptionSheet<T extends string>({
+  open,
+  onClose,
+  title,
+  hint,
+  value,
+  options,
+  onChange,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  hint?: string;
+  value: T | null;
+  options: SelectOption<T>[];
+  onChange: (value: T) => void;
+}) {
+  return (
+    <BottomSheet open={open} onClose={onClose} title={title}>
+      {hint ? (
+        <Text variant="caption" tone="muted" className="-mt-2">
+          {hint}
+        </Text>
+      ) : null}
+      <View className="gap-1">
+        {options.map((o) => (
+          <OptionRow
+            key={o.value}
+            label={o.label}
+            selected={o.value === value}
+            onPress={() => {
+              onChange(o.value);
+              onClose();
+            }}
+          />
+        ))}
+      </View>
+    </BottomSheet>
   );
 }
 

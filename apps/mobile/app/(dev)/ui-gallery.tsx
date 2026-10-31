@@ -4,15 +4,33 @@
 import type { PublicListing } from '@hp/core';
 import { LOCALES, type ListingCategory, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
-import { Bell, Heart, ListChecks, LogOut, MessageCircle, Plus, Search, Share2 } from 'lucide-react-native';
+import {
+  Bell,
+  ClipboardList,
+  Heart,
+  LayoutGrid,
+  ListChecks,
+  LogIn,
+  LogOut,
+  MapPin,
+  MessageCircle,
+  Plus,
+  Search,
+  Share2,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { setLocale } from '@/core/i18n';
 import { type ThemePref, useSettings } from '@/core/settings';
 import {
+  AlertRow,
   Avatar,
   Badge,
+  BannerCarousel,
+  type BannerSlide,
   BookmarkButton,
   BottomSheet,
   Button,
@@ -27,6 +45,9 @@ import {
   Fab,
   FilterBar,
   Header,
+  HomeHeader,
+  HomeHeaderCurve,
+  HomeHeaderSearch,
   IconButton,
   ImageGallery,
   ImagePicker,
@@ -36,17 +57,24 @@ import {
   ListingCover,
   MenuItem,
   Notice,
+  NotificationBell,
   MultiSelect,
+  OptionSheet,
   PriceInput,
+  PromoCard,
   Row,
   Screen,
   SearchBar,
   SectionHeader,
   Select,
+  ServiceGrid,
   ServiceTile,
+  SiteChip,
   SkeletonListingCard,
   SkeletonListingDetail,
   StaggerItem,
+  StatColumns,
+  StatTile,
   StickyCta,
   SuccessScreen,
   Text,
@@ -94,6 +122,12 @@ const SAMPLE_PHOTOS: ImagePickerItem[] = [
   { key: 'c', uri: '', status: 'error' },
 ];
 
+// Khu mẫu cho SiteChip / OptionSheet (dữ liệu giả, chỉ ở gallery).
+const SAMPLE_SITES = [
+  { value: 'dung_quat', label: 'Khu liên hợp Hòa Phát Dung Quất' },
+  { value: 'cang', label: 'Cảng Dung Quất' },
+];
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <View className="mt-6 gap-3">
@@ -120,6 +154,16 @@ export default function UiGalleryScreen() {
   const [saved, setSaved] = useState(false);
   const [tile, setTile] = useState<FeatureKey>('pass');
   const [photos, setPhotos] = useState<ImagePickerItem[]>(SAMPLE_PHOTOS);
+  const [unread, setUnread] = useState(3);
+  const [siteSheet, setSiteSheet] = useState(false);
+  const [site, setSite] = useState('dung_quat');
+  const siteLabel = SAMPLE_SITES.find((x) => x.value === site)?.label ?? null;
+  // Banner mẫu: tone accent / dịch vụ / primary, có và không CTA.
+  const slides: BannerSlide[] = [
+    { id: 'b1', title: t('home.card.first_post_title'), subtitle: t('home.card.first_post_body'), ctaLabel: t('actions.post'), tone: 'accent' },
+    { id: 'b2', title: t('feature.room'), subtitle: t('home.site_sheet_hint'), ctaLabel: t('home.see_all'), tone: 'room' },
+    { id: 'b3', title: t('home.safety_title'), subtitle: t('listing:detail.safety_tip'), tone: 'primary', linked: false },
+  ];
   const samples = [
     sampleListing({ id: 's1', title: t('dev.sample') }),
     sampleListing({ id: 's2', category: 'room_rent', title: t('dev.sample'), price: 1_800_000, lang: 'en' }),
@@ -242,6 +286,143 @@ export default function UiGalleryScreen() {
         </View>
         <SectionHeader title={t('listing:hub.latest_title')} action={{ label: t('listing:hub.see_all'), onPress: () => toast.show(t('listing:hub.see_all')) }} />
         <SectionHeader title={t('listing:detail.similar')} />
+      </Section>
+
+      <Section title="HomeHeader · HomeHeaderSearch · HomeHeaderCurve · SiteChip · NotificationBell">
+        <View className="-mx-4 overflow-hidden">
+          <HomeHeader
+            user={{ name: 'Nguyễn Văn An', onPress: () => toast.show(t('nav.me')), accessibilityLabel: t('nav.me') }}
+            title={t('home.greeting', { name: 'An' })}
+            subtitle={t('home.subtitle')}
+            bell={{ count: unread, onPress: () => setUnread((n) => n + 1), accessibilityLabel: t('home.notifications_unread', { count: unread }) }}
+            site={{ label: siteLabel, onPress: () => setSiteSheet(true), accessibilityLabel: t('home.site_label') }}
+          />
+          <HomeHeaderSearch placeholder={t('nav.search_placeholder')} onPress={() => toast.show(t('nav.search'))} />
+          <HomeHeaderCurve />
+        </View>
+        <View className="-mx-4 overflow-hidden">
+          <HomeHeader
+            user={null}
+            title={t('home.greeting_guest')}
+            subtitle={t('home.subtitle')}
+            signIn={{ label: t('auth:sign_in'), onPress: () => toast.show(t('auth:sign_in')) }}
+            site={{ label: null, onPress: () => undefined, accessibilityLabel: t('home.site_label') }}
+          />
+          <HomeHeader user={null} loading title="" site={{ label: siteLabel, onPress: () => undefined, accessibilityLabel: t('home.site_label') }} />
+        </View>
+        <Row gap={4} className="rounded-md bg-primary p-3">
+          <NotificationBell count={0} onPress={() => undefined} accessibilityLabel={t('home.notifications')} />
+          <NotificationBell count={12} onPress={() => undefined} accessibilityLabel={t('home.notifications_unread', { count: 12 })} />
+          <SiteChip label={siteLabel} onPress={() => setSiteSheet(true)} accessibilityLabel={t('home.site_label')} />
+        </Row>
+        <View className="rounded-md bg-primary p-3">
+          <Button size="sm" variant="inverse" shape="pill" label={t('auth:sign_in')} />
+        </View>
+        <OptionSheet
+          open={siteSheet}
+          onClose={() => setSiteSheet(false)}
+          title={t('home.site_sheet_title')}
+          hint={t('home.site_sheet_hint')}
+          value={site}
+          options={SAMPLE_SITES}
+          onChange={setSite}
+        />
+      </Section>
+
+      <Section title="ServiceTile grid · ServiceGrid">
+        <View className="rounded-xl bg-surface p-4 shadow-card">
+          <ServiceGrid>
+            {FEATURE_KEYS.map((f, i) => (
+              <View key={f} className="flex-1">
+                <ServiceTile
+                  variant="grid"
+                  service={f}
+                  label={t(`feature.${f}`)}
+                  soon={i >= 4}
+                  badge={i >= 4 ? { label: t('home.badge.soon'), tone: 'soon' } : i === 0 ? { label: t('home.badge.new'), tone: 'new' } : undefined}
+                  onPress={() => toast.show(t(`feature.${f}`))}
+                />
+              </View>
+            ))}
+            <View className="flex-1">
+              <ServiceTile variant="grid" icon={ClipboardList} label={t('home.tiles.my_listings')} onPress={() => toast.show(t('home.tiles.my_listings'))} />
+            </View>
+            <View className="flex-1">
+              <ServiceTile variant="grid" icon={LayoutGrid} label={t('home.tiles.all')} onPress={() => toast.show(t('home.tiles.all'))} />
+            </View>
+          </ServiceGrid>
+        </View>
+      </Section>
+
+      <Section title="BannerCarousel">
+        <View className="-mx-4">
+          <BannerCarousel slides={slides} onPress={(slide) => toast.show(slide.title)} />
+        </View>
+        <View className="-mx-4">
+          <BannerCarousel slides={slides.slice(1, 2)} />
+        </View>
+      </Section>
+
+      <Section title="PromoCard · StatColumns · AlertRow · StatTile">
+        <PromoCard
+          icon={LogIn}
+          title={t('home.card.guest_title')}
+          body={t('home.card.guest_body')}
+          action={{ label: t('auth:sign_in'), onPress: () => toast.show(t('auth:sign_in')) }}
+        />
+        <View className="gap-3 rounded-xl bg-surface p-4 shadow-card">
+          <Text variant="label" weight="semibold">
+            {t('home.card.mine_title')}
+          </Text>
+          <StatColumns
+            items={[
+              { value: '3', label: t('home.card.active') },
+              { value: '1', label: t('home.card.pending'), tone: 'warning' },
+              { value: '1.204', label: t('home.card.views') },
+            ]}
+          />
+          <AlertRow tone="warning" label={t('home.card.expiring', { count: 2 })} onPress={() => toast.show(t('home.card.manage'))} />
+          <AlertRow tone="danger" label={t('home.card.rejected', { count: 1 })} onPress={() => toast.show(t('home.card.manage'))} />
+        </View>
+        <Row gap={3}>
+          <StatTile className="flex-1" value="1.234" label={t('home.stats.users')} />
+          <StatTile className="flex-1" value="460" label={t('home.stats.listings')} />
+          <StatTile className="flex-1" value="4" label={t('home.stats.sites')} />
+        </Row>
+      </Section>
+
+      <Section title="SectionHeader icon · Chip sm dot · compact states · Notice bordered">
+        <SectionHeader
+          title={t('home.near_title', { site: 'Dung Quất' })}
+          icon={{ icon: MapPin, tone: 'primary' }}
+          chevron
+          action={{ label: t('home.see_all'), onPress: () => toast.show(t('home.see_all')) }}
+        />
+        <SectionHeader
+          title={t('home.for_you_title')}
+          subtitle={t('home.for_you_hint')}
+          icon={{ icon: Sparkles, tone: 'accent' }}
+          chevron
+          action={{ label: t('home.see_all'), onPress: () => toast.show(t('home.see_all')) }}
+        />
+        <SectionHeader title={t('feature.job')} icon={{ service: 'job' }} chevron action={{ label: t('home.see_all'), onPress: () => undefined }} />
+        <Row gap={2} wrap>
+          <Chip size="sm" dot="pass" label={t('home.shortcut.motorbike')} />
+          <Chip size="sm" dot="room" label={t('home.shortcut.room_loft')} />
+          <Chip size="sm" dot="job" label={t('home.shortcut.night_shift')} />
+          <Chip size="sm" dot="lostFound" label={t('home.shortcut.found')} disabled />
+        </Row>
+        <ErrorState compact title={t('home.section_error')} code="network" onRetry={() => toast.show(t('actions.retry'))} />
+        <EmptyState
+          compact
+          title={t('home.empty_title')}
+          description={t('home.empty_body')}
+          action={{ label: t('actions.post'), icon: Plus, onPress: () => undefined }}
+        />
+        <Notice variant="bordered" tone="warning" icon={ShieldCheck} title={t('home.safety_title')} text={t('listing:detail.safety_tip')} />
+        <Text variant="micro" tone="muted" className="text-center">
+          {t('disclaimer')}
+        </Text>
       </Section>
 
       <Section title="SearchBar · FilterBar · Select chip">

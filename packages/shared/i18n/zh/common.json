@@ -12,7 +12,8 @@
     "block": "屏蔽",
     "close": "关闭",
     "back": "返回",
-    "done": "完成"
+    "done": "完成",
+    "clear_filter": "移除此筛选"
   },
   "category": {
     "pass_electronics": "手机、电脑、电子产品",

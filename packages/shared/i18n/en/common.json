@@ -12,7 +12,8 @@
     "block": "Block",
     "close": "Close",
     "back": "Back",
-    "done": "Done"
+    "done": "Done",
+    "clear_filter": "Remove this filter"
   },
   "category": {
     "pass_electronics": "Phones, computers & electronics",
@@ -31,7 +32,7 @@
     "room": "Find a room",
     "job": "Find a job",
     "lostFound": "Lost & found",
-    "ride": "Ride sharing home",
+    "ride": "Rides home",
     "sport": "Find a game"
   },
   "status": {

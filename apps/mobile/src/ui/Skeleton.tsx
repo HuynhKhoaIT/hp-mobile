@@ -71,15 +71,23 @@ export type SkeletonListingCardProps = {
   columns?: 1 | 2;
   /** Hàng ngang (section ở Hub / tin tương tự): thẻ rộng cố định nằm cạnh nhau. */
   horizontal?: boolean;
+  /** Bề rộng thẻ trong hàng ngang (khớp ListingRail: 'w-44' tin tương tự, 'w-52' dải Hub). */
+  itemClassName?: string;
 };
 
-export function SkeletonListingCard({ count = 1, layout = 'grid', columns = 1, horizontal = false }: SkeletonListingCardProps) {
+export function SkeletonListingCard({
+  count = 1,
+  layout = 'grid',
+  columns = 1,
+  horizontal = false,
+  itemClassName = 'w-44',
+}: SkeletonListingCardProps) {
   const items = Array.from({ length: count }, (_, i) => i);
   if (horizontal) {
     return (
       <View className="flex-row gap-3 overflow-hidden">
         {items.map((i) => (
-          <OneCard key={i} layout="grid" className="w-44" />
+          <OneCard key={i} layout="grid" className={itemClassName} />
         ))}
       </View>
     );

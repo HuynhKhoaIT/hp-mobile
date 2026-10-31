@@ -12,7 +12,16 @@ import {
   useSupabase,
   useToggleBookmark,
 } from '@hp/core/react';
-import { APP_NAME, type ListingCategory, type ListingFeature, type OwnerListingStatus, toE164 } from '@hp/shared';
+import {
+  APP_NAME,
+  featureOfCategory,
+  HOME_SHORTCUTS,
+  LISTING_CATEGORIES,
+  type ListingCategory,
+  type ListingFeature,
+  type OwnerListingStatus,
+  toE164,
+} from '@hp/shared';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,24 +39,66 @@ import type { ListingFeatureConfig } from './types';
 export const ALL = '' as const;
 
 /**
- * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu → useListingList (cursor, staleTime 60s).
+ * Bộ lọc đặt sẵn khi mở danh sách từ Hub (chip "Tìm nhanh", "Dành cho bạn → Xem tất cả"): nhóm category + lọc theo
+ * attributes, hiện thành một chip đang chọn bỏ được ở đầu hàng lọc.
+ */
+export type ListingPreset = {
+  label: string;
+  categories?: readonly ListingCategory[];
+  attributes?: Readonly<Record<string, string | number | boolean>>;
+};
+
+const isCategory = (v: string): v is ListingCategory => (LISTING_CATEGORIES as readonly string[]).includes(v);
+
+/**
+ * Tham số route `listings/[feature]` → bộ lọc đặt sẵn: `shortcut` = id trong HOME_SHORTCUTS (@hp/shared, nhãn
+ * `common.home.shortcut.<id>`); `categories` = danh sách category cách nhau dấu phẩy (nhãn = tên các tính năng).
+ */
+export function useListingPreset(params: { shortcut?: string; categories?: string }): ListingPreset | undefined {
+  const { t } = useTranslation();
+  return useMemo(() => {
+    const shortcut = params.shortcut ? HOME_SHORTCUTS.find((s) => s.id === params.shortcut) : undefined;
+    if (shortcut) return { label: t(`home.shortcut.${shortcut.id}`), categories: shortcut.categories, attributes: shortcut.attributes };
+    const categories = (params.categories ?? '').split(',').filter(isCategory);
+    if (categories.length === 0) return undefined;
+    const features = [...new Set(categories.map(featureOfCategory))];
+    return { label: features.map((f) => t(`feature.${f}`)).join(' · '), categories };
+  }, [params.categories, params.shortcut, t]);
+}
+
+/**
+ * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, bộ lọc đặt sẵn → useListingList (cursor, staleTime 60s).
  * Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event `search` một lần cho mỗi bộ lọc.
  */
-export function useListingBrowser(config: ListingFeatureConfig, initial: { site?: string; query?: string } = {}) {
+export function useListingBrowser(
+  config: ListingFeatureConfig,
+  initial: { site?: string; query?: string; preset?: ListingPreset } = {},
+) {
   const client = useSupabase();
+  // Bộ lọc đặt sẵn chỉ là một category con của tính năng (vd "Đồ bảo hộ") → chọn luôn chip đó, không cần chip riêng.
+  const single = initial.preset?.categories?.length === 1 && !initial.preset.attributes ? initial.preset.categories[0] : undefined;
+  const asChip = single && config.categories.includes(single) ? single : undefined;
   const [input, setInput] = useState(initial.query ?? '');
   const [query, setQuery] = useState(initial.query?.trim() ?? '');
-  const [category, setCategory] = useState<ListingCategory | typeof ALL>(ALL);
+  const [category, setCategory] = useState<ListingCategory | typeof ALL>(asChip ?? ALL);
   const [site, setSite] = useState<string>(initial.site ?? ALL);
+  const [preset, setPreset] = useState<ListingPreset | null>(asChip ? null : (initial.preset ?? null));
 
   const filters = useMemo(
     () => ({
-      // 'all' không giới hạn category trừ khi chọn chip.
-      ...(category !== ALL ? { categories: [category] } : config.key === 'all' ? {} : { categories: [...config.categories] }),
+      // 'all' không giới hạn category trừ khi chọn chip hoặc có bộ lọc đặt sẵn.
+      ...(category !== ALL
+        ? { categories: [category] }
+        : preset?.categories?.length
+          ? { categories: [...preset.categories] }
+          : config.key === 'all'
+            ? {}
+            : { categories: [...config.categories] }),
+      ...(preset?.attributes ? { attributes: { ...preset.attributes } } : {}),
       ...(query ? { query } : {}),
       ...(site !== ALL ? { site } : {}),
     }),
-    [category, config.categories, config.key, query, site],
+    [category, config.categories, config.key, preset, query, site],
   );
   const list = useListingList(filters);
 
@@ -75,8 +126,10 @@ export function useListingBrowser(config: ListingFeatureConfig, initial: { site?
     setCategory,
     site,
     setSite,
-    /** Đang lọc (từ khoá / category / khu) → rỗng là "không tìm thấy", không phải "chưa có tin". */
-    isFiltered: !!query || category !== ALL || site !== ALL,
+    preset,
+    clearPreset: () => setPreset(null),
+    /** Đang lọc (từ khoá / category / khu / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
+    isFiltered: !!query || category !== ALL || site !== ALL || !!preset,
   };
 }
 

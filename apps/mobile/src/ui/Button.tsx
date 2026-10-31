@@ -1,6 +1,7 @@
 // Button — nút có chữ. Cao 48 (md, nút chính) / 44 (sm). Thu nhỏ 0.97 khi nhấn (tắt khi Reduce Motion).
 // Biến thể `accent` = Đăng tin (cam, chữ tối). Không cắt chữ (không numberOfLines). Haptic chỉ bật cho
-// đăng tin / tham gia nhóm / lưu tin (prop `haptic`).
+// đăng tin / tham gia nhóm / lưu tin (prop `haptic`). `inverse`: nút trên nền primary (header Hub) — nền surface, chữ
+// primary. `shape="pill"` bo tròn hẳn (nút trong header / banner).
 import * as Haptics from 'expo-haptics';
 import type { LucideIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
@@ -10,7 +11,7 @@ import { Text, type TextTone } from './Text';
 import { useTheme } from './theme';
 import { usePressScale } from './usePressScale';
 
-export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'inverse';
 export type ButtonSize = 'md' | 'sm';
 
 const BOX: Record<ButtonVariant, string> = {
@@ -20,6 +21,7 @@ const BOX: Record<ButtonVariant, string> = {
   outline: 'bg-surface border-border',
   ghost: 'bg-transparent border-transparent',
   danger: 'bg-danger border-danger',
+  inverse: 'bg-surface border-surface',
 };
 const TONE: Record<ButtonVariant, TextTone> = {
   primary: 'onPrimary',
@@ -28,6 +30,7 @@ const TONE: Record<ButtonVariant, TextTone> = {
   outline: 'default',
   ghost: 'primary',
   danger: 'onPrimary',
+  inverse: 'primary',
 };
 const SIZE: Record<ButtonSize, string> = { md: 'min-h-12 px-5', sm: 'min-h-11 px-4' };
 
@@ -39,6 +42,7 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   loading?: boolean;
   fullWidth?: boolean;
   haptic?: boolean;
+  shape?: 'rounded' | 'pill';
   className?: string;
 };
 
@@ -50,6 +54,7 @@ export function Button({
   loading = false,
   fullWidth = false,
   haptic = false,
+  shape = 'rounded',
   disabled,
   onPress,
   className,
@@ -74,7 +79,8 @@ export function Button({
           onPress?.(e);
         }}
         className={[
-          'flex-row items-center justify-center gap-2 rounded-md border',
+          'flex-row items-center justify-center gap-2 border',
+          shape === 'pill' ? 'rounded-full' : 'rounded-md',
           BOX[variant],
           SIZE[size],
           isDisabled && 'opacity-50',
