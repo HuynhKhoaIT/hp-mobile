@@ -1,7 +1,7 @@
 -- profiles, public_profiles, helper quyền, guard, hook JWT — anon / user / banned / moderator / admin.
 begin;
 \ir _helpers.psql
-select plan(27);
+select plan(30);
 
 select tests.create_user('user_a');
 select tests.create_user('user_b');
@@ -26,6 +26,7 @@ reset role;
 select hasnt_column('public', 'public_profiles', 'phone', 'public_profiles không có phone');
 select hasnt_column('public', 'public_profiles', 'full_name', 'public_profiles không có full_name');
 select hasnt_column('public', 'public_profiles', 'push_tokens', 'public_profiles không có push_tokens');
+select hasnt_column('public', 'public_profiles', 'interests', 'public_profiles không có interests');
 
 -- ── user ────────────────────────────────────────────────────────────────────────
 select tests.authenticate_as('user_a');
@@ -40,6 +41,10 @@ select throws_ok($$ update public.profiles set rating_avg = 5 where id = tests.g
   'user: không sửa điểm đánh giá');
 select throws_ok($$ update public.profiles set phone = '84999999999' where id = tests.get_uid('user_a') $$, '42501', null,
   'user: không sửa SĐT trực tiếp');
+select lives_ok($$ update public.profiles set interests = array['pass','ride'] where id = tests.get_uid('user_a') $$,
+  'user: chọn tính năng quan tâm');
+select throws_ok($$ update public.profiles set interests = array['casino'] where id = tests.get_uid('user_a') $$, '23514', null,
+  'user: không lưu mã quan tâm lạ');
 update public.profiles set full_name = 'Hack' where id = tests.get_uid('user_b');
 reset role;
 select isnt((select full_name from public.profiles where id = tests.get_uid('user_b')), 'Hack',

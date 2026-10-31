@@ -51,3 +51,7 @@ export const LISTING_FEATURES = {
   lostFound: ['lost', 'found'],
 } as const satisfies Record<string, readonly ListingCategory[]>;
 export type ListingFeature = keyof typeof LISTING_FEATURES;
+
+/** 6 tính năng (Hub, onboarding "quan tâm", profiles.interests). Khớp i18n `common.feature.<code>` và CHECK trong DB. */
+export const FEATURES = ['pass', 'room', 'job', 'lostFound', 'ride', 'sport'] as const;
+export type Feature = (typeof FEATURES)[number];

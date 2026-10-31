@@ -43,3 +43,10 @@ export const NOTIFICATION_SCREENS = {
 } as const;
 export type NotificationType = keyof typeof NOTIFICATION_SCREENS;
 export type NotificationScreen = (typeof NOTIFICATION_SCREENS)[NotificationType] | 'notifications';
+
+/** Phiên bản điều khoản + chính sách đang hiển thị; ghi vào profiles.consent_version khi người dùng đồng ý (Nghị định 13/2023). */
+export const CONSENT_VERSION = '2026-10-31';
+
+/** Mã OTP qua SMS / Zalo: 6 chữ số; chờ trước khi cho gửi lại. */
+export const OTP_LENGTH = 6;
+export const OTP_RESEND_SECONDS = 60;

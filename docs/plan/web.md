@@ -68,6 +68,14 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 - [ ] Vercel: nối project (Root Directory `apps/web`), env Preview = Supabase staging → preview URL mỗi PR.
 - Ghi chú Next 16 + `cacheComponents`: không dùng `export const dynamic / revalidate / dynamicParams`; cache bằng `'use cache'` + `cacheLife` + `cacheTag` (đã sửa `.claude/rules/web-routing-rsc.md`, skill `new-page`).
 
+## 3c. Tiến độ tuần 2 (cập nhật 2026-10-31)
+- [x] Nhóm route `(marketing)` (header gọn) và `(app)` (header: tìm, Đăng tin, tin nhắn, thông báo, tài khoản; bottom nav 5 mục < 640px, chừa vùng an toàn iPhone); footer có link pháp lý + đổi ngôn ngữ / giao diện
+- [x] `/dang-nhap`: số điện thoại → OTP → onboarding 3 bước (giống app) → về `next` (chống open redirect); Google qua `/auth/callback`; `LoginDialog` đăng nhập tại chỗ; `/toi` tạm (tên, SĐT, khu, quan tâm, đăng xuất)
+- [x] `components/shared`: `empty-state`, `error-state`, `skeletons`, `json-ld`, `choice-chip`, `login-dialog`, `user-menu`, `app-header`, `bottom-nav`, `coming-soon`; shadcn `dialog` (sheet đáy trên điện thoại), `input`, `label`, `checkbox`, `skeleton` chỉnh theo token
+- [x] Khung pháp lý: `/gioi-thieu` (có nội dung + dòng độc lập), `/dieu-khoan`, `/chinh-sach-bao-mat`, `/xoa-tai-khoan`, `/lien-he` (đang soạn). MDX + nội dung thật: tuần 11, cần `@next/mdx` (hỏi trước)
+- [x] Đã kiểm bằng `next start` + cookie phiên thật: khách thấy Đăng nhập; `/toi` khách → `/dang-nhap?next=/toi`; user đã onboarding thấy hồ sơ; user mới thấy nút hoàn tất onboarding
+- [ ] `listing-card` / `group-card` dời sang tuần 3, làm cùng `ListingCard` của app khi có bảng `listings` (tránh đoán props)
+
 ## 4. Danh sách trang
 
 | Route | Khu | Render | Tuần |

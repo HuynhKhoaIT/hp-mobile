@@ -4,12 +4,12 @@ import { type Client, type Result, fail, fromSupabase, requireUserId } from './r
 
 /** Cột của chính mình mà client được đọc (không lấy push_tokens). */
 const MY_PROFILE_COLUMNS =
-  'id, phone, full_name, avatar_url, site, department, badges, locale, reputation_score, rating_avg, rating_count, role, is_banned, banned_until, notification_prefs, consent_at, created_at' as const;
+  'id, phone, full_name, avatar_url, site, department, badges, locale, reputation_score, rating_avg, rating_count, role, is_banned, banned_until, notification_prefs, interests, consent_at, created_at' as const;
 
 export type MyProfile = Pick<
   Tables<'profiles'>,
   | 'id' | 'phone' | 'full_name' | 'avatar_url' | 'site' | 'department' | 'badges' | 'locale' | 'reputation_score'
-  | 'rating_avg' | 'rating_count' | 'role' | 'is_banned' | 'banned_until' | 'notification_prefs' | 'consent_at' | 'created_at'
+  | 'rating_avg' | 'rating_count' | 'role' | 'is_banned' | 'banned_until' | 'notification_prefs' | 'interests' | 'consent_at' | 'created_at'
 >;
 export type PublicProfile = Tables<'public_profiles'>;
 

@@ -5,13 +5,15 @@
   "type": "module",
   "sideEffects": false,
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./react": "./src/react/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --test --disable-warning=ExperimentalWarning \"src/**/*.test.ts\""
   },
   "devDependencies": {
+    "@tanstack/react-query": "^5.105.0",
     "@types/react": "~19.3.0",
     "react": "19.3.0",
     "typescript": "~6.0.3"
@@ -22,6 +24,7 @@
     "@supabase/supabase-js": "^2.118.0"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "^5",
     "react": ">=19"
   }
 }

@@ -9,7 +9,10 @@
     "join": "加入",
     "share": "分享",
     "report": "举报",
-    "block": "屏蔽"
+    "block": "屏蔽",
+    "close": "关闭",
+    "back": "返回",
+    "done": "完成"
   },
   "category": {
     "pass_electronics": "手机、电脑、电子产品",
@@ -61,5 +64,27 @@
     "theme_light": "浅色",
     "theme_dark": "深色",
     "language": "语言"
+  },
+  "nav": {
+    "home": "首页",
+    "explore": "发现",
+    "post": "发布",
+    "messages": "消息",
+    "me": "我的",
+    "notifications": "通知",
+    "search_placeholder": "搜索摩托车、房间、工作…"
+  },
+  "states": {
+    "empty_title": "这里还没有内容",
+    "error_title": "数据加载失败",
+    "offline": "您当前处于离线状态"
+  },
+  "select": {
+    "placeholder": "请选择"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
   }
 }

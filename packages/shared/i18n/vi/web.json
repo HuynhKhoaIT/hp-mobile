@@ -13,11 +13,6 @@
     "light": "Sáng",
     "dark": "Tối"
   },
-  "locale": {
-    "vi": "Tiếng Việt",
-    "en": "English",
-    "zh": "中文"
-  },
   "footer": {
     "rights": "© {{year}} {{appName}}"
   },
@@ -31,5 +26,24 @@
     "sizes": "Kích thước",
     "states": "Trạng thái",
     "disabled": "Đã tắt"
+  },
+  "legal": {
+    "about": "Giới thiệu",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản sử dụng",
+    "delete_account": "Xoá tài khoản",
+    "contact": "Liên hệ",
+    "drafting": "Nội dung trang này đang được soạn và sẽ có trước khi ứng dụng ra mắt.",
+    "about_body": "{{appName}} là ứng dụng cộng đồng giúp người lao động quanh khu Dung Quất mua bán đồ cũ, tìm phòng trọ, tìm việc, tìm đồ thất lạc, ghép xe và ghép trận thể thao.",
+    "about_independent": "Đây là ứng dụng cá nhân, độc lập, không thuộc và không đại diện cho Tập đoàn Hòa Phát."
+  },
+  "login": {
+    "title": "Đăng nhập"
+  },
+  "me": {
+    "phone": "Số điện thoại",
+    "site": "Nơi làm việc",
+    "no_site": "Chưa chọn",
+    "interests": "Quan tâm"
   }
 }

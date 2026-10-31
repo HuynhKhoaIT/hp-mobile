@@ -7,5 +7,10 @@
   "not_found": "未找到内容",
   "rate_limited": "操作过于频繁，请稍后再试",
   "banned": "账号已被锁定",
-  "conflict": "内容已存在"
+  "conflict": "内容已存在",
+  "phone_invalid": "手机号格式不正确，例如 0912 345 678",
+  "otp_invalid": "验证码错误或已过期",
+  "sms_failed": "短信发送失败，请稍后再试",
+  "required": "请填写此项",
+  "too_long": "内容过长"
 }

@@ -13,6 +13,8 @@ export const supabase = createClient<Database>(env.supabaseUrl, env.supabaseAnon
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: false,
+    // PKCE: Google OAuth trả `code` về hoaphat://auth/callback, app đổi code lấy phiên (verifier lưu MMKV).
+    flowType: 'pkce',
   },
 });
 

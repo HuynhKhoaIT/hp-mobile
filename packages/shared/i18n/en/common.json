@@ -9,7 +9,10 @@
     "join": "Join",
     "share": "Share",
     "report": "Report",
-    "block": "Block"
+    "block": "Block",
+    "close": "Close",
+    "back": "Back",
+    "done": "Done"
   },
   "category": {
     "pass_electronics": "Phones, computers & electronics",
@@ -61,5 +64,27 @@
     "theme_light": "Light",
     "theme_dark": "Dark",
     "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "post": "Post",
+    "messages": "Messages",
+    "me": "Me",
+    "notifications": "Notifications",
+    "search_placeholder": "Search bikes, rooms, jobs…"
+  },
+  "states": {
+    "empty_title": "Nothing here yet",
+    "error_title": "Could not load data",
+    "offline": "You are offline"
+  },
+  "select": {
+    "placeholder": "Select"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
   }
 }

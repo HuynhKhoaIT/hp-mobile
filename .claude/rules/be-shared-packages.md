@@ -14,6 +14,7 @@ paths:
 
 ## Luật `@hp/core`
 - Mọi hàm: `(client: SupabaseClient<Database>, input) => Promise<Result<T>>` với `Result<T> = { data: T; error: null } | { data: null; error: { code: string; message: string } }`; `code` là key `errors.*`. Không throw.
+- Hai entry: `@hp/core` (hàm thuần, **không** import React — dùng được trong Server Component, Server Action, Edge Function) và `@hp/core/react` (`'use client'`: `SupabaseProvider`, `useSupabase`, hook TanStack `useSession`, `useMyProfile`, `useSites`, `useCompleteOnboarding`, `useUpdateProfile`, `unwrap`). Không export thứ gì gọi `createContext` / hook từ entry gốc.
 - Hook nhận client qua `useSupabase()` (context do app / web cung cấp qua `SupabaseProvider`); `@hp/core` chỉ phụ thuộc `react`, `@tanstack/react-query`, `@supabase/supabase-js`, `@hp/shared`, `@hp/db`.
 - Query key chỉ ở `keys.ts`: `keys.listings(filters)`, `keys.listing(id)`, `keys.myListings()`, `keys.groups(kind, filters)`, `keys.group(id)`, `keys.myGroups()`, `keys.conversations()`, `keys.messages(conversationId)`, `keys.profile(id)`, `keys.notifications()`, `keys.bookmarks()`. Thêm key = thêm ở đây + dùng trong `invalidateQueries` của mutation liên quan.
 - Mutation hook có optimistic + rollback cho: gửi tin nhắn, lưu tin, tham gia nhóm, đánh dấu đã bán (TanStack v5: `onMutate` / `onError` / `onSettled`).

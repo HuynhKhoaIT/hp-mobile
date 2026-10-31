@@ -3,11 +3,39 @@
 // Có sẵn bộ chuyển sáng / tối và ngôn ngữ để rà màn ở cả 3 ngôn ngữ, 2 giao diện.
 import { LOCALES, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
+import { Bell, Search, Share2 } from 'lucide-react-native';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { setLocale } from '@/core/i18n';
 import { type ThemePref, useSettings } from '@/core/settings';
-import { Chip, Screen, Text, type TextTone, type TextVariant } from '@/ui';
+import {
+  Avatar,
+  Badge,
+  BottomSheet,
+  Button,
+  type ButtonVariant,
+  Card,
+  Checkbox,
+  Chip,
+  Col,
+  Divider,
+  EmptyState,
+  ErrorState,
+  Header,
+  IconButton,
+  Input,
+  MultiSelect,
+  PriceInput,
+  Row,
+  Screen,
+  Select,
+  SkeletonListingCard,
+  Text,
+  type TextTone,
+  type TextVariant,
+  toast,
+} from '@/ui';
 
 const VARIANTS: TextVariant[] = ['display', 'heading', 'title', 'price', 'label', 'body', 'caption'];
 const TONES: TextTone[] = ['default', 'muted', 'disabled', 'primary', 'accent', 'success', 'warning', 'danger'];
@@ -23,6 +51,9 @@ const SERVICE_CLASS: Record<(typeof SERVICES)[number], { soft: string; fg: strin
   'lost-found': { soft: 'bg-service-lost-found-soft', fg: 'bg-service-lost-found' },
 };
 const THEMES: ThemePref[] = ['system', 'light', 'dark'];
+const BUTTONS: ButtonVariant[] = ['primary', 'accent', 'secondary', 'outline', 'ghost', 'danger'];
+const FEATURE_KEYS = ['pass', 'room', 'job', 'lostFound', 'ride', 'sport'] as const;
+type FeatureKey = (typeof FEATURE_KEYS)[number];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -37,6 +68,13 @@ export default function UiGalleryScreen() {
   const { t, i18n } = useTranslation();
   const themePref = useSettings((s) => s.themePref);
   const setThemePref = useSettings((s) => s.setThemePref);
+  const [text, setText] = useState('');
+  const [price, setPrice] = useState<number | null>(1500000);
+  const [checked, setChecked] = useState(false);
+  const [single, setSingle] = useState<FeatureKey | null>(null);
+  const [multi, setMulti] = useState<FeatureKey[]>(['pass']);
+  const [sheet, setSheet] = useState(false);
+  const featureOptions = FEATURE_KEYS.map((f) => ({ value: f, label: t(`feature.${f}`) }));
 
   if (!__DEV__) return <Redirect href="/" />;
 
@@ -60,6 +98,87 @@ export default function UiGalleryScreen() {
             <Chip key={l} label={l.toUpperCase()} selected={i18n.language === l} onPress={() => void setLocale(l)} />
           ))}
         </View>
+      </Section>
+
+      <Section title="Header">
+        <Header title={t('dev.ui_gallery')} back right={<IconButton icon={Share2} accessibilityLabel={t('actions.share')} />} />
+      </Section>
+
+      <Section title="Button">
+        <Col gap={2}>
+          {BUTTONS.map((v) => (
+            <Button key={v} variant={v} label={v === 'accent' ? t('actions.post') : t('actions.save')} />
+          ))}
+          <Row gap={2} wrap>
+            <Button size="sm" label={t('actions.share')} icon={Share2} variant="outline" />
+            <Button label={t('actions.save')} loading />
+            <Button label={t('actions.save')} disabled />
+          </Row>
+          <Button label={t('actions.join')} fullWidth haptic onPress={() => toast.show(t('actions.join'), 'success')} />
+        </Col>
+      </Section>
+
+      <Section title="IconButton">
+        <Row gap={2}>
+          <IconButton icon={Search} accessibilityLabel={t('nav.search_placeholder')} />
+          <IconButton icon={Bell} variant="filled" accessibilityLabel={t('nav.notifications')} />
+          <IconButton icon={Share2} tone="primary" accessibilityLabel={t('actions.share')} disabled />
+        </Row>
+      </Section>
+
+      <Section title="Input · PriceInput">
+        <Input label={t('auth:phone.label')} placeholder={t('auth:phone.placeholder')} icon={Search} value={text} onChangeText={setText} hint={t('auth:onboarding.name_hint')} />
+        <Input label={t('auth:otp.label')} value="12" error={t('errors:otp_invalid')} />
+        <Input label={t('auth:phone.label')} value="0912 345 678" editable={false} />
+        <PriceInput label={t('dev.sample')} value={price} onChange={setPrice} />
+      </Section>
+
+      <Section title="Select · MultiSelect · Checkbox">
+        <Select label={t('auth:onboarding.interests_title')} value={single} options={featureOptions} onChange={setSingle} />
+        <MultiSelect label={t('auth:onboarding.interests_title')} values={multi} options={featureOptions} onChange={setMulti} />
+        <Checkbox checked={checked} onChange={setChecked} accessibilityLabel={t('auth:onboarding.terms')}>
+          <Text>{t('auth:onboarding.consent_before')} {t('auth:onboarding.terms')}</Text>
+        </Checkbox>
+      </Section>
+
+      <Section title="Badge · Avatar">
+        <Row gap={2} wrap>
+          <Badge label={t('status.active')} tone="success" />
+          <Badge label={t('status.pending_review')} tone="warning" />
+          <Badge label={t('status.rejected')} tone="danger" />
+          <Badge label={t('status.draft')} />
+          <Badge label={t('price.free')} tone="primary" />
+        </Row>
+        <Row gap={3}>
+          <Avatar name="Nguyễn Văn An" size="sm" />
+          <Avatar name="Trần Thị Bình" />
+          <Avatar name="Lê Văn Cường" size="lg" />
+        </Row>
+      </Section>
+
+      <Section title="Card · Divider">
+        <Card onPress={() => toast.show(t('dev.sample'))} accessibilityLabel={t('dev.sample')}>
+          <Text variant="label">{t('dev.sample')}</Text>
+          <Divider className="my-2" />
+          <Text tone="muted">{t('feature.pass')}</Text>
+        </Card>
+      </Section>
+
+      <Section title="Skeleton · Empty · Error">
+        <SkeletonListingCard />
+        <EmptyState title={t('states.empty_title')} action={{ label: t('actions.post'), onPress: () => toast.show(t('actions.post')) }} />
+        <ErrorState code="network" onRetry={() => toast.show(t('actions.retry'), 'danger')} />
+      </Section>
+
+      <Section title="BottomSheet · Toast">
+        <Row gap={2} wrap>
+          <Button label="BottomSheet" variant="outline" onPress={() => setSheet(true)} />
+          <Button label="Toast" variant="outline" onPress={() => toast.show(t('auth:signed_in'), 'success')} />
+        </Row>
+        <BottomSheet open={sheet} onClose={() => setSheet(false)} title={t('auth:dialog.title')}>
+          <Text tone="muted">{t('auth:dialog.description')}</Text>
+          <Button label={t('actions.close')} fullWidth onPress={() => setSheet(false)} />
+        </BottomSheet>
       </Section>
 
       <Section title="Chip">

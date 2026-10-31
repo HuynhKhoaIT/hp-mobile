@@ -13,11 +13,6 @@
     "light": "Light",
     "dark": "Dark"
   },
-  "locale": {
-    "vi": "Tiếng Việt",
-    "en": "English",
-    "zh": "中文"
-  },
   "footer": {
     "rights": "© {{year}} {{appName}}"
   },
@@ -31,5 +26,24 @@
     "sizes": "Sizes",
     "states": "States",
     "disabled": "Disabled"
+  },
+  "legal": {
+    "about": "About",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "delete_account": "Delete account",
+    "contact": "Contact",
+    "drafting": "This page is being written and will be available before the app launches.",
+    "about_body": "{{appName}} is a community app that helps workers around Dung Quat buy and sell used items, find rooms and jobs, recover lost items, share rides and join sports games.",
+    "about_independent": "This is an independent personal project. It is not part of, and does not represent, Hoa Phat Group."
+  },
+  "login": {
+    "title": "Sign in"
+  },
+  "me": {
+    "phone": "Phone number",
+    "site": "Workplace",
+    "no_site": "Not selected",
+    "interests": "Interests"
   }
 }

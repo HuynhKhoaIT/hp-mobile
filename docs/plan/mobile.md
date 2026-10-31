@@ -104,6 +104,15 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - [ ] EAS: `eas init` gắn project, development build (MMKV là module native → **không chạy trong Expo Go**, cần dev client).
 - Ghi chú phiên bản: Expo SDK 58 đi kèm Reanimated **4.7** (CLAUDE.md ghi Reanimated 3 — API dùng như cũ, worklets tách sang `react-native-worklets`).
 
+## 5c. Tiến độ tuần 2 (cập nhật 2026-10-31)
+- [x] Design system bước 2–5: `Header`, `Row` / `Col` / `Spacer` / `Divider`, `Button` (6 biến thể, nhấn 0.97, haptic tuỳ chọn), `IconButton`, `Input` (nhãn, gợi ý, lỗi, suffix), `Checkbox`, `Badge`, `Avatar`, `Card`, `Icon` (Lucide), `Skeleton` (shimmer 1.2s, tắt khi Reduce Motion), `SkeletonListingCard`, `EmptyState`, `ErrorState`, `Toast` (`toast.show`), `BottomSheet`, `Select` / `MultiSelect`, `PriceInput`; tất cả có trong `ui-gallery`
+- [ ] `DateTimePicker` — cần `@react-native-community/datetimepicker` (ngoài danh sách stack, hỏi trước); làm cùng form ghép xe tuần 7
+- [x] `src/core/auth`: `requireAuth(action)` (lưu hành động, quay lại đúng màn bằng `router.dismissTo`), `continueAfterSignIn`, `finishAuthFlow`, `signOutApp`, `signInWithGoogleApp` (PKCE, `hoaphat://auth/callback`)
+- [x] `(auth)/phone` → `otp` (tự xác nhận khi đủ 6 số, gửi lại sau 60s) → `onboarding` 3 bước (ngôn ngữ đổi ngay, tên + đồng ý điều khoản, nơi làm việc + quan tâm, bỏ qua được); màn chính tạm có nút Đăng nhập / Đăng xuất để thử
+- [x] Đã kiểm: typecheck, lint, `expo export --platform android` (4313 module, một bản React / TanStack Query / SupabaseProvider)
+- [ ] Chạy trên máy thật: cần development build (EAS) — MMKV không có trong Expo Go
+- Ghi chú: avatar ở onboarding dời sang tuần 3 cùng `ImagePicker` + bucket `avatars`
+
 ## 6. Hạ tầng kỹ thuật
 - **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
 - **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`. Giá trị thật trong EAS Secrets.

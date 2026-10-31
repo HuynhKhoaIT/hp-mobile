@@ -12,6 +12,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { useTrackLastPath } from '@/core/auth';
 import { AppProviders } from '@/core/providers';
 import { useScheme } from '@/ui';
 
@@ -25,6 +26,8 @@ export default function RootLayout() {
     BeVietnamPro_700Bold,
   });
   const scheme = useScheme();
+  // Nhớ màn gần nhất để đăng nhập xong quay lại đúng chỗ (requireAuth).
+  useTrackLastPath();
   // Lỗi tải font vẫn mở app (rơi về font hệ thống), không kẹt ở splash.
   const ready = fontsLoaded || fontError != null;
 

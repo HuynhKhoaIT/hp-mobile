@@ -111,11 +111,14 @@ export const motion = {
   skeletonShimmerMs: 1200,
 } as const;
 
+/** Tỉ lệ khung ảnh: thẻ tin 4:3, avatar 1:1 (class `aspect-card`, `aspect-avatar` ở app và web). */
+export const aspect = { card: '4 / 3', avatar: '1 / 1' } as const;
+
 /** Vùng chạm tối thiểu. */
 export const hitTarget = { primary: 48, secondary: 44 } as const;
 
 /** Kích thước icon Lucide. */
 export const icon = { button: 20, tab: 24, strokeWidth: 1.75 } as const;
 
-export const tokens = { colors, serviceColors, gradients, space, radius, font, shadow, motion, hitTarget, icon } as const;
+export const tokens = { colors, serviceColors, gradients, space, radius, font, shadow, motion, aspect, hitTarget, icon } as const;
 export type Tokens = typeof tokens;

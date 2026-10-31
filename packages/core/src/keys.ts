@@ -6,7 +6,8 @@ export const keys = {
   all: ['hp'] as const,
 
   profile: (id: string) => ['hp', 'profile', id] as const,
-  me: () => ['hp', 'me'] as const,
+  /** Hồ sơ của chính mình; truyền userId để đổi tài khoản không dùng nhầm cache. */
+  me: (userId?: string) => (userId ? (['hp', 'me', userId] as const) : (['hp', 'me'] as const)),
   sites: () => ['hp', 'sites'] as const,
 
   listings: (filters?: Filters) => (filters ? (['hp', 'listings', filters] as const) : (['hp', 'listings'] as const)),

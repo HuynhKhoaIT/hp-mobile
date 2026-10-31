@@ -72,6 +72,14 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 - [ ] Đăng nhập Google (cần OAuth client) · `[auth.hook.send_sms]` → `send-otp` → tuần 2
 - [x] Màu dịch vụ `serviceColors`: tông dịu, `fg` + `soft`, light + dark, tương phản ≥ 3:1 (chọn 2026-10-30)
 
+### Tiến độ tuần 2 — phần đăng nhập dùng chung (cập nhật 2026-10-31)
+- [x] Migration `20261031100000_profiles_interests`: `profiles.interests` (CHECK theo FEATURES), không vào `public_profiles`; pgTAP 84
+- [x] Seed: `0900000002` là tài khoản mới chưa onboarding (thử màn onboarding); các số khác đã đồng ý điều khoản
+- [x] `@hp/shared`: `normalizeVnPhone` / `toE164` / `formatVnPhone` (+ test), `PhoneInput`, `OtpInput`, `FEATURES`, `CONSENT_VERSION`, `OTP_LENGTH`, `OTP_RESEND_SECONDS`; i18n `auth`, lỗi `phone_invalid` / `otp_invalid` / `sms_failed`, `common.nav`, `common.states`, `common.locale`
+- [x] `@hp/core`: `sendPhoneOtp`, `verifyPhoneOtp`, `signInWithGoogle`, `exchangeCodeForSession`, `signOut`, `needsOnboarding`, `toAuthError`; entry `@hp/core/react` (provider + hook). Đã chạy thật với Supabase local: số sai, mã sai, đăng nhập, onboarding, đăng xuất
+- [ ] **`send-otp` (Auth Hook gửi SMS / Zalo ZNS) — chờ chọn nhà cung cấp** (tài khoản Zalo OA + ZNS template, hoặc SMS brandname). Chưa có thì staging không gửi được SMS thật: dùng số test của Supabase (Dashboard → Authentication → Providers → Phone → Test phone numbers)
+- [ ] Google OAuth: chờ OAuth client (Google Cloud) → bật provider trên Supabase local / staging; code app + web đã sẵn
+
 ### Tiến độ tuần 2 (cập nhật 2026-10-30)
 - [x] Migration `20261030100000_core`: `sites`, `profiles` (+ trigger tạo từ `auth.users`, guard cột, consent), `ratings` (+ trigger avg / count), `notifications` (Realtime, chỉ sửa `read_at`), `bookmarks`, `badge_requests` (+ trigger duyệt), `blocks`, `rate_limits` + `assert_rate_limit`, `audit_log` (chỉ thêm); helper `is_staff`, `is_admin`, `is_banned`, `is_blocked`, `short_name`; view `public_profiles`
 - [x] Hook JWT `custom_access_token_hook` (Postgres) — đã thử: JWT moderator có `app_metadata.role = moderator`
@@ -95,6 +103,7 @@ Ghi mỗi khi mục 2 đổi. Client đọc bảng này để biết phải cậ
 
 | Ngày | Mục | Thay đổi | Việc ở mobile | Việc ở web | Trạng thái |
 |---|---|---|---|---|---|
+| 2026-10-31 | DB + `@hp/shared` + `@hp/core` | `profiles.interests`; schema `PhoneInput` / `OtpInput`; hàm auth (`sendPhoneOtp`, `verifyPhoneOtp`, `signInWithGoogle`, `exchangeCodeForSession`, `signOut`, `needsOnboarding`); **`SupabaseProvider` chuyển sang `@hp/core/react`**; `keys.me(userId)`; `common.locale` thay `web.locale`; token `aspect` (`aspect-card`, `aspect-avatar`) | import provider từ `@hp/core/react`; màn phone / otp / onboarding | `/dang-nhap`, `/auth/callback`, LoginDialog | xong |
 | 2026-10-31 | `@hp/tokens` + i18n `web` | Token mới `onAccent` (chữ tối trên nút cam, tương phản 6,3:1 thay vì 2,8:1 của chữ trắng). Namespace `web`: `meta`, `header`, `theme`, `locale`, `footer`, `home`, `dev` | `Text` có tone `onAccent` | `Button` `accent` dùng `text-on-accent`; header / footer dùng ns `web` | xong |
 | 2026-10-31 | `@hp/core` + `@hp/tokens` | `@hp/core`: `SupabaseProvider`, `useSupabase` (peer `react >= 19`). `@hp/tokens`: sinh thêm `tailwind.preset.cjs` (export `@hp/tokens/tailwind.preset`) cho NativeWind 4, CI kiểm file đã sinh lại | `AppProviders` dùng `SupabaseProvider`; NativeWind dùng preset | bọc `SupabaseProvider` khi thêm hook TanStack dùng chung | xong |
 | 2026-10-31 | DB + `@hp/core` | Migration `20261031090000_sites_dung_quat`: `sites` chỉ còn khu Dung Quất (`hoa_phat_dung_quat`, `cang_dung_quat`, `vsip_quang_ngai`, `hyundai_eco_vina`; mã `dung_quat` bỏ); cột `is_active`, `sort_order`; policy select chỉ khu đang hiện (admin thấy hết); audit trigger. `listSites` lọc `is_active`, sắp `sort_order` | onboarding chọn khu từ `listSites` (không hard-code mã) | `/admin/catalog` quản lý sites (tuần 10) | xong (DB) |

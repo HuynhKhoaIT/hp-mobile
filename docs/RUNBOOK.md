@@ -48,7 +48,7 @@ Trên Windows, container `supabase_vector` (thu log) có thể khởi động l�
 | SĐT | Vai trò | Tên |
 |---|---|---|
 | 84900000001 | user | Nguyễn Văn An |
-| 84900000002 | user | Trần Thị Bình |
+| 84900000002 | user | (trống) — tài khoản mới, chưa onboarding: dùng để thử màn onboarding |
 | 84900000003 | user **bị cấm** | Lê Văn Cấm |
 | 84900000004 | moderator | Phạm Thị Duyệt |
 | 84900000005 | admin | Hoàng Văn Quản |

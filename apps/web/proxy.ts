@@ -3,6 +3,7 @@
 // Vai trò đọc từ JWT claims (app_metadata.role) — không query DB ở đây.
 import createIntlMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
+import { splitLocale } from '@/i18n/paths';
 import { routing } from '@/i18n/routing';
 import { updateSession } from '@/lib/supabase/proxy';
 
@@ -14,15 +15,6 @@ const STAFF = new Set(['moderator', 'admin']);
 const NOINDEX = 'noindex, nofollow';
 
 const isUnder = (path: string, base: string) => path === base || path.startsWith(`${base}/`);
-
-/** Tách locale khỏi đường dẫn: `/en/toi` → { prefix: '/en', path: '/toi' }; tiếng Việt không có tiền tố. */
-function splitLocale(pathname: string) {
-  const first = pathname.split('/')[1] ?? '';
-  const isPrefixed = (routing.locales as readonly string[]).includes(first) && first !== routing.defaultLocale;
-  return isPrefixed
-    ? { prefix: `/${first}`, path: pathname.slice(first.length + 1) || '/' }
-    : { prefix: '', path: pathname };
-}
 
 /** Chuyển hướng nhưng giữ cookie phiên vừa làm mới. */
 function redirectKeepingCookies(url: URL, from: NextResponse) {
@@ -61,6 +53,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Bỏ qua API, file tĩnh, _next, _vercel và mọi đường dẫn có dấu chấm (favicon, .well-known…).
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  // Bỏ qua API, /auth/callback (OAuth, tự đổi code lấy phiên), file tĩnh, _next, _vercel và đường dẫn có dấu chấm.
+  matcher: ['/((?!api|auth/callback|_next|_vercel|.*\\..*).*)'],
 };
