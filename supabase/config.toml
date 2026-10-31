@@ -69,7 +69,7 @@ schema_paths = []
 enabled = true
 # Specifies an ordered list of seed files to load during db reset.
 # Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
+sql_paths = ["./seed.sql", "./seed/*.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.
@@ -269,13 +269,25 @@ max_frequency = "5s"
 
 # Use pre-defined map of phone number to OTP for testing.
 # Keys are the phone number with country code and without the + prefix.
-# SĐT test cho dev / seed (không gửi SMS thật). Khớp tests.create_user trong supabase/tests/_helpers.psql.
+# SĐT test cho dev / seed (không gửi SMS thật, OTP cố định 123456) — cách đăng nhập duy nhất cho tới khi có send-otp.
+# 01–05: user seed, khớp tests.create_user trong supabase/tests/_helpers.psql.
+# 10–19: không có trong seed → mỗi số là một tài khoản mới, dùng để thử onboarding nhiều lần (db reset để dùng lại).
 [auth.sms.test_otp]
 84900000001 = "123456"
 84900000002 = "123456"
 84900000003 = "123456"
 84900000004 = "123456"
 84900000005 = "123456"
+84900000010 = "123456"
+84900000011 = "123456"
+84900000012 = "123456"
+84900000013 = "123456"
+84900000014 = "123456"
+84900000015 = "123456"
+84900000016 = "123456"
+84900000017 = "123456"
+84900000018 = "123456"
+84900000019 = "123456"
 
 # Configure logged in session timeouts.
 # [auth.sessions]
@@ -297,7 +309,7 @@ uri = "pg-functions://postgres/public/custom_access_token_hook"
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 # LOCAL ONLY: provider giả để GoTrue bật đăng nhập SĐT; chỉ số trong [auth.sms.test_otp] dùng được (không gọi Twilio).
-# Tuần 2 thay bằng [auth.hook.send_sms] → Edge Function send-otp (Zalo ZNS). Không phải secret thật.
+# Khi có nhà cung cấp SMS / Zalo ZNS: thay bằng [auth.hook.send_sms] → Edge Function send-otp. Không phải secret thật.
 [auth.sms.twilio]
 enabled = true
 account_sid = "local-dev-not-real"

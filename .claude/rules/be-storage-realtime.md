@@ -10,7 +10,7 @@ paths:
 | Bucket | public | file_size_limit | allowed_mime_types | Đường dẫn |
 |---|---|---|---|---|
 | `listing-images` | true | 2 MB | image/webp, image/jpeg | `{user_id}/{listing_id}/{n}.webp` |
-| `avatars` | true | 1 MB | image/webp, image/jpeg | `{user_id}.webp` (512px) |
+| `avatars` | true | 1 MB | image/webp, image/jpeg | `{user_id}/{timestamp}.webp` (512px; tên mới mỗi lần đổi, `profiles.avatar_url` lưu path) |
 | `verification` | false | 5 MB | image/webp, image/jpeg, application/pdf | `{user_id}/{badge}/{ts}.webp` |
 | `chat-images` | false | 2 MB | image/webp, image/jpeg | `{conversation_id}/{message_id}.webp` |
 

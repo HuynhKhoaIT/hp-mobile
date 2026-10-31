@@ -58,9 +58,16 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
       className={cn('h-full', beVietnamPro.variable, isZh && [notoSansSc.variable, 'lang-zh'])}
     >
       <body className="flex min-h-full flex-col">
-        {/* Client chỉ nhận namespace cần cho component tương tác. Header / footer ở layout của (marketing) và (app). */}
+        {/* Client chỉ nhận namespace cần cho component tương tác. Header / footer ở layout của (marketing) và (app).
+            `listing`: thẻ tin của "Xem thêm", chia sẻ, liên hệ (features/listing/components). */}
         <NextIntlClientProvider
-          messages={{ web: messages.web, common: messages.common, errors: messages.errors, auth: messages.auth }}
+          messages={{
+            web: messages.web,
+            common: messages.common,
+            errors: messages.errors,
+            auth: messages.auth,
+            listing: messages.listing,
+          }}
         >
           <ThemeProvider>{children}</ThemeProvider>
         </NextIntlClientProvider>

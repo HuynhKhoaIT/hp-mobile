@@ -66,13 +66,16 @@ Extensions: `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`.
 - `audit_log(id identity, actor_id, action <đối_tượng>.<động_từ>, target_type, target_id text, meta)` — staff insert với `actor_id = auth.uid()`, admin đọc, trigger chặn update / delete.
 - Hook `custom_access_token_hook` (Postgres function, `pg-functions://`) chép `profiles.role` vào JWT `app_metadata.role` cho middleware web. Quyền thật luôn kiểm bằng `is_staff()` / `is_admin()` đọc `profiles`.
 
-### Listing
+### Listing (migration `20261031110000_listings`, `20261031120000_public_listings`, storage `20261031130000_storage_listing_avatars`)
 - enum `listing_category`: `pass_electronics, pass_vehicle, pass_ppe, pass_home, room_rent, room_share, job_main, job_parttime, lost, found`.
 - enum `listing_status`: `draft, pending_review, active, sold, closed, expired, rejected`.
 - `listings`: `owner_id`, `category`, `status`, `title` (≤120), `slug` (tiêu đề không dấu + id ngắn, sinh bằng trigger, unique), `short_id` (6 ký tự base36, unique), `description`, `price`, `price_type fixed|negotiable|free`, `attributes jsonb` (validate bằng Zod theo category), `site`, `location`, `address_text`, `images text[]`, `lang` (`vi|en|zh`), `view_count`, `expires_at`, `search_vector tsvector generated` (`'simple'`), `deleted_at`.
 - Index: `(category, status, created_at desc)`, GIST `location`, GIN `search_vector`, GIN trigram `title`, GIN `attributes`.
-- `listing_translations(listing_id, lang, title, description)` pk `(listing_id, lang)`.
-- `listing_views(listing_id, user_id, viewed_at)` cho gợi ý.
+- Trigger `trg_listings_identity` sinh `short_id` / `slug` (đổi tiêu đề → slug mới, giữ `short_id`) và `expires_at` mặc định (`listing_default_ttl`); `trg_listings_guard`: chủ tin chỉ đặt `draft | active | sold | closed`, không tự mở lại `pending_review | rejected | expired`, không đổi `owner_id`, `category`, `view_count`, `expires_at`. `search_vector` dùng `f_unaccent` (bỏ dấu, đ → d). Không có quyền delete: xoá mềm `deleted_at`.
+- View `public_listings` (anon + authenticated): tin active, chưa xoá, chưa hết hạn, chủ tin không bị cấm / xoá, ẩn hai chiều khi chặn; `lat` / `lng` làm tròn lưới 0.003°, `distance_to_site_m` (làm tròn 100 m), `site_name`, `owner_name` ("An N."), `owner_avatar_url`, `owner_badges`, `owner_rating_*`, `owner_since`. Không SĐT, không `location` chính xác.
+- `listing_translations(listing_id, lang, title, description)` pk `(listing_id, lang)` — chỉ service role.
+- `listing_views(listing_id, user_id, viewed_on, viewed_at)` pk 1 lượt / người / ngày, ghi qua RPC `record_listing_view` (tăng `view_count`, không đếm chủ tin / khách).
+- `search_logs(query ≤100, category, results_count, user_id)` ghi qua RPC `log_search` (anon được), staff đọc.
 
 Hết hạn mặc định (`expires_at`): pass/room 30 ngày, job 14 ngày, lost/found 60 ngày.
 
@@ -112,7 +115,7 @@ Hết hạn mặc định (`expires_at`): pass/room 30 ngày, job 14 ngày, lost
 
 ### Phục vụ web Next.js
 - Auth: bật provider Phone (OTP) và **Google**; thêm `https://tenapp.vn/**`, `https://*.vercel.app/**` (preview) và URL dev vào Redirect URLs. Web giữ phiên bằng cookie qua `@supabase/ssr`.
-- RPC công khai (cho phép anon, `stable`, `security invoker`): `get_listing_by_slug(slug)`, `get_group_by_slug(slug)`, `search_listings(...)`, `search_groups(...)`, `similar_listings(id, limit)`, `public_stats()` (số người dùng, tin, chuyến — cache 1 giờ), `sitemap_listings(page)` (id, slug, updated_at của tin active, 10.000/trang).
+- RPC công khai (cho phép anon, `stable`, `security invoker`) — **đã có**: `search_listings`, `get_listing_by_slug`, `similar_listings`, `log_search` (volatile, definer); user: `record_listing_view`. Dự kiến: `get_listing_by_slug(slug)`, `get_group_by_slug(slug)`, `search_listings(...)`, `search_groups(...)`, `similar_listings(id, limit)`, `public_stats()` (số người dùng, tin, chuyến — cache 1 giờ), `sitemap_listings(page)` (id, slug, updated_at của tin active, 10.000/trang).
 - Khi tin/nhóm đổi trạng thái hoặc nội dung: DB webhook gọi `revalidate` của web (`POST https://tenapp.vn/api/revalidate` có secret, body `{tag: 'listing:{id}'}`) để trang ISR cập nhật ngay.
 - Web không có push: `send-push` bỏ qua người dùng không có `push_tokens`; bảng `notifications` vẫn là nguồn để web hiện chấm đỏ.
 - Anon có thể đọc nhiều → index phải phủ mọi truy vấn công khai; giới hạn `p_limit` tối đa 50; không trả cột nhạy cảm qua RPC công khai.
@@ -156,7 +159,7 @@ export default handler(async ({ req, user, admin }) => {
 | Bucket | Truy cập | Đường dẫn & giới hạn |
 |---|---|---|
 | `listing-images` | đọc public, ghi khi `(storage.foldername(name))[1] = auth.uid()::text` | `{user_id}/{listing_id}/{n}.webp`, ≤ 2 MB, chỉ image/webp, image/jpeg |
-| `avatars` | đọc public | `{user_id}.webp`, 512px |
+| `avatars` | đọc public, ghi thư mục của mình | `{user_id}/{timestamp}.webp`, ≤ 1 MB, 512px; `profiles.avatar_url` lưu path (ảnh Google: URL đầy đủ) — client dựng URL bằng `avatarUrl()` |
 | `verification` | riêng tư, chỉ chủ upload + staff đọc | xoá tự động 30 ngày sau khi duyệt |
 | `chat-images` | riêng tư, signed URL 1 giờ, chỉ member | `{conversation_id}/{message_id}.webp` |
 

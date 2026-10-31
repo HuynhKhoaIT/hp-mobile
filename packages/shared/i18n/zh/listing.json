@@ -1,1 +1,148 @@
-{}
+{
+  "hub": {
+    "greeting": "{{name}}，你好",
+    "greeting_guest": "你好",
+    "subtitle": "Dung Quất 周边的一切",
+    "latest_title": "最新发布",
+    "latest_near": "{{site}}附近的最新信息",
+    "see_all": "查看全部"
+  },
+  "list": {
+    "title_all": "全部信息",
+    "filter_all": "全部",
+    "search_placeholder": "在{{feature}}中搜索",
+    "search_submit": "搜索",
+    "clear_search": "清除关键词",
+    "site_filter": "区域",
+    "site_any": "所有区域",
+    "empty_title": "暂无信息",
+    "empty_body": "成为第一个在这里发布的人吧。",
+    "empty_search_title": "没有找到相关信息",
+    "empty_search_body": "试试其他关键词或减少筛选条件。",
+    "post_cta": "发布信息",
+    "load_more": "加载更多",
+    "end": "已经到底了",
+    "loading_more": "正在加载…"
+  },
+  "card": {
+    "no_image": "暂无图片",
+    "distance_to_site": "距{{site}} {{distance}}",
+    "salary_range": "{{min}} – {{max}}",
+    "salary_from": "{{min}}起",
+    "per_month": "{{price}}/月",
+    "per_hour": "{{price}}/小时",
+    "per_day": "{{price}}/天"
+  },
+  "detail": {
+    "title": "信息详情",
+    "description": "描述",
+    "no_description": "发布者尚未填写描述。",
+    "attributes": "详细信息",
+    "location": "区域",
+    "approx_location": "为保护发布者，仅显示大致位置（约300米）",
+    "posted_by": "发布者",
+    "member_since": "{{date}}加入",
+    "rating": "{{avg}} ★（{{count}}条评价）",
+    "no_rating": "暂无评价",
+    "posted_at": "发布于{{time}}",
+    "expires_at": "{{date}}到期",
+    "views_one": "{{count}}次浏览",
+    "views_other": "{{count}}次浏览",
+    "contact": "发消息",
+    "contact_soon": "与发布者聊天功能将在下次更新中推出。",
+    "share": "分享",
+    "share_text": "{{title}} — 来自{{app}}",
+    "link_copied": "链接已复制",
+    "report": "举报信息",
+    "similar": "相似信息",
+    "not_found_title": "信息已不存在",
+    "not_found_body": "信息已被删除、已过期或链接有误。",
+    "back_to_list": "返回列表",
+    "image_count": "图片 {{current}}/{{total}}",
+    "safety_tip": "看货、看房之前不要先付定金。"
+  },
+  "attr": {
+    "brand": "品牌",
+    "model": "型号",
+    "condition": "成色",
+    "warranty_months": "保修",
+    "vehicle_type": "车型",
+    "year": "年份",
+    "odometer_km": "里程",
+    "plate_prefix": "车牌省份",
+    "item_type": "物品类型",
+    "size": "尺码",
+    "area_m2": "面积",
+    "electricity_price": "电费",
+    "water_price": "水费",
+    "has_loft": "有阁楼",
+    "has_parking": "停车位",
+    "curfew": "门禁时间",
+    "max_people": "最多入住",
+    "shift": "班次",
+    "salary_min": "最低工资",
+    "salary_max": "最高工资",
+    "pay_type": "计薪方式",
+    "requirements": "要求",
+    "contact_name": "联系人",
+    "lost_at": "时间",
+    "place": "地点",
+    "identifying_marks": "识别特征",
+    "returned": "已归还"
+  },
+  "attr_value": {
+    "condition": {
+      "new": "全新",
+      "like_new": "几乎全新",
+      "used": "二手"
+    },
+    "vehicle_type": {
+      "motorbike": "摩托车",
+      "car": "汽车",
+      "bicycle": "自行车"
+    },
+    "item_type": {
+      "boots": "安全鞋",
+      "helmet": "安全帽",
+      "uniform": "工作服",
+      "gloves": "手套",
+      "wallet": "钱包",
+      "phone": "手机",
+      "keys": "钥匙",
+      "card": "卡 / 证件",
+      "bag": "包",
+      "other": "其他"
+    },
+    "shift": {
+      "day": "白班",
+      "night": "夜班",
+      "rotating": "轮班"
+    },
+    "pay_type": {
+      "hour": "按小时",
+      "day": "按天",
+      "month": "按月"
+    },
+    "bool": {
+      "yes": "有",
+      "no": "无"
+    }
+  },
+  "unit": {
+    "m2": "{{value}} 平方米",
+    "km": "{{value}} 公里",
+    "year": "{{value}}年",
+    "months_one": "{{count}}个月",
+    "months_other": "{{count}}个月",
+    "people_one": "{{count}}人",
+    "people_other": "{{count}}人",
+    "per_kwh": "{{price}}/度"
+  },
+  "owner_badge": {
+    "phone": "手机号已验证",
+    "worker": "已认证工人",
+    "landlord": "已认证房东",
+    "venue": "已认证场地主",
+    "employer": "已认证雇主"
+  }
+}

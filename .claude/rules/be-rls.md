@@ -28,7 +28,8 @@ create policy listings_update_owner on public.listings for update to authenticat
 -- chủ tin không tự đổi pending_review/rejected → active: chặn bằng trigger trg_listings_guard_status
 
 create policy listings_update_staff on public.listings for update to authenticated
-  using (is_staff()) with check (true);
+  using (is_staff()) with check (is_staff());
+-- KHÔNG with check (true): Postgres OR with check của mọi policy permissive → 'true' mở update cho cả người không phải staff
 ```
 - Người dùng khác xem tin active qua `public_listings`; view ẩn tin của người đã chặn người xem (`not is_blocked(owner_id, auth.uid())`).
 - `messages`: insert khi `is_member(conversation_id) and sender_id = auth.uid() and not is_blocked(...)`; select khi `is_member`.

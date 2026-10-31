@@ -12,4 +12,6 @@ export const env = {
   goongKey: process.env.EXPO_PUBLIC_GOONG_KEY ?? '',
   sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN ?? '',
   posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY ?? '',
+  /** Supabase Image Transformation (resize ảnh qua /render/image). Staging gói Free không có → đặt 'false' để tải ảnh gốc. */
+  imageTransform: process.env.EXPO_PUBLIC_IMAGE_TRANSFORM !== 'false',
 } as const;

@@ -66,7 +66,9 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 | Route | Kiểu | Feature | Tuần | Mở từ |
 |---|---|---|---|---|
 | `(auth)/phone`, `(auth)/otp`, `(auth)/onboarding` | Form | auth | 2 | `requireAuth` |
-| `(tabs)/index` | Hub | — | 3 | cold start |
+| `(tabs)/index` | Hub | — | 3 | cold start (tuần 3 tạm ở `app/index.tsx`, chuyển vào `(tabs)` khi có TabBar) |
+| `listings/[feature]` (`pass` · `room` · `job` · `lost-found` · `all`, `?site=`) | List | listing | 3 | ô dịch vụ ở Hub, "Xem tất cả" |
+| `groups/[kind]` (`ride` · `sport`) | List | group | 3 (tạm "Sắp ra mắt") → 7–8 | ô dịch vụ ở Hub |
 | `(tabs)/explore` | List | listing + group | 8 | tab |
 | `(tabs)/post` | Hub (chọn loại tin) | — | 4 | tab, nút Đăng xoay 45° |
 | `(tabs)/chat/index` | List | chat | 5 | tab, push `new_message` không có id |
@@ -113,9 +115,24 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - [ ] Chạy trên máy thật: cần development build (EAS) — MMKV không có trong Expo Go
 - Ghi chú: avatar ở onboarding dời sang tuần 3 cùng `ImagePicker` + bucket `avatars`
 
+## 5d. Tiến độ tuần 3 — xem tin (cập nhật 2026-10-31)
+- [x] Design system bước 7 (phần đọc): `ListingCard` (`layout` grid / row; thứ tự khớp web: ảnh 4:3 hoặc ô giữ chỗ màu dịch vụ → badge danh mục + badge ngôn ngữ → tiêu đề 2 dòng → giá 700 → khu + khoảng cách · thời gian), `ListingCover`, `SkeletonListingCard` (grid 2 cột / row / hàng ngang), `SkeletonListingDetail`, `ServiceTile`, `SectionHeader`, `SearchBar`, `FilterBar` (+ `Select trigger="chip"`), `Fab`, `StaggerItem`, `StickyCta`, `Notice`, `ImageGallery`; `Icon service`, `Card padded`, `Badge numberOfLines`, `Chip trailingIcon`; map icon dịch vụ ở `src/ui/service.ts` (Package · House · Briefcase · Search · Car · Trophy). Tất cả có trong `ui-gallery`
+- [x] `features/listing` engine: `types.ts` (`ListingFeatureConfig`: categories, color, card.variant, estimatedHeight, filters), `hooks.ts` (`useListingBrowser` — từ khoá / category / khu → `useListingList` cursor + `logSearch`; `usePostListing`, `useContactListing` bọc `requireAuth`; `useShareListing` URL web), `navigation.ts`, components `ListingFeed` (FlashList v2, kéo làm mới, tải trang tiếp khi còn ~5 item), `ListingDetail`, `AttributeList` (`readAttributes`), `OwnerCard`, `ListingRail`
+- [x] Config 4 tính năng: `features/{pass,room,job,lost-found}/config.ts` (pass / room lưới 2 cột, job / lost-found thẻ hàng) + `allListingsConfig`
+- [x] Hub `app/index.tsx`: chào theo tên, 6 ô dịch vụ (4 Listing → danh sách; ghép xe / ghép trận → "Sắp ra mắt"), "Tin mới quanh {khu}" / "Tin mới đăng" + Xem tất cả, đăng nhập / đăng xuất, dòng miễn trừ, lối vào gallery khi dev
+- [x] `listings/[feature]`, `listing/[id]` + alias `tin/[slug]` (Universal Link; không thấy → "Tin không còn"), `groups/[kind]` tạm; Nhắn tin = `requireAuth` → toast (chat tuần 5); Chia sẻ = `https://tenapp.vn/tin/{slug}`; đếm lượt xem `useRecordListingView`
+- [x] `@shopify/flash-list` 2.3.2 (bản SDK 58): v2 tự đo item, bỏ `estimatedItemSize` — `card.estimatedHeight` dùng để tính ngưỡng `onEndReached`
+- [x] Query không thử lại với lỗi `not_found` / `invalid_input` / `forbidden` / `auth_required` / `banned` (màn "Tin không còn" hiện ngay)
+- [x] i18n mới: `listing.owner_badge.{phone,worker,landlord,venue,employer}` (3 ngôn ngữ)
+- [x] Đã kiểm: `tsc --noEmit`, `lint`, `i18n:check`, `expo export --platform android` (4398 module, Hermes 8,6 MB)
+- [ ] Avatar ở onboarding / hồ sơ: cần `expo-image-picker` (ngoài danh sách stack — chờ duyệt) + `ImagePicker` của `@/ui`; hook `useUploadAvatar` đã có ở `@hp/core`
+- [ ] `(tabs)/_layout` + `TabBar`; ô tìm kiếm ở Hub (khi có màn `search`, tuần 4); header Hub gradient (cần `expo-linear-gradient`, ngoài stack — đang dùng nền `bg-primary`)
+- [ ] Shared element ảnh card → chi tiết; event `view_listing` / `contact` (chờ `src/core/analytics` tuần 4); `associatedDomains` / `intentFilters` cho `tenapp.vn/tin/*` (tuần 11)
+- [ ] Chạy trên máy thật (dev build): 200 item seed cuộn nhanh, light / dark, 360px, font 150%, Reduce Motion, vi / en / zh
+
 ## 6. Hạ tầng kỹ thuật
 - **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
-- **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`. Giá trị thật trong EAS Secrets.
+- **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`, `EXPO_PUBLIC_IMAGE_TRANSFORM` (mặc định `true`; staging gói Free không có Image Transformation → `false`, tải ảnh gốc). Giá trị thật trong EAS Secrets.
 - **EAS**: profile `development` (dev client, Supabase local / staging), `staging` (internal, channel `staging`, Supabase staging), `production` (store, channel `production`). GitHub Actions: PR → tsc / lint / i18n:check / test; merge `main` → `eas update --channel staging`; tag `v*` → `eas build --profile production`.
 - **Push**: Expo Push; token ghi `profiles.push_tokens` khi đăng nhập và khi token đổi; xoá khi đăng xuất. Payload `{ screen, params }` → `routeForNotification`.
 - **Deep link**: `tenapp.vn/tin/{slug}` → `tin/[slug]` → resolve `short_id` (6 ký tự cuối slug) → `listing/[id]`; `nhom/{slug}` tương tự; `hoaphat://chat/{id}` chỉ cho push.
@@ -128,6 +145,7 @@ Ghi mỗi khi `@hp/core` / `@hp/shared` / RPC / Edge Function đổi API và mob
 | Ngày | Gói / RPC / Function | Thay đổi | Việc ở mobile | Trạng thái |
 |---|---|---|---|---|
 | 2026-10-31 | `@hp/core`, `@hp/tokens` | Mới: `SupabaseProvider`, `useSupabase` (React peer); `@hp/tokens/tailwind.preset` (NativeWind) | `AppProviders` bọc `SupabaseProvider`; `tailwind.config.js` dùng preset | xong |
+| 2026-10-31 | `@hp/core` listings + hooks, `@hp/shared` `priceLabel` / `readAttributes` / `featureOfCategory` | Mới: đọc tin công khai (`searchListings` cursor, `getListing(BySlug)`, `similarListings`, `recordListingView`, `logSearch`, `imageUrl(…, transform)`, `avatarUrl`, `shareUrl`) | Hub, danh sách 4 tính năng, chi tiết + `tin/[slug]`; `EXPO_PUBLIC_IMAGE_TRANSFORM` | xong |
 
 ## 8. Rủi ro riêng mobile
 | Rủi ro | Giảm thiểu |

@@ -1,14 +1,12 @@
-// Trang giữ chỗ: Danh sách tin (tuần 3). Thanh điều hướng đã trỏ tới đây nên không để 404.
+// /tin — Khám phá: tất cả tin (4 tính năng Listing), chip dẫn sang trang từng tính năng. Dùng chung features/listing.
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { ComingSoon } from '@/components/shared/coming-soon';
+import { ListingListPage } from '@/features/listing/components/listing-list-page';
+import { listMetadata } from '@/features/listing/metadata';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('common.nav');
-  return { title: t('explore') };
+export function generateMetadata({ searchParams }: PageProps<'/[locale]/tin'>): Promise<Metadata> {
+  return listMetadata('all', searchParams);
 }
 
-export default async function Page() {
-  const t = await getTranslations('common.nav');
-  return <ComingSoon title={t('explore')} />;
+export default function Page({ searchParams }: PageProps<'/[locale]/tin'>) {
+  return <ListingListPage scope="all" searchParams={searchParams} />;
 }

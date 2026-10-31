@@ -1,6 +1,7 @@
 'use client';
 
-// Onboarding 3 bước (giống app): 1 ngôn ngữ · 2 tên + đồng ý điều khoản (bắt buộc, Nghị định 13/2023) ·
+// Onboarding 3 bước (giống app): 1 ngôn ngữ · 2 ảnh đại diện (không bắt buộc, upload ngay khi chọn) + tên + đồng ý điều khoản
+// (bắt buộc, Nghị định 13/2023) ·
 // 3 nơi làm việc + quan tâm (bỏ qua được). Lưu một lần ở bước cuối qua completeOnboarding (@hp/core).
 import { completeOnboarding, listSites, type MyProfile, type Site } from '@hp/core';
 import { CONSENT_VERSION, FEATURES, type Feature, LOCALES, type Locale } from '@hp/shared';
@@ -13,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AvatarPicker } from '@/features/profile/components/avatar-picker';
 import { Link } from '@/i18n/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { useErrorText } from './use-error-text';
@@ -27,6 +29,8 @@ export function OnboardingForm({ profile, onDone }: { profile: MyProfile; onDone
   const [step, setStep] = useState(1);
   const [locale, setLocale] = useState<Locale>(currentLocale);
   const [fullName, setFullName] = useState(profile.full_name);
+  // Ảnh đã upload (giữ khi quay lại bước 2 — picker được dựng lại).
+  const [avatar, setAvatar] = useState(profile.avatar_url);
   const [consent, setConsent] = useState(false);
   const [site, setSite] = useState<string | null>(profile.site);
   const [interests, setInterests] = useState<Feature[]>((profile.interests ?? []) as Feature[]);
@@ -88,6 +92,13 @@ export function OnboardingForm({ profile, onDone }: { profile: MyProfile; onDone
       {step === 2 ? (
         <form onSubmit={submitName} className="flex flex-col gap-4" noValidate>
           <h1 className="text-2xl font-semibold text-fg">{t('auth.onboarding.name_title')}</h1>
+          <AvatarPicker
+            userId={profile.id}
+            initialValue={avatar}
+            label={t('auth.onboarding.avatar_label')}
+            hint={t('auth.onboarding.avatar_hint')}
+            onChange={setAvatar}
+          />
           <div className="flex flex-col gap-2">
             <Label htmlFor={`${id}-name`}>{t('auth.onboarding.name_label')}</Label>
             <Input

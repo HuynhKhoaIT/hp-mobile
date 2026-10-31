@@ -12,5 +12,8 @@
   "otp_invalid": "The code is incorrect or has expired",
   "sms_failed": "We could not send the text message, please try again later",
   "required": "This field is required",
-  "too_long": "This is too long"
+  "too_long": "This is too long",
+  "file_too_large": "The image is too large. Please choose a smaller one.",
+  "upload_failed": "Couldn't upload the image. Please try again.",
+  "file_type": "Only JPG, PNG or WebP images are accepted."
 }

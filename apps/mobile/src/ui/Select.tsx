@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { BottomSheet } from './BottomSheet';
 import { Button } from './Button';
+import { Chip } from './Chip';
 import { Icon } from './Icon';
 import { Text } from './Text';
 
@@ -67,17 +68,41 @@ function OptionRow({ label, selected, onPress }: { label: string; selected: bool
   );
 }
 
+/**
+ * trigger 'field' (mặc định): ô như Input trong form. 'chip': viên lọc trong FilterBar — hiện nhãn lựa chọn,
+ * đánh dấu chọn khi giá trị khác `neutralValue` (vd "Mọi khu").
+ */
 export function Select<T extends string>({
   value,
   options,
   onChange,
+  trigger = 'field',
+  neutralValue,
   ...field
-}: FieldProps & { value: T | null; options: SelectOption<T>[]; onChange: (value: T) => void }) {
+}: FieldProps & {
+  value: T | null;
+  options: SelectOption<T>[];
+  onChange: (value: T) => void;
+  trigger?: 'field' | 'chip';
+  neutralValue?: T;
+}) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
   return (
     <>
-      <Field {...field} display={selected?.label ?? null} onPress={() => setOpen(true)} />
+      {trigger === 'chip' ? (
+        <Chip
+          label={selected?.label ?? field.placeholder ?? t('select.placeholder')}
+          selected={value !== null && value !== neutralValue}
+          trailingIcon={ChevronDown}
+          accessibilityLabel={field.label}
+          accessibilityValue={{ text: selected?.label ?? '' }}
+          onPress={() => setOpen(true)}
+        />
+      ) : (
+        <Field {...field} display={selected?.label ?? null} onPress={() => setOpen(true)} />
+      )}
       <BottomSheet open={open} onClose={() => setOpen(false)} title={field.label}>
         <View className="gap-1">
           {options.map((o) => (

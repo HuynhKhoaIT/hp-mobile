@@ -1,12 +1,21 @@
 // Hook TanStack Query dùng chung app và web (client). Client lấy qua useSupabase(); key chỉ từ keys.ts.
 // queryFn ném AppError (unwrap) để TanStack đánh dấu lỗi; component đọc `error.code` rồi t('errors.' + code).
 import type { Session } from '@supabase/supabase-js';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { keys } from '../keys';
-import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile } from '../profile';
+import {
+  getListing,
+  getListingBySlug,
+  type ListingQuery,
+  type PublicListing,
+  recordListingView,
+  searchListings,
+  similarListings,
+} from '../listings';
+import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile, uploadAvatar } from '../profile';
 import type { AppError, Result } from '../result';
-import { listSites, type Site } from '../social';
+import { listSites, type Page, type Site } from '../social';
 import { useSupabase } from './provider';
 
 /** Result → data, hoặc ném AppError cho TanStack. */
@@ -86,4 +95,86 @@ export function useUpdateProfile() {
       void qc.invalidateQueries({ queryKey: keys.profile(profile.id) });
     },
   });
+}
+
+/** Đổi ảnh đại diện: body đã nén sẵn (app: expo-image-manipulator, web: canvas) → upload → ghi avatar_url. */
+export function useUploadAvatar() {
+  const client = useSupabase();
+  const qc = useQueryClient();
+  return useMutation<MyProfile, AppError, { userId: string; body: ArrayBuffer | Blob; contentType: 'image/webp' | 'image/jpeg' }>({
+    mutationFn: (input) => unwrap(uploadAvatar(client, input)),
+    onSuccess: (profile) => {
+      qc.setQueryData(keys.me(profile.id), profile);
+      void qc.invalidateQueries({ queryKey: keys.profile(profile.id) });
+    },
+  });
+}
+
+// ── Tin đăng (đọc) ──────────────────────────────────────────────────────────────
+
+/** Danh sách tin vô hạn (cursor). Key theo bộ lọc; staleTime 60 s (.claude/rules/mobile-performance.md). */
+export function useListingList(query: Omit<ListingQuery, 'cursor'> = {}, opts: { enabled?: boolean } = {}) {
+  const client = useSupabase();
+  const result = useInfiniteQuery<Page<PublicListing>, AppError, InfiniteData<Page<PublicListing>>, readonly unknown[], string | null>({
+    queryKey: keys.listings(query),
+    queryFn: ({ pageParam }) => unwrap(searchListings(client, { ...query, cursor: pageParam })),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
+    staleTime: 60_000,
+    enabled: opts.enabled ?? true,
+  });
+  const items = result.data?.pages.flatMap((p) => p.items) ?? [];
+  return { ...result, items };
+}
+
+/** Chi tiết theo id (điều hướng nội bộ). Lấy sẵn từ cache danh sách để mở màn không chớp skeleton. */
+export function useListing(id: string | undefined) {
+  const client = useSupabase();
+  const qc = useQueryClient();
+  return useQuery<PublicListing, AppError>({
+    queryKey: keys.listing(id ?? ''),
+    queryFn: () => unwrap(getListing(client, id ?? '')),
+    enabled: !!id,
+    staleTime: 30_000,
+    placeholderData: () => (id ? findCachedListing(qc, id) : undefined),
+  });
+}
+
+/** Chi tiết theo slug (link chia sẻ / Universal Link). */
+export function useListingBySlug(slug: string | undefined) {
+  const client = useSupabase();
+  return useQuery<PublicListing, AppError>({
+    queryKey: keys.listingBySlug(slug ?? ''),
+    queryFn: () => unwrap(getListingBySlug(client, slug ?? '')),
+    enabled: !!slug,
+    staleTime: 30_000,
+  });
+}
+
+export function useSimilarListings(id: string | undefined, limit = 6) {
+  const client = useSupabase();
+  return useQuery<PublicListing[], AppError>({
+    queryKey: keys.similarListings(id ?? ''),
+    queryFn: () => unwrap(similarListings(client, id ?? '', limit)),
+    enabled: !!id,
+    staleTime: 60_000,
+  });
+}
+
+/** Đếm lượt xem một lần khi mở chi tiết (chỉ khi đăng nhập; lỗi bỏ qua). */
+export function useRecordListingView(id: string | undefined) {
+  const client = useSupabase();
+  useEffect(() => {
+    if (id) void recordListingView(client, id);
+  }, [client, id]);
+}
+
+function findCachedListing(qc: ReturnType<typeof useQueryClient>, id: string): PublicListing | undefined {
+  for (const [, data] of qc.getQueriesData<InfiniteData<Page<PublicListing>>>({ queryKey: keys.listings() })) {
+    for (const page of data?.pages ?? []) {
+      const hit = page.items.find((l) => l.id === id);
+      if (hit) return hit;
+    }
+  }
+  return undefined;
 }

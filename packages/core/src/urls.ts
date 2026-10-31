@@ -29,3 +29,22 @@ export function imageUrl(
   if (size === 'original' || !transform) return `${base}/storage/v1/object/public/${bucket}/${p}`;
   return `${base}/storage/v1/render/image/public/${bucket}/${p}?${TRANSFORM[size]}`;
 }
+
+/** Đường dẫn web cố định của 4 tính năng Listing (.claude/rules/web-routing-rsc.md — không đổi khi chưa hỏi). */
+export const LISTING_FEATURE_PATHS = {
+  pass: '/pass-do',
+  room: '/tro',
+  job: '/viec-lam',
+  lostFound: '/that-lac',
+} as const;
+export type ListingFeaturePath = (typeof LISTING_FEATURE_PATHS)[keyof typeof LISTING_FEATURE_PATHS];
+
+/**
+ * URL ảnh đại diện: profiles.avatar_url là path trong bucket avatars (upload trong app / web)
+ * hoặc URL đầy đủ (ảnh Google). null → client hiện chữ cái đầu.
+ */
+export function avatarUrl(supabaseUrl: string, value: string | null | undefined, transform = true): string | null {
+  if (!value) return null;
+  if (/^https?:\/\//.test(value)) return value;
+  return imageUrl(supabaseUrl, 'avatars', value, 'avatar', transform);
+}
