@@ -1,177 +1,98 @@
-// Trang chủ kiểu super app: dải tiêu đề + ô tìm kiếm lớn → lưới module (Dịch vụ, Tiện ích) → số liệu thật →
-// mỗi dịch vụ một dải tin trượt ngang → mẹo an toàn. Server Component, không đọc cookie / searchParams:
-// toàn trang prerender, dữ liệu tin cache 300s (tag listings — webhook DB làm mới), số liệu cache 1 giờ.
-import { formatNumber } from '@hp/shared';
-import { ChevronRight, MapPin, Search, ShieldAlert } from 'lucide-react';
+// Trang chủ (Hub) kiểu super app — docs/design/home.md (thứ tự khối §3, thông số §10). Cùng thứ tự, chữ, dữ liệu với
+// Hub của app (apps/mobile/app/(tabs)/index.tsx).
+// Render (§5): Server Component không đọc cookie / searchParams → prerender tĩnh. Phần công khai (lưới, chip, banner, dải
+// theo dịch vụ, dải "Gần {khu}" của khu mặc định, số liệu) render server + cache 300s (tag `listings` / `banners`; số liệu
+// 1 giờ) nên HTML có tin thật kể cả khi tắt JS. Phần theo người dùng (lời chào, ảnh, chuông, khu đã chọn, thẻ cá nhân,
+// "Dành cho bạn") đọc ở trình duyệt sau khi biết phiên (HomeProvider) — có skeleton, không làm trang thành dynamic.
+// Header: điện thoại dùng header xanh của trang này (AppHeader ẩn ở "/"); từ 640px giữ AppHeader + dải chào (hub-header.tsx).
+import { APP_NAME, type ListingFeature } from '@hp/shared';
+import { Inbox, Plus } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { getPathname, Link } from '@/i18n/navigation';
+import { EmptyState } from '@/components/shared/empty-state';
+import { Button } from '@/components/ui/button';
 import { asLocale } from '@/features/listing/display';
-import { ListingCard } from '@/features/listing/components/listing-card';
-import { getListPage, getPublicStats } from '@/features/listing/queries';
+import { LISTING_FEATURE_ORDER } from '@/features/listing/features';
+import { getPublicSites } from '@/features/listing/queries';
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { HOME_RAILS, type HomeModule, SERVICE_MODULES, UTILITY_MODULES } from '../modules';
-
-const RAIL_SIZE = 8;
+import { getFeatureRail, getHomeBanners, getHomeStats, getNearRail } from '../queries';
+import type { RailData } from '../types';
+import { BannerCarousel } from './banner-carousel';
+import { CommunitySection } from './community-section';
+import { HomeProvider } from './home-context';
+import { FeatureRail, ForYouRail, NearRail } from './home-rails';
+import { HubHeader } from './hub-header';
+import { HubSearch } from './hub-search';
+import { PersonalCard } from './personal-card';
+import { QuickSearch } from './quick-search';
+import { ServiceGrid } from './service-grid';
 
 export async function HomePage() {
   const t = await getTranslations();
   const locale = asLocale(await getLocale());
-  const [stats, rails] = await Promise.all([
-    getPublicStats().catch(() => null),
+  const sites = await getPublicSites();
+  const defaultSite = sites[0]?.code ?? null;
+
+  const [banners, stats, near, featureRails] = await Promise.all([
+    getHomeBanners(locale),
+    getHomeStats(),
+    defaultSite ? getNearRail(defaultSite) : Promise.resolve(null),
     Promise.all(
-      HOME_RAILS.map(async (rail) => {
-        const { page, now } = await getListPage({ categories: rail.categories, site: null, query: '' });
-        return { ...rail, items: page.items.slice(0, RAIL_SIZE), now };
-      }),
+      LISTING_FEATURE_ORDER.map(async (feature): Promise<{ feature: ListingFeature; data: RailData | null }> => ({
+        feature,
+        data: await getFeatureRail(feature),
+      })),
     ),
   ]);
-  const searchAction = getPathname({ href: '/tim-kiem', locale });
+  // Cả cộng đồng chưa có tin nào (đọc thành công, mọi dải rỗng) → một EmptyState thay cho chip + các dải.
+  const noListings = featureRails.every((r) => r.data !== null && r.data.items.length === 0);
+  const hasBanners = banners === null || banners.length > 0;
 
   return (
-    <div className="flex flex-col gap-8 pb-8">
-      {/* Dải tiêu đề + tìm kiếm */}
-      <section className="rounded-b-xl bg-primary px-4 pt-6 pb-8 text-on-primary">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4">
-          <p className="inline-flex items-center gap-1 self-start rounded-full bg-on-primary/15 px-3 py-1 text-sm font-medium">
-            <MapPin className="size-4" strokeWidth={1.75} aria-hidden />
-            {t('web.home.area')}
-          </p>
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-bold sm:text-3xl">{t('listing.hub.subtitle')}</h1>
-            <p className="text-md opacity-90">{t('web.home.tagline')}</p>
+    <HomeProvider sites={sites} initialNear={defaultSite && near ? { site: defaultSite, data: near } : null}>
+      <div className="flex flex-col">
+        <h1 className="sr-only">{t('web.home.heading', { appName: APP_NAME })}</h1>
+        <HubHeader />
+        <HubSearch />
+        {/* Phần đáy dải xanh (pb-16 của header) — lưới dịch vụ nổi đè lên 48px. */}
+        <div aria-hidden className="h-13 rounded-b-xl bg-primary sm:h-16" />
+
+        <div className="relative mx-auto -mt-12 flex w-full max-w-6xl flex-col gap-6 px-4 pb-6 sm:pb-10">
+          <ServiceGrid />
+
+          <div className="flex flex-col gap-6 lg:grid lg:grid-cols-3 lg:items-stretch">
+            {hasBanners ? <BannerCarousel initial={banners} className="lg:col-span-2" /> : null}
+            <PersonalCard className={cn(hasBanners ? 'lg:col-span-1' : 'lg:col-span-3')} />
           </div>
-          <form action={searchAction} role="search" className="relative">
-            <label className="block">
-              <span className="sr-only">{t('common.nav.search_placeholder')}</span>
-              <Search className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" strokeWidth={1.75} aria-hidden />
-              <input
-                name="q"
-                type="search"
-                placeholder={t('common.nav.search_placeholder')}
-                className="h-12 w-full rounded-full bg-surface pr-4 pl-12 text-md text-fg shadow-card outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
-              />
-            </label>
-          </form>
-        </div>
-      </section>
 
-      <div className="mx-auto -mt-12 flex w-full max-w-6xl flex-col gap-8 px-4">
-        {/* Dịch vụ */}
-        <ModuleSection title={t('web.home.services_title')} modules={SERVICE_MODULES} soon={t('web.home.soon')} t={t} raised />
-        {/* Tiện ích */}
-        <ModuleSection title={t('web.home.utilities_title')} modules={UTILITY_MODULES} soon={t('web.home.soon')} t={t} />
-
-        {/* Số liệu thật (ẩn khi chưa có / lỗi) */}
-        {stats && stats.listings > 0 ? (
-          <dl className="grid grid-cols-3 gap-3">
-            {(
-              [
-                ['users', stats.users],
-                ['listings', stats.listings],
-                ['sites', stats.sites],
-              ] as const
-            ).map(([key, value]) => (
-              <div key={key} className="flex flex-col items-center gap-0.5 rounded-lg bg-surface p-3 text-center shadow-card">
-                <dd className="text-xl font-bold text-primary">{formatNumber(value, locale)}</dd>
-                <dt className="text-sm text-muted">{t(`web.home.stats.${key}`)}</dt>
-              </div>
-            ))}
-          </dl>
-        ) : null}
-
-        {/* Dải tin theo dịch vụ */}
-        {rails.map((rail) =>
-          rail.items.length === 0 ? null : (
-            <section key={rail.feature} aria-labelledby={`rail-${rail.feature}`} className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3">
-                <h2 id={`rail-${rail.feature}`} className="flex items-center gap-2 text-xl font-semibold text-fg">
-                  <span className={cn('flex size-8 items-center justify-center rounded-md', rail.config.tone.soft)}>
-                    <rail.config.Icon className={cn('size-5', rail.config.tone.fg)} strokeWidth={1.75} aria-hidden />
-                  </span>
-                  {t(`common.feature.${rail.feature}`)}
-                </h2>
-                <Link
-                  href={rail.config.path}
-                  className="inline-flex min-h-11 items-center gap-0.5 text-md font-medium text-primary hover:underline"
-                >
-                  {t('listing.hub.see_all')}
-                  <ChevronRight className="size-5" strokeWidth={1.75} aria-hidden />
-                </Link>
-              </div>
-              <ul className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2">
-                {rail.items.map((listing) => (
-                  <li key={listing.id} className="flex w-52 shrink-0 snap-start flex-col *:flex-1 sm:w-60">
-                    <ListingCard listing={listing} layout="grid" now={rail.now} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ),
-        )}
-
-        {/* Mẹo an toàn */}
-        <aside className="flex items-start gap-3 rounded-lg border border-warning bg-surface p-4">
-          <ShieldAlert className="mt-0.5 size-6 shrink-0 text-warning" strokeWidth={1.75} aria-hidden />
-          <div className="flex flex-col gap-1">
-            <p className="text-md font-semibold text-fg">{t('web.home.safety_title')}</p>
-            <p className="text-md text-muted">{t('listing.detail.safety_tip')}</p>
-          </div>
-        </aside>
-      </div>
-    </div>
-  );
-}
-
-function ModuleSection({
-  title,
-  modules,
-  soon,
-  t,
-  raised = false,
-}: {
-  title: string;
-  modules: readonly HomeModule[];
-  soon: string;
-  t: (key: string) => string;
-  /** Khối đầu nổi lên trên dải tiêu đề (kiểu super app). */
-  raised?: boolean;
-}) {
-  return (
-    <section aria-label={title} className={cn('flex flex-col gap-3', raised && 'rounded-xl bg-surface p-4 shadow-card')}>
-      <h2 className="text-lg font-semibold text-fg">{title}</h2>
-      <ul className="grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-6">
-        {modules.map((m) => {
-          const inner = (
+          {noListings ? (
+            <EmptyState
+              icon={Inbox}
+              title={t('common.home.empty_title')}
+              description={t('common.home.empty_body')}
+              action={
+                <Button asChild variant="accent">
+                  <Link href="/dang-tin">
+                    <Plus aria-hidden strokeWidth={2} />
+                    {t('common.actions.post')}
+                  </Link>
+                </Button>
+              }
+            />
+          ) : (
             <>
-              <span className={cn('relative flex size-14 items-center justify-center rounded-xl', m.tone.soft)}>
-                <m.Icon className={cn('size-7', m.tone.fg)} strokeWidth={1.75} aria-hidden />
-                {m.href ? null : (
-                  <span className="absolute -top-1.5 -right-2 rounded-full bg-surface-2 px-1.5 text-xs font-medium text-muted">
-                    {soon}
-                  </span>
-                )}
-              </span>
-              <span className="text-center text-sm font-medium text-fg">{t(m.labelKey)}</span>
+              <QuickSearch />
+              <NearRail />
+              <ForYouRail />
+              {featureRails.map((r) => (
+                <FeatureRail key={r.feature} feature={r.feature} initial={r.data} />
+              ))}
             </>
-          );
-          return (
-            <li key={m.id}>
-              {m.href ? (
-                <Link
-                  href={m.href}
-                  className="flex min-h-11 flex-col items-center gap-2 rounded-lg p-1 transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                  {inner}
-                </Link>
-              ) : (
-                <div aria-disabled className="flex flex-col items-center gap-2 p-1 opacity-70">
-                  {inner}
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+          )}
+
+          <CommunitySection stats={stats} />
+        </div>
+      </div>
+    </HomeProvider>
   );
 }

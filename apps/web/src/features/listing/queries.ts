@@ -27,6 +27,7 @@ import {
 import type { Database } from '@hp/db';
 import type { ListingCategory } from '@hp/shared';
 import { cacheLife, cacheTag } from 'next/cache';
+import type { AttributeFilter } from './filters';
 import { createPublicClient } from '@/lib/supabase/public';
 import { createServerClient } from '@/lib/supabase/server';
 
@@ -35,7 +36,15 @@ export const LIST_PAGE_SIZE = 24;
 
 export type Timed<T> = T & { now: number };
 
-export type ListQuery = { categories: readonly ListingCategory[]; site: string | null; query: string };
+export type ListQuery = {
+  categories: readonly ListingCategory[];
+  site: string | null;
+  query: string;
+  /** Lọc thuộc tính (chip "Tìm nhanh") — đã kiểm bằng parseListFilters. */
+  attributes?: AttributeFilter;
+};
+
+const hasAttributes = (a: AttributeFilter | undefined): a is AttributeFilter => !!a && Object.keys(a).length > 0;
 
 /** Lỗi đọc dữ liệu: message = mã errors.* (error.tsx không hiện message ở production, chỉ để log). */
 function unwrap<T>(result: Result<T>): T {
@@ -49,23 +58,24 @@ async function fetchListPage(q: ListQuery): Promise<Page<PublicListing>> {
       categories: [...q.categories],
       site: q.site ?? undefined,
       query: q.query || undefined,
+      attributes: hasAttributes(q.attributes) ? { ...q.attributes } : undefined,
       limit: LIST_PAGE_SIZE,
     }),
   );
 }
 
-/** Trang đầu theo danh mục / khu (không từ khoá): tập tham số hữu hạn → cache 300s. */
-async function getCachedListPage(categories: readonly ListingCategory[], site: string | null) {
+/** Trang đầu theo danh mục / khu / thuộc tính (không từ khoá): tập tham số hữu hạn (whitelist) → cache 300s. */
+async function getCachedListPage(categories: readonly ListingCategory[], site: string | null, attributes: AttributeFilter | undefined) {
   'use cache';
   cacheLife({ revalidate: 300 });
   cacheTag('listings');
-  const page = await fetchListPage({ categories, site, query: '' });
+  const page = await fetchListPage({ categories, site, query: '', attributes });
   return { page, now: Date.now() };
 }
 
 /** Trang đầu của danh sách. Có từ khoá → đọc theo request (không cache); chỉ gọi sau khi đã đọc searchParams. */
 export async function getListPage(q: ListQuery): Promise<Timed<{ page: Page<PublicListing> }>> {
-  if (!q.query) return getCachedListPage(q.categories, q.site);
+  if (!q.query) return getCachedListPage(q.categories, q.site, hasAttributes(q.attributes) ? q.attributes : undefined);
   const page = await fetchListPage(q);
   return { page, now: Date.now() };
 }

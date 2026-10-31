@@ -17,18 +17,14 @@
     "rights": "© {{year}} {{appName}}"
   },
   "home": {
-    "tagline": "Buy and sell, find rooms and jobs, share rides and join games around Dung Quat.",
     "coming_soon": "Under construction, coming soon.",
-    "area": "Dung Quat area",
     "services_title": "Services",
-    "utilities_title": "Shortcuts",
-    "soon": "Soon",
-    "safety_title": "Stay safe",
-    "stats": {
-      "users": "Members",
-      "listings": "Active listings",
-      "sites": "Work sites"
-    }
+    "heading": "{{appName}} — community services around Dung Quat",
+    "see_all_label": "See all: {{title}}",
+    "rail_prev": "Scroll left",
+    "rail_next": "Scroll right",
+    "get_app_ios": "Download on the App Store",
+    "get_app_android": "Get it on Google Play"
   },
   "dev": {
     "title": "Web UI gallery",
@@ -97,7 +93,8 @@
       "title": "Search listings",
       "description": "Find second-hand items, rooms, jobs and lost & found around Dung Quat.",
       "heading_site": "Search near {{site}}"
-    }
+    },
+    "remove_filter": "Remove filter: {{label}}"
   },
   "post": {
     "step_basics": "Main details",

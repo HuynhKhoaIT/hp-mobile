@@ -24,7 +24,7 @@ import { PostListingButton } from './post-listing-button';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
-const NO_FILTERS: ListFilterState = { category: null, query: '', site: null };
+const NO_FILTERS: ListFilterState = { category: null, query: '', site: null, attributes: {} };
 
 export function ListingListPage({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
   return (
@@ -47,7 +47,12 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
   const t = await getTranslations();
 
   const [{ page, now }, sites] = await Promise.all([
-    getListPage({ categories: filters.category ? [filters.category] : categories, site: filters.site, query: filters.query }),
+    getListPage({
+      categories: filters.category ? [filters.category] : categories,
+      site: filters.site,
+      query: filters.query,
+      attributes: filters.attributes,
+    }),
     getPublicSites(),
   ]);
   if (filters.query) {
@@ -107,6 +112,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
             categories={filters.category ? [filters.category] : categories}
             query={filters.query}
             site={filters.site}
+            attributes={filters.attributes}
             pageSize={LIST_PAGE_SIZE}
             initialCursor={page.nextCursor}
             layout={cardLayout}
