@@ -1,11 +1,12 @@
-// /toi — trang "Tôi" (cần đăng nhập; proxy.ts chuyển khách sang /dang-nhap?next=/toi): lối vào Tin của tôi / Tin đã lưu
-// + hồ sơ (đọc theo request → trong Suspense).
+// /toi — trang "Tôi" (giống tab Tôi của app). Khách vào được (proxy.ts GUEST_OK): thẻ đăng nhập + cài đặt; đã đăng nhập:
+// hồ sơ + lối vào Tin của tôi / Tin đã lưu. Hồ sơ đọc theo request → trong Suspense. /toi/* vẫn cần đăng nhập.
 import type { Metadata } from 'next';
 import { ChevronRight, FileText, Heart } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { TextLinesSkeleton } from '@/components/shared/skeletons';
 import { MyAccount } from '@/features/auth/components/my-account';
+import { MeSettings } from '@/features/profile/components/me-settings';
 import { Link } from '@/i18n/navigation';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,6 +23,9 @@ export default async function MePage() {
 
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+      <Suspense fallback={<TextLinesSkeleton lines={6} />}>
+        <MyAccount />
+      </Suspense>
       <nav aria-label={t('manage.title')}>
         <ul className="grid gap-3 sm:grid-cols-2">
           {links.map(({ href, label, Icon }) => (
@@ -38,9 +42,7 @@ export default async function MePage() {
           ))}
         </ul>
       </nav>
-      <Suspense fallback={<TextLinesSkeleton lines={6} />}>
-        <MyAccount />
-      </Suspense>
+      <MeSettings />
     </section>
   );
 }

@@ -18,7 +18,17 @@
   },
   "home": {
     "tagline": "Buy and sell, find rooms and jobs, share rides and join games around Dung Quat.",
-    "coming_soon": "Under construction, coming soon."
+    "coming_soon": "Under construction, coming soon.",
+    "area": "Dung Quat area",
+    "services_title": "Services",
+    "utilities_title": "Shortcuts",
+    "soon": "Soon",
+    "safety_title": "Stay safe",
+    "stats": {
+      "users": "Members",
+      "listings": "Active listings",
+      "sites": "Work sites"
+    }
   },
   "dev": {
     "title": "Web UI gallery",
@@ -45,7 +55,11 @@
     "site": "Workplace",
     "no_site": "Not selected",
     "interests": "Interests",
-    "avatar": "Profile photo"
+    "avatar": "Profile photo",
+    "guest_body": "Sign in to post, save listings and message others.",
+    "settings": "Settings",
+    "theme": "Appearance",
+    "about": "About"
   },
   "listing": {
     "all": {

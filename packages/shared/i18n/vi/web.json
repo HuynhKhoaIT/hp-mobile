@@ -18,7 +18,17 @@
   },
   "home": {
     "tagline": "Mua bán, tìm trọ, tìm việc, ghép xe và ghép trận quanh khu Dung Quất.",
-    "coming_soon": "Đang xây dựng, sắp ra mắt."
+    "coming_soon": "Đang xây dựng, sắp ra mắt.",
+    "area": "Khu Dung Quất",
+    "services_title": "Dịch vụ",
+    "utilities_title": "Tiện ích",
+    "soon": "Sắp có",
+    "safety_title": "Giao dịch an toàn",
+    "stats": {
+      "users": "Người dùng",
+      "listings": "Tin đang đăng",
+      "sites": "Khu làm việc"
+    }
   },
   "dev": {
     "title": "Thư viện giao diện web",
@@ -45,7 +55,11 @@
     "site": "Nơi làm việc",
     "no_site": "Chưa chọn",
     "interests": "Quan tâm",
-    "avatar": "Ảnh đại diện"
+    "avatar": "Ảnh đại diện",
+    "guest_body": "Đăng nhập để đăng tin, lưu tin và nhắn tin với người khác.",
+    "settings": "Cài đặt",
+    "theme": "Giao diện",
+    "about": "Thông tin"
   },
   "listing": {
     "all": {

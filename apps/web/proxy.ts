@@ -11,6 +11,8 @@ const intl = createIntlMiddleware(routing);
 
 /** Route cần đăng nhập (khu (auth)). */
 const AUTH_ONLY = ['/dang-tin', '/tao-nhom', '/tin-nhan', '/thong-bao', '/toi'];
+/** Ngoại lệ: trang "Tôi" mở cho khách (nút đăng nhập + cài đặt ngôn ngữ / giao diện / pháp lý), giống tab Tôi của app. */
+const GUEST_OK = new Set(['/toi']);
 const STAFF = new Set(['moderator', 'admin']);
 const NOINDEX = 'noindex, nofollow';
 
@@ -43,7 +45,7 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  if (!session.userId && AUTH_ONLY.some((base) => isUnder(path, base))) {
+  if (!session.userId && !GUEST_OK.has(path) && AUTH_ONLY.some((base) => isUnder(path, base))) {
     const url = new URL(`${prefix}/dang-nhap`, request.url);
     url.searchParams.set('next', `${pathname}${search}`);
     return redirectKeepingCookies(url, response);
