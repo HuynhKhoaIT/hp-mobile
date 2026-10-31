@@ -86,5 +86,9 @@
     "vi": "Tiếng Việt",
     "en": "English",
     "zh": "中文"
+  },
+  "coming_soon": {
+    "title": "Coming soon",
+    "body": "This feature is being built."
   }
 }
