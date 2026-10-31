@@ -170,7 +170,8 @@ module.exports = {
       },
       "aspectRatio": {
         "card": "4 / 3",
-        "avatar": "1 / 1"
+        "avatar": "1 / 1",
+        "banner": "16 / 7"
       }
     }
   },

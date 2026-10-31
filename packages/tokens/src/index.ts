@@ -111,8 +111,8 @@ export const motion = {
   skeletonShimmerMs: 1200,
 } as const;
 
-/** Tỉ lệ khung ảnh: thẻ tin 4:3, avatar 1:1 (class `aspect-card`, `aspect-avatar` ở app và web). */
-export const aspect = { card: '4 / 3', avatar: '1 / 1' } as const;
+/** Tỉ lệ khung ảnh: thẻ tin 4:3, avatar 1:1, banner Hub 16:7 (class `aspect-card`, `aspect-avatar`, `aspect-banner` ở app và web). */
+export const aspect = { card: '4 / 3', avatar: '1 / 1', banner: '16 / 7' } as const;
 
 /** Vùng chạm tối thiểu. */
 export const hitTarget = { primary: 48, secondary: 44 } as const;
