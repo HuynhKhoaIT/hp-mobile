@@ -1,1 +1,141 @@
-{}
+{
+  "hub": {
+    "greeting": "Chào {{name}}",
+    "greeting_guest": "Chào bạn",
+    "subtitle": "Mọi thứ quanh khu Dung Quất",
+    "latest_title": "Tin mới đăng",
+    "latest_near": "Tin mới quanh {{site}}",
+    "see_all": "Xem tất cả"
+  },
+  "list": {
+    "title_all": "Tất cả tin",
+    "filter_all": "Tất cả",
+    "search_placeholder": "Tìm trong {{feature}}",
+    "search_submit": "Tìm",
+    "clear_search": "Xoá từ khoá",
+    "site_filter": "Khu",
+    "site_any": "Mọi khu",
+    "empty_title": "Chưa có tin nào",
+    "empty_body": "Hãy là người đầu tiên đăng tin ở mục này.",
+    "empty_search_title": "Không tìm thấy tin phù hợp",
+    "empty_search_body": "Thử từ khoá khác hoặc bỏ bớt bộ lọc.",
+    "post_cta": "Đăng tin",
+    "load_more": "Xem thêm",
+    "end": "Bạn đã xem hết tin",
+    "loading_more": "Đang tải thêm…"
+  },
+  "card": {
+    "no_image": "Chưa có ảnh",
+    "distance_to_site": "Cách {{site}} {{distance}}",
+    "salary_range": "{{min}} – {{max}}",
+    "salary_from": "Từ {{min}}",
+    "per_month": "{{price}}/tháng",
+    "per_hour": "{{price}}/giờ",
+    "per_day": "{{price}}/ngày"
+  },
+  "detail": {
+    "title": "Chi tiết tin",
+    "description": "Mô tả",
+    "no_description": "Người đăng chưa viết mô tả.",
+    "attributes": "Thông tin",
+    "location": "Khu vực",
+    "approx_location": "Vị trí gần đúng (~300 m) để bảo vệ người đăng",
+    "posted_by": "Người đăng",
+    "member_since": "Tham gia từ {{date}}",
+    "rating": "{{avg}} ★ ({{count}} đánh giá)",
+    "no_rating": "Chưa có đánh giá",
+    "posted_at": "Đăng {{time}}",
+    "expires_at": "Hết hạn {{date}}",
+    "views_one": "{{count}} lượt xem",
+    "views_other": "{{count}} lượt xem",
+    "contact": "Nhắn tin",
+    "contact_soon": "Nhắn tin với người đăng sẽ có trong bản cập nhật tới.",
+    "share": "Chia sẻ",
+    "share_text": "{{title}} — xem trên {{app}}",
+    "link_copied": "Đã sao chép liên kết",
+    "report": "Báo cáo tin",
+    "similar": "Tin tương tự",
+    "not_found_title": "Tin không còn",
+    "not_found_body": "Tin đã bị gỡ, hết hạn hoặc liên kết không đúng.",
+    "back_to_list": "Về danh sách",
+    "image_count": "Ảnh {{current}}/{{total}}",
+    "safety_tip": "Không chuyển tiền đặt cọc trước khi xem hàng / xem phòng."
+  },
+  "attr": {
+    "brand": "Hãng",
+    "model": "Đời máy",
+    "condition": "Tình trạng",
+    "warranty_months": "Bảo hành",
+    "vehicle_type": "Loại xe",
+    "year": "Năm sản xuất",
+    "odometer_km": "Số km đã đi",
+    "plate_prefix": "Biển số tỉnh",
+    "item_type": "Loại đồ",
+    "size": "Size",
+    "area_m2": "Diện tích",
+    "electricity_price": "Giá điện",
+    "water_price": "Giá nước",
+    "has_loft": "Có gác",
+    "has_parking": "Chỗ để xe",
+    "curfew": "Giờ giấc",
+    "max_people": "Ở tối đa",
+    "shift": "Ca làm",
+    "salary_min": "Lương từ",
+    "salary_max": "Lương đến",
+    "pay_type": "Trả lương theo",
+    "requirements": "Yêu cầu",
+    "contact_name": "Người liên hệ",
+    "lost_at": "Thời điểm",
+    "place": "Nơi mất / nhặt",
+    "identifying_marks": "Đặc điểm nhận dạng",
+    "returned": "Đã trả lại"
+  },
+  "attr_value": {
+    "condition": {
+      "new": "Mới",
+      "like_new": "Như mới",
+      "used": "Đã dùng"
+    },
+    "vehicle_type": {
+      "motorbike": "Xe máy",
+      "car": "Ô tô",
+      "bicycle": "Xe đạp"
+    },
+    "item_type": {
+      "boots": "Giày bảo hộ",
+      "helmet": "Mũ bảo hộ",
+      "uniform": "Quần áo bảo hộ",
+      "gloves": "Găng tay",
+      "wallet": "Ví",
+      "phone": "Điện thoại",
+      "keys": "Chìa khoá",
+      "card": "Thẻ / giấy tờ",
+      "bag": "Túi / balo",
+      "other": "Khác"
+    },
+    "shift": {
+      "day": "Ca ngày",
+      "night": "Ca đêm",
+      "rotating": "Ca xoay"
+    },
+    "pay_type": {
+      "hour": "Giờ",
+      "day": "Ngày",
+      "month": "Tháng"
+    },
+    "bool": {
+      "yes": "Có",
+      "no": "Không"
+    }
+  },
+  "unit": {
+    "m2": "{{value}} m²",
+    "km": "{{value}} km",
+    "year": "{{value}}",
+    "months_one": "{{count}} tháng",
+    "months_other": "{{count}} tháng",
+    "people_one": "{{count}} người",
+    "people_other": "{{count}} người",
+    "per_kwh": "{{price}}/kWh"
+  }
+}

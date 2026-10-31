@@ -64,3 +64,21 @@ export function flattenIssues(issues: { path: PropertyKey[]; message: string }[]
   }
   return out;
 }
+
+// ── Ảnh đại diện (bucket avatars, migration 20261031130000) ────────────────────────
+/**
+ * Upload ảnh đại diện đã nén (webp / jpeg, ≤ 1 MB, 512 px) rồi ghi path vào profiles.avatar_url.
+ * Path `{userId}/{timestamp}.{ext}`: không ghi đè file cũ (policy không cho update) → CDN không giữ ảnh cũ.
+ */
+export async function uploadAvatar(
+  client: Client,
+  v: { userId: string; body: ArrayBuffer | Blob; contentType: 'image/webp' | 'image/jpeg' },
+): Promise<Result<MyProfile>> {
+  const path = `${v.userId}/${Date.now()}.${v.contentType === 'image/webp' ? 'webp' : 'jpg'}`;
+  const up = await client.storage.from('avatars').upload(path, v.body, { contentType: v.contentType, upsert: false });
+  if (up.error) {
+    const status = (up.error as { statusCode?: string | number }).statusCode;
+    return fail(String(status) === '413' ? 'file_too_large' : String(status) === '403' ? 'forbidden' : 'upload_failed');
+  }
+  return updateMyProfile(client, { avatar_url: path });
+}

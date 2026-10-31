@@ -42,3 +42,5 @@ where id::text like '00000000-0000-4000-8000-00000000000_'
 update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
 update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';
 update public.profiles set role = 'admin' where id = '00000000-0000-4000-8000-000000000005';
+
+-- Tin đăng mẫu: supabase/seed/listings.sql (chạy sau file này — [db.seed] sql_paths trong config.toml).

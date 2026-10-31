@@ -12,5 +12,8 @@
   "otp_invalid": "Mã xác nhận không đúng hoặc đã hết hạn",
   "sms_failed": "Chưa gửi được tin nhắn, vui lòng thử lại sau",
   "required": "Vui lòng nhập thông tin này",
-  "too_long": "Nội dung quá dài"
+  "too_long": "Nội dung quá dài",
+  "file_too_large": "Ảnh quá lớn, hãy chọn ảnh nhỏ hơn.",
+  "upload_failed": "Tải ảnh lên không thành công. Thử lại nhé.",
+  "file_type": "Chỉ nhận ảnh JPG, PNG hoặc WebP."
 }

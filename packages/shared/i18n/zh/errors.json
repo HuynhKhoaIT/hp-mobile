@@ -12,5 +12,8 @@
   "otp_invalid": "验证码错误或已过期",
   "sms_failed": "短信发送失败，请稍后再试",
   "required": "请填写此项",
-  "too_long": "内容过长"
+  "too_long": "内容过长",
+  "file_too_large": "图片太大，请选择更小的图片。",
+  "upload_failed": "图片上传失败，请重试。",
+  "file_type": "仅支持 JPG、PNG 或 WebP 图片。"
 }

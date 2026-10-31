@@ -1,1 +1,141 @@
-{}
+{
+  "hub": {
+    "greeting": "Hi {{name}}",
+    "greeting_guest": "Hi there",
+    "subtitle": "Everything around Dung Quat",
+    "latest_title": "Latest listings",
+    "latest_near": "Latest around {{site}}",
+    "see_all": "See all"
+  },
+  "list": {
+    "title_all": "All listings",
+    "filter_all": "All",
+    "search_placeholder": "Search {{feature}}",
+    "search_submit": "Search",
+    "clear_search": "Clear search",
+    "site_filter": "Area",
+    "site_any": "All areas",
+    "empty_title": "No listings yet",
+    "empty_body": "Be the first to post in this section.",
+    "empty_search_title": "No matching listings",
+    "empty_search_body": "Try another keyword or remove some filters.",
+    "post_cta": "Post a listing",
+    "load_more": "Load more",
+    "end": "You've reached the end",
+    "loading_more": "Loading more…"
+  },
+  "card": {
+    "no_image": "No photo",
+    "distance_to_site": "{{distance}} from {{site}}",
+    "salary_range": "{{min}} – {{max}}",
+    "salary_from": "From {{min}}",
+    "per_month": "{{price}}/month",
+    "per_hour": "{{price}}/hour",
+    "per_day": "{{price}}/day"
+  },
+  "detail": {
+    "title": "Listing details",
+    "description": "Description",
+    "no_description": "The poster hasn't added a description.",
+    "attributes": "Details",
+    "location": "Area",
+    "approx_location": "Approximate location (~300 m) to protect the poster",
+    "posted_by": "Posted by",
+    "member_since": "Member since {{date}}",
+    "rating": "{{avg}} ★ ({{count}} ratings)",
+    "no_rating": "No ratings yet",
+    "posted_at": "Posted {{time}}",
+    "expires_at": "Expires {{date}}",
+    "views_one": "{{count}} view",
+    "views_other": "{{count}} views",
+    "contact": "Message",
+    "contact_soon": "Messaging the poster is coming in the next update.",
+    "share": "Share",
+    "share_text": "{{title}} — on {{app}}",
+    "link_copied": "Link copied",
+    "report": "Report listing",
+    "similar": "Similar listings",
+    "not_found_title": "Listing unavailable",
+    "not_found_body": "It was removed, has expired, or the link is wrong.",
+    "back_to_list": "Back to listings",
+    "image_count": "Photo {{current}}/{{total}}",
+    "safety_tip": "Never pay a deposit before seeing the item or room."
+  },
+  "attr": {
+    "brand": "Brand",
+    "model": "Model",
+    "condition": "Condition",
+    "warranty_months": "Warranty",
+    "vehicle_type": "Vehicle type",
+    "year": "Year",
+    "odometer_km": "Mileage",
+    "plate_prefix": "Plate province",
+    "item_type": "Item type",
+    "size": "Size",
+    "area_m2": "Area",
+    "electricity_price": "Electricity",
+    "water_price": "Water",
+    "has_loft": "Loft",
+    "has_parking": "Parking",
+    "curfew": "Curfew",
+    "max_people": "Max occupants",
+    "shift": "Shift",
+    "salary_min": "Salary from",
+    "salary_max": "Salary up to",
+    "pay_type": "Paid per",
+    "requirements": "Requirements",
+    "contact_name": "Contact person",
+    "lost_at": "When",
+    "place": "Where",
+    "identifying_marks": "Identifying marks",
+    "returned": "Returned"
+  },
+  "attr_value": {
+    "condition": {
+      "new": "New",
+      "like_new": "Like new",
+      "used": "Used"
+    },
+    "vehicle_type": {
+      "motorbike": "Motorbike",
+      "car": "Car",
+      "bicycle": "Bicycle"
+    },
+    "item_type": {
+      "boots": "Safety boots",
+      "helmet": "Hard hat",
+      "uniform": "Workwear",
+      "gloves": "Gloves",
+      "wallet": "Wallet",
+      "phone": "Phone",
+      "keys": "Keys",
+      "card": "Card / ID",
+      "bag": "Bag",
+      "other": "Other"
+    },
+    "shift": {
+      "day": "Day shift",
+      "night": "Night shift",
+      "rotating": "Rotating"
+    },
+    "pay_type": {
+      "hour": "Hour",
+      "day": "Day",
+      "month": "Month"
+    },
+    "bool": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  },
+  "unit": {
+    "m2": "{{value}} m²",
+    "km": "{{value}} km",
+    "year": "{{value}}",
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people",
+    "per_kwh": "{{price}}/kWh"
+  }
+}
