@@ -105,7 +105,8 @@ Hết hạn mặc định (`expires_at`): pass/room 30 ngày, job 14 ngày, lost
 
 ### Marketing (phục vụ web)
 - `marketing_leads(contact, contact_type email|phone, kind user|landlord|venue|employer, site, locale, utm jsonb, consent_at, status new|contacted|closed, note)` — chỉ insert qua Server Action của web (service role, có rate limit theo IP); staff đọc/sửa.
-- `banners(placement app_home|web_home|web_listing, title_key, image_path, link_url, locale, starts_at, ends_at, is_active, sort)` — ai cũng đọc banner đang hiệu lực; chỉ admin ghi.
+- `banners(placement app_home|web_home|web_listing, locale | null, title, subtitle, cta_label, link_url (/… hoặc https://), image_path (bucket `banners`), tone primary|accent|<dịch vụ>, starts_at, ends_at, is_active, sort)` — migration `20261101110000_home_banners_stats`; chữ viết sẵn theo locale (không khoá i18n: admin đổi theo đợt không cần deploy); ai cũng đọc banner đang hiệu lực, admin thấy / ghi tất cả, mọi thay đổi ghi `audit_log` (`banner.insert|update|delete`). Bucket `banners` public, chỉ admin ghi.
+- RPC `my_listing_stats()` (authenticated, invoker): `active, pending, rejected, drafts, expiring_soon, total_views` của chính người gọi — thẻ "Tin của bạn" ở Hub (`docs/design/home.md`).
 
 ## 5. Row Level Security (bắt buộc trên MỌI bảng)
 

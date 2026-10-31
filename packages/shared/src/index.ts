@@ -11,3 +11,4 @@ export * from './schemas/auth';
 export * from './schemas/profile';
 export * from './schemas/listing';
 export * from './listing-display';
+export * from './home';

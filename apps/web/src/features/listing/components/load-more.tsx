@@ -11,18 +11,20 @@ import { ErrorState } from '@/components/shared/error-state';
 import { ListingGridSkeleton } from '@/components/shared/skeletons';
 import { Button } from '@/components/ui/button';
 import { createBrowserClient } from '@/lib/supabase/client';
+import type { AttributeFilter } from '../filters';
 import { ListingGrid } from './listing-grid';
 
 type Props = {
   categories: readonly ListingCategory[];
   query: string;
   site: string | null;
+  attributes: AttributeFilter;
   pageSize: number;
   initialCursor: string | null;
   layout: 'grid' | 'row';
 };
 
-export function LoadMore({ categories, query, site, pageSize, initialCursor, layout }: Props) {
+export function LoadMore({ categories, query, site, attributes, pageSize, initialCursor, layout }: Props) {
   const t = useTranslations('listing.list');
   const [items, setItems] = useState<PublicListing[]>([]);
   const [fetchedAt, setFetchedAt] = useState(0);
@@ -37,6 +39,7 @@ export function LoadMore({ categories, query, site, pageSize, initialCursor, lay
       categories: [...categories],
       query: query || undefined,
       site: site ?? undefined,
+      attributes: Object.keys(attributes).length > 0 ? { ...attributes } : undefined,
       cursor,
       limit: pageSize,
     });

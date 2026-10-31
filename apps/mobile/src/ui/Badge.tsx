@@ -22,7 +22,7 @@ const TONE: Record<BadgeTone, TextTone> = {
 /** numberOfLines chỉ dùng trong card (ô hẹp); nơi khác để chữ xuống dòng. */
 export function Badge({ label, tone = 'neutral', numberOfLines }: { label: string; tone?: BadgeTone; numberOfLines?: number }) {
   return (
-    <View className={`self-start rounded-full px-3 py-1 ${BOX[tone]}`}>
+    <View className={`max-w-full self-start rounded-full px-3 py-1 ${BOX[tone]}`}>
       <Text variant="caption" tone={TONE[tone]} className="font-sans-medium" numberOfLines={numberOfLines}>
         {label}
       </Text>

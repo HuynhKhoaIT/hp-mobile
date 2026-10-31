@@ -8,11 +8,21 @@ import { Button } from '@/components/ui/button';
 import { getMyProfileForPage, getSitesForPage } from '@/features/auth/queries';
 import { AvatarPicker } from '@/features/profile/components/avatar-picker';
 import { Link } from '@/i18n/navigation';
+import { LoginButton } from '@/components/shared/login-button';
 import { SignOutButton } from './sign-out-button';
 
 export async function MyAccount() {
   const t = await getTranslations();
   const profile = await getMyProfileForPage();
+  if (profile.error?.code === 'auth_required') {
+    return (
+      <div className="flex flex-col items-start gap-4 rounded-lg bg-surface p-6 shadow-card">
+        <h1 className="text-2xl font-semibold text-fg">{t('common.nav.me')}</h1>
+        <p className="text-md text-muted">{t('web.me.guest_body')}</p>
+        <LoginButton />
+      </div>
+    );
+  }
   if (profile.error) {
     const key = `errors.${profile.error.code}`;
     return <EmptyState title={t('common.states.error_title')} description={t.has(key) ? t(key) : t('errors.unknown')} />;

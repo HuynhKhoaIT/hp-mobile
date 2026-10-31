@@ -1,13 +1,16 @@
-// Header khu người dùng: logo · ô tìm kiếm · Đăng tin (cam) · tin nhắn · thông báo · tài khoản.
-// Điện thoại (< 640px): chỉ logo + tìm + tài khoản; các mục còn lại ở BottomNav.
-import { Bell, MessageCircle, Plus, Search } from 'lucide-react';
+// Header khu người dùng: logo · ô tìm kiếm · Đăng tin (cam) · tin nhắn · thông báo (kèm số chưa đọc) · tài khoản.
+// Điện thoại (< 640px): chỉ logo + tìm + tài khoản; các mục còn lại ở BottomNav. Trang chủ "/" trên điện thoại dùng
+// header riêng của Hub (AppHeaderShell ẩn header này ở đó).
+import { MessageCircle, Plus, Search } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { locale as rootLocale } from 'next/root-params';
 import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { getPathname, Link } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
+import { AppHeaderShell } from './app-header-shell';
 import { Logo } from './logo';
 import { UserMenu, UserMenuSkeleton } from './user-menu';
 
@@ -18,7 +21,7 @@ export async function AppHeader() {
   const searchAction = getPathname({ href: '/tim-kiem', locale });
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
+    <AppHeaderShell className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-2">
         <Logo />
         <form action={searchAction} role="search" className="hidden flex-1 sm:block">
@@ -45,16 +48,12 @@ export async function AppHeader() {
               <MessageCircle strokeWidth={1.75} />
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex">
-            <Link href="/thong-bao" aria-label={t('common.nav.notifications')}>
-              <Bell strokeWidth={1.75} />
-            </Link>
-          </Button>
+          <NotificationBell className="hidden sm:inline-flex" />
           <Suspense fallback={<UserMenuSkeleton />}>
             <UserMenu />
           </Suspense>
         </div>
       </div>
-    </header>
+    </AppHeaderShell>
   );
 }

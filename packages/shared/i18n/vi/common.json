@@ -12,7 +12,8 @@
     "block": "Chặn",
     "close": "Đóng",
     "back": "Quay lại",
-    "done": "Xong"
+    "done": "Xong",
+    "clear_filter": "Bỏ bộ lọc này"
   },
   "category": {
     "pass_electronics": "Điện thoại, máy tính, điện tử",
@@ -94,5 +95,82 @@
   },
   "settings": {
     "language": "Ngôn ngữ"
+  },
+  "home": {
+    "greeting": "Chào {{name}}",
+    "greeting_guest": "Chào bạn",
+    "subtitle": "Hôm nay bạn cần gì?",
+    "site_label": "Khu làm việc",
+    "site_change": "Đổi khu",
+    "site_sheet_title": "Chọn khu làm việc",
+    "site_sheet_hint": "Tin \"Gần bạn\" sẽ theo khu này.",
+    "notifications": "Thông báo",
+    "notifications_unread_one": "{{count}} thông báo chưa đọc",
+    "notifications_unread_other": "{{count}} thông báo chưa đọc",
+    "badge": {
+      "soon": "Sắp có",
+      "new": "Mới",
+      "hot": "Hot"
+    },
+    "tiles": {
+      "my_listings": "Tin của tôi",
+      "all": "Tất cả tin"
+    },
+    "banner": {
+      "label": "Tin nổi bật",
+      "prev": "Banner trước",
+      "next": "Banner sau",
+      "pause": "Dừng tự chuyển",
+      "play": "Tự chuyển",
+      "slide": "Banner {{current}} / {{total}}"
+    },
+    "card": {
+      "guest_title": "Đăng nhập để dùng đầy đủ",
+      "guest_body": "Lưu tin, nhắn tin với người đăng và đăng tin của bạn — miễn phí.",
+      "onboarding_title": "Hoàn thiện hồ sơ",
+      "onboarding_body": "Thêm tên và khu làm việc để người khác tin tưởng bạn hơn.",
+      "onboarding_cta": "Hoàn thiện ngay",
+      "mine_title": "Tin của bạn",
+      "active": "Đang đăng",
+      "pending": "Chờ duyệt",
+      "views": "Lượt xem",
+      "expiring_one": "{{count}} tin sắp hết hạn — gia hạn để tin tiếp tục hiện",
+      "expiring_other": "{{count}} tin sắp hết hạn — gia hạn để tin tiếp tục hiện",
+      "rejected_one": "{{count}} tin chưa được duyệt — xem lý do",
+      "rejected_other": "{{count}} tin chưa được duyệt — xem lý do",
+      "manage": "Quản lý tin",
+      "first_post_title": "Có đồ cần pass?",
+      "first_post_body": "Đăng tin chỉ mất 1 phút, hàng nghìn anh em quanh khu sẽ thấy."
+    },
+    "shortcuts_title": "Tìm nhanh",
+    "shortcut": {
+      "motorbike": "Xe máy",
+      "electronics": "Điện thoại, laptop",
+      "ppe": "Đồ bảo hộ",
+      "home_goods": "Đồ gia dụng",
+      "room_loft": "Phòng có gác",
+      "room_share": "Ở ghép",
+      "night_shift": "Việc ca đêm",
+      "parttime": "Làm thêm ngoài ca",
+      "found": "Nhặt được đồ"
+    },
+    "near_title": "Gần {{site}}",
+    "for_you_title": "Dành cho bạn",
+    "for_you_hint": "Theo mối quan tâm bạn đã chọn",
+    "latest_title": "Mới đăng",
+    "see_all": "Xem tất cả",
+    "community_title": "Cộng đồng Dung Quất",
+    "stats": {
+      "users": "Thành viên",
+      "listings": "Tin đang đăng",
+      "sites": "Khu làm việc"
+    },
+    "safety_title": "Giao dịch an toàn",
+    "empty_title": "Chưa có tin nào",
+    "empty_body": "Hãy là người đầu tiên đăng tin trong cộng đồng.",
+    "get_app_title": "Dùng app để nhận thông báo ngay",
+    "get_app_body": "Biết ngay khi có người nhắn tin, tin được duyệt hoặc có phòng mới gần bạn.",
+    "section_error": "Không tải được mục này",
+    "refreshing": "Đang làm mới…"
   }
 }

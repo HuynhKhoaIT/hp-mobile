@@ -35,6 +35,14 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Dải cuộn ngang (banner, dải tin, chip): ẩn thanh cuộn — vuốt trên điện thoại, nút trước / sau trên desktop. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

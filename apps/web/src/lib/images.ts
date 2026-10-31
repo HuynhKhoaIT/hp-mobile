@@ -13,3 +13,9 @@ export function listingImageUrl(path: string, size: ImageSize): string {
 export function profileAvatarUrl(value: string | null | undefined): string | null {
   return avatarUrl(publicEnv.supabaseUrl, value, publicEnv.imageTransform);
 }
+
+/** Ảnh banner trang chủ (bucket công khai `banners`, admin upload sẵn đúng tỉ lệ 16:7) — ảnh gốc, không transform. */
+export function bannerImageUrl(path: string): string {
+  const base = publicEnv.supabaseUrl.replace(/\/+$/, '');
+  return `${base}/storage/v1/object/public/banners/${path.split('/').map(encodeURIComponent).join('/')}`;
+}

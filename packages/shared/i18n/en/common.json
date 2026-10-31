@@ -12,7 +12,8 @@
     "block": "Block",
     "close": "Close",
     "back": "Back",
-    "done": "Done"
+    "done": "Done",
+    "clear_filter": "Remove this filter"
   },
   "category": {
     "pass_electronics": "Phones, computers & electronics",
@@ -31,7 +32,7 @@
     "room": "Find a room",
     "job": "Find a job",
     "lostFound": "Lost & found",
-    "ride": "Ride sharing home",
+    "ride": "Rides home",
     "sport": "Find a game"
   },
   "status": {
@@ -94,5 +95,82 @@
   },
   "settings": {
     "language": "Language"
+  },
+  "home": {
+    "greeting": "Hi {{name}}",
+    "greeting_guest": "Hi there",
+    "subtitle": "What do you need today?",
+    "site_label": "Work site",
+    "site_change": "Change site",
+    "site_sheet_title": "Choose your work site",
+    "site_sheet_hint": "\"Near you\" listings follow this site.",
+    "notifications": "Notifications",
+    "notifications_unread_one": "{{count}} unread notification",
+    "notifications_unread_other": "{{count}} unread notifications",
+    "badge": {
+      "soon": "Soon",
+      "new": "New",
+      "hot": "Hot"
+    },
+    "tiles": {
+      "my_listings": "My listings",
+      "all": "All listings"
+    },
+    "banner": {
+      "label": "Highlights",
+      "prev": "Previous banner",
+      "next": "Next banner",
+      "pause": "Pause autoplay",
+      "play": "Play autoplay",
+      "slide": "Banner {{current}} of {{total}}"
+    },
+    "card": {
+      "guest_title": "Sign in for the full experience",
+      "guest_body": "Save listings, message posters and post your own — for free.",
+      "onboarding_title": "Complete your profile",
+      "onboarding_body": "Add your name and work site so others trust you more.",
+      "onboarding_cta": "Complete now",
+      "mine_title": "Your listings",
+      "active": "Active",
+      "pending": "In review",
+      "views": "Views",
+      "expiring_one": "{{count}} listing expires soon — renew to keep it visible",
+      "expiring_other": "{{count}} listings expire soon — renew to keep them visible",
+      "rejected_one": "{{count}} listing was not approved — see why",
+      "rejected_other": "{{count}} listings were not approved — see why",
+      "manage": "Manage listings",
+      "first_post_title": "Something to sell?",
+      "first_post_body": "Posting takes a minute — thousands of people around the site will see it."
+    },
+    "shortcuts_title": "Quick search",
+    "shortcut": {
+      "motorbike": "Motorbikes",
+      "electronics": "Phones & laptops",
+      "ppe": "Safety gear",
+      "home_goods": "Household",
+      "room_loft": "Rooms with loft",
+      "room_share": "Room sharing",
+      "night_shift": "Night-shift jobs",
+      "parttime": "Side jobs",
+      "found": "Found items"
+    },
+    "near_title": "Near {{site}}",
+    "for_you_title": "For you",
+    "for_you_hint": "Based on the interests you picked",
+    "latest_title": "Just posted",
+    "see_all": "See all",
+    "community_title": "Dung Quat community",
+    "stats": {
+      "users": "Members",
+      "listings": "Active listings",
+      "sites": "Work sites"
+    },
+    "safety_title": "Trade safely",
+    "empty_title": "No listings yet",
+    "empty_body": "Be the first to post in the community.",
+    "get_app_title": "Get the app for instant alerts",
+    "get_app_body": "Know right away when someone messages you, your listing is approved or a room appears nearby.",
+    "section_error": "Couldn't load this section",
+    "refreshing": "Refreshing…"
   }
 }

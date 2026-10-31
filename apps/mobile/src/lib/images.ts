@@ -9,3 +9,7 @@ export const listingImageUrl = (path: string, size: ImageSize = 'thumb') =>
 
 /** Ảnh đại diện: path trong bucket avatars hoặc URL đầy đủ (Google); null → Avatar hiện chữ cái đầu. */
 export const profileAvatarUrl = (value: string | null | undefined) => avatarUrl(env.supabaseUrl, value, env.imageTransform);
+
+/** Ảnh banner Hub (bucket public `banners`, ảnh đã cắt sẵn 16:7 → tải bản gốc, không resize). */
+export const bannerImageUrl = (path: string) =>
+  `${env.supabaseUrl.replace(/\/+$/, '')}/storage/v1/object/public/banners/${path.split('/').map(encodeURIComponent).join('/')}`;

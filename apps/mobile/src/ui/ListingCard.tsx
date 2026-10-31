@@ -26,6 +26,8 @@ export type ListingCardProps = {
   onPress?: () => void;
   /** Bề rộng / vị trí trong lưới hoặc hàng ngang (vd `w-44`). */
   className?: string;
+  /** Ưu tiên tải ảnh (vd 4 thẻ đầu của dải đầu tiên ở Hub: 'high'). */
+  imagePriority?: 'low' | 'normal' | 'high';
 };
 
 const join = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -34,10 +36,12 @@ const join = (...parts: (string | false | undefined)[]) => parts.filter(Boolean)
 export function ListingCover({
   listing,
   size = 'thumb',
+  priority,
   className,
 }: {
   listing: Pick<PublicListing, 'images' | 'category'>;
   size?: 'thumb' | 'full';
+  priority?: 'low' | 'normal' | 'high';
   className?: string;
 }) {
   const { t } = useTranslation();
@@ -49,6 +53,7 @@ export function ListingCover({
         source={{ uri: listingImageUrl(cover, size) }}
         contentFit="cover"
         cachePolicy="memory-disk"
+        priority={priority}
         transition={motion.fast.duration}
         accessibilityIgnoresInvertColors
         className={join('bg-surface-2', className)}
@@ -68,7 +73,7 @@ export function ListingCover({
   );
 }
 
-export function ListingCard({ listing, layout = 'grid', onPress, className }: ListingCardProps) {
+export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority }: ListingCardProps) {
   const { t, i18n } = useTranslation();
   const priceText = usePriceText();
   const siteText = useSiteText();
@@ -85,8 +90,14 @@ export function ListingCard({ listing, layout = 'grid', onPress, className }: Li
       <Text variant="label" numberOfLines={2}>
         {listing.title}
       </Text>
-      <Text variant="price" numberOfLines={1}>
-        {price}
+      {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web). */}
+      <Text variant="price" numberOfLines={2}>
+        {price.lastIndexOf('/') > 0 ? price.slice(0, price.lastIndexOf('/')) : price}
+        {price.lastIndexOf('/') > 0 ? (
+          <Text variant="caption" tone="muted" weight="semibold">
+            {price.slice(price.lastIndexOf('/'))}
+          </Text>
+        ) : null}
       </Text>
       <Text variant="caption" tone="muted" numberOfLines={1}>
         {meta}
@@ -103,12 +114,12 @@ export function ListingCard({ listing, layout = 'grid', onPress, className }: Li
     >
       {layout === 'grid' ? (
         <>
-          <ListingCover listing={listing} className="aspect-card w-full rounded-t-md" />
+          <ListingCover listing={listing} priority={imagePriority} className="aspect-card w-full rounded-t-md" />
           {body}
         </>
       ) : (
         <View className="flex-row items-start gap-3">
-          <ListingCover listing={listing} className="aspect-avatar w-24 rounded-sm" />
+          <ListingCover listing={listing} priority={imagePriority} className="aspect-avatar w-24 rounded-sm" />
           {body}
         </View>
       )}

@@ -1,13 +1,13 @@
 // POST /api/revalidate — webhook DB (trigger listings → app_settings.web_revalidate_url) làm mới cache web khi tin đổi
 // (đăng / sửa / đổi trạng thái từ app, admin, cron hết hạn). Body: {"tags": ["listing:<uuid>", "listings"]}.
 // Header `x-revalidate-secret` so khớp REVALIDATE_SECRET theo thời gian hằng (băm SHA-256 hai phía để cùng độ dài).
-// Chỉ nhận tag `listings` hoặc `listing:<uuid>` (tối đa 20). 401 sai secret · 400 body sai · 200 { revalidated }.
+// Chỉ nhận tag `listings`, `banners` hoặc `listing:<uuid>` (tối đa 20). 401 sai secret · 400 body sai · 200 { revalidated }.
 // - `listing:<id>`: { expire: 0 } — trang chi tiết đọc lại ngay ở request kế tiếp (tin vừa bán / bị gỡ không còn hiện cũ).
 // - `listings`: 'max' — danh sách / sitemap phục vụ bản cũ một lần trong khi làm mới nền (stale-while-revalidate).
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { revalidateTag } from 'next/cache';
 
-const TAG = /^(listings|listing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/;
+const TAG = /^(listings|banners|listing:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/;
 const MAX_TAGS = 20;
 
 const json = (body: unknown, status: number) =>

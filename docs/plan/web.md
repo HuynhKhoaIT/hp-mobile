@@ -107,16 +107,29 @@ g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
 - [ ] Chưa kiểm bằng trình duyệt (phiên không có công cụ trình duyệt): form nhiều bước, upload ảnh thật, toast, menu, LoginDialog + intent, 360 / 1440 px, dark mode
 - [ ] Còn lại: `opengraph-image.tsx` cho tin, `/u/[id]`, `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, "Xem thêm" không JS, bố cục 2 cột cho form ≥ 1024 px (hiện một cột, cùng thứ tự với app)
 
+## 3f. Trang chủ Hub kiểu super app (cập nhật 2026-11-01)
+Theo `docs/design/home.md` (§3 thứ tự khối, §10 thông số). Route `/` nằm trong `(app)`; code ở `src/features/home/*`.
+- [x] **Header cùng tồn tại với AppHeader**: điện thoại (< 640px) AppHeader ẩn ở `/` (`components/shared/app-header-shell.tsx`, `usePathname` nên không nháy) → header xanh của Hub là header duy nhất: hàng 48 (ảnh đại diện → `/toi` · "Chào {tên gọi}" + `home.subtitle` · chuông có số), khách: tên app + nút Đăng nhập (LoginDialog); chip khu; ô tìm kiếm cao 48 **dính trên cùng** khi cuộn (thanh xanh, có bóng khi đang dính). Từ 640px giữ AppHeader như mọi trang (logo, tìm, Đăng tin, tin nhắn, chuông, tài khoản) và dải xanh chỉ còn lời chào lớn + chip khu (không lặp ô tìm / chuông). Chuông của AppHeader giờ có số chưa đọc (`features/notifications/components/notification-bell.tsx`, gộp một lần gọi `countUnreadNotifications` 30 giây, đọc lại khi quay lại tab, "9+", lắc nhẹ khi số tăng)
+- [x] **Chia render** (trang vẫn PPR tĩnh, không `cookies()`): server + cache — lưới 8 ô, chip Tìm nhanh, banner (`listBanners` web_home, 300s tag `banners`), 4 dải theo dịch vụ (dùng chung cache trang đầu `/pass-do`…), dải "Gần {khu}" của **khu mặc định** (sites[0]) để HTML có tin thật, số liệu (`public_stats` 1 giờ). Trình duyệt (`HomeProvider`): phiên + hồ sơ, khu đã chọn (profiles.site → localStorage `hp:home-site` → khu đầu), đổi khu (khách lưu máy; đăng nhập `updateMyProfile`, lỗi trả khu cũ + toast), "Gần {khu}" khi khu khác mặc định, "Dành cho bạn" (interests ∩ Listing, bỏ tin trùng "Gần bạn"), thẻ cá nhân, số thông báo. Server lỗi một khối → khối đó tự tải lại ở trình duyệt (`use-loadable.ts`), vẫn lỗi → `SectionError` + Thử lại
+- [x] Lưới dịch vụ `HOME_TILES` (thẻ nổi -48px, 4×2 / 8 cột từ 768px, nhãn 2 dòng không cắt, "Sắp có" / "Mới", stagger 30ms, giảm chuyển động → chỉ mờ 150ms). Ghép xe / ghép trận → trang giữ chỗ `/ghep-xe`, `/ghep-tran` (ComingSoon, noindex). "Tin của tôi" của khách → proxy chuyển `/dang-nhap?next=/toi/tin-cua-toi`
+- [x] Banner: scroll-snap (vuốt), chấm vị trí, nút trước / sau (≥ 640, hover / focus), tự chuyển 5s dừng khi hover / focus / tự vuốt / ngoài màn hình / tab ẩn, tắt khi giảm chuyển động, nút dừng / chạy; thẻ chữ theo tone (primary / accent / màu dịch vụ + icon 64), ảnh từ bucket `banners` (`bannerImageUrl`); khung 16:7, chữ dài thì thẻ cao thêm (không cắt). Desktop: banner 2/3 + thẻ cá nhân 1/3 cao bằng nhau
+- [x] Thẻ cá nhân 4 biến thể (khách / onboarding — mở LoginDialog, LoginFlow tự vào bước hồ sơ / "Tin của bạn" 3 số + cảnh báo sắp hết hạn → tab active, bị từ chối → tab pending / chưa có tin)
+- [x] **Chip Tìm nhanh → bộ lọc thuộc tính trên URL**: `features/listing/filters.ts` nhận tham số whitelist = khoá thuộc tính enum / bool của `ATTRIBUTE_FIELDS` thuộc category đang xét (`?vehicle_type=motorbike`, `?has_loft=1`, `?shift=night`; sai giá trị → bỏ qua) → `searchListings({ attributes })` (cache trang đầu theo cả thuộc tính, "Xem thêm" giữ thuộc tính). Trang danh sách hiện viên thuốc "Có gác ×" để bỏ lọc, giữ thuộc tính qua form tìm và qua chip category khi còn hợp lệ; tính vào `activeFilterCount` (noindex > 2). Key mới `web.listing.remove_filter`
+- [x] Dải tin: tiêu đề 44 (ô icon 32, "Xem tất cả ›" có aria-label riêng), 208 / 232 px, desktop 5 thẻ một màn + nút cuộn; skeleton 3 thẻ (desktop 5); "Gần {khu}" rỗng → thẻ mời đăng tin; cả cộng đồng chưa có tin → một `EmptyState`. Cộng đồng (3 số, chỉ khi có tin) + hộp an toàn + thẻ tải app (chỉ khi có `NEXT_PUBLIC_APP_STORE_URL` / `PLAY_STORE_URL`); dòng miễn trừ do layout (MobileDisclaimer / footer)
+- [x] Key mới `web.home.{heading,see_all_label,rail_prev,rail_next,get_app_ios,get_app_android}`; bỏ key cũ không dùng (`tagline`, `area`, `utilities_title`, `soon`, `safety_title`, `stats`). Tiện ích CSS `no-scrollbar` (globals.css)
+- [x] Đã chụp (Chrome headless, `next start`): 360 / 390 / 768 / 1024 / 1440, sáng + tối, vi / en / zh, khách / đã đăng nhập (có tin, 9+ thông báo, cảnh báo) / chưa hoàn thiện hồ sơ / chưa có tin + interests + khu khác mặc định, hộp chọn khu, lỗi khối (chặn RPC), giảm chuyển động; tràn ngang 0
+- [ ] Còn lại: analytics §7 (chờ PostHog), QR tải app trên desktop (cần thư viện QR — chưa hỏi), số thông báo theo Realtime, tag `banners` chưa nằm trong whitelist `/api/revalidate` (admin banner tuần 10 gọi `revalidateTag('banners')` trực tiếp)
+
 ## 4. Danh sách trang
 
 | Route | Khu | Render | Tuần |
 |---|---|---|---|
-| `/` | marketing | SSG | 2 khung, 11 đầy đủ |
+| `/` | (app) — Hub | PPR tĩnh + cache 300 (phần người dùng ở client) | 4b Hub; landing marketing tuần 11 |
 | `/tinh-nang/[slug]`, `/tai-app`, `/cho-chu-tro`, `/blog/[slug]`, `/gioi-thieu`, `/lien-he`, `/chinh-sach-bao-mat`, `/dieu-khoan`, `/xoa-tai-khoan` | marketing | SSG | 2 khung, 11 |
 | `/tin`, `/pass-do`, `/viec-lam`, `/tro`, `/that-lac` | public | SSR + cache 300 | 3 (trang `/[site]`: 4) |
 | `/tin/[slug]` | public | cache 300 + tag | 3 (`opengraph-image`: 4) |
 | `/u/[id]`, `/tim-kiem` | public | SSR + ISR / dynamic | 4 |
-| `/ghep-xe`, `/ghep-tran`, `/nhom/[slug]` | public | SSR + ISR 300 | 7 |
+| `/ghep-xe`, `/ghep-tran`, `/nhom/[slug]` | public | SSR + ISR 300 | 7 (giữ chỗ "Sắp có" từ 4b) |
 | `/tro` bản đồ + `/tro/[site]` | public | SSR + ISR 300 | 8 |
 | `/dang-nhap` | public | dynamic | 2 |
 | `/dang-tin` (`?feature=`), `/toi`, `/toi/tin-cua-toi` (`?tab=`), `/toi/tin-cua-toi/[id]/sua`, `/toi/da-luu` | auth | dynamic | 4 (kéo sớm từ 5; `/dang-tin/[category]` thay bằng `?feature=`) |

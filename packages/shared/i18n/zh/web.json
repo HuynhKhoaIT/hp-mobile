@@ -17,8 +17,14 @@
     "rights": "© {{year}} {{appName}}"
   },
   "home": {
-    "tagline": "在 Dung Quất 周边转让二手、找房、找工作、拼车和约球。",
-    "coming_soon": "正在建设中，即将上线。"
+    "coming_soon": "正在建设中，即将上线。",
+    "services_title": "服务",
+    "heading": "{{appName}} — Dung Quất 周边社区服务",
+    "see_all_label": "查看全部：{{title}}",
+    "rail_prev": "向左滚动",
+    "rail_next": "向右滚动",
+    "get_app_ios": "在 App Store 下载",
+    "get_app_android": "在 Google Play 下载"
   },
   "dev": {
     "title": "网页界面组件库",
@@ -45,7 +51,11 @@
     "site": "工作地点",
     "no_site": "未选择",
     "interests": "兴趣",
-    "avatar": "头像"
+    "avatar": "头像",
+    "guest_body": "登录后即可发布信息、收藏信息并与他人聊天。",
+    "settings": "设置",
+    "theme": "外观",
+    "about": "关于"
   },
   "listing": {
     "all": {
@@ -83,7 +93,8 @@
       "title": "搜索信息",
       "description": "搜索 Dung Quất 周边的二手物品、出租房、工作和失物招领。",
       "heading_site": "在 {{site}} 附近搜索"
-    }
+    },
+    "remove_filter": "移除筛选：{{label}}"
   },
   "post": {
     "step_basics": "主要信息",

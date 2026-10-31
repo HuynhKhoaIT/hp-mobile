@@ -17,8 +17,14 @@
     "rights": "© {{year}} {{appName}}"
   },
   "home": {
-    "tagline": "Mua bán, tìm trọ, tìm việc, ghép xe và ghép trận quanh khu Dung Quất.",
-    "coming_soon": "Đang xây dựng, sắp ra mắt."
+    "coming_soon": "Đang xây dựng, sắp ra mắt.",
+    "services_title": "Dịch vụ",
+    "heading": "{{appName}} — dịch vụ cộng đồng quanh khu Dung Quất",
+    "see_all_label": "Xem tất cả: {{title}}",
+    "rail_prev": "Cuộn sang trái",
+    "rail_next": "Cuộn sang phải",
+    "get_app_ios": "Tải trên App Store",
+    "get_app_android": "Tải trên Google Play"
   },
   "dev": {
     "title": "Thư viện giao diện web",
@@ -45,7 +51,11 @@
     "site": "Nơi làm việc",
     "no_site": "Chưa chọn",
     "interests": "Quan tâm",
-    "avatar": "Ảnh đại diện"
+    "avatar": "Ảnh đại diện",
+    "guest_body": "Đăng nhập để đăng tin, lưu tin và nhắn tin với người khác.",
+    "settings": "Cài đặt",
+    "theme": "Giao diện",
+    "about": "Thông tin"
   },
   "listing": {
     "all": {
@@ -83,7 +93,8 @@
       "title": "Tìm kiếm tin",
       "description": "Tìm đồ cũ, phòng trọ, việc làm và đồ thất lạc quanh khu Dung Quất.",
       "heading_site": "Tìm kiếm gần {{site}}"
-    }
+    },
+    "remove_filter": "Bỏ lọc {{label}}"
   },
   "post": {
     "step_basics": "Thông tin chính",

@@ -9,6 +9,15 @@ export const EVENTS = [
   'save_listing',
   'login_success',
   'share_listing',
+  // Trang chủ (docs/design/home.md §7)
+  'home_view',
+  'home_tile_click',
+  'home_banner_click',
+  'home_shortcut_click',
+  'home_rail_click',
+  'home_rail_see_all',
+  'home_site_change',
+  'home_card_cta',
 ] as const;
 
 export type AnalyticsEvent = (typeof EVENTS)[number];

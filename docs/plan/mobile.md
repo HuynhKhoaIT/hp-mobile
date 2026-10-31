@@ -66,8 +66,8 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 | Route | Kiểu | Feature | Tuần | Mở từ |
 |---|---|---|---|---|
 | `(auth)/phone`, `(auth)/otp`, `(auth)/onboarding` | Form | auth | 2 | `requireAuth` |
-| `(tabs)/index` | Hub | — | 3 → 4 | cold start (chuyển vào `(tabs)` ở tuần 4) |
-| `listings/[feature]` (`pass` · `room` · `job` · `lost-found` · `all`, `?site=`) | List | listing | 3 | ô dịch vụ ở Hub, "Xem tất cả" |
+| `(tabs)/index` | Hub | home | 3 → 4 → 4b (super app theo `docs/design/home.md`) | cold start (chuyển vào `(tabs)` ở tuần 4) |
+| `listings/[feature]` (`pass` · `room` · `job` · `lost-found` · `all`, `?site=`, `?shortcut=`, `?categories=a,b`) | List | listing | 3 (+ bộ lọc đặt sẵn tuần 4b) | ô dịch vụ ở Hub, "Xem tất cả", chip "Tìm nhanh", link banner |
 | `groups/[kind]` (`ride` · `sport`) | List | group | 3 (tạm "Sắp ra mắt") → 7–8 | ô dịch vụ ở Hub |
 | `(tabs)/explore` | List | listing (4) + group (8) | 4 / 8 | tab |
 | `(tabs)/post` | Hub (chọn loại tin) | — | 4 | tab, nút Đăng xoay 45° |
@@ -83,7 +83,7 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 | `group/new/[kind]` | Form | group | 7 | post |
 | `chat/[conversationId]` | Conversation | chat | 5 | danh sách, push `new_message`, CTA Chat |
 | `search` (`?q=`) | List | listing (+ group tuần 8) | 4 | ô tìm kiếm ở Hub |
-| `notifications` | List | — | 6 | icon chuông, push mở app |
+| `notifications` | List | — | 4b (tạm "Sắp ra mắt") → 6 | chuông ở header Hub, push mở app |
 | `profile/[id]` | Detail | profile | 6 | avatar ở tin / chat |
 | `settings/index`, `settings/language`, `settings/notifications`, `settings/delete-account`, `settings/about` | Form | profile | 6 / 12 | me |
 | `badge/request` | Form | profile | 10 | me |
@@ -149,8 +149,25 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - [x] i18n mới (3 ngôn ngữ): `listing.form.{basics_title, photo_failed, draft_restored, start_over, today, yesterday, site_none, suffix.*}`, `common.nav.search`, `common.settings.language`.
 - [x] Đã kiểm: `tsc --noEmit`, `lint`, `i18n:check`, `expo export --platform android` (4435 module, Hermes 9,1 MB); chạy thử luồng dữ liệu với Supabase local (OTP 0900000001): nháp → upload 2 ảnh → đăng (về `pending_review` vì `low_price`), việc làm không ảnh → `active`, lưu nháp đồ thất lạc, lỗi Zod `too_short` / `price_required`, 4 tab tin của tôi, sửa giá + bỏ ảnh + dọn Storage, đóng / mở lại, gia hạn → `too_early`, lưu / bỏ lưu + tin đã lưu, hiện SĐT.
 - [ ] Chạy trên máy thật (dev build): chọn nhiều ảnh, nén WebP, upload mạng yếu, bàn phím che ô nhập, vuốt quay lại iOS, Android Back; light / dark, 360px, font 150%, Reduce Motion, vi / en / zh.
-- [ ] Lottie confetti khi đăng thành công (chưa cài `lottie-react-native`); shared element ảnh; header Hub thu gọn khi cuộn.
+- [ ] Lottie confetti khi đăng thành công (chưa cài `lottie-react-native`); shared element ảnh. (Header Hub thu gọn khi cuộn: xong ở 5f.)
 - [ ] Hàng đợi upload lũy thừa 5 lần (rule `src/core/upload`): hiện dùng retry 2 lần của `useUploadListingImage` + nút thử lại từng ảnh.
+
+## 5f. Trang chủ super app — `docs/design/home.md` (cập nhật 2026-11-01)
+- [x] `(tabs)/index` dựng lại theo §3–§10, route chỉ ghép khối; logic ở `src/features/home` (`hooks.ts`: `useHomeSite`, `usePersonalCard`, `useHomeRails`, `useHubRefresh`, `useHubScroll`, `useHomeViewEvent`; `navigation.ts`: `openTile`, `openShortcut`, `openWebLink`, `openNotifications`; `components/`: `HomeTopBar`, `HomeServices`, `HomeBanners`, `PersonalCard`, `QuickSearch`, `HomeRail`, `HomeListings`, `HomeFooter`).
+- [x] Header: nền primary bo `rounded-b-xl`, tràn lên dải trạng thái (`Screen statusBar="primary"`, thanh trạng thái chữ sáng / tối theo giao diện khi tab đang mở); đã đăng nhập: avatar viền on-primary/30 (→ tab Tôi) + "Chào {tên gọi}" + dòng phụ + chuông (số chưa đọc, > 9 → "9+", lắc một lần khi tăng); khách: logo chữ + Đăng nhập; chip khu → sheet chọn khu (`OptionSheet`; mặc định `profile.site` → khu lưu máy `useSettings.homeSite` → khu đầu tiên; đổi khi đăng nhập ghi `profiles.site`, hiện ngay trong lúc ghi). Chip khu đặt hàng riêng dưới hàng chào (tên khu dài như "Khu liên hợp Hòa Phát Dung Quất" không phải xuống dòng) — web nên làm giống.
+- [x] Thu gọn khi cuộn (Reanimated, UI thread): lời chào + chip khu mờ dần và dịch lên 8 (Reduce Motion: chỉ mờ); ô tìm kiếm dính trên cùng (`stickyHeaderIndices`), nền xanh kéo dài lên trên cho iOS kéo làm mới.
+- [x] Lưới 8 ô (`HOME_TILES`) nổi đè đáy header 48: `ServiceTile variant="grid"` + `ServiceGrid` 4 cột; nhãn góc "Sắp có" / "Mới"; ô sắp có mờ 60% (nhãn góc vẫn rõ), đọc "đã tắt", bấm → màn "Sắp ra mắt"; "Tin của tôi" → `requireAuth`; xuất hiện lần lượt (`StaggerItem`).
+- [x] Banner (`useBanners('app_home', locale)`): `BannerCarousel` tràn mép, snap đầu slide, khung tối thiểu 16:7, slide chữ theo tone (primary / accent / dịch vụ + icon 64), slide ảnh (`bannerImageUrl`), chấm co giãn, tự chuyển 5 s (dừng khi chạm / rời tab / nút dừng; tắt khi Reduce Motion), link nội bộ map qua `routeForWebPath` (`src/lib/urls.ts`), `https://` → trình duyệt; không có banner → ẩn khối.
+- [x] Thẻ cá nhân 4 biến thể (khách / hoàn thiện hồ sơ / "Tin của bạn" với `StatColumns` + `AlertRow` sắp hết hạn → tab Đang đăng, bị từ chối → tab Chờ duyệt / chưa có tin) — `PromoCard`.
+- [x] Tìm nhanh: `Chip size="sm" dot` từ `HOME_SHORTCUTS` → `listings/[feature]?shortcut=` (bộ lọc category + attributes đặt sẵn, hiện thành chip bỏ được; một category con → chọn luôn chip con).
+- [x] Dải: "Gần {khu}" (luôn hiện; rỗng → thẻ mời đăng gọn), "Dành cho bạn" (theo `profile.interests`, bỏ tin trùng, → `?categories=`), 4 dải dịch vụ (rỗng → ẩn); `SectionHeader` có ô icon / phụ đề / ChevronRight; thẻ 208 (`w-52`) snap; 4 ảnh đầu dải đầu `priority="high"`; Hub chưa có tin nào → một `EmptyState`.
+- [x] Chân trang: số liệu cộng đồng (`StatTile`, chỉ khi có tin), hộp an toàn (`Notice variant="bordered"`), dòng miễn trừ.
+- [x] Trạng thái từng khối: skeleton đúng hình (header, banner 16:7 + chấm, thẻ cá nhân, dải 3 thẻ, số liệu), `ErrorState compact` + thử lại chỉ ở khối lỗi; kéo xuống làm mới mọi query của Hub (query theo người dùng chỉ khi đã đăng nhập); cache MMKV đọc trước.
+- [x] Analytics (`events.ts`): `home_view`, `home_tile_click`, `home_banner_click`, `home_shortcut_click`, `home_rail_click`, `home_rail_see_all`, `home_site_change`, `home_card_cta`.
+- [x] Design system mới / mở rộng (đều có trong ui-gallery): `HomeHeader` + `HomeHeaderSearch` + `HomeHeaderCurve` + `SiteChip` + `NotificationBell`, `BannerCarousel`, `ServiceTile variant="grid"` + `ServiceGrid`, `StatColumns`, `StatTile`, `AlertRow`, `PromoCard`, `OptionSheet`; `Text` (variant `micro` 12, `titleLg` 20, prop `weight`), `Chip` (`size="sm"`, `dot`), `SectionHeader` (`icon`, `subtitle`, `chevron`), `SearchBar variant="elevated"`, `Button` (`inverse`, `shape="pill"`), `ErrorState` / `EmptyState` `compact`, `Notice variant="bordered"`, `Screen` (`statusBar`, `onScroll`, `stickyHeaderIndices`, `onRefresh`), `Skeleton itemClassName`, `ListingCard imagePriority`, `Badge` không tràn thẻ.
+- [x] i18n mới: `common.actions.clear_filter` (3 ngôn ngữ). Màn mới `notifications` (tạm "Sắp ra mắt").
+- [x] Đã kiểm: `tsc --noEmit`, `lint`, `i18n:check`, `expo export --platform android` (4453 module, Hermes 9,2 MB); chụp bản xem trước web (react-native-web, chỉ để rà giao diện) khách / đã đăng nhập / chưa onboarding / có "Dành cho bạn", sáng / tối, 360 / 390, vi / en / zh, header đang thu gọn.
+- [ ] Máy thật (dev build): tự chuyển banner + snap, kéo làm mới, header dính trên Android, lắc chuông, thanh trạng thái, font 150%, Reduce Motion, TalkBack / VoiceOver.
 
 ## 6. Hạ tầng kỹ thuật
 - **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
@@ -159,13 +176,14 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - **Push**: Expo Push; token ghi `profiles.push_tokens` khi đăng nhập và khi token đổi; xoá khi đăng xuất. Payload `{ screen, params }` → `routeForNotification`.
 - **Deep link**: `tenapp.vn/tin/{slug}` → `tin/[slug]` → resolve `short_id` (6 ký tự cuối slug) → `listing/[id]`; `nhom/{slug}` tương tự; `hoaphat://chat/{id}` chỉ cho push.
 - **Offline**: TanStack persist MMKV; `src/core/offline` (nháp tin, tin nhắn chưa gửi, hàng đợi upload); flush khi online.
-- **Theo dõi**: Sentry (crash + Performance `hub`, `listing_list`); PostHog event: `view_listing`, `contact`, `create_listing`, `join_group`, `search`, `save_listing`, `login_success`, `share_listing`.
+- **Theo dõi**: Sentry (crash + Performance `hub`, `listing_list`); PostHog event: `view_listing`, `contact`, `create_listing`, `join_group`, `search`, `save_listing`, `login_success`, `share_listing`, `home_*` (docs/design/home.md §7).
 
 ## 7. Thay đổi hợp đồng với backend (log)
 Ghi mỗi khi `@hp/core` / `@hp/shared` / RPC / Edge Function đổi API và mobile phải theo.
 
 | Ngày | Gói / RPC / Function | Thay đổi | Việc ở mobile | Trạng thái |
 |---|---|---|---|---|
+| 2026-11-01 | `@hp/core` home (`useBanners`, `useMyListingStats`, `useUnreadNotificationCount`, `usePublicStats`), `@hp/shared` `HOME_TILES` / `HOME_SHORTCUTS` / `HOME_RAIL_SIZE` / `givenName`, `@hp/tokens` `aspect.banner` 16:7 | Mới: dữ liệu trang chủ | Hub super app (5f), `listings/[feature]` nhận `shortcut` / `categories` | xong |
 | 2026-10-31 | `@hp/core`, `@hp/tokens` | Mới: `SupabaseProvider`, `useSupabase` (React peer); `@hp/tokens/tailwind.preset` (NativeWind) | `AppProviders` bọc `SupabaseProvider`; `tailwind.config.js` dùng preset | xong |
 | 2026-10-31 | `@hp/core` listings-write + hooks, `@hp/shared` `CreateListingInput` / `UpdateListingInput` / `MAX_LISTING_IMAGES`, i18n `form.*` / `manage.*` / `saved.*` / `contact.*` / `state.*` / `bookmark.*` | Mới: đăng / sửa (status thật sau kiểm duyệt), upload / xoá ảnh, trạng thái (optimistic), gia hạn, hiện SĐT, tin của tôi, lưu tin; `public_listings` có tin đã bán / đóng / hết hạn (`listingDisplayStatus`) | Form "Đăng nhanh", sửa tin, tin của tôi, tin đã lưu, trái tim + hiện SĐT + banner ở chi tiết | xong |
 | 2026-10-31 | `@hp/core` listings + hooks, `@hp/shared` `priceLabel` / `readAttributes` / `featureOfCategory` | Mới: đọc tin công khai (`searchListings` cursor, `getListing(BySlug)`, `similarListings`, `recordListingView`, `logSearch`, `imageUrl(…, transform)`, `avatarUrl`, `shareUrl`) | Hub, danh sách 4 tính năng, chi tiết + `tin/[slug]`; `EXPO_PUBLIC_IMAGE_TRANSFORM` | xong |

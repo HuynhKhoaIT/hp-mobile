@@ -1,6 +1,7 @@
 // SearchBar — ô tìm kiếm: icon kính lúp, bàn phím nút "Tìm", nút xoá từ khoá khi có chữ. Cao 48, chữ 16.
 // Tìm khi bấm Tìm trên bàn phím (onSubmit) — không gọi server theo từng ký tự (mạng yếu).
-// Có `onPress` → chỉ là nút trông như ô tìm kiếm (Hub → mở màn Tìm kiếm).
+// Có `onPress` → chỉ là nút trông như ô tìm kiếm (Hub → mở màn Tìm kiếm). `variant="elevated"` (header Hub,
+// docs/design/home.md §10): không viền, nền surface + shadow-card trên nền primary, chữ gợi ý text-md muted.
 import { Search, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
@@ -21,24 +22,25 @@ type SearchBarInputProps = {
   onPress?: undefined;
 };
 
-type SearchBarButtonProps = { onPress: () => void; placeholder?: string; className?: string };
+type SearchBarButtonProps = { onPress: () => void; placeholder?: string; variant?: 'outline' | 'elevated'; className?: string };
 
 export type SearchBarProps = SearchBarInputProps | SearchBarButtonProps;
 
 const BOX = 'min-h-12 flex-row items-center gap-2 rounded-full border border-border bg-surface pl-4';
+const BOX_ELEVATED = 'min-h-12 flex-row items-center gap-2 rounded-full bg-surface pl-4 shadow-card';
 
 export function SearchBar(props: SearchBarProps) {
   if (props.onPress) {
-    const { onPress, placeholder, className } = props;
+    const { onPress, placeholder, variant = 'outline', className } = props;
     return (
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={placeholder}
         onPress={onPress}
-        className={[BOX, 'pr-4 active:opacity-80', className].filter(Boolean).join(' ')}
+        className={[variant === 'elevated' ? BOX_ELEVATED : BOX, 'pr-4 active:opacity-80', className].filter(Boolean).join(' ')}
       >
         <Icon icon={Search} tone="muted" />
-        <Text tone="disabled" numberOfLines={1} className="flex-1 py-3">
+        <Text tone={variant === 'elevated' ? 'muted' : 'disabled'} numberOfLines={1} className="flex-1 py-3">
           {placeholder}
         </Text>
       </Pressable>

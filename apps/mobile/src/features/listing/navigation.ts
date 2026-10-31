@@ -25,8 +25,20 @@ export function openListing(id: string, opts: { replace?: boolean } = {}) {
   else router.push(href);
 }
 
-export function openListingList(slug: ListingFeatureConfig['slug'], params: { site?: string } = {}) {
-  router.push({ pathname: '/listings/[feature]', params: { feature: slug, ...params } });
+/**
+ * Danh sách tin của một tính năng. `site`: đặt sẵn khu; `shortcut`: id chip "Tìm nhanh" (HOME_SHORTCUTS);
+ * `categories`: nhóm category đặt sẵn (vd "Dành cho bạn") — xem useListingPreset.
+ */
+export function openListingList(
+  slug: ListingFeatureConfig['slug'],
+  params: { site?: string; shortcut?: string; categories?: readonly ListingCategory[] } = {},
+) {
+  const { categories, ...rest } = params;
+  const extra = Object.fromEntries(Object.entries(rest).filter(([, v]) => !!v)) as Record<string, string>;
+  router.push({
+    pathname: '/listings/[feature]',
+    params: { feature: slug, ...extra, ...(categories?.length ? { categories: categories.join(',') } : {}) },
+  });
 }
 
 /** Bước 0 của "Đăng nhanh": chọn loại tin (đặt sẵn tính năng khi đến từ danh sách của tính năng đó). */

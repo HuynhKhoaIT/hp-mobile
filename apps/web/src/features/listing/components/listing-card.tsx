@@ -84,12 +84,28 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
         <h3 lang={listing.lang} className="line-clamp-2 text-md font-medium text-fg">
           {listing.title}
         </h3>
-        <p className="text-lg font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
+        <ListingPrice text={priceText(priceLabel(listing), t, locale)} />
         <p className="line-clamp-1 text-sm text-muted">
           {where ? `${where} · ` : null}
           <time dateTime={listing.created_at}>{when}</time>
         </p>
       </div>
     </Link>
+  );
+}
+
+/**
+ * Giá + đơn vị ("2.500.000 ₫" + "/tháng"): formatMoney nối số và ₫ bằng dấu cách không ngắt nên cả chuỗi không xuống dòng
+ * được → bị cắt ở thẻ hẹp. Tách đơn vị sau dấu "/" cuối thành chữ nhỏ, cho phép xuống dòng trước nó (giống app).
+ */
+function ListingPrice({ text }: { text: string }) {
+  const cut = text.lastIndexOf('/');
+  if (cut <= 0) return <p className="text-lg font-bold text-fg">{text}</p>;
+  return (
+    <p className="text-lg font-bold text-fg">
+      {text.slice(0, cut)}
+      <wbr />
+      <span className="text-sm font-semibold text-muted">{text.slice(cut)}</span>
+    </p>
   );
 }
