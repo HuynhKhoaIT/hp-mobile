@@ -1,1 +1,35 @@
-{}
+{
+  "meta": {
+    "description": "Pass đồ, tìm trọ, tìm việc, ghép xe, ghép trận cho người lao động quanh khu Dung Quất."
+  },
+  "header": {
+    "home": "Về trang chủ",
+    "language": "Ngôn ngữ",
+    "theme": "Giao diện",
+    "main_nav": "Điều hướng chính"
+  },
+  "theme": {
+    "system": "Theo máy",
+    "light": "Sáng",
+    "dark": "Tối"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
+  },
+  "footer": {
+    "rights": "© {{year}} {{appName}}"
+  },
+  "home": {
+    "tagline": "Mua bán, tìm trọ, tìm việc, ghép xe và ghép trận quanh khu Dung Quất.",
+    "coming_soon": "Đang xây dựng, sắp ra mắt."
+  },
+  "dev": {
+    "title": "Thư viện giao diện web",
+    "buttons": "Nút",
+    "sizes": "Kích thước",
+    "states": "Trạng thái",
+    "disabled": "Đã tắt"
+  }
+}

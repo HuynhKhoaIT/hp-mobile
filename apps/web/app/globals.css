@@ -1,12 +1,44 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 /* Token dùng chung với app — sinh từ packages/tokens. Không khai báo màu / cỡ chữ tại đây. */
 @import "@hp/tokens/theme.css";
 
-/* Dark mode theo class `dark` trên <html> (next-themes), không theo prefers-color-scheme. */
+/* Dark mode theo class `dark` trên <html> (next-themes). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Tên ngữ nghĩa của shadcn/ui trỏ về token @hp/tokens — không thêm màu mới.
+ * Lưu ý va chạm tên: `muted` và `accent` của token là màu CHỮ xám / màu cam nút Đăng, còn shadcn dùng
+ * `bg-muted`, `bg-accent` làm nền hover. Component trong src/components/ui đã đổi các chỗ đó sang
+ * `bg-surface-2`; khi thêm component shadcn mới bằng CLI, sửa tương tự (xem .claude/rules/web-ui-design.md).
+ */
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-fg);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-fg);
+  --color-popover: var(--color-surface);
+  --color-popover-foreground: var(--color-fg);
+  --color-primary-foreground: var(--color-on-primary);
+  --color-secondary: var(--color-surface-2);
+  --color-secondary-foreground: var(--color-fg);
+  --color-muted-foreground: var(--color-muted);
+  --color-accent-foreground: var(--color-fg);
+  --color-destructive: var(--color-danger);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-primary);
+}
+
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
   body {
-    @apply bg-bg text-fg font-sans text-md;
+    @apply bg-bg text-fg font-sans text-md antialiased;
+  }
+  /* Tiếng Trung: Noto Sans SC (layout gắn class lang-zh). */
+  .lang-zh body {
+    @apply font-zh;
   }
 }

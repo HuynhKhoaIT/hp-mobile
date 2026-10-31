@@ -69,7 +69,7 @@ app/
 │   │   ├── u/[id]/page.tsx               # hồ sơ công khai
 │   │   ├── tim-kiem/page.tsx
 │   │   ├── dang-nhap/page.tsx            # OTP + Google
-│   │   └── (auth)/                       # yêu cầu đăng nhập — middleware chặn
+│   │   └── (auth)/                       # yêu cầu đăng nhập — proxy.ts chặn
 │   │       ├── dang-tin/page.tsx | dang-tin/[category]/page.tsx
 │   │       ├── tao-nhom/[kind]/page.tsx
 │   │       ├── tin-nhan/page.tsx | tin-nhan/[conversationId]/page.tsx
@@ -99,7 +99,7 @@ src/
 ├── components/shared/                    # Logo, LocaleSwitcher, ThemeToggle, EmptyState, ErrorState, Skeletons
 └── components/admin/                     # DataTable, PageHeader, StatusBadge, ConfirmDialog
 content/blog/{vi,en,zh}/*.mdx
-middleware.ts                             # locale + refresh session + chặn (auth) và /admin
+proxy.ts                                  # (Next 16, thay middleware.ts) locale + refresh session + chặn (auth) và /admin
 ```
 
 URL: tiếng Việt không tiền tố, `/en/...`, `/zh/...` (`localePrefix: 'as-needed'`). Slug trong URL luôn tiếng Việt không dấu, lấy từ tiêu đề + id ngắn (`xe-wave-2019-con-dep-a1b2c3`); trang tự redirect 301 nếu slug cũ khác.
@@ -187,7 +187,7 @@ Landing theo thứ tự: Hero (tiêu đề, 1 câu, 2 nút "Dùng ngay trên web
 
 ## 10. Admin (`/admin`)
 
-- `middleware.ts`: chưa đăng nhập → `/admin/login`; không phải `moderator`/`admin` → 403. MFA bắt buộc (mật khẩu + TOTP, hoặc Google có 2FA). Header `X-Robots-Tag: noindex, nofollow`.
+- `proxy.ts`: chưa đăng nhập → `/admin/login`; không phải `moderator`/`admin` → 403. MFA bắt buộc (mật khẩu + TOTP, hoặc Google có 2FA). Header `X-Robots-Tag: noindex, nofollow`.
 - Moderator: kiểm duyệt, báo cáo, huy hiệu, khoá tạm, xem lead. Chỉ admin: cấm vĩnh viễn, đổi vai trò, catalog, nội dung marketing, toàn bộ audit log, xuất dữ liệu.
 - Mọi server action admin: Zod → kiểm tra quyền **lại ở server** → thực hiện → ghi `audit_log(actor_id, action, target_type, target_id, meta)` → `revalidatePath` (+ `revalidateTag` trang tin công khai bị ảnh hưởng).
 - Không xoá cứng; chỉ đổi trạng thái, `deleted_at`, `is_banned`. Hành động ảnh hưởng người dùng → insert `notifications` (key i18n + tham số).

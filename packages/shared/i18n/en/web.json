@@ -1,1 +1,35 @@
-{}
+{
+  "meta": {
+    "description": "Buy and sell, find rooms, jobs, shared rides and pickup games for workers around Dung Quat."
+  },
+  "header": {
+    "home": "Go to home page",
+    "language": "Language",
+    "theme": "Appearance",
+    "main_nav": "Main navigation"
+  },
+  "theme": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
+  },
+  "footer": {
+    "rights": "© {{year}} {{appName}}"
+  },
+  "home": {
+    "tagline": "Buy and sell, find rooms and jobs, share rides and join games around Dung Quat.",
+    "coming_soon": "Under construction, coming soon."
+  },
+  "dev": {
+    "title": "Web UI gallery",
+    "buttons": "Buttons",
+    "sizes": "Sizes",
+    "states": "States",
+    "disabled": "Disabled"
+  }
+}

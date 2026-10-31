@@ -1,0 +1,13 @@
+'use client';
+
+// Dark mode bằng class `dark` trên <html> (next-themes). Mặc định theo máy.
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import type { ReactNode } from 'react';
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  return (
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      {children}
+    </NextThemesProvider>
+  );
+}

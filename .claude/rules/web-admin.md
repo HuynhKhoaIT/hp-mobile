@@ -42,6 +42,6 @@ export async function approveListingAction(raw: unknown): Promise<ActionResult> 
 - Chữ admin qua next-intl ns `admin`; đủ `vi`, `en`; `zh` được phép fallback `vi` (ngoại lệ duy nhất, khai báo trong config `i18n:check`).
 
 ## Bảo vệ
-- `middleware.ts`: chưa đăng nhập → `/admin/login`; không staff → 403; chưa `aal2` → `/admin/login/mfa`; header `X-Robots-Tag: noindex, nofollow`.
+- `proxy.ts` (trước đây `middleware.ts`): chưa đăng nhập → `/admin/login`; không staff → 403; chưa `aal2` → `/admin/login/mfa`; header `X-Robots-Tag: noindex, nofollow`.
 - MFA bắt buộc: `supabase.auth.mfa.getAuthenticatorAssuranceLevel()`; TOTP enroll ở lần đăng nhập đầu.
 - `/admin` không trong sitemap; layout admin không render header / footer marketing; không PostHog session replay ở admin.

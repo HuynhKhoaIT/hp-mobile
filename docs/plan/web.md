@@ -58,6 +58,16 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 | 11 | Landing đầy đủ 11 section; `/tinh-nang/[slug]`; `/tai-app` (UA detect, QR, UTM); `/cho-chu-tro`; blog MDX; lead form + rate limit + honeypot; PostHog + cookie consent; pháp lý 3 ngôn ngữ hoàn chỉnh; `.well-known` AASA / assetlinks | Lighthouse mobile ≥ 90 / 100 / 95; app verify deep link | `/seo-check` |
 | 12 | Rà 3 ngôn ngữ, dark, 360 / 1440, a11y, zoom 200%; Vercel production + domain; Sentry; tune ISR / cache; Google Search Console gửi sitemap; `/web-done-check` toàn bộ | **Cổng 4** | `/web-done-check` |
 
+## 3b. Tiến độ tuần 1 (cập nhật 2026-10-31)
+- [x] next-intl 4.14: `[locale]` với `localePrefix: 'as-needed'` (vi không tiền tố), `src/i18n/{routing,navigation,request,messages}.ts`; locale đọc từ `next/root-params` (setRequestLocale đã deprecated); file dịch dùng chung `packages/shared/i18n`, chuyển `{{x}}` → `{x}` và `_one/_other` → ICU khi nạp; locale lạ → 404.
+- [x] `proxy.ts` (Next 16 thay middleware.ts): locale → làm mới phiên (`getClaims`) → chặn `/dang-tin`, `/tao-nhom`, `/tin-nhan`, `/thong-bao`, `/toi` (→ `/dang-nhap?next=`) → `/admin` (chưa đăng nhập → `/admin/login`, không staff → 403, chưa aal2 → `/admin/login/mfa`, `X-Robots-Tag: noindex`). Đã thử bằng `next start` + curl.
+- [x] `src/lib/supabase/{server,client,admin,proxy}.ts` (`createServerClient`, `createBrowserClient`, `createAdminClient` server-only).
+- [x] shadcn (Radix, Nova) + `Button` chỉnh token (min-h-11, text-md, biến thể `accent` chữ tối); tên ngữ nghĩa shadcn trỏ về token trong `app/globals.css`.
+- [x] Font Be Vietnam Pro (`next/font`), Noto Sans SC chỉ gắn khi zh (không preload); dark mode `next-themes`; header (logo chữ, đổi ngôn ngữ, đổi giao diện) + footer (dòng miễn trừ, năm cache theo ngày).
+- [x] `/dev/ui` (404 ở production); ESLint chặn `next/link`, `redirect` / `useRouter` / `usePathname` của next/navigation, code admin ngoài `app/[locale]/admin`, Supabase trong `app/` (đã thử bằng file vi phạm).
+- [ ] Vercel: nối project (Root Directory `apps/web`), env Preview = Supabase staging → preview URL mỗi PR.
+- Ghi chú Next 16 + `cacheComponents`: không dùng `export const dynamic / revalidate / dynamicParams`; cache bằng `'use cache'` + `cacheLife` + `cacheTag` (đã sửa `.claude/rules/web-routing-rsc.md`, skill `new-page`).
+
 ## 4. Danh sách trang
 
 | Route | Khu | Render | Tuần |
@@ -91,7 +101,7 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 ## 6. Thay đổi hợp đồng với backend (log)
 | Ngày | Gói / RPC / Function | Thay đổi | Việc ở web | Trạng thái |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 2026-10-31 | `@hp/tokens` | Mới token `onAccent` (`text-on-accent`): chữ trên nút cam Đăng tin | `Button` biến thể `accent` dùng `text-on-accent` | xong |
 
 ## 7. Rủi ro riêng web
 | Rủi ro | Giảm thiểu |

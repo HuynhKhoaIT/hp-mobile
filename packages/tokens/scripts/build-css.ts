@@ -23,6 +23,7 @@ const COLOR_NAME: Record<ColorToken, string> = {
   textMuted: 'muted',
   textDisabled: 'disabled',
   onPrimary: 'on-primary',
+  onAccent: 'on-accent',
 };
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);

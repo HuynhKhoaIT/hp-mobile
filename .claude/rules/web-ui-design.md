@@ -16,6 +16,8 @@ paths:
 
 ## Component
 - Primitive: `src/components/ui` (shadcn, sinh bằng CLI, chỉnh token). Không tự viết lại Button / Dialog / Sheet / Select.
+- Sau khi `pnpm dlx shadcn add <x>`: (1) import `cn` từ `@/lib/utils` (không gói `cn`); (2) đổi `bg-muted`, `hover:bg-accent`, `bg-accent` (nền hover của shadcn) → `bg-surface-2` vì `muted` / `accent` của token là màu chữ xám / cam Đăng tin; (3) bỏ class giá trị tuỳ ý (`text-[0.8rem]`, `rounded-[min(...)]`); (4) vùng chạm ≥ 44px (`min-h-11`). Tên ngữ nghĩa shadcn khác (`background`, `foreground`, `card`, `popover`, `input`, `ring`, `destructive`, `primary-foreground`) đã trỏ về token trong `app/globals.css`.
+- Nút cam (Đăng tin) dùng `text-on-accent` (chữ tối), không `text-on-primary`: chữ trắng trên `accent` chỉ ~2,9:1.
 - Dùng chung: `src/components/shared` (`logo`, `locale-switcher`, `theme-toggle`, `empty-state`, `error-state`, `skeletons`, `json-ld`, `app-only`, `app-promo-card`, `open-in-app-bar`, `login-dialog`).
 - Card / badge của tin và nhóm: `src/features/listing/components/listing-card.tsx`, `src/features/group/components/group-card.tsx` — bố cục, tone badge, thứ tự thông tin **giống app** (`apps/mobile/src/ui/ListingCard.tsx`, `GroupCard.tsx`). Đổi 1 bên → ghi chú để đổi bên kia.
 - Tên file `kebab-case.tsx`, export named; component thuộc feature nằm trong `features/<x>/components`.
