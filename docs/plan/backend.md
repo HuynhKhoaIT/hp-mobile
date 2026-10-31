@@ -75,10 +75,11 @@ Tuần 1 token / db / shared → tuần 2 auth + profiles → tuần 3 listing �
 ### Tiến độ tuần 2 (cập nhật 2026-10-30)
 - [x] Migration `20261030100000_core`: `sites`, `profiles` (+ trigger tạo từ `auth.users`, guard cột, consent), `ratings` (+ trigger avg / count), `notifications` (Realtime, chỉ sửa `read_at`), `bookmarks`, `badge_requests` (+ trigger duyệt), `blocks`, `rate_limits` + `assert_rate_limit`, `audit_log` (chỉ thêm); helper `is_staff`, `is_admin`, `is_banned`, `is_blocked`, `short_name`; view `public_profiles`
 - [x] Hook JWT `custom_access_token_hook` (Postgres) — đã thử: JWT moderator có `app_metadata.role = moderator`
-- [x] Seed: 3 khu + 5 user (user, user, banned, moderator, admin), SĐT `84900000001–05`
+- [x] Seed: 5 user (user, user, banned, moderator, admin), SĐT `84900000001–05`
 - [x] pgTAP: `010_profiles` (27) + `020_core_tables` (30), tổng 75 assertion; thử thật qua REST + supabase-js
 - [x] `@hp/core`: `Result` / `toAppError`, `keys`, profile (`getMyProfile`, `updateMyProfile`, `completeOnboarding`, `getPublicProfile`), sites, notifications (cursor), bookmarks, blocks, `shareUrl`, `imageUrl`; `@hp/shared`: Zod `UpdateProfileInput`, `OnboardingInput`
 - [ ] `send-otp` (cần tài khoản Zalo ZNS / SMS brandname) · Google OAuth · `ratings` insert qua RPC (tuần 6 / 8) · bật hook trên staging
+- [x] Migration `20261031090000_sites_dung_quat`: chỉ khu Dung Quất (4 địa điểm khởi đầu); `sites` + `is_active`, `sort_order`, `updated_at`, trigger audit — admin tự thêm công ty / khu mới ở `/admin/catalog` (màn web tuần 10). pgTAP tổng 81
 
 ## 5. Thứ tự migration dự kiến
 `0001_extensions_helpers` → `0002_core_profiles_sites` → `0003_core_notifications_bookmarks_ratings` → `0004_core_moderation_tables` → `0005_rls_helpers_core_policies` → `0006_listings` → `0007_listings_public_view_rpc` → `0008_storage_buckets_listing_avatars` → `0009_listing_write_rpc_moderation_webhook` → `0010_chat` → `0011_realtime_publication_chat_storage` → `0012_push_webhook_notification_prefs` → `0013_groups` → `0014_group_rpc_join` → `0015_cron_expire_remind` → `0016_venues` → `0017_lost_found_match_webhook` → `0018_home_feed_reports_auto_hide` → `0019_verification_translations_purge` → `0020_marketing_catalog_admin` → `0021_app_settings_local`. Tên thật theo timestamp của `supabase migration new`.
@@ -94,6 +95,7 @@ Ghi mỗi khi mục 2 đổi. Client đọc bảng này để biết phải cậ
 
 | Ngày | Mục | Thay đổi | Việc ở mobile | Việc ở web | Trạng thái |
 |---|---|---|---|---|---|
+| 2026-10-31 | DB + `@hp/core` | Migration `20261031090000_sites_dung_quat`: `sites` chỉ còn khu Dung Quất (`hoa_phat_dung_quat`, `cang_dung_quat`, `vsip_quang_ngai`, `hyundai_eco_vina`; mã `dung_quat` bỏ); cột `is_active`, `sort_order`; policy select chỉ khu đang hiện (admin thấy hết); audit trigger. `listSites` lọc `is_active`, sắp `sort_order` | onboarding chọn khu từ `listSites` (không hard-code mã) | `/admin/catalog` quản lý sites (tuần 10) | xong (DB) |
 | 2026-10-30 | `@hp/shared` | Mới: `LOCALES`, enums (`LISTING_CATEGORIES`, `GROUP_SUB_KINDS`…), `APP_NAME`, `EXPIRES_DAYS`, `RATE_LIMITS`, `NOTIFICATION_SCREENS`, `format*`, `toSlug` / `buildSlug` / `parseShortId`; i18n 9 ns (`common` có `category.*`, `status.*`, `feature.*`, `actions.*`, `disclaimer`; `errors` mã chung) | dùng `@hp/shared/format` trong `src/lib/format.ts` | dùng `@hp/shared/format`, `parseShortId` cho `/tin/[slug]` | xong |
 | 2026-10-30 | `@hp/tokens` | Mới: token TS + `theme.css` (Tailwind v4). Tên class: `text-fg`, `text-muted`, `bg-surface-2`, `bg-primary-light` (xem `.claude/rules/be-shared-packages.md`) | NativeWind chưa nối — chọn bản NativeWind hợp Tailwind v4 | đã nối `globals.css` | xong (web) |
 | 2026-10-30 | DB + `@hp/core` | Migration `20261030100000_core` (bảng Core, `public_profiles`, hook JWT). `@hp/core` mới: `Result`, `keys`, profile, sites, notifications, bookmarks, blocks, `shareUrl`, `imageUrl` | dùng `getMyProfile`, `completeOnboarding` ở onboarding; `setBookmark` cho tim lưu tin | dùng `getPublicProfile` cho `/u/[id]`; middleware đọc `app_metadata.role` | xong |

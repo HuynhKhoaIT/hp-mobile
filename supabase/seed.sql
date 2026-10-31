@@ -36,7 +36,7 @@ where u.id::text like '00000000-0000-4000-8000-00000000000_'
   and not exists (select 1 from auth.identities i where i.user_id = u.id and i.provider = 'phone');
 
 -- Vai trò và trạng thái (chạy với quyền postgres nên guard trigger cho qua)
-update public.profiles set site = 'dung_quat', consent_at = now(), consent_version = 'seed'
+update public.profiles set site = 'hoa_phat_dung_quat', consent_at = now(), consent_version = 'seed'
 where id::text like '00000000-0000-4000-8000-00000000000_';
 update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
 update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';

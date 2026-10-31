@@ -1,7 +1,7 @@
 -- sites, notifications, bookmarks, blocks, ratings, badge_requests, audit_log, rate_limits.
 begin;
 \ir _helpers.psql
-select plan(30);
+select plan(36);
 
 select tests.create_user('user_a');
 select tests.create_user('user_b');
@@ -19,12 +19,23 @@ values ('11111111-1111-4111-8111-111111111111', tests.get_uid('user_a'), 'landlo
 -- ── sites ───────────────────────────────────────────────────────────────────────
 select tests.clear_auth();
 select ok((select count(*) from public.sites) >= 3, 'anon: đọc sites');
+select is((select array_agg(code order by code) from public.sites),
+  array['cang_dung_quat','hoa_phat_dung_quat','hyundai_eco_vina','vsip_quang_ngai'], 'sites: 4 địa điểm khu Dung Quất');
 select tests.authenticate_as('user_a');
 select throws_ok($$ insert into public.sites (code, name, location) values ('x', 'X', 'POINT(0 0)') $$, '42501', null,
   'user: không thêm site');
 select tests.authenticate_as('boss');
 select lives_ok($$ insert into public.sites (code, name, location) values ('test_site', 'Test', 'POINT(106 21)') $$,
   'admin: thêm site');
+select lives_ok($$ update public.sites set is_active = false where code = 'test_site' $$, 'admin: ẩn site');
+select is((select count(*)::int from public.sites where code = 'test_site'), 1, 'admin: vẫn thấy site đã ẩn');
+select tests.clear_auth();
+select is((select count(*)::int from public.sites where code = 'test_site'), 0, 'anon: không thấy site đã ẩn');
+select tests.authenticate_as('user_a');
+select is((select count(*)::int from public.sites where code = 'test_site'), 0, 'user: không thấy site đã ẩn');
+reset role;
+select is((select array_agg(action order by id) from public.audit_log where target_type = 'site' and target_id = 'test_site'),
+  array['site.create','site.update'], 'trigger: ghi audit khi admin thêm / sửa site');
 
 -- ── notifications ───────────────────────────────────────────────────────────────
 select tests.authenticate_as('user_a');

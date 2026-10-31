@@ -251,14 +251,14 @@ isOneToOne: false
                   ]
                 },"sites": {
                   Row: {
-                    "code": string,"created_at": string,"location": unknown,"name": string
+                    "code": string,"created_at": string,"is_active": boolean,"location": unknown,"name": string,"sort_order": number,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "code": string,"created_at"?: string,"location": unknown,"name": string
+                    "code": string,"created_at"?: string,"is_active"?: boolean,"location": unknown,"name": string,"sort_order"?: number,"updated_at"?: string
                   }
                   Update: {
-                    "code"?: string,"created_at"?: string,"location"?: unknown,"name"?: string
+                    "code"?: string,"created_at"?: string,"is_active"?: boolean,"location"?: unknown,"name"?: string,"sort_order"?: number,"updated_at"?: string
                   }
                   Relationships: [
                     

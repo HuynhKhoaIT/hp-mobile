@@ -41,7 +41,7 @@ supabase/
 │   ├── expire-content/
 │   └── remind-groups/
 ├── tests/                    # pgTAP: *.test.sql cho RLS và trigger
-└── seed.sql                  # sites, venues, 50 tin mẫu mỗi category, user test mỗi vai trò
+└── seed.sql                  # venues, 50 tin mẫu mỗi category, user test mỗi vai trò
 packages/db/                  # database.types.ts sinh tự động — không sửa tay
 packages/shared/              # Zod schemas, enums, i18n — dùng chung app, web & Edge Functions
 packages/core/                # hàm gọi Supabase + query keys + hooks dùng chung app & web (đổi RPC/bảng → cập nhật ở đây)
@@ -55,7 +55,7 @@ Extensions: `postgis`, `pg_trgm`, `unaccent`, `pg_cron`, `pg_net`.
 
 ### Core (migration `20261030100000_core.sql`)
 - `profiles` (id = `auth.users.id`, tạo bởi trigger `trg_auth_users_new_profile`): `phone` (`849…`, null nếu Google), `full_name ≤80`, `avatar_url`, `site` → `sites.code`, `department`, `badges text[]` (`phone | worker | landlord | venue | employer`; `phone` gán khi đăng ký bằng SĐT), `locale` (`vi|en|zh`), `reputation_score`, `rating_avg`, `rating_count`, `home_location`, `is_banned` (cấm vĩnh viễn, chỉ admin), `banned_until` (khoá tạm, staff), `role` (`user | moderator | admin`, chỉ admin), `push_tokens text[]`, `notification_prefs jsonb`, `consent_at`, `consent_version`, `deleted_at`. Trigger `trg_profiles_guard` chặn client đổi `phone`, `rating_*`, `reputation_score`; `badges` / `banned_until` chỉ staff; `role` / `is_banned` chỉ admin.
-- `sites(code pk, name, location)` — danh mục khu liên hợp; ai cũng đọc, chỉ admin ghi.
+- `sites(code pk, name, location, is_active, sort_order, updated_at)` — danh mục địa điểm làm việc (khởi đầu: Hòa Phát Dung Quất, Cảng Dung Quất, VSIP Quảng Ngãi, Hyundai Eco Vina), **admin quản lý** ở `/admin/catalog`; anon / user chỉ thấy `is_active`, admin thấy hết; chỉ admin ghi; trigger `trg_sites_audit` ghi `audit_log` (`site.create / update / delete`). Ẩn thay vì xoá.
 - `venues` — sân thể thao: `name`, `sports text[]`, `location`, `price_ref`, `phone`, `status` (moderator duyệt).
 - `ratings(rater_id, ratee_id, context_type listing|group, context_id, score 1–5, comment ≤500)` unique `(rater_id, context_type, context_id)`; trigger cập nhật `profiles.rating_avg / rating_count`. **Chưa có insert cho client** — mở qua RPC kiểm tra giao dịch khi có listings / groups.
 - `notifications(user_id, type, title_key, body_key, params jsonb, data jsonb {screen, params}, read_at)` — lưu key i18n, client dịch; client chỉ được sửa `read_at` (column grant). Có trong publication Realtime.
