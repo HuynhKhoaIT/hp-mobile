@@ -74,7 +74,20 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 - [x] `components/shared`: `empty-state`, `error-state`, `skeletons`, `json-ld`, `choice-chip`, `login-dialog`, `user-menu`, `app-header`, `bottom-nav`, `coming-soon`; shadcn `dialog` (sheet đáy trên điện thoại), `input`, `label`, `checkbox`, `skeleton` chỉnh theo token
 - [x] Khung pháp lý: `/gioi-thieu` (có nội dung + dòng độc lập), `/dieu-khoan`, `/chinh-sach-bao-mat`, `/xoa-tai-khoan`, `/lien-he` (đang soạn). MDX + nội dung thật: tuần 11, cần `@next/mdx` (hỏi trước)
 - [x] Đã kiểm bằng `next start` + cookie phiên thật: khách thấy Đăng nhập; `/toi` khách → `/dang-nhap?next=/toi`; user đã onboarding thấy hồ sơ; user mới thấy nút hoàn tất onboarding
-- [ ] `listing-card` / `group-card` dời sang tuần 3, làm cùng `ListingCard` của app khi có bảng `listings` (tránh đoán props)
+- [x] `listing-card` làm ở tuần 3 cùng `ListingCard` của app (xem 3d); `group-card`: tuần 7
+- [x] Danh sách `/tin` (tất cả), `/pass-do`, `/tro`, `/viec-lam`, `/that-lac`: một cài đặt `features/listing/components/listing-list-page.tsx`, khác biệt ở `features/{pass,room,job,lost-found}/config.ts` (category, icon, màu dịch vụ, bố cục thẻ grid / row, loại JSON-LD). `/tro`, `/that-lac` kéo sớm từ tuần 8 (chưa có bản đồ / lọc khoảng cách)
+- [x] Bộ lọc trên URL `?category=&q=&site=` kiểm bằng `ListingFilters` (sai → bỏ qua): chip là link, ô tìm + chọn khu là form GET (chạy khi tắt JS); H1 + title "… gần {khu}" khi lọc khu; "Xem thêm" theo `nextCursor` ở trình duyệt; empty (`list.empty_*` + Đăng tin / Xoá từ khoá), lỗi → `error.tsx` thử lại
+- [x] Cache: trang đầu không từ khoá `'use cache'` 300s (tag `listings`); fallback của `<Suspense>` chính là trang đầu không lọc → static shell có tin thật (tắt JS / bot chỉ đọc HTML vẫn thấy tin); kết quả lọc đọc `searchParams` trong Suspense; có từ khoá → không cache. Lỗi ném trong hàm cache (không cache lỗi)
+- [x] `ListingCard` (grid 4:3 / row vuông), `Badge`, skeleton grid + row khớp app; ảnh trống = nền `service-*-soft` + icon
+- [x] `/tin/[slug]`: `getListingPage` cache 300s + tag `listing:{id}`; slug khác chuẩn → `permanentRedirect` 308; không có → `not-found.tsx` (404); 20 tin mới nhất prerender lúc build; metadata "{tiêu đề} – {giá} – {khu}", canonical + hreflang 3 ngôn ngữ + x-default, OG (ảnh bìa nếu có); JSON-LD Product+Offer (pass), JobPosting (việc), Accommodation (trọ); 2 cột ≥ 1024px, cột phải dính; Nhắn tin (khách → LoginDialog, đã đăng nhập → "sắp có"), Chia sẻ (Web Share / sao chép), ghi lượt xem khi đã đăng nhập, tin tương tự
+- [x] Ảnh đại diện: chọn ảnh ở onboarding bước 2 và đổi ở `/toi` (cắt vuông 512, WebP / JPEG ≤ 1 MB bằng canvas, `uploadAvatar`)
+- [x] Env `NEXT_PUBLIC_IMAGE_TRANSFORM` (false trên staging gói Free); `apps/web/.env.example` trước đây bị `.gitignore` bỏ qua → đã mở lại
+- [x] Đã kiểm `next start` + curl: 5 trang danh sách 200 (vi / en / zh), chi tiết 200, slug sai 308, slug không có 404, không có SĐT / toạ độ trong HTML
+- [ ] Lần truy cập ĐẦU TIÊN của trình duyệt vào slug chưa prerender trả 200 + redirect phía client / `noindex` (App Shell của Partial Prefetching); lần sau và bot chỉ đọc HTML nhận 308 / 404 thật
+- [ ] Còn lại tuần 4: `opengraph-image.tsx`, `/api/revalidate` (`revalidateTag('listing:{id}')`), `sitemap.ts` + `robots.ts`, tin sold / expired 200 + nhãn rồi 410 (RPC hiện trả not_found), `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, `/tim-kiem`, "Xem thêm" không JS (link `?cursor=`), `logSearch`
+- [ ] Chưa kiểm: Lighthouse mobile, xem bằng mắt 360 / 1440 + dark, upload ảnh đại diện thật trên trình duyệt
+
+g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
 
 ## 4. Danh sách trang
 
@@ -82,10 +95,11 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 |---|---|---|---|
 | `/` | marketing | SSG | 2 khung, 11 đầy đủ |
 | `/tinh-nang/[slug]`, `/tai-app`, `/cho-chu-tro`, `/blog/[slug]`, `/gioi-thieu`, `/lien-he`, `/chinh-sach-bao-mat`, `/dieu-khoan`, `/xoa-tai-khoan` | marketing | SSG | 2 khung, 11 |
-| `/tin`, `/pass-do`, `/viec-lam` (+ `/[site]`) | public | SSR + ISR 300 | 3 |
-| `/tin/[slug]` (+ `opengraph-image`), `/u/[id]`, `/tim-kiem` | public | SSR + ISR / dynamic | 4 |
+| `/tin`, `/pass-do`, `/viec-lam`, `/tro`, `/that-lac` | public | SSR + cache 300 | 3 (trang `/[site]`: 4) |
+| `/tin/[slug]` | public | cache 300 + tag | 3 (`opengraph-image`: 4) |
+| `/u/[id]`, `/tim-kiem` | public | SSR + ISR / dynamic | 4 |
 | `/ghep-xe`, `/ghep-tran`, `/nhom/[slug]` | public | SSR + ISR 300 | 7 |
-| `/tro` (+ `/[site]`), `/that-lac` | public | SSR + ISR 300 | 8 |
+| `/tro` bản đồ + `/tro/[site]` | public | SSR + ISR 300 | 8 |
 | `/dang-nhap` | public | dynamic | 2 |
 | `/dang-tin`, `/dang-tin/[category]`, `/toi`, `/toi/tin-cua-toi`, `/toi/da-luu` | auth | dynamic | 5 |
 | `/tin-nhan`, `/tin-nhan/[conversationId]`, `/thong-bao` | auth | dynamic | 6 |

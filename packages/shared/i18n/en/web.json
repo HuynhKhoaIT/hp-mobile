@@ -44,6 +44,39 @@
     "phone": "Phone number",
     "site": "Workplace",
     "no_site": "Not selected",
-    "interests": "Interests"
+    "interests": "Interests",
+    "avatar": "Profile photo"
+  },
+  "listing": {
+    "all": {
+      "title": "Latest listings around Dung Quat",
+      "description": "Second-hand items, rooms, jobs and lost & found posted around Dung Quat.",
+      "heading_site": "Listings near {{site}}"
+    },
+    "pass": {
+      "title": "Second-hand items around Dung Quat",
+      "description": "Buy and sell used items between workers around Dung Quat: phones, motorbikes, safety gear, household goods.",
+      "heading_site": "Items near {{site}}"
+    },
+    "room": {
+      "title": "Rooms for rent around Dung Quat",
+      "description": "Rooms and shared housing near Dung Quat factories, with the distance to your workplace.",
+      "heading_site": "Rooms near {{site}}"
+    },
+    "job": {
+      "title": "Jobs around Dung Quat",
+      "description": "Main jobs and side jobs outside your shift around Dung Quat, with clear pay.",
+      "heading_site": "Jobs near {{site}}"
+    },
+    "lostFound": {
+      "title": "Lost & found around Dung Quat",
+      "description": "Report lost items and return found items around Dung Quat.",
+      "heading_site": "Lost & found near {{site}}"
+    },
+    "categories_label": "Categories",
+    "features_label": "Sections",
+    "search_results": "Results for “{{query}}”",
+    "prev_image": "Previous photo",
+    "next_image": "Next photo"
   }
 }

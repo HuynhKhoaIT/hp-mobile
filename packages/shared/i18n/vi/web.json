@@ -44,6 +44,39 @@
     "phone": "Số điện thoại",
     "site": "Nơi làm việc",
     "no_site": "Chưa chọn",
-    "interests": "Quan tâm"
+    "interests": "Quan tâm",
+    "avatar": "Ảnh đại diện"
+  },
+  "listing": {
+    "all": {
+      "title": "Tin mới quanh Dung Quất",
+      "description": "Pass đồ, phòng trọ, việc làm và đồ thất lạc mới đăng quanh khu Dung Quất.",
+      "heading_site": "Tin gần {{site}}"
+    },
+    "pass": {
+      "title": "Pass đồ cũ quanh Dung Quất",
+      "description": "Mua bán đồ cũ giữa người lao động quanh khu Dung Quất: điện thoại, xe máy, đồ bảo hộ, đồ gia dụng.",
+      "heading_site": "Pass đồ gần {{site}}"
+    },
+    "room": {
+      "title": "Phòng trọ quanh Dung Quất",
+      "description": "Phòng trọ, ở ghép gần các nhà máy khu Dung Quất, có khoảng cách tới nơi làm việc.",
+      "heading_site": "Phòng trọ gần {{site}}"
+    },
+    "job": {
+      "title": "Việc làm quanh Dung Quất",
+      "description": "Việc chính và việc làm thêm ngoài ca quanh khu Dung Quất, lương rõ ràng.",
+      "heading_site": "Việc làm gần {{site}}"
+    },
+    "lostFound": {
+      "title": "Đồ thất lạc quanh Dung Quất",
+      "description": "Báo mất và tìm chủ đồ nhặt được quanh khu Dung Quất.",
+      "heading_site": "Đồ thất lạc gần {{site}}"
+    },
+    "categories_label": "Danh mục",
+    "features_label": "Chọn mục",
+    "search_results": "Kết quả cho “{{query}}”",
+    "prev_image": "Ảnh trước",
+    "next_image": "Ảnh sau"
   }
 }

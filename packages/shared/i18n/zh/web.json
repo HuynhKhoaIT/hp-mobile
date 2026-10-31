@@ -44,6 +44,39 @@
     "phone": "手机号",
     "site": "工作地点",
     "no_site": "未选择",
-    "interests": "兴趣"
+    "interests": "兴趣",
+    "avatar": "头像"
+  },
+  "listing": {
+    "all": {
+      "title": "Dung Quat 周边最新信息",
+      "description": "Dung Quat 周边最新发布的二手物品、房屋出租、招聘和失物招领。",
+      "heading_site": "{{site}}附近的信息"
+    },
+    "pass": {
+      "title": "Dung Quat 周边二手物品",
+      "description": "Dung Quat 周边工人之间买卖二手物品：手机、摩托车、劳保用品、家居用品。",
+      "heading_site": "{{site}}附近的二手物品"
+    },
+    "room": {
+      "title": "Dung Quat 周边租房",
+      "description": "Dung Quat 工厂附近的出租房和合租房，并显示到工作地点的距离。",
+      "heading_site": "{{site}}附近的出租房"
+    },
+    "job": {
+      "title": "Dung Quat 周边招聘",
+      "description": "Dung Quat 周边的全职工作和班外兼职，薪资清楚。",
+      "heading_site": "{{site}}附近的工作"
+    },
+    "lostFound": {
+      "title": "Dung Quat 周边失物招领",
+      "description": "在 Dung Quat 周边发布丢失物品和寻找失主。",
+      "heading_site": "{{site}}附近的失物招领"
+    },
+    "categories_label": "分类",
+    "features_label": "栏目",
+    "search_results": "“{{query}}”的搜索结果",
+    "prev_image": "上一张",
+    "next_image": "下一张"
   }
 }
