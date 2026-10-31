@@ -10,6 +10,7 @@ import { Be_Vietnam_Pro, Noto_Sans_SC } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { locale as rootLocale } from 'next/root-params';
 import { ThemeProvider } from '@/components/shared/theme-provider';
+import { ToastProvider } from '@/components/shared/toast';
 import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 
@@ -69,7 +70,9 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
             listing: messages.listing,
           }}
         >
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

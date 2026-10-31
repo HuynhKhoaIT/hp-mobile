@@ -1,14 +1,13 @@
-// Trang giữ chỗ: Tìm kiếm (tuần 4). Thanh điều hướng đã trỏ tới đây nên không để 404.
+// /tim-kiem — tìm kiếm mọi tin (ô tìm ở header gửi ?q= tới đây). Dùng chung engine danh sách (features/listing,
+// scope 'search' = mọi category); có từ khoá → đọc theo request + ghi log_search; trang kết quả noindex.
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { ComingSoon } from '@/components/shared/coming-soon';
+import { ListingListPage } from '@/features/listing/components/listing-list-page';
+import { listMetadata } from '@/features/listing/metadata';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('common.nav');
-  return { title: t('search_placeholder') };
+export function generateMetadata({ searchParams }: PageProps<'/[locale]/tim-kiem'>): Promise<Metadata> {
+  return listMetadata('search', searchParams);
 }
 
-export default async function Page() {
-  const t = await getTranslations('common.nav');
-  return <ComingSoon title={t('search_placeholder')} />;
+export default function Page({ searchParams }: PageProps<'/[locale]/tim-kiem'>) {
+  return <ListingListPage scope="search" searchParams={searchParams} />;
 }

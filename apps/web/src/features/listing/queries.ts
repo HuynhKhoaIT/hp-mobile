@@ -8,7 +8,15 @@
 import 'server-only';
 import {
   getListingBySlug,
+  getMyListing,
+  getMyProfile,
+  listMyListings,
+  listSavedListings,
   listSites,
+  logSearch,
+  type MyListing,
+  type MyListingsTab,
+  type MyProfile,
   type Page,
   type PublicListing,
   type Result,
@@ -16,9 +24,11 @@ import {
   similarListings,
   type Site,
 } from '@hp/core';
+import type { Database } from '@hp/db';
 import type { ListingCategory } from '@hp/shared';
 import { cacheLife, cacheTag } from 'next/cache';
 import { createPublicClient } from '@/lib/supabase/public';
+import { createServerClient } from '@/lib/supabase/server';
 
 /** Số tin mỗi trang: chia hết cho lưới 2 / 3 / 4 cột. */
 export const LIST_PAGE_SIZE = 24;
@@ -62,7 +72,8 @@ export async function getListPage(q: ListQuery): Promise<Timed<{ page: Page<Publ
 
 /**
  * Chi tiết theo slug `{tieu-de}-{short_id}` (RPC so short_id cuối slug; trả slug chuẩn để trang redirect 301).
- * Tag `listing:{id}` để /api/revalidate (tuần 4) làm mới khi chủ tin sửa / đổi trạng thái. null = không có / không còn active.
+ * Tag `listing:{id}` để /api/revalidate (webhook DB) và Server Action làm mới khi chủ tin sửa / đổi trạng thái.
+ * Trả cả tin đã bán / đóng / hết hạn (trang hiện nhãn, 410 sau 30 ngày). null = không có / đã gỡ / chờ duyệt / nháp.
  */
 export async function getListingPage(slug: string): Promise<Timed<{ listing: PublicListing | null }>> {
   'use cache';
@@ -114,4 +125,66 @@ export async function getPrerenderSlugs(limit = 20): Promise<string[]> {
   const res = await searchListings(createPublicClient(), { limit });
   const slugs = res.data?.items.map((l) => l.slug) ?? [];
   return slugs.length > 0 ? slugs : ['tin-000000'];
+}
+
+/** Ghi từ khoá tìm kiếm (gợi ý từ khoá hot). Chạy sau khi trả trang (after()); lỗi bỏ qua — không ảnh hưởng kết quả. */
+export async function logSearchTerm(query: string, results: number, category?: ListingCategory): Promise<void> {
+  await logSearch(createPublicClient(), { query, results, category });
+}
+
+// ── SEO: sitemap + số liệu công khai ─────────────────────────────────────────────
+export type PublicStats = Database['public']['Functions']['public_stats']['Returns'][number];
+export type SitemapListing = Database['public']['Functions']['sitemap_listings']['Returns'][number];
+
+/** Số liệu cộng đồng (người dùng / tin đang đăng / khu) — RPC public_stats (anon). Cache 1 giờ; lỗi ném (không cache lỗi). */
+export async function getPublicStats(): Promise<PublicStats> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('listings', 'stats');
+  // Chưa có wrapper @hp/core (RPC chỉ web dùng): gọi rpc có type từ @hp/db.
+  const { data, error } = await createPublicClient().rpc('public_stats');
+  if (error) throw new Error(error.code ?? 'unknown');
+  return data?.[0] ?? { users: 0, listings: 0, sites: 0 };
+}
+
+/** Số URL tin mỗi file sitemap (khớp RPC sitemap_listings). */
+export const SITEMAP_PAGE_SIZE = 10_000;
+
+/** Một trang sitemap tin (1 = mới nhất). Cache 1 giờ + tag `listings` (webhook làm mới khi tin đổi). */
+export async function getSitemapListings(page: number): Promise<SitemapListing[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('listings');
+  const { data, error } = await createPublicClient().rpc('sitemap_listings', { p_page: page });
+  if (error) throw new Error(error.code ?? 'unknown');
+  return data ?? [];
+}
+
+// ── Khu đăng nhập: theo request (cookie phiên), KHÔNG 'use cache' — gọi trong <Suspense> ─────────────────
+/** Ngữ cảnh form đăng tin: hồ sơ (khu mặc định) + danh mục khu. */
+export async function getPostFormContext(): Promise<Result<{ profile: MyProfile; sites: Site[] }>> {
+  const supabase = await createServerClient();
+  const [profile, sites] = await Promise.all([getMyProfile(supabase), listSites(supabase)]);
+  if (profile.error) return profile;
+  return { data: { profile: profile.data, sites: sites.data ?? [] }, error: null };
+}
+
+/** Số tin mỗi trang "Tin của tôi". */
+export const MY_LISTINGS_PAGE_SIZE = 20;
+
+/** Tin của tôi theo tab (trang /toi/tin-cua-toi) + thời điểm đọc (tính hết hạn / gia hạn — component phải thuần). */
+export async function getMyListingsPage(tab: MyListingsTab): Promise<{ result: Result<Page<MyListing>>; now: number }> {
+  const result = await listMyListings(await createServerClient(), { tab, limit: MY_LISTINGS_PAGE_SIZE });
+  return { result, now: Date.now() };
+}
+
+/** Một tin của tôi để sửa (RLS: chỉ chủ tin đọc được bảng gốc). */
+export async function getMyListingForEdit(id: string): Promise<Result<MyListing>> {
+  return getMyListing(await createServerClient(), id);
+}
+
+/** Tin đã lưu (trang /toi/da-luu) + thời điểm đọc (thời gian tương đối trên thẻ). */
+export async function getSavedListingsPage(): Promise<{ result: Result<PublicListing[]>; now: number }> {
+  const result = await listSavedListings(await createServerClient());
+  return { result, now: Date.now() };
 }

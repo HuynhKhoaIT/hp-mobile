@@ -77,6 +77,17 @@
     "features_label": "栏目",
     "search_results": "“{{query}}”的搜索结果",
     "prev_image": "上一张",
-    "next_image": "下一张"
+    "next_image": "下一张",
+    "owner_note": "这是您发布的信息。",
+    "search": {
+      "title": "搜索信息",
+      "description": "搜索 Dung Quất 周边的二手物品、出租房、工作和失物招领。",
+      "heading_site": "在 {{site}} 附近搜索"
+    }
+  },
+  "post": {
+    "step_basics": "主要信息",
+    "preparing_photos": "正在处理图片…",
+    "restore_body": "您在此浏览器中有一条未完成的信息。"
   }
 }

@@ -77,6 +77,17 @@
     "features_label": "Sections",
     "search_results": "Results for “{{query}}”",
     "prev_image": "Previous photo",
-    "next_image": "Next photo"
+    "next_image": "Next photo",
+    "owner_note": "This is your listing.",
+    "search": {
+      "title": "Search listings",
+      "description": "Find second-hand items, rooms, jobs and lost & found around Dung Quat.",
+      "heading_site": "Search near {{site}}"
+    }
+  },
+  "post": {
+    "step_basics": "Main details",
+    "preparing_photos": "Processing photos…",
+    "restore_body": "You have an unfinished listing in this browser."
   }
 }

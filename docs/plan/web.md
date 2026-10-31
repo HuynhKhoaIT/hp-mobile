@@ -1,6 +1,6 @@
 # Kế hoạch triển khai — apps/web (Next.js: marketing + người dùng + admin)
 
-Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 11, 12), `apps/web/CLAUDE.md` · Tổng quan: `docs/PLAN.md` · Khu khác: `docs/plan/mobile.md`, `docs/plan/backend.md`
+Cập nhật: 2026-10-31 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 11, 12), `apps/web/CLAUDE.md` · Tổng quan: `docs/PLAN.md` · Khu khác: `docs/plan/mobile.md`, `docs/plan/backend.md`
 
 ## 1. Mục tiêu và cổng
 
@@ -84,10 +84,28 @@ Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 4, 6, 7, 9, 1
 - [x] Env `NEXT_PUBLIC_IMAGE_TRANSFORM` (false trên staging gói Free); `apps/web/.env.example` trước đây bị `.gitignore` bỏ qua → đã mở lại
 - [x] Đã kiểm `next start` + curl: 5 trang danh sách 200 (vi / en / zh), chi tiết 200, slug sai 308, slug không có 404, không có SĐT / toạ độ trong HTML
 - [x] **Quyết định 2026-10-31: giữ nguyên** — lần truy cập ĐẦU TIÊN vào slug chưa prerender trả 200 + redirect phía client / `noindex` (App Shell); lần sau và bot chỉ đọc HTML nhận 308 / 404 thật. Người dùng luôn thấy đúng trang. Đã thử chuyển `UserMenu` sang client: không đổi được mã lần đầu (shell gửi trước vì `params` chưa prerender), nên bỏ. Nếu đo SEO thấy vấn đề → kiểm slug trong `proxy.ts` (thêm 1 lần gọi DB / lượt xem tin)
-- [ ] Còn lại tuần 4: `opengraph-image.tsx`, `/api/revalidate` (`revalidateTag('listing:{id}')`), `sitemap.ts` + `robots.ts`, tin sold / expired 200 + nhãn rồi 410 (RPC hiện trả not_found), `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, `/tim-kiem`, "Xem thêm" không JS (link `?cursor=`), `logSearch`
+- [x] Phần "còn lại tuần 4" đã làm ở mục 3e (trừ `opengraph-image.tsx`, `OpenInAppBar`, trang khu vực, "Xem thêm" không JS — vẫn còn)
 - [ ] Chưa kiểm: Lighthouse mobile, xem bằng mắt 360 / 1440 + dark, upload ảnh đại diện thật trên trình duyệt
 
 g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
+
+## 3e. Tiến độ tuần 4 — đăng tin + quản lý tin + SEO (cập nhật 2026-10-31)
+- [x] **Đăng tin "Đăng nhanh"** `/dang-tin` (`?feature=pass|room|job|lostFound` chọn sẵn): một engine `features/listing/components/listing-form/*` theo config + `ATTRIBUTE_FIELDS`. Bước 0 chọn tính năng (4 ô) → danh mục (chip, khi > 1) · 1 ảnh (nhiều ảnh, tối đa 10, xoá, đặt làm bìa; pass / trọ nhắc `form.photos_required`, không chặn) · 2 thông tin chính (tiêu đề, hình thức giá + giá — ẩn với việc / thất lạc, mô tả) · 3 chi tiết (enum → chip, số / tiền → ô số + gợi ý đã định dạng, bool → checkbox, text, datetime-local; khu mặc định theo hồ sơ, khu vực, ngôn ngữ mặc định theo trang, `form.rules_hint`). Kiểm từng bước bằng chính `CreateListingInput` (Zod @hp/shared); lỗi server (`fieldErrors`) nhảy về đúng bước. Việc làm / thất lạc gửi `price_type: 'negotiable'`, `price: null`
+- [x] Ảnh: nén ở trình duyệt bằng canvas (cạnh dài 1280, WebP 0.8 → JPEG nếu không hỗ trợ, ≤ 2 MB, không thư viện — giống ảnh đại diện), upload thẳng Storage bằng `uploadListingImage`. Luồng: có ảnh mới → `createListingAction(draft, images: [])` → upload từng ảnh (`form.uploading` x/y; ảnh lỗi gắn nhãn + nút `form.upload_retry`, thử lại không tạo tin trùng) → `updateListingAction({ id, category, images, status })`; không ảnh mới → tạo thẳng `active` / `draft`. Ảnh bỏ khi sửa → `removeListingImages` sau khi lưu thành công
+- [x] Màn kết quả theo status DB trả về: active → `form.success_*` (sửa: `form.saved`), pending_review → `form.pending_*` + `manage.reason.*`, rejected → `form.rejected_*` + nút Sửa, draft → `form.draft_saved`; link Xem tin / Đăng tin khác / Tin của tôi
+- [x] Sửa tin `/toi/tin-cua-toi/[id]/sua` (không dùng `/dang-tin/[id]` để khỏi đụng `/dang-tin/[category]` trong bảng route): điền sẵn từ `getMyListing`, giữ ảnh cũ, thêm / xoá / đổi bìa; tin nháp có Lưu nháp + Đăng tin, tin khác chỉ "Lưu thay đổi" (không gửi status — DB không cho chủ tin mở lại tin chờ duyệt / bị từ chối / hết hạn). Tin không phải của mình / không có → not-found. "Huỷ" khi đang soạn → `form.discard_*`; đóng tab khi chưa lưu → cảnh báo của trình duyệt. Đăng mới tự lưu phần chữ vào `localStorage` (bọc try/catch) và lần sau hỏi "Tiếp tục soạn / Bỏ tin" (`web.post.restore_body`)
+- [x] **Tin của tôi** `/toi/tin-cua-toi?tab=active|pending|draft|closed` (tab là link, chạy khi tắt JS): dòng = ảnh bìa, tiêu đề, badge `common.status.*`, giá, `manage.expires_on`, lượt xem, ghi chú chờ duyệt / bị từ chối + lý do. Menu (`DropdownMenu` shadcn): Sửa · Đánh dấu đã bán (xác nhận `manage.sold_*`) · Đóng tin · Mở lại (đã bán / đã đóng) · Gia hạn (≤ 3 ngày cuối hoặc đã hết hạn) · Xoá (xác nhận `manage.delete_*`); toast `manage.*_done` / `renewed`; "Xem thêm" đọc ở trình duyệt. **Tin đã lưu** `/toi/da-luu`. `/toi` có lối vào hai trang này
+- [x] **Chi tiết tin**: tim Lưu tin (`useOptimistic`, khách → LoginDialog), "Hiện số điện thoại" → nút `tel:+84…` (`contact.call`, `contact.no_phone`, lỗi `errors.*` như `rate_limited`); SĐT chỉ đến sau khi bấm (không có trong HTML). LoginDialog nhận `intent` (lưu `sessionStorage`): sau đăng nhập trang tải lại và tự Lưu / Hiện số. Chủ tin xem tin mình → `web.listing.owner_note` + Sửa tin + Tin của tôi (không liên hệ). Tin đã bán / đóng / hết hạn → banner `state.*` + `state.inactive_hint`, badge trạng thái, ẩn liên hệ, không JSON-LD, vẫn có tin tương tự
+- [x] **410**: Next 16 không có API đặt mã 410 cho page. Cách chọn: page `/tin/[slug]` gặp tin `isListingGone` (thôi hiện > 30 ngày) → `redirect` 307 tới route handler `/tin/[slug]/da-go` trả **410** (HTML tối giản 3 ngôn ngữ, `noindex`, link về danh sách; tin đã mở lại → 307 về trang tin; không có → 404). 307 (không 308) vì chủ tin có thể mở lại tin. Không kiểm trong `proxy.ts` (thêm 1 lần gọi DB mỗi lượt xem — đã quyết định không làm). Đã đo: bot "HTML-limited" của Next (bingbot, facebookexternalhit…) nhận `307 Location` thật → `410`; trình duyệt và Googlebot (render JS) nhận khung PPR mã 307 **không có header `Location`** + chuyển hướng phía client → `410`. Lưu ý: redirect 308 slug cũ (tuần 3) cũng y như vậy — Next 16.4 không gửi `Location` khi phục vụ khung PPR đã cache
+- [x] **Server Action** `features/listing/actions.ts` cho mọi thao tác ghi (đăng, sửa, đổi trạng thái, xoá, gia hạn, hiện số, lưu tin): Zod (@hp/shared) → đăng nhập (`getClaims`) → @hp/core (RLS quyết định; người khác đổi tin → `not_found`) → `updateTag('listing:{id}')` + `updateTag('listings')` → `ActionResult` (`src/lib/action-result.ts`). Đọc dữ liệu riêng ở client (trạng thái đã lưu, "Xem thêm") vẫn gọi @hp/core với `createBrowserClient()` như tuần 3. Input nhỏ (id, trạng thái, bookmark) chưa có schema ở @hp/shared → kiểm uuid / enum ngay tại action
+- [x] **`/api/revalidate`** (POST): so `x-revalidate-secret` thời gian hằng (SHA-256 + `timingSafeEqual`), body `{ tags }` chỉ nhận `listings` / `listing:<uuid>` (≤ 20); `listing:*` → `revalidateTag(tag, { expire: 0 })`, `listings` → `'max'`; 401 / 400 / 200 JSON
+- [x] **Sitemap / robots**: Next không tự sinh sitemap index → route handler `/sitemap.xml` (index) + `/sitemaps/static.xml` (trang tĩnh × 3 ngôn ngữ, hreflang) + `/sitemaps/listings-{n}.xml` (RPC `sitemap_listings`, 10.000 / file, số file = `public_stats().listings / 10.000`; chỉ URL vi, en / zh khai báo qua hreflang trong trang); cache 1 giờ + tag `listings`. `robots.ts` chặn `/admin`, `/toi`, `/tin-nhan`, `/dang-tin`, `/thong-bao`, `/tao-nhom`, `/dang-nhap`, `/api/` cho cả `/en`, `/zh`. **Toàn site vẫn `noindex` ở layout gốc tới khi ra mắt** — robots.txt cho thu thập để bot đọc được thẻ đó
+- [x] **`/tim-kiem`**: cùng engine danh sách (scope `search`, mọi category), ô tìm ở header gửi `?q=`; có từ khoá → đọc theo request + `logSearch` sau khi trả trang (`after()`), `noindex, follow`. Nút Đăng tin ở trang tính năng mở `/dang-tin?feature=…`
+- [x] Dùng chung mới: `components/shared/{toast,confirm-dialog,login-intent}`, `components/ui/{dropdown-menu,textarea}` (dropdown sinh bằng shadcn CLI rồi chỉnh token; CLI tự thêm gói `cn` → đã gỡ, lockfile cài lại). Key mới `web.json`: `post.{step_basics,preparing_photos,restore_body}`, `listing.owner_note`, `listing.search.{title,description,heading_site}`
+- [x] Đã kiểm `next start -p 3200` + curl: danh sách / chi tiết / `/tim-kiem?q=giay` 200 (ghi `search_logs`); tin đã bán 200 + banner, không JSON-LD; đã bán + `updated_at` 31 ngày trước → 307 → `/da-go` **410**; khách vào `/dang-tin`, `/toi/*` → 307 `/dang-nhap?next=`; chủ tin: `/dang-tin`, Tin của tôi, Đã lưu, trang sửa 200, người khác mở trang sửa → not-found; Server Action qua HTTP: hiện số (đăng nhập ok / khách `auth_required`), lưu tin, người khác đổi trạng thái → `not_found`, Zod `too_short` + `price_required`, gia hạn sớm `too_early`, đăng → đã bán (rời danh sách, chi tiết có banner) → mở lại → xoá (404); `/api/revalidate` 401 / 400 / 200; `/sitemap.xml`, `/robots.txt`; không có SĐT trong HTML công khai
+- [x] Theo backend mới (gửi duyệt lại): tin `rejected` có thao tác `manage.resubmit` trong menu (status `active` → DB chuyển `pending_review`, lý do `resubmit`, toast `form.pending_title`); trang sửa tin bị từ chối có nút chính `manage.resubmit` gửi `status: 'active'` kèm nội dung, màn kết quả theo status trả về; tin khác không phải nháp vẫn không gửi status. "Đánh dấu đã bán" chỉ cho pass đồ / trọ (việc làm / thất lạc chỉ Đóng tin) — khớp app
+- [ ] Chưa kiểm bằng trình duyệt (phiên không có công cụ trình duyệt): form nhiều bước, upload ảnh thật, toast, menu, LoginDialog + intent, 360 / 1440 px, dark mode
+- [ ] Còn lại: `opengraph-image.tsx` cho tin, `/u/[id]`, `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, "Xem thêm" không JS, bố cục 2 cột cho form ≥ 1024 px (hiện một cột, cùng thứ tự với app)
 
 ## 4. Danh sách trang
 
@@ -101,7 +119,7 @@ g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
 | `/ghep-xe`, `/ghep-tran`, `/nhom/[slug]` | public | SSR + ISR 300 | 7 |
 | `/tro` bản đồ + `/tro/[site]` | public | SSR + ISR 300 | 8 |
 | `/dang-nhap` | public | dynamic | 2 |
-| `/dang-tin`, `/dang-tin/[category]`, `/toi`, `/toi/tin-cua-toi`, `/toi/da-luu` | auth | dynamic | 5 |
+| `/dang-tin` (`?feature=`), `/toi`, `/toi/tin-cua-toi` (`?tab=`), `/toi/tin-cua-toi/[id]/sua`, `/toi/da-luu` | auth | dynamic | 4 (kéo sớm từ 5; `/dang-tin/[category]` thay bằng `?feature=`) |
 | `/tin-nhan`, `/tin-nhan/[conversationId]`, `/thong-bao` | auth | dynamic | 6 |
 | `/tao-nhom/[kind]`, `/toi/nhom-cua-moi` | auth | dynamic | 7–8 |
 | `/toi/huy-hieu`, `/toi/cai-dat` | auth | dynamic | 8 |
@@ -109,6 +127,7 @@ g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
 | `/admin` (dashboard), `/admin/reports`, `/admin/badges`, `/admin/users` | admin | dynamic | 9 |
 | `/admin/listings`, `/admin/groups`, `/admin/marketing/*`, `/admin/catalog/*`, `/admin/audit` | admin | dynamic | 10 |
 | `/api/revalidate`, `/.well-known/*` | api | handler | 4, 11 |
+| `/tin/[slug]/da-go` (410 Gone), `/sitemaps/[file]` | public | handler | 4 |
 | `/sitemap.xml`, `/robots.txt` | — | generated | 4 |
 
 ## 5. Hạ tầng kỹ thuật

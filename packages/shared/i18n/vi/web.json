@@ -77,6 +77,17 @@
     "features_label": "Chọn mục",
     "search_results": "Kết quả cho “{{query}}”",
     "prev_image": "Ảnh trước",
-    "next_image": "Ảnh sau"
+    "next_image": "Ảnh sau",
+    "owner_note": "Đây là tin của bạn.",
+    "search": {
+      "title": "Tìm kiếm tin",
+      "description": "Tìm đồ cũ, phòng trọ, việc làm và đồ thất lạc quanh khu Dung Quất.",
+      "heading_site": "Tìm kiếm gần {{site}}"
+    }
+  },
+  "post": {
+    "step_basics": "Thông tin chính",
+    "preparing_photos": "Đang xử lý ảnh…",
+    "restore_body": "Bạn có một tin đang soạn dở trên trình duyệt này."
   }
 }
