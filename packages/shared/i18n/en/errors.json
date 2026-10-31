@@ -19,5 +19,10 @@
   "too_short": "Too short.",
   "price_required": "Enter a price, or choose \"Negotiable\" / \"Free\".",
   "too_many_images": "Up to 10 photos.",
-  "too_early": "You can only renew in the last 3 days before it expires."
+  "too_early": "You can only renew in the last 3 days before it expires.",
+  "mfa_code_invalid": "The authentication code is wrong or expired. Enter the current code from your app.",
+  "mfa_disabled": "Two-step verification is not enabled on the server.",
+  "reason_required": "Choose a reason for rejecting.",
+  "mfa_required": "Two-step verification is required to continue.",
+  "mfa_enroll_failed": "Could not set up two-step verification: admin accounts need an email address on file. Ask an administrator to add one, then try again."
 }

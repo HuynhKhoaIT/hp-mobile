@@ -71,8 +71,30 @@ insert into public.app_settings (key, value) values
 on conflict (key) do update set value = excluded.value, updated_at = now();
 ```
 
-### Duyệt tin chờ (chưa có màn /admin/moderation)
-Tin của tài khoản < 7 ngày / có từ khoá / giá thấp bất thường vào `moderation_queue`. Moderator đăng nhập rồi gọi RPC `review_listing(listing_id, true|false, 'ghi chú')` (local: Studio → SQL với `set role authenticated` + JWT, hoặc qua `@hp/core` sau khi có màn admin). Danh sách chờ: `select * from moderation_queue where status = 'pending' order by created_at`.
+### Duyệt tin chờ — màn `/admin/moderation`
+Tin của tài khoản < 7 ngày / có từ khoá / giá thấp bất thường / gửi duyệt lại vào `moderation_queue`. Moderator xử lý trên web:
+1. Mở `https://<domain>/admin` → đăng nhập bằng SĐT + OTP → **xác thực hai bước** (lần đầu: quét QR bằng Google Authenticator / Microsoft Authenticator / Authy rồi nhập mã 6 số; các lần sau chỉ nhập mã).
+2. **Kiểm duyệt tin** (`/admin/moderation`): tab Chờ duyệt (rủi ro cao trước) / Đã duyệt / Đã từ chối, chip lọc theo lý do. Bấm một dòng để xem chi tiết (ảnh, mô tả, thông số, người đăng, lịch sử).
+3. **Duyệt** (phím `A`): tin hiện công khai ngay, được gia hạn, chủ tin nhận thông báo. **Từ chối** (phím `R`): bắt buộc chọn lý do mẫu, ghi chú thêm không bắt buộc (chỉ staff thấy). `J` / `K` chuyển tin; sau mỗi thao tác tự sang tin kế. Chọn nhiều dòng → **Duyệt N tin** (xác nhận trước).
+4. Mọi thao tác ghi `audit_log` (`listing.approve` / `listing.reject`, `meta.note` = `"<mã lý do>: <ghi chú>"`). Xem nhanh bằng SQL (admin): `select created_at, actor_id, action, target_id, meta from audit_log where action like 'listing.%' order by created_at desc limit 50;`
+
+Dự phòng khi web lỗi: gọi RPC `review_listing(listing_id, true|false, 'ghi chú')` bằng phiên của moderator (không dùng service role — RPC kiểm `is_staff()` theo người gọi).
+
+### Cấp quyền moderator / admin (staging / prod)
+1. Người đó đăng nhập app hoặc web ít nhất một lần (để có `auth.users` + `profiles`).
+2. **Thêm email cho tài khoản** (bắt buộc cho xác thực hai bước — Supabase dùng email làm tên tài khoản trong mã TOTP; thiếu thì trang MFA báo `errors.mfa_enroll_failed`): Dashboard → Authentication → Users → chọn người dùng → sửa **Email** (đánh dấu đã xác nhận), hoặc SQL Editor:
+```sql
+update auth.users set email = '<email>', email_confirmed_at = now() where phone = '84xxxxxxxxx';
+```
+3. Đổi vai trò (SQL Editor chạy quyền owner; người dùng không tự đổi được `role` — trigger guard):
+```sql
+update public.profiles set role = 'moderator' where phone = '84xxxxxxxxx';   -- hoặc 'admin'
+```
+4. Người đó **đăng xuất rồi đăng nhập lại** (JWT mới mang `app_metadata.role` qua Auth Hook — cần bật hook, mục dưới) → vào `/admin` → bật xác thực hai bước.
+5. Dashboard → Authentication → **Multi-Factor** (Sign In / Providers → MFA): bật **TOTP (App Authenticator)** — enroll + verify. Local đã bật trong `supabase/config.toml` `[auth.mfa.totp]`.
+6. Thu quyền: `update public.profiles set role = 'user' where id = '<uuid>';` — có hiệu lực ngay ở mọi trang / action admin (web kiểm vai trò trong `profiles` mỗi request, RLS dùng `is_staff()`), không cần chờ JWT hết hạn.
+
+**Đặt lại xác thực hai bước** (staff mất điện thoại): SQL Editor `delete from auth.mfa_factors where user_id = '<uuid>';` → lần đăng nhập sau trang MFA cho đăng ký lại. Ghi lại ai yêu cầu / ai làm (chưa có màn admin cho việc này).
 
 ### Auth hook trên staging / prod
 Dashboard → Authentication → Hooks → **Customize Access Token (JWT) Claims** → Postgres function `public.custom_access_token_hook`. Bật sau khi migration `20261030100000_core` đã lên project đó.

@@ -1,1 +1,220 @@
-{}
+{
+  "meta": {
+    "title": "Quản trị",
+    "login": "Đăng nhập quản trị",
+    "mfa": "Xác thực hai bước",
+    "moderation": "Kiểm duyệt tin",
+    "overview": "Tổng quan"
+  },
+  "brand": {
+    "area": "Quản trị",
+    "staff_only": "Khu vực dành cho người kiểm duyệt và quản trị viên."
+  },
+  "nav": {
+    "label": "Điều hướng quản trị",
+    "overview": "Tổng quan",
+    "moderation": "Kiểm duyệt tin",
+    "open_menu": "Mở menu",
+    "close_menu": "Đóng menu",
+    "collapse": "Thu gọn thanh bên",
+    "expand": "Mở rộng thanh bên",
+    "back_to_site": "Về trang người dùng",
+    "pending_count_one": "{{count}} tin chờ duyệt",
+    "pending_count_other": "{{count}} tin chờ duyệt"
+  },
+  "role": {
+    "user": "Người dùng",
+    "moderator": "Kiểm duyệt viên",
+    "admin": "Quản trị viên"
+  },
+  "topbar": {
+    "account": "Tài khoản",
+    "sign_out": "Đăng xuất",
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ"
+  },
+  "access": {
+    "denied_title": "Không có quyền truy cập",
+    "denied_body": "Tài khoản này không phải kiểm duyệt viên hoặc quản trị viên.",
+    "sign_in_again": "Đăng nhập bằng tài khoản khác"
+  },
+  "login": {
+    "title": "Đăng nhập khu quản trị",
+    "subtitle": "Dùng số điện thoại đã được cấp quyền kiểm duyệt. Sau bước này cần thêm mã từ ứng dụng xác thực.",
+    "not_staff": "Tài khoản này không có quyền quản trị. Hãy đăng nhập bằng tài khoản kiểm duyệt viên hoặc quản trị viên.",
+    "signed_in_as": "Đang đăng nhập với tài khoản thường",
+    "use_other": "Đăng nhập bằng tài khoản khác",
+    "back_home": "Về trang chủ",
+    "step_label": "Bước {{current}}/{{total}}",
+    "step_phone": "Số điện thoại",
+    "step_mfa": "Mã xác thực"
+  },
+  "mfa": {
+    "enroll_title": "Bật xác thực hai bước",
+    "enroll_intro": "Khu quản trị bắt buộc xác thực hai bước. Chỉ cần làm một lần trên điện thoại của bạn.",
+    "step_install": "Cài một ứng dụng xác thực: Google Authenticator, Microsoft Authenticator hoặc Authy.",
+    "step_scan": "Trong ứng dụng, chọn thêm tài khoản rồi quét mã QR bên dưới.",
+    "step_code": "Nhập mã 6 số ứng dụng hiển thị để hoàn tất.",
+    "qr_alt": "Mã QR để thêm tài khoản quản trị vào ứng dụng xác thực",
+    "secret_label": "Không quét được? Nhập khoá này vào ứng dụng",
+    "copy": "Sao chép khoá",
+    "copied": "Đã sao chép khoá",
+    "verify_title": "Nhập mã xác thực",
+    "verify_intro": "Mở ứng dụng xác thực trên điện thoại và nhập mã 6 số của tài khoản {{app}}.",
+    "code_label": "Mã 6 số",
+    "submit": "Xác nhận",
+    "submit_enroll": "Bật và tiếp tục",
+    "lost_device": "Mất điện thoại hoặc ứng dụng xác thực? Nhờ quản trị viên đặt lại xác thực hai bước cho bạn.",
+    "sign_out": "Đăng xuất",
+    "load_error": "Không tải được thông tin xác thực hai bước."
+  },
+  "overview": {
+    "title": "Tổng quan",
+    "subtitle": "Tình hình hàng chờ kiểm duyệt tin.",
+    "pending": "Tin chờ duyệt",
+    "pending_hint": "Tin của tài khoản mới, có từ khoá cần kiểm tra hoặc giá bất thường.",
+    "approved": "Đã duyệt",
+    "rejected": "Đã từ chối",
+    "open_queue": "Mở hàng chờ",
+    "more_soon": "Thống kê người dùng, báo cáo và lượt truy cập sẽ có ở các bản sau."
+  },
+  "moderation": {
+    "title": "Kiểm duyệt tin",
+    "subtitle": "Tin rủi ro cao hiện trước. Xem kỹ nội dung, ảnh và người đăng trước khi quyết định.",
+    "tabs_label": "Trạng thái hàng chờ",
+    "tabs": {
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối"
+    },
+    "filter_label": "Lọc theo lý do",
+    "filter_all": "Mọi lý do",
+    "list_label": "Danh sách tin",
+    "select_all": "Chọn tất cả tin trong trang",
+    "select_item": "Chọn tin “{{title}}”",
+    "selected_one": "Đã chọn {{count}} tin",
+    "selected_other": "Đã chọn {{count}} tin",
+    "clear_selection": "Bỏ chọn",
+    "bulk_approve_one": "Duyệt {{count}} tin",
+    "bulk_approve_other": "Duyệt {{count}} tin",
+    "risk": "Rủi ro {{score}}",
+    "risk_level": {
+      "low": "Rủi ro thấp",
+      "medium": "Rủi ro vừa",
+      "high": "Rủi ro cao"
+    },
+    "owner_joined": "Tham gia {{time}}",
+    "new_account": "Tài khoản mới",
+    "banned": "Đang bị khoá",
+    "deleted_owner": "Tài khoản đã xoá",
+    "unknown_owner": "Không rõ người đăng",
+    "posted": "Đăng {{time}}",
+    "reviewed_by": "{{name}} xử lý {{time}}",
+    "auto_rejected": "Hệ thống tự từ chối {{time}}",
+    "no_image": "Không có ảnh",
+    "results": "{{from}}–{{to}} trong {{total}} tin",
+    "pagination_label": "Phân trang",
+    "page": "Trang {{page}}/{{total}}",
+    "prev_page": "Trang trước",
+    "next_page": "Trang sau",
+    "empty": {
+      "pending_title": "Hết tin chờ duyệt",
+      "pending_body": "Tin mới cần duyệt sẽ hiện ở đây. Bạn đã xử lý xong hàng chờ.",
+      "approved_title": "Chưa duyệt tin nào",
+      "rejected_title": "Chưa từ chối tin nào",
+      "other_body": "Tin đã xử lý sẽ hiện ở đây, mới nhất trước.",
+      "filtered_title": "Không có tin nào với lý do này",
+      "filtered_body": "Thử bỏ bộ lọc để xem toàn bộ hàng chờ.",
+      "clear_filter": "Bỏ bộ lọc",
+      "view_approved": "Xem tin đã duyệt"
+    },
+    "detail": {
+      "label": "Chi tiết tin",
+      "placeholder_title": "Chọn một tin để xem chi tiết",
+      "placeholder_body": "Dùng phím J / K để chuyển tin, A để duyệt, R để từ chối.",
+      "back": "Quay lại danh sách",
+      "position": "Tin {{current}}/{{total}}",
+      "prev": "Tin trước",
+      "next": "Tin sau",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "open_public": "Xem trang công khai",
+      "images_one": "Ảnh ({{count}})",
+      "images_other": "Ảnh ({{count}})",
+      "open_image": "Mở ảnh {{n}} cỡ lớn trong tab mới",
+      "reasons": "Lý do vào hàng chờ",
+      "description": "Mô tả",
+      "no_description": "Không có mô tả.",
+      "attributes": "Thông số",
+      "location": "Khu vực",
+      "address": "Địa chỉ người đăng ghi",
+      "owner": "Người đăng",
+      "phone": "Số điện thoại",
+      "joined": "Tham gia",
+      "listing_count_one": "{{count}} tin đã đăng",
+      "listing_count_other": "{{count}} tin đã đăng",
+      "rejected_count_one": "{{count}} tin bị từ chối",
+      "rejected_count_other": "{{count}} tin bị từ chối",
+      "history": "Lịch sử kiểm duyệt",
+      "history_entered": "Vào hàng chờ {{time}}",
+      "history_status": {
+        "pending": "Đang chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Đã từ chối"
+      },
+      "history_by": "bởi {{name}}",
+      "history_system": "bởi hệ thống",
+      "note": "Ghi chú",
+      "loading_extra": "Đang tải lịch sử…",
+      "extra_error": "Không tải được lịch sử kiểm duyệt.",
+      "deleted_listing": "Chủ tin đã xoá tin này.",
+      "not_pending": "Tin không còn ở trạng thái chờ duyệt.",
+      "status": "Trạng thái tin"
+    },
+    "shortcuts": {
+      "title": "Phím tắt",
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "next": "Tin sau",
+      "prev": "Tin trước",
+      "close": "Đóng chi tiết"
+    },
+    "reject": {
+      "title": "Từ chối tin “{{title}}” của {{owner}}?",
+      "description": "Tin sẽ không hiện công khai. Chủ tin nhận thông báo và có thể sửa rồi gửi duyệt lại.",
+      "reason_label": "Lý do từ chối",
+      "note_label": "Ghi chú thêm (không bắt buộc)",
+      "note_hint": "Chỉ kiểm duyệt viên và quản trị viên xem được ghi chú này.",
+      "note_count": "{{count}}/{{max}}",
+      "confirm": "Từ chối tin"
+    },
+    "bulk": {
+      "title_one": "Duyệt {{count}} tin đã chọn?",
+      "title_other": "Duyệt {{count}} tin đã chọn?",
+      "description": "Các tin sẽ hiện công khai ngay và chủ tin nhận thông báo đã được duyệt.",
+      "confirm_one": "Duyệt {{count}} tin",
+      "confirm_other": "Duyệt {{count}} tin"
+    },
+    "toast": {
+      "approved": "Đã duyệt “{{title}}”",
+      "rejected": "Đã từ chối “{{title}}”",
+      "bulk_done_one": "Đã duyệt {{count}} tin",
+      "bulk_done_other": "Đã duyệt {{count}} tin",
+      "bulk_partial": "Đã duyệt {{ok}} tin, {{failed}} tin không duyệt được (đã được xử lý hoặc không còn chờ duyệt)",
+      "already_reviewed": "Tin này đã được xử lý hoặc không còn chờ duyệt"
+    }
+  },
+  "reasons": {
+    "scam": "Lừa đảo, đòi chuyển tiền trước",
+    "prohibited": "Hàng hoá / dịch vụ bị cấm",
+    "wrong_category": "Sai danh mục",
+    "duplicate": "Tin trùng lặp",
+    "misleading_price": "Giá không đúng thực tế",
+    "contact_in_title": "SĐT / liên hệ trong tiêu đề hoặc ảnh",
+    "other": "Lý do khác"
+  },
+  "error": {
+    "title": "Không tải được trang quản trị",
+    "body": "Có lỗi khi đọc dữ liệu. Thử lại sau giây lát."
+  }
+}

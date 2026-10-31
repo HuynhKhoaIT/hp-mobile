@@ -19,5 +19,10 @@
   "too_short": "太短了。",
   "price_required": "请输入价格，或选择“面议” / “免费”。",
   "too_many_images": "最多 10 张图片。",
-  "too_early": "只能在到期前最后 3 天内续期。"
+  "too_early": "只能在到期前最后 3 天内续期。",
+  "mfa_code_invalid": "验证码错误或已过期，请输入应用中的最新验证码。",
+  "mfa_disabled": "服务器未启用两步验证。",
+  "reason_required": "请选择拒绝原因。",
+  "mfa_required": "需要完成两步验证才能继续。",
+  "mfa_enroll_failed": "无法开启两步验证：管理账号需要绑定邮箱。请联系管理员添加邮箱后重试。"
 }

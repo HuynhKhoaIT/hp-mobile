@@ -46,5 +46,8 @@ where p.id = u.id and p.id::text like '00000000-0000-4000-8000-00000000000_' and
 update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
 update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';
 update public.profiles set role = 'admin' where id = '00000000-0000-4000-8000-000000000005';
+-- Email cho staff: TOTP (MFA /admin) cần email làm tên tài khoản; tài khoản chỉ có SĐT không tạo được QR.
+update auth.users set email = 'moderator@seed.local', email_confirmed_at = now() where id = '00000000-0000-4000-8000-000000000004';
+update auth.users set email = 'admin@seed.local', email_confirmed_at = now() where id = '00000000-0000-4000-8000-000000000005';
 
 -- Tin đăng mẫu: supabase/seed/listings.sql (chạy sau file này — [db.seed] sql_paths trong config.toml).

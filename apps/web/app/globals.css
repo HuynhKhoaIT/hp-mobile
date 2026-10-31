@@ -55,3 +55,8 @@
     @apply font-zh;
   }
 }
+
+/* Khu admin: panel chi tiết hàng chờ dính dưới thanh trên (h-16) và tự cuộn bên trong — cao tối đa = màn hình − 6rem. */
+@utility max-h-admin-panel {
+  max-height: calc(100dvh - 6rem);
+}

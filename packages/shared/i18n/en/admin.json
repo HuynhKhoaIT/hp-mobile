@@ -1,1 +1,220 @@
-{}
+{
+  "meta": {
+    "title": "Admin",
+    "login": "Admin sign-in",
+    "mfa": "Two-step verification",
+    "moderation": "Listing moderation",
+    "overview": "Overview"
+  },
+  "brand": {
+    "area": "Admin",
+    "staff_only": "For moderators and administrators only."
+  },
+  "nav": {
+    "label": "Admin navigation",
+    "overview": "Overview",
+    "moderation": "Moderation",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "back_to_site": "Back to the site",
+    "pending_count_one": "{{count}} listing awaiting review",
+    "pending_count_other": "{{count}} listings awaiting review"
+  },
+  "role": {
+    "user": "User",
+    "moderator": "Moderator",
+    "admin": "Administrator"
+  },
+  "topbar": {
+    "account": "Account",
+    "sign_out": "Sign out",
+    "theme": "Theme",
+    "language": "Language"
+  },
+  "access": {
+    "denied_title": "Access denied",
+    "denied_body": "This account is not a moderator or administrator.",
+    "sign_in_again": "Sign in with another account"
+  },
+  "login": {
+    "title": "Admin sign-in",
+    "subtitle": "Use the phone number that was granted moderation rights. You will also need a code from your authenticator app.",
+    "not_staff": "This account has no admin rights. Sign in with a moderator or administrator account.",
+    "signed_in_as": "Signed in with a regular account",
+    "use_other": "Sign in with another account",
+    "back_home": "Back to home",
+    "step_label": "Step {{current}}/{{total}}",
+    "step_phone": "Phone number",
+    "step_mfa": "Authentication code"
+  },
+  "mfa": {
+    "enroll_title": "Turn on two-step verification",
+    "enroll_intro": "Two-step verification is required for the admin area. You only need to set it up once on your phone.",
+    "step_install": "Install an authenticator app: Google Authenticator, Microsoft Authenticator or Authy.",
+    "step_scan": "In the app, add an account and scan the QR code below.",
+    "step_code": "Enter the 6-digit code the app shows to finish.",
+    "qr_alt": "QR code to add the admin account to your authenticator app",
+    "secret_label": "Can't scan? Enter this key in the app",
+    "copy": "Copy key",
+    "copied": "Key copied",
+    "verify_title": "Enter authentication code",
+    "verify_intro": "Open your authenticator app and enter the 6-digit code for the {{app}} account.",
+    "code_label": "6-digit code",
+    "submit": "Verify",
+    "submit_enroll": "Turn on and continue",
+    "lost_device": "Lost your phone or authenticator app? Ask an administrator to reset two-step verification for you.",
+    "sign_out": "Sign out",
+    "load_error": "Could not load two-step verification details."
+  },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "The listing moderation queue at a glance.",
+    "pending": "Awaiting review",
+    "pending_hint": "Listings from new accounts, with keywords to check, or with unusual prices.",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "open_queue": "Open queue",
+    "more_soon": "User, report and traffic statistics will come in later releases."
+  },
+  "moderation": {
+    "title": "Listing moderation",
+    "subtitle": "Highest risk first. Check the content, photos and poster before deciding.",
+    "tabs_label": "Queue status",
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "filter_label": "Filter by reason",
+    "filter_all": "All reasons",
+    "list_label": "Listings",
+    "select_all": "Select all listings on this page",
+    "select_item": "Select “{{title}}”",
+    "selected_one": "{{count}} listing selected",
+    "selected_other": "{{count}} listings selected",
+    "clear_selection": "Clear selection",
+    "bulk_approve_one": "Approve {{count}} listing",
+    "bulk_approve_other": "Approve {{count}} listings",
+    "risk": "Risk {{score}}",
+    "risk_level": {
+      "low": "Low risk",
+      "medium": "Medium risk",
+      "high": "High risk"
+    },
+    "owner_joined": "Joined {{time}}",
+    "new_account": "New account",
+    "banned": "Suspended",
+    "deleted_owner": "Deleted account",
+    "unknown_owner": "Unknown poster",
+    "posted": "Posted {{time}}",
+    "reviewed_by": "{{name}} reviewed {{time}}",
+    "auto_rejected": "Auto-rejected {{time}}",
+    "no_image": "No photo",
+    "results": "{{from}}–{{to}} of {{total}} listings",
+    "pagination_label": "Pagination",
+    "page": "Page {{page}}/{{total}}",
+    "prev_page": "Previous page",
+    "next_page": "Next page",
+    "empty": {
+      "pending_title": "Queue is clear",
+      "pending_body": "New listings that need review will appear here. You're all caught up.",
+      "approved_title": "Nothing approved yet",
+      "rejected_title": "Nothing rejected yet",
+      "other_body": "Reviewed listings appear here, newest first.",
+      "filtered_title": "No listings with this reason",
+      "filtered_body": "Clear the filter to see the whole queue.",
+      "clear_filter": "Clear filter",
+      "view_approved": "View approved listings"
+    },
+    "detail": {
+      "label": "Listing details",
+      "placeholder_title": "Select a listing to review",
+      "placeholder_body": "Use J / K to move between listings, A to approve, R to reject.",
+      "back": "Back to list",
+      "position": "Listing {{current}}/{{total}}",
+      "prev": "Previous listing",
+      "next": "Next listing",
+      "approve": "Approve",
+      "reject": "Reject",
+      "open_public": "View public page",
+      "images_one": "Photo ({{count}})",
+      "images_other": "Photos ({{count}})",
+      "open_image": "Open photo {{n}} full size in a new tab",
+      "reasons": "Why it is in the queue",
+      "description": "Description",
+      "no_description": "No description.",
+      "attributes": "Details",
+      "location": "Area",
+      "address": "Address given by poster",
+      "owner": "Poster",
+      "phone": "Phone",
+      "joined": "Joined",
+      "listing_count_one": "{{count}} listing posted",
+      "listing_count_other": "{{count}} listings posted",
+      "rejected_count_one": "{{count}} listing rejected",
+      "rejected_count_other": "{{count}} listings rejected",
+      "history": "Moderation history",
+      "history_entered": "Entered queue {{time}}",
+      "history_status": {
+        "pending": "Awaiting review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "history_by": "by {{name}}",
+      "history_system": "by the system",
+      "note": "Note",
+      "loading_extra": "Loading history…",
+      "extra_error": "Could not load moderation history.",
+      "deleted_listing": "The poster deleted this listing.",
+      "not_pending": "This listing is no longer awaiting review.",
+      "status": "Listing status"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "approve": "Approve",
+      "reject": "Reject",
+      "next": "Next listing",
+      "prev": "Previous listing",
+      "close": "Close details"
+    },
+    "reject": {
+      "title": "Reject “{{title}}” by {{owner}}?",
+      "description": "The listing will not be public. The poster is notified and can edit and resubmit it.",
+      "reason_label": "Reason",
+      "note_label": "Additional note (optional)",
+      "note_hint": "Only moderators and administrators can see this note.",
+      "note_count": "{{count}}/{{max}}",
+      "confirm": "Reject listing"
+    },
+    "bulk": {
+      "title_one": "Approve {{count}} selected listing?",
+      "title_other": "Approve {{count}} selected listings?",
+      "description": "The listings go public immediately and each poster is notified that it was approved.",
+      "confirm_one": "Approve {{count}} listing",
+      "confirm_other": "Approve {{count}} listings"
+    },
+    "toast": {
+      "approved": "Approved “{{title}}”",
+      "rejected": "Rejected “{{title}}”",
+      "bulk_done_one": "Approved {{count}} listing",
+      "bulk_done_other": "Approved {{count}} listings",
+      "bulk_partial": "Approved {{ok}}; {{failed}} could not be approved (already reviewed or no longer pending)",
+      "already_reviewed": "This listing was already reviewed or is no longer pending"
+    }
+  },
+  "reasons": {
+    "scam": "Scam or upfront payment request",
+    "prohibited": "Prohibited item or service",
+    "wrong_category": "Wrong category",
+    "duplicate": "Duplicate listing",
+    "misleading_price": "Misleading price",
+    "contact_in_title": "Phone / contact in title or photos",
+    "other": "Other reason"
+  },
+  "error": {
+    "title": "Could not load the admin page",
+    "body": "Something went wrong while reading data. Try again in a moment."
+  }
+}
