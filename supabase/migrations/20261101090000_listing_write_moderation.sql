@@ -70,7 +70,7 @@ on conflict do nothing;
 create table public.moderation_queue (
   id uuid primary key default gen_random_uuid(),
   listing_id uuid not null references public.listings (id) on delete cascade,
-  reasons text[] not null check (reasons <@ array['keyword', 'keyword_reject', 'new_account', 'low_price', 'image_dup', 'report']),
+  reasons text[] not null check (reasons <@ array['keyword', 'keyword_reject', 'new_account', 'low_price', 'resubmit', 'image_dup', 'report']),
   risk_score int not null default 0,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
   reviewed_by uuid references public.profiles (id) on delete set null,
@@ -137,8 +137,9 @@ begin
     if new.status not in ('draft', 'active', 'sold', 'closed') then
       raise exception using errcode = '42501', message = 'forbidden', detail = 'listings: trạng thái chỉ server đặt';
     end if;
-    if new.status = 'active' and old.status in ('pending_review', 'rejected', 'expired') then
-      raise exception using errcode = '42501', message = 'forbidden', detail = 'listings: không tự mở lại tin chờ duyệt / bị từ chối / hết hạn';
+    -- rejected → active được phép: đó là "gửi duyệt lại" — trg_listings_moderate luôn chuyển thành pending_review.
+    if new.status = 'active' and old.status in ('pending_review', 'expired') then
+      raise exception using errcode = '42501', message = 'forbidden', detail = 'listings: không tự mở tin chờ duyệt / hết hạn (gia hạn qua renew_listing)';
     end if;
   end if;
 
@@ -153,7 +154,8 @@ $$;
 -- Chỉ với người dùng (staff, service role, seed bỏ qua) và chỉ khi tin sắp hiện công khai (active):
 --   - giới hạn 10 tin / 24 giờ / người (đếm cả nháp) → P0001 rate_limited
 --   - từ khoá reject → rejected; từ khoá review → pending_review
---   - tài khoản < 7 ngày → pending_review (tin đầu của người mới)
+--   - tài khoản < 7 ngày → pending_review (mỗi lần chuyển sang active, kể cả nháp → active)
+--   - tin từng bị từ chối được gửi lại → pending_review (resubmit)
 --   - giá < 30% trung vị 30 ngày cùng category (≥ 5 mẫu) → pending_review
 -- Sửa tin đang active: kiểm lại từ khoá khi tiêu đề / mô tả đổi.
 create or replace function public.trg_listings_moderate()
@@ -199,11 +201,20 @@ begin
     v_reasons := array_append(v_reasons, 'keyword');
   end if;
 
-  if tg_op = 'INSERT' then
+  -- Mỗi lần tin chuyển sang active (đăng mới, nháp → đăng khi có ảnh, mở lại), không chỉ lúc INSERT.
+  if tg_op = 'INSERT' or old.status <> 'active' then
     select now() - p.created_at into v_account_age from public.profiles p where p.id = new.owner_id;
     if v_account_age < interval '7 days' then
       v_reasons := array_append(v_reasons, 'new_account');
     end if;
+  end if;
+
+  -- Gửi lại tin đã bị từ chối (trực tiếp rejected → active, hoặc qua nháp): luôn để moderator xem lại,
+  -- kể cả khi nội dung đã sạch — không để tin bị từ chối tay tự lên lại.
+  if tg_op = 'UPDATE' and old.status <> 'active'
+     and (old.status = 'rejected'
+          or exists (select 1 from public.moderation_queue q where q.listing_id = new.id and q.status = 'rejected')) then
+    v_reasons := array_append(v_reasons, 'resubmit');
   end if;
 
   if new.price is not null and new.price > 0 and new.price_type = 'fixed' then

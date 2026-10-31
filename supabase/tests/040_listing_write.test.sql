@@ -2,7 +2,7 @@
 -- Vai trò: anon, user (tài khoản cũ / mới), người khác, bị cấm, moderator, admin.
 begin;
 \ir _helpers.psql
-select plan(44);
+select plan(47);
 
 select tests.create_user('old_user');
 select tests.create_user('new_user');
@@ -100,6 +100,22 @@ select is((select array_agg(type order by type) from public.notifications where 
   array['listing_approved', 'listing_rejected'], 'duyệt / từ chối gửi thông báo cho chủ tin');
 select is((select title_key from public.notifications where type = 'listing_approved' and data->'params'->>'id' = 'b0000000-0000-4000-8000-000000000002'),
   'listing_approved.title', 'thông báo lưu khoá i18n (ns push), không lưu chữ');
+
+-- ── gửi lại / luồng nháp → đăng ─────────────────────────────────────────────────
+select tests.authenticate_as('new_user');
+insert into public.listings (id, owner_id, category, title, status)
+values ('b0000000-0000-4000-8000-000000000008', auth.uid(), 'pass_ppe', 'Mũ bảo hộ có ảnh zxqw', 'draft');
+update public.listings set status = 'active' where id = 'b0000000-0000-4000-8000-000000000008';
+select is((select status::text from public.listings where id = 'b0000000-0000-4000-8000-000000000008'), 'pending_review',
+  'kiểm duyệt: tài khoản mới nháp → đăng (luồng có ảnh) vẫn chờ duyệt');
+update public.listings set status = 'active' where id = 'b0000000-0000-4000-8000-000000000005';
+select ok((select status = 'pending_review' and 'resubmit' = any (moderation_reasons) from public.listings
+           where id = 'b0000000-0000-4000-8000-000000000005'), 'gửi lại tin bị moderator từ chối → chờ duyệt (resubmit)');
+select tests.authenticate_as('old_user');
+update public.listings set status = 'draft' where id = 'b0000000-0000-4000-8000-000000000003';
+update public.listings set title = 'Bán đồ bóng đá cũ zxqw', status = 'active' where id = 'b0000000-0000-4000-8000-000000000003';
+select is((select status::text from public.listings where id = 'b0000000-0000-4000-8000-000000000003'), 'pending_review',
+  'gửi lại qua nháp tin bị từ chối tự động (đã sửa sạch) → vẫn chờ duyệt, không tự lên');
 
 -- ── gia hạn ─────────────────────────────────────────────────────────────────────
 select tests.authenticate_as('old_user');
