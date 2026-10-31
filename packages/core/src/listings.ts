@@ -12,7 +12,7 @@ export type PublicListing = Omit<PublicListingRow, 'search_vector'>;
 
 /** Cột client đọc từ public_listings / RPC. Thêm cột vào view → thêm ở đây. Một chuỗi literal để supabase-js suy ra type. */
 // prettier-ignore
-export const LISTING_COLUMNS = 'id,slug,short_id,category,status,title,description,price,price_type,attributes,site,site_name,lat,lng,distance_to_site_m,address_text,images,lang,view_count,expires_at,created_at,updated_at,owner_id,owner_name,owner_avatar_url,owner_badges,owner_rating_avg,owner_rating_count,owner_since';
+export const LISTING_COLUMNS = 'id,slug,short_id,category,status,title,description,price,price_type,attributes,site,site_name,lat,lng,distance_to_site_m,address_text,images,lang,view_count,expires_at,created_at,updated_at,owner_id,owner_name,owner_avatar_url,owner_badges,owner_rating_avg,owner_rating_count,owner_since,is_expired,inactive_since';
 
 export type ListingQuery = ListingFilters & { cursor?: string | null; limit?: number };
 
@@ -90,4 +90,34 @@ export async function logSearch(
 /** Ảnh bìa (path trong bucket listing-images) hoặc null. Dựng URL bằng imageUrl(supabaseUrl, 'listing-images', path). */
 export function listingCover(listing: Pick<PublicListing, 'images'>): string | null {
   return listing.images[0] ?? null;
+}
+
+// ── Vòng đời (trang chi tiết tin đã bán / đóng / hết hạn) ──────────────────────────
+export type ListingDisplayStatus = 'active' | 'sold' | 'closed' | 'expired';
+
+/** Trạng thái để hiện nhãn: active quá expires_at (cron chưa kịp đổi) coi là expired. */
+export function listingDisplayStatus(l: Pick<PublicListing, 'status' | 'is_expired'>): ListingDisplayStatus {
+  if (l.status === 'active') return l.is_expired ? 'expired' : 'active';
+  return l.status === 'sold' || l.status === 'closed' ? l.status : 'expired';
+}
+
+/** Tin thôi hiện quá 30 ngày → web trả 410 (.claude/rules/web-seo-public.md). */
+export function isListingGone(l: Pick<PublicListing, 'inactive_since'>, now: Date = new Date()): boolean {
+  if (!l.inactive_since) return false;
+  return now.getTime() - new Date(l.inactive_since).getTime() > 30 * 24 * 60 * 60 * 1000;
+}
+
+// ── Tin đã lưu (bookmarks target_type = listing) ───────────────────────────────────
+/** Tin đã lưu còn công khai, mới lưu trước. Tin đã gỡ / bị chặn tự biến mất (view lọc). */
+export async function listSavedListings(client: Client): Promise<Result<PublicListing[]>> {
+  const marks = fromSupabase(
+    await client.from('bookmarks').select('target_id, created_at').eq('target_type', 'listing').order('created_at', { ascending: false }).limit(200),
+  );
+  if (marks.error) return marks;
+  const ids = (marks.data ?? []).map((m) => m.target_id);
+  if (ids.length === 0) return ok([]);
+  const res = fromSupabase<PublicListing[]>(await client.from('public_listings').select(LISTING_COLUMNS).in('id', ids));
+  if (res.error) return res;
+  const byId = new Map((res.data ?? []).map((l) => [l.id, l]));
+  return ok(ids.flatMap((id) => byId.get(id) ?? []));
 }

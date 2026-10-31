@@ -15,5 +15,9 @@
   "too_long": "This is too long",
   "file_too_large": "The image is too large. Please choose a smaller one.",
   "upload_failed": "Couldn't upload the image. Please try again.",
-  "file_type": "Only JPG, PNG or WebP images are accepted."
+  "file_type": "Only JPG, PNG or WebP images are accepted.",
+  "too_short": "Too short.",
+  "price_required": "Enter a price, or choose \"Negotiable\" / \"Free\".",
+  "too_many_images": "Up to 10 photos.",
+  "too_early": "You can only renew in the last 3 days before it expires."
 }

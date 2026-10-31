@@ -126,7 +126,7 @@ select throws_ok($$ update public.listings set status = 'active' where id = 'a00
 select lives_ok($$ update public.listings set status = 'closed' where id = 'a0000000-0000-4000-8000-000000000001' $$,
   'user: đóng tin đang chờ duyệt');
 select tests.clear_auth();
-select is((select count(*)::int from public.public_listings where title like '%zxqtest%'), 0, 'anon: tin không còn active thì ẩn');
+select is((select count(*)::int from public.search_listings(p_query => 'zxqtest')), 0, 'anon: tin không còn active thì ẩn khỏi danh sách');
 
 -- ── Storage ─────────────────────────────────────────────────────────────────────
 select tests.authenticate_as('user_a');

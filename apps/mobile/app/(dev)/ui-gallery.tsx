@@ -77,6 +77,7 @@ function sampleListing(over: Partial<PublicListing>): PublicListing {
     lat: null, lng: null, distance_to_site_m: 1200, address_text: null, images: [], lang: 'vi', view_count: 12,
     expires_at: null, created_at: HOUR_AGO, updated_at: HOUR_AGO, owner_id: 'owner', owner_name: 'An', owner_avatar_url: null,
     owner_badges: ['phone'], owner_rating_avg: 4.6, owner_rating_count: 5, owner_since: '2026-01-01T00:00:00Z',
+    is_expired: false, inactive_since: null,
     ...over,
   };
 }

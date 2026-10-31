@@ -1,1 +1,10 @@
-{}
+{
+  "listing_approved": {
+    "title": "Tin đã được duyệt",
+    "body": "Tin \"{{title}}\" của bạn đã hiện công khai."
+  },
+  "listing_rejected": {
+    "title": "Tin chưa được duyệt",
+    "body": "Tin \"{{title}}\" vi phạm quy định nên chưa được đăng. Bạn có thể sửa và đăng lại."
+  }
+}
