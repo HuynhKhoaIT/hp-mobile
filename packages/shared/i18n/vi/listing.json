@@ -200,7 +200,20 @@
     "discard_title": "Bỏ tin đang soạn?",
     "discard_body": "Nội dung chưa lưu sẽ mất.",
     "discard_confirm": "Bỏ tin",
-    "keep_editing": "Tiếp tục soạn"
+    "keep_editing": "Tiếp tục soạn",
+    "basics_title": "Thông tin chính",
+    "photo_failed": "Lỗi tải ảnh",
+    "draft_restored": "Đã mở lại tin bạn đang soạn dở.",
+    "start_over": "Soạn lại từ đầu",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "site_none": "Không chọn khu",
+    "suffix": {
+      "m2": "m²",
+      "km": "km",
+      "months": "tháng",
+      "people": "người"
+    }
   },
   "manage": {
     "title": "Tin của tôi",
@@ -239,8 +252,10 @@
       "new_account": "Tài khoản mới (dưới 7 ngày)",
       "low_price": "Giá thấp bất thường",
       "image_dup": "Ảnh trùng tin khác",
-      "report": "Bị báo cáo"
-    }
+      "report": "Bị báo cáo",
+      "resubmit": "Gửi duyệt lại sau khi bị từ chối"
+    },
+    "resubmit": "Gửi duyệt lại"
   },
   "saved": {
     "title": "Tin đã lưu",

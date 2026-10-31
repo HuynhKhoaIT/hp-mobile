@@ -2,6 +2,7 @@
 // uploadAvatar (@hp/core). Giống web (apps/web/src/features/profile/avatar-image.ts): ≤ 1 MB, bucket avatars.
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
+import { base64ToArrayBuffer } from '@/core/upload';
 
 const SIZE = 512;
 const MAX_BYTES = 1024 * 1024;
@@ -32,10 +33,3 @@ export async function pickAvatar(): Promise<{ data: PreparedAvatar } | { error: 
   }
 }
 
-/** Base64 → ArrayBuffer bằng atob có sẵn trong Hermes (không cần expo-file-system). */
-function base64ToArrayBuffer(base64: string): ArrayBuffer {
-  const binary = globalThis.atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-  return bytes.buffer;
-}

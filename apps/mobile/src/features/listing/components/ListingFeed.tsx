@@ -4,7 +4,18 @@ import type { PublicListing } from '@hp/core';
 import { FlashList } from '@shopify/flash-list';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions, View } from 'react-native';
-import { Button, EmptyState, ErrorState, ListingCard, SERVICE, SkeletonListingCard, StaggerItem, Text, useTheme } from '@/ui';
+import {
+  Button,
+  EmptyState,
+  type EmptyStateProps,
+  ErrorState,
+  ListingCard,
+  SERVICE,
+  SkeletonListingCard,
+  StaggerItem,
+  Text,
+  useTheme,
+} from '@/ui';
 import { openListing } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 
@@ -22,6 +33,8 @@ export type ListingFeedProps = {
   fetchNextPage: () => void;
   refetch: () => void;
   onPost: () => void;
+  /** Thay trạng thái rỗng mặc định ("Chưa có tin" + Đăng tin), vd màn Tin đã lưu. */
+  empty?: EmptyStateProps;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -37,6 +50,7 @@ export function ListingFeed(p: ListingFeedProps) {
   if (p.isLoading) return <SkeletonListingCard count={6} layout={p.config.card.variant} columns={columns} />;
   if (p.isError && p.items.length === 0) return <ErrorState code={p.errorCode} onRetry={p.refetch} />;
   if (p.items.length === 0) {
+    if (p.empty) return <EmptyState {...p.empty} />;
     return (
       <EmptyState
         icon={p.config.color ? SERVICE[p.config.color].icon : undefined}

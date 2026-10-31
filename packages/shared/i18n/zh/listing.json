@@ -200,7 +200,20 @@
     "discard_title": "放弃正在编辑的信息？",
     "discard_body": "未保存的内容将会丢失。",
     "discard_confirm": "放弃",
-    "keep_editing": "继续编辑"
+    "keep_editing": "继续编辑",
+    "basics_title": "基本信息",
+    "photo_failed": "上传失败",
+    "draft_restored": "已恢复你未写完的信息。",
+    "start_over": "重新开始",
+    "today": "今天",
+    "yesterday": "昨天",
+    "site_none": "不选择区域",
+    "suffix": {
+      "m2": "平方米",
+      "km": "公里",
+      "months": "个月",
+      "people": "人"
+    }
   },
   "manage": {
     "title": "我的信息",
@@ -239,8 +252,10 @@
       "new_account": "新账号（不足 7 天）",
       "low_price": "价格异常偏低",
       "image_dup": "图片与其他信息重复",
-      "report": "被举报"
-    }
+      "report": "被举报",
+      "resubmit": "被拒后重新提交"
+    },
+    "resubmit": "重新提交审核"
   },
   "saved": {
     "title": "收藏的信息",

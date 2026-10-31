@@ -1,6 +1,7 @@
 // @/ui — nguồn duy nhất cho component giao diện. Thêm component: tạo file ở đây + mục trong app/(dev)/ui-gallery.tsx.
 export { Avatar, type AvatarSize } from './Avatar';
 export { Badge, type BadgeTone } from './Badge';
+export { BookmarkButton, type BookmarkButtonProps } from './BookmarkButton';
 export { BottomSheet, type BottomSheetProps } from './BottomSheet';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, type CardProps } from './Card';
@@ -14,9 +15,11 @@ export { Header, type HeaderProps } from './Header';
 export { Icon, type IconProps } from './Icon';
 export { IconButton, type IconButtonProps } from './IconButton';
 export { ImageGallery, type ImageGalleryProps } from './ImageGallery';
+export { ImagePicker, type ImagePickerItem, type ImagePickerItemStatus, type ImagePickerProps } from './ImagePicker';
 export { Input, type InputProps } from './Input';
 export { Col, Divider, Row, Spacer, type SpaceStep } from './Layout';
 export { ListingCard, type ListingCardLayout, type ListingCardProps, ListingCover } from './ListingCard';
+export { MenuItem, type MenuItemProps } from './MenuItem';
 export { Notice, type NoticeTone } from './Notice';
 export { PriceInput, type PriceInputProps } from './PriceInput';
 export { Screen, type ScreenProps } from './Screen';
@@ -28,6 +31,8 @@ export { ServiceTile, type ServiceTileProps } from './ServiceTile';
 export { Skeleton, SkeletonListingCard, type SkeletonListingCardProps, SkeletonListingDetail } from './Skeleton';
 export { StaggerItem } from './StaggerItem';
 export { StickyCta } from './StickyCta';
+export { SuccessScreen, type SuccessScreenProps, type SuccessTone } from './SuccessScreen';
+export { TabBar, type TabBarProps } from './TabBar';
 export { Text, type TextProps, type TextTone, type TextVariant } from './Text';
 export { toast, ToastHost, type ToastTone } from './Toast';
 export { useReducedMotion, useScheme, useTheme, type Scheme, type Theme } from './theme';

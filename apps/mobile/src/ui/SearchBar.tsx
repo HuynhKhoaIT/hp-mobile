@@ -1,13 +1,15 @@
 // SearchBar — ô tìm kiếm: icon kính lúp, bàn phím nút "Tìm", nút xoá từ khoá khi có chữ. Cao 48, chữ 16.
 // Tìm khi bấm Tìm trên bàn phím (onSubmit) — không gọi server theo từng ký tự (mạng yếu).
+// Có `onPress` → chỉ là nút trông như ô tìm kiếm (Hub → mở màn Tìm kiếm).
 import { Search, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { TextInput, View } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
+import { Text } from './Text';
 import { Icon } from './Icon';
 import { IconButton } from './IconButton';
 import { useTheme } from './theme';
 
-export type SearchBarProps = {
+type SearchBarInputProps = {
   value: string;
   onChangeText: (text: string) => void;
   onSubmit: (text: string) => void;
@@ -15,9 +17,37 @@ export type SearchBarProps = {
   onClear?: () => void;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
+  onPress?: undefined;
 };
 
-export function SearchBar({ value, onChangeText, onSubmit, onClear, placeholder, className }: SearchBarProps) {
+type SearchBarButtonProps = { onPress: () => void; placeholder?: string; className?: string };
+
+export type SearchBarProps = SearchBarInputProps | SearchBarButtonProps;
+
+const BOX = 'min-h-12 flex-row items-center gap-2 rounded-full border border-border bg-surface pl-4';
+
+export function SearchBar(props: SearchBarProps) {
+  if (props.onPress) {
+    const { onPress, placeholder, className } = props;
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={placeholder}
+        onPress={onPress}
+        className={[BOX, 'pr-4 active:opacity-80', className].filter(Boolean).join(' ')}
+      >
+        <Icon icon={Search} tone="muted" />
+        <Text tone="disabled" numberOfLines={1} className="flex-1 py-3">
+          {placeholder}
+        </Text>
+      </Pressable>
+    );
+  }
+  return <SearchInput {...props} />;
+}
+
+function SearchInput({ value, onChangeText, onSubmit, onClear, placeholder, className, autoFocus }: SearchBarInputProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const clear =
@@ -28,9 +58,7 @@ export function SearchBar({ value, onChangeText, onSubmit, onClear, placeholder,
     });
   return (
     <View
-      className={['min-h-12 flex-row items-center gap-2 rounded-full border border-border bg-surface pl-4', className]
-        .filter(Boolean)
-        .join(' ')}
+      className={[BOX, className].filter(Boolean).join(' ')}
     >
       <Icon icon={Search} tone="muted" />
       <TextInput
@@ -40,6 +68,7 @@ export function SearchBar({ value, onChangeText, onSubmit, onClear, placeholder,
         placeholder={placeholder}
         accessibilityLabel={placeholder}
         returnKeyType="search"
+        autoFocus={autoFocus}
         autoCorrect={false}
         maxFontSizeMultiplier={1.5}
         placeholderTextColor={theme.colors.textDisabled}

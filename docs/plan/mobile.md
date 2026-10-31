@@ -1,6 +1,6 @@
 # Kế hoạch triển khai — apps/mobile (Expo iOS / Android)
 
-Cập nhật: 2026-10-30 · Nguồn: `docs/ARCHITECTURE.md` (mục 8, 9, 12, 13), `apps/mobile/CLAUDE.md` · Tổng quan: `docs/PLAN.md` · Khu khác: `docs/plan/web.md`, `docs/plan/backend.md`
+Cập nhật: 2026-10-31 · Nguồn: `docs/ARCHITECTURE.md` (mục 8, 9, 12, 13), `apps/mobile/CLAUDE.md` · Tổng quan: `docs/PLAN.md` · Khu khác: `docs/plan/web.md`, `docs/plan/backend.md`
 
 ## 1. Mục tiêu và cổng
 
@@ -66,20 +66,23 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 | Route | Kiểu | Feature | Tuần | Mở từ |
 |---|---|---|---|---|
 | `(auth)/phone`, `(auth)/otp`, `(auth)/onboarding` | Form | auth | 2 | `requireAuth` |
-| `(tabs)/index` | Hub | — | 3 | cold start (tuần 3 tạm ở `app/index.tsx`, chuyển vào `(tabs)` khi có TabBar) |
+| `(tabs)/index` | Hub | — | 3 → 4 | cold start (chuyển vào `(tabs)` ở tuần 4) |
 | `listings/[feature]` (`pass` · `room` · `job` · `lost-found` · `all`, `?site=`) | List | listing | 3 | ô dịch vụ ở Hub, "Xem tất cả" |
 | `groups/[kind]` (`ride` · `sport`) | List | group | 3 (tạm "Sắp ra mắt") → 7–8 | ô dịch vụ ở Hub |
-| `(tabs)/explore` | List | listing + group | 8 | tab |
+| `(tabs)/explore` | List | listing (4) + group (8) | 4 / 8 | tab |
 | `(tabs)/post` | Hub (chọn loại tin) | — | 4 | tab, nút Đăng xoay 45° |
-| `(tabs)/chat/index` | List | chat | 5 | tab, push `new_message` không có id |
-| `(tabs)/me` | Hub | profile | 6 | tab |
+| `(tabs)/chat/index` | List | chat | 4 (tạm "Sắp ra mắt") → 5 | tab, push `new_message` không có id |
+| `(tabs)/me` | Hub | profile | 4 (hồ sơ, tin của tôi, đã lưu, ngôn ngữ, đăng xuất) → 6 | tab |
 | `listing/[id]` + alias `tin/[slug]` | Detail | listing | 3 | card, push `listing_*`, `lost_found_match`, URL web |
 | `listing/new/[category]` | Form | listing | 4 | post, FAB Đăng |
-| `listing/edit/[id]` | Form | listing | 6 | tin của tôi |
+| `listing/new` (`?feature=`) | Form (bước 0: chọn loại tin) | listing | 4 | FAB Đăng ở danh sách, kết quả "Đăng tin khác" |
+| `listing/edit/[id]` | Form | listing | 4 | tin của tôi, chi tiết tin của mình, tin bị từ chối |
+| `my-listings` (`?tab=`) | List | listing | 4 | tab Tôi, kết quả đăng tin, chi tiết tin của mình |
+| `saved` | List | listing | 4 | tab Tôi |
 | `group/[id]` + alias `nhom/[slug]` | Detail | group | 7 | card, push `join_*`, `group_reminder`, URL web |
 | `group/new/[kind]` | Form | group | 7 | post |
 | `chat/[conversationId]` | Conversation | chat | 5 | danh sách, push `new_message`, CTA Chat |
-| `search` | List | listing + group | 4 | SearchBar |
+| `search` (`?q=`) | List | listing (+ group tuần 8) | 4 | ô tìm kiếm ở Hub |
 | `notifications` | List | — | 6 | icon chuông, push mở app |
 | `profile/[id]` | Detail | profile | 6 | avatar ở tin / chat |
 | `settings/index`, `settings/language`, `settings/notifications`, `settings/delete-account`, `settings/about` | Form | profile | 6 / 12 | me |
@@ -131,6 +134,24 @@ Thứ tự tính năng theo ARCHITECTURE mục 13: Pass đồ và Việc trướ
 - [ ] Shared element ảnh card → chi tiết; event `view_listing` / `contact` (chờ `src/core/analytics` tuần 4); `associatedDomains` / `intentFilters` cho `tenapp.vn/tin/*` (tuần 11)
 - [ ] Chạy trên máy thật (dev build): 200 item seed cuộn nhanh, light / dark, 360px, font 150%, Reduce Motion, vi / en / zh
 
+## 5e. Tiến độ tuần 4 — đăng tin, quản lý tin (cập nhật 2026-10-31)
+- [x] Thư viện: `react-hook-form` **7.91.0**, `@hookform/resolvers` **6.0.2** (JS thuần, không cần dev build mới). Zustand đã có sẵn.
+- [x] Điều hướng: `(tabs)/_layout` (js-tabs của Expo Router SDK 58) + `@/ui/TabBar` tự vẽ — Trang chủ · Khám phá · Đăng (nút cam, xoay 45° khi mở) · Tin nhắn (sắp ra mắt) · Tôi; icon luôn kèm chữ, tab mở nảy nhẹ, Reduce Motion tắt chuyển động. Hub chuyển vào `(tabs)/index` + ô tìm kiếm → `search`. `tin/[slug]` giữ nguyên.
+- [x] Form "Đăng nhanh" (một engine `features/listing/form`, khác nhau ở `config.form` + `ATTRIBUTE_FIELDS`): bước 0 chọn loại tin + danh mục (`(tabs)/post`, `listing/new?feature=`) → `listing/new/[category]`: 1 Ảnh (`@/ui/ImagePicker`: chọn nhiều, ảnh bìa, xoá, trạng thái từng ảnh) → 2 Thông tin chính (tiêu đề, hình thức giá + giá — ẩn với việc làm / đồ thất lạc, mô tả) → 3 Chi tiết (attributes: enum chip, số + đơn vị, tiền, ô tích, chữ, ngày mất / nhặt bằng chip "hôm nay … 6 ngày trước"; khu mặc định `profile.site`; khu vực; ngôn ngữ mặc định theo app; nhắc quy định). RHF + `zodResolver(CreateListingInput)`, lỗi inline theo mã `errors.*`, lỗi server nhảy về đúng bước.
+- [x] Luồng lưu đúng hợp đồng `@hp/core`: có ảnh → `createListing(draft)` → nén (`src/core/upload`: cạnh dài 1280, WebP q0.8 → 0.6 → 0.4, ≤ 2 MB) + upload lần lượt (tiến độ `form.uploading`, ảnh lỗi giữ lại + "Tải lại ảnh lỗi") → `updateListing(images, status)`; không ảnh → `createListing(active)`. Lưu nháp = giữ `draft` → "Tin của tôi / Nháp". Màn kết quả theo `status` thật: active / pending_review (+ lý do `manage.reason.*`) / rejected. Haptic nhẹ khi đăng thành công.
+- [x] Sửa tin `listing/edit/[id]`: cùng form, điền từ `getMyListing` (chờ bản mới nhất), giữ ảnh cũ, upload ảnh mới, `removeListingImages` ảnh bỏ; tin nháp: Lưu nháp / Đăng tin; tin đã đăng: "Lưu thay đổi" ở mọi bước, không gửi `status`. Rời form khi đang soạn → BottomSheet "Bỏ tin đang soạn?" (`usePreventRemove`; iOS tắt vuốt quay lại khi dirty; Android Back lùi bước).
+- [x] Tự lưu bản đang soạn cục bộ (`src/core/offline` `useDraft`, Zustand + MMKV, debounce 500ms, app-only `offlineDrafts`); mở lại form → "Đã mở lại tin bạn đang soạn dở" + "Soạn lại từ đầu"; xoá khi lưu xong / bỏ tin.
+- [x] "Tin của tôi" (`my-listings?tab=`): tab Đang đăng / Chờ duyệt / Nháp / Đã đóng, dòng có ảnh bìa, badge trạng thái (`LISTING_STATUS_TONE`), giá, hết hạn, lượt xem, ghi chú chờ duyệt / bị từ chối + lý do; BottomSheet thao tác: Sửa, Đánh dấu đã bán (pass / trọ, có xác nhận), Đóng tin, Mở lại (đã bán / đóng), Gia hạn (≤ 3 ngày hoặc hết hạn), Xoá (có xác nhận). Ẩn mở lại với chờ duyệt / bị từ chối / hết hạn. Toast `manage.*`.
+- [x] Chi tiết tin: trái tim lưu tin (`@/ui/BookmarkButton`, nảy 1 → 1.3 → 1, khách → đăng nhập, toast), "Hiện số điện thoại" → "Gọi 0912 345 678" (`tel:+84…`) / `contact.no_phone`, banner tin đã bán / đóng / hết hạn (`listingDisplayStatus`) và ẩn liên hệ; chủ tin thấy Sửa tin + Tin của tôi.
+- [x] "Tin đã lưu" (`saved`), tìm kiếm (`search?q=`, tab Khám phá) dùng chung `ListingBrowser` (log_search + event `search`). Tab Tôi: hồ sơ (đổi ảnh đại diện), Tin của tôi, Tin đã lưu, ngôn ngữ (ghi `profiles.locale`), đăng xuất.
+- [x] `src/core/analytics` (`track`, `events.ts`): `view_listing`, `contact` (chat / reveal_phone / call), `create_listing`, `search`, `save_listing`, `share_listing` — chưa gửi đi đâu cho tới khi có PostHog key (`setAnalyticsSink`).
+- [x] Design system: `BookmarkButton`, `ImagePicker`, `SuccessScreen`, `MenuItem`, `TabBar`; `Notice` (tone danger, title, children), `SearchBar` dạng nút, `ServiceTile selected`, `Screen tab`. Gallery có đủ (trừ `TabBar` — xem trong app).
+- [x] i18n mới (3 ngôn ngữ): `listing.form.{basics_title, photo_failed, draft_restored, start_over, today, yesterday, site_none, suffix.*}`, `common.nav.search`, `common.settings.language`.
+- [x] Đã kiểm: `tsc --noEmit`, `lint`, `i18n:check`, `expo export --platform android` (4435 module, Hermes 9,1 MB); chạy thử luồng dữ liệu với Supabase local (OTP 0900000001): nháp → upload 2 ảnh → đăng (về `pending_review` vì `low_price`), việc làm không ảnh → `active`, lưu nháp đồ thất lạc, lỗi Zod `too_short` / `price_required`, 4 tab tin của tôi, sửa giá + bỏ ảnh + dọn Storage, đóng / mở lại, gia hạn → `too_early`, lưu / bỏ lưu + tin đã lưu, hiện SĐT.
+- [ ] Chạy trên máy thật (dev build): chọn nhiều ảnh, nén WebP, upload mạng yếu, bàn phím che ô nhập, vuốt quay lại iOS, Android Back; light / dark, 360px, font 150%, Reduce Motion, vi / en / zh.
+- [ ] Lottie confetti khi đăng thành công (chưa cài `lottie-react-native`); shared element ảnh; header Hub thu gọn khi cuộn.
+- [ ] Hàng đợi upload lũy thừa 5 lần (rule `src/core/upload`): hiện dùng retry 2 lần của `useUploadListingImage` + nút thử lại từng ảnh.
+
 ## 6. Hạ tầng kỹ thuật
 - **`app.config.ts`**: `scheme: "hoaphat"`, `ios.bundleIdentifier`, `ios.associatedDomains: ["applinks:tenapp.vn"]`, `android.intentFilters` autoVerify cho `https://tenapp.vn/tin/*` và `/nhom/*`; plugin `expo-notifications`, `expo-localization`, `expo-location` (chỉ foreground), `expo-image`, `@sentry/react-native`.
 - **Env** (`.env.example`): `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_GOONG_KEY`, `EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_WEB_URL`, `EXPO_PUBLIC_IMAGE_TRANSFORM` (mặc định `true`; staging gói Free không có Image Transformation → `false`, tải ảnh gốc). Giá trị thật trong EAS Secrets.
@@ -146,6 +167,7 @@ Ghi mỗi khi `@hp/core` / `@hp/shared` / RPC / Edge Function đổi API và mob
 | Ngày | Gói / RPC / Function | Thay đổi | Việc ở mobile | Trạng thái |
 |---|---|---|---|---|
 | 2026-10-31 | `@hp/core`, `@hp/tokens` | Mới: `SupabaseProvider`, `useSupabase` (React peer); `@hp/tokens/tailwind.preset` (NativeWind) | `AppProviders` bọc `SupabaseProvider`; `tailwind.config.js` dùng preset | xong |
+| 2026-10-31 | `@hp/core` listings-write + hooks, `@hp/shared` `CreateListingInput` / `UpdateListingInput` / `MAX_LISTING_IMAGES`, i18n `form.*` / `manage.*` / `saved.*` / `contact.*` / `state.*` / `bookmark.*` | Mới: đăng / sửa (status thật sau kiểm duyệt), upload / xoá ảnh, trạng thái (optimistic), gia hạn, hiện SĐT, tin của tôi, lưu tin; `public_listings` có tin đã bán / đóng / hết hạn (`listingDisplayStatus`) | Form "Đăng nhanh", sửa tin, tin của tôi, tin đã lưu, trái tim + hiện SĐT + banner ở chi tiết | xong |
 | 2026-10-31 | `@hp/core` listings + hooks, `@hp/shared` `priceLabel` / `readAttributes` / `featureOfCategory` | Mới: đọc tin công khai (`searchListings` cursor, `getListing(BySlug)`, `similarListings`, `recordListingView`, `logSearch`, `imageUrl(…, transform)`, `avatarUrl`, `shareUrl`) | Hub, danh sách 4 tính năng, chi tiết + `tin/[slug]`; `EXPO_PUBLIC_IMAGE_TRANSFORM` | xong |
 
 ## 8. Rủi ro riêng mobile

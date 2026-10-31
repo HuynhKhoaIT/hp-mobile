@@ -200,7 +200,20 @@
     "discard_title": "Discard this listing?",
     "discard_body": "Unsaved content will be lost.",
     "discard_confirm": "Discard",
-    "keep_editing": "Keep editing"
+    "keep_editing": "Keep editing",
+    "basics_title": "Main details",
+    "photo_failed": "Upload failed",
+    "draft_restored": "We restored the listing you were writing.",
+    "start_over": "Start over",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "site_none": "No area",
+    "suffix": {
+      "m2": "m²",
+      "km": "km",
+      "months": "months",
+      "people": "people"
+    }
   },
   "manage": {
     "title": "My listings",
@@ -239,8 +252,10 @@
       "new_account": "New account (under 7 days)",
       "low_price": "Unusually low price",
       "image_dup": "Photo duplicates another listing",
-      "report": "Reported"
-    }
+      "report": "Reported",
+      "resubmit": "Resubmitted after rejection"
+    },
+    "resubmit": "Resubmit for review"
   },
   "saved": {
     "title": "Saved listings",

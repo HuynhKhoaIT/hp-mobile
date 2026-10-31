@@ -10,4 +10,5 @@ export const lostFoundConfig: ListingFeatureConfig = {
   titleKey: 'common:feature.lostFound',
   card: { variant: 'row', estimatedHeight: 140 },
   filters: ['subcategory', 'site'],
+  form: { photos: 'optional', price: false, defaultPriceType: 'free' },
 };

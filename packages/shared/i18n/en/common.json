@@ -72,7 +72,8 @@
     "messages": "Messages",
     "me": "Me",
     "notifications": "Notifications",
-    "search_placeholder": "Search bikes, rooms, jobs…"
+    "search_placeholder": "Search bikes, rooms, jobs…",
+    "search": "Search"
   },
   "states": {
     "empty_title": "Nothing here yet",
@@ -90,5 +91,8 @@
   "coming_soon": {
     "title": "Coming soon",
     "body": "This feature is being built."
+  },
+  "settings": {
+    "language": "Language"
   }
 }

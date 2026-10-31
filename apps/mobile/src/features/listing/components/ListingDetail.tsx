@@ -1,12 +1,16 @@
 // Chi tiết tin (mọi category) — dùng cho cả `listing/[id]` (điều hướng nội bộ) và `tin/[slug]` (Universal Link).
-// Thứ tự khớp web: ảnh (hoặc ô giữ chỗ lớn) → tiêu đề, giá, badge, đăng lúc + lượt xem → mẹo an toàn
-// → thông tin (attributes) → mô tả → khu vực (gần đúng, chưa có bản đồ) → người đăng → tin tương tự;
-// thanh dính đáy: Nhắn tin (cần đăng nhập; chat ở tuần 5).
-import type { AppError, PublicListing } from '@hp/core';
+// Thứ tự khớp web: ảnh (hoặc ô giữ chỗ lớn) → tiêu đề, giá, badge, đăng lúc + lượt xem → banner tin đã bán /
+// đóng / hết hạn → mẹo an toàn → thông tin (attributes) → mô tả → khu vực (gần đúng) → người đăng → tin tương tự;
+// thanh dính đáy: Nhắn tin + Hiện số điện thoại (cần đăng nhập) · chủ tin: Sửa tin + Tin của tôi · tin không còn
+// hiện: không có liên hệ.
+import { type AppError, listingDisplayStatus, type PublicListing } from '@hp/core';
 import { useRecordListingView, useSimilarListings } from '@hp/core/react';
-import { MapPin, MessageCircle, SearchX } from 'lucide-react-native';
+import { formatVnPhone } from '@hp/shared';
+import { MapPin, MessageCircle, Pencil, Phone, SearchX } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import { track } from '@/core/analytics';
 import { formatRelative } from '@/lib/format';
 import { listingImageUrl } from '@/lib/images';
 import { usePriceText, useSiteText } from '@/lib/listing';
@@ -25,8 +29,8 @@ import {
   StickyCta,
   Text,
 } from '@/ui';
-import { useContactListing } from '../hooks';
-import { backOrHome } from '../navigation';
+import { useContactListing, useIsOwner, useRevealPhone } from '../hooks';
+import { backOrHome, openEditListing, openMyListings } from '../navigation';
 import { AttributeList } from './AttributeList';
 import { ListingRail } from './ListingRail';
 import { OwnerCard } from './OwnerCard';
@@ -70,9 +74,13 @@ function ListingDetailBody({ listing }: { listing: PublicListing }) {
   const { t, i18n } = useTranslation('listing');
   const priceText = usePriceText();
   const siteText = useSiteText();
-  const contact = useContactListing();
   const similar = useSimilarListings(listing.id);
+  const isOwner = useIsOwner(listing);
+  const display = listingDisplayStatus(listing);
   useRecordListingView(listing.id);
+  useEffect(() => {
+    track('view_listing', { listing_id: listing.id, category: listing.category });
+  }, [listing.id, listing.category]);
 
   const site = siteText(listing);
   const showLang = listing.lang !== i18n.language && i18n.exists(`common:locale.${listing.lang}`);
@@ -103,6 +111,8 @@ function ListingDetailBody({ listing }: { listing: PublicListing }) {
             {meta}
           </Text>
         </View>
+
+        {display !== 'active' ? <Notice tone="warning" title={t(`state.${display}`)} text={t('state.inactive_hint')} /> : null}
 
         <Notice tone="warning" text={t('detail.safety_tip')} />
 
@@ -145,9 +155,60 @@ function ListingDetailBody({ listing }: { listing: PublicListing }) {
         ) : null}
       </ScrollView>
 
-      <StickyCta>
-        <Button label={t('detail.contact')} icon={MessageCircle} fullWidth onPress={contact} />
-      </StickyCta>
+      {isOwner ? (
+        <StickyCta>
+          <View className="flex-row gap-2">
+            <View className="flex-1">
+              <Button label={t('form.title_edit')} icon={Pencil} fullWidth onPress={() => openEditListing(listing.id)} />
+            </View>
+            <View className="flex-1">
+              <Button label={t('form.my_listings')} variant="outline" fullWidth onPress={() => openMyListings()} />
+            </View>
+          </View>
+        </StickyCta>
+      ) : display === 'active' ? (
+        <ContactBar listing={listing} />
+      ) : null}
     </>
+  );
+}
+
+/** Liên hệ người đăng: Nhắn tin (chat tuần 5) + Hiện số điện thoại → Gọi. Khách bấm → đăng nhập rồi làm tiếp. */
+function ContactBar({ listing }: { listing: PublicListing }) {
+  const { t } = useTranslation('listing');
+  const contact = useContactListing();
+  const phone = useRevealPhone(listing);
+  return (
+    <StickyCta>
+      <View className="flex-row gap-2">
+        <View className="flex-1">
+          <Button label={t('detail.contact')} icon={MessageCircle} fullWidth onPress={() => contact(listing)} />
+        </View>
+        <View className="flex-1">
+          {phone.revealed && phone.phone ? (
+            <Button
+              label={t('contact.call', { phone: formatVnPhone(phone.phone) })}
+              icon={Phone}
+              variant="outline"
+              fullWidth
+              onPress={() => phone.phone && phone.call(phone.phone)}
+            />
+          ) : (
+            <Button
+              label={t('contact.reveal')}
+              icon={Phone}
+              variant="outline"
+              fullWidth
+              loading={phone.isPending}
+              disabled={phone.revealed}
+              onPress={phone.reveal}
+            />
+          )}
+        </View>
+      </View>
+      <Text variant="caption" tone="muted" accessibilityLiveRegion="polite">
+        {phone.revealed && !phone.phone ? t('contact.no_phone') : t('contact.hint')}
+      </Text>
+    </StickyCta>
   );
 }
