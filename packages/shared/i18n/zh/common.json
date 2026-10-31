@@ -94,5 +94,82 @@
   },
   "settings": {
     "language": "语言"
+  },
+  "home": {
+    "greeting": "{{name}}，你好",
+    "greeting_guest": "你好",
+    "subtitle": "今天需要什么？",
+    "site_label": "工作区域",
+    "site_change": "切换区域",
+    "site_sheet_title": "选择工作区域",
+    "site_sheet_hint": "“附近”信息将按此区域显示。",
+    "notifications": "通知",
+    "notifications_unread_one": "{{count}} 条未读通知",
+    "notifications_unread_other": "{{count}} 条未读通知",
+    "badge": {
+      "soon": "即将推出",
+      "new": "新",
+      "hot": "热门"
+    },
+    "tiles": {
+      "my_listings": "我的信息",
+      "all": "全部信息"
+    },
+    "banner": {
+      "label": "精选",
+      "prev": "上一张",
+      "next": "下一张",
+      "pause": "暂停自动播放",
+      "play": "自动播放",
+      "slide": "第 {{current}} / {{total}} 张"
+    },
+    "card": {
+      "guest_title": "登录以使用全部功能",
+      "guest_body": "收藏信息、联系发布者并免费发布你的信息。",
+      "onboarding_title": "完善个人资料",
+      "onboarding_body": "填写姓名和工作区域，让别人更信任你。",
+      "onboarding_cta": "立即完善",
+      "mine_title": "你的信息",
+      "active": "发布中",
+      "pending": "审核中",
+      "views": "浏览",
+      "expiring_one": "{{count}} 条信息即将到期——续期后继续显示",
+      "expiring_other": "{{count}} 条信息即将到期——续期后继续显示",
+      "rejected_one": "{{count}} 条信息未通过审核——查看原因",
+      "rejected_other": "{{count}} 条信息未通过审核——查看原因",
+      "manage": "管理信息",
+      "first_post_title": "有东西要转让？",
+      "first_post_body": "发布只需 1 分钟，周边成千上万的人都能看到。"
+    },
+    "shortcuts_title": "快速查找",
+    "shortcut": {
+      "motorbike": "摩托车",
+      "electronics": "手机、电脑",
+      "ppe": "劳保用品",
+      "home_goods": "家居用品",
+      "room_loft": "带阁楼房间",
+      "room_share": "合租",
+      "night_shift": "夜班工作",
+      "parttime": "兼职",
+      "found": "捡到物品"
+    },
+    "near_title": "{{site}}附近",
+    "for_you_title": "为你推荐",
+    "for_you_hint": "根据你选择的兴趣",
+    "latest_title": "最新发布",
+    "see_all": "查看全部",
+    "community_title": "Dung Quất 社区",
+    "stats": {
+      "users": "成员",
+      "listings": "在线信息",
+      "sites": "工作区域"
+    },
+    "safety_title": "安全交易",
+    "empty_title": "暂无信息",
+    "empty_body": "成为社区里第一个发布信息的人吧。",
+    "get_app_title": "下载 App，第一时间收到通知",
+    "get_app_body": "有人发消息、信息通过审核或附近有新房源时立即知道。",
+    "section_error": "此栏目加载失败",
+    "refreshing": "正在刷新…"
   }
 }

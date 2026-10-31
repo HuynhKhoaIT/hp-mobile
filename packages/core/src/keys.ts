@@ -9,6 +9,9 @@ export const keys = {
   /** Hồ sơ của chính mình; truyền userId để đổi tài khoản không dùng nhầm cache. */
   me: (userId?: string) => (userId ? (['hp', 'me', userId] as const) : (['hp', 'me'] as const)),
   sites: () => ['hp', 'sites'] as const,
+  banners: (placement: string, locale: string) => ['hp', 'banners', placement, locale] as const,
+  myListingStats: () => ['hp', 'my-listings', 'stats'] as const,
+  publicStats: () => ['hp', 'public-stats'] as const,
 
   listings: (filters?: Filters) => (filters ? (['hp', 'listings', filters] as const) : (['hp', 'listings'] as const)),
   listing: (id: string) => ['hp', 'listing', id] as const,

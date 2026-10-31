@@ -7,6 +7,7 @@ export { appOnly, isAppOnly, type AppOnlyFeature } from './capabilities';
 export * from './auth';
 export { toAuthError } from './auth-error';
 export * from './keys';
+export * from './home';
 export * from './listings';
 export * from './listings-write';
 export * from './result';

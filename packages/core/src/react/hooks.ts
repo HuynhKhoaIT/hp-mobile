@@ -1,8 +1,10 @@
 // Hook TanStack Query dùng chung app và web (client). Client lấy qua useSupabase(); key chỉ từ keys.ts.
 // queryFn ném AppError (unwrap) để TanStack đánh dấu lỗi; component đọc `error.code` rồi t('errors.' + code).
+import type { Locale } from '@hp/shared';
 import type { Session } from '@supabase/supabase-js';
 import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { type Banner, type BannerPlacement, getMyListingStats, getPublicStats, listBanners, type MyListingStats, type PublicStats } from '../home';
 import { keys } from '../keys';
 import {
   getListing,
@@ -15,7 +17,7 @@ import {
 } from '../listings';
 import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile, uploadAvatar } from '../profile';
 import type { AppError, Result } from '../result';
-import { listSites, type Page, type Site } from '../social';
+import { countUnreadNotifications, listSites, type Page, type Site } from '../social';
 import { useSupabase } from './provider';
 
 /** Result → data, hoặc ném AppError cho TanStack. */
@@ -177,4 +179,50 @@ function findCachedListing(qc: ReturnType<typeof useQueryClient>, id: string): P
     }
   }
   return undefined;
+}
+
+// ── Trang chủ (docs/design/home.md) ─────────────────────────────────────────────
+
+/** Banner đang hiệu lực theo placement + ngôn ngữ (cache 10 phút). */
+export function useBanners(placement: BannerPlacement, locale: Locale) {
+  const client = useSupabase();
+  return useQuery<Banner[], AppError>({
+    queryKey: keys.banners(placement, locale),
+    queryFn: () => unwrap(listBanners(client, { placement, locale })),
+    staleTime: 10 * 60_000,
+  });
+}
+
+/** Thẻ "Tin của bạn" (chỉ khi đăng nhập). Key nằm dưới myListings() → mutation tin tự làm mới. */
+export function useMyListingStats(opts: { enabled?: boolean } = {}) {
+  const client = useSupabase();
+  const { userId } = useSession();
+  return useQuery<MyListingStats, AppError>({
+    queryKey: keys.myListingStats(),
+    queryFn: () => unwrap(getMyListingStats(client)),
+    enabled: !!userId && (opts.enabled ?? true),
+    staleTime: 30_000,
+  });
+}
+
+/** Số thông báo chưa đọc cho chuông ở header (0 khi khách). */
+export function useUnreadNotificationCount() {
+  const client = useSupabase();
+  const { userId } = useSession();
+  return useQuery<number, AppError>({
+    queryKey: keys.unreadCount(),
+    queryFn: () => unwrap(countUnreadNotifications(client)),
+    enabled: !!userId,
+    staleTime: 30_000,
+  });
+}
+
+/** Số liệu cộng đồng (cache 1 giờ). */
+export function usePublicStats() {
+  const client = useSupabase();
+  return useQuery<PublicStats, AppError>({
+    queryKey: keys.publicStats(),
+    queryFn: () => unwrap(getPublicStats(client)),
+    staleTime: 60 * 60_000,
+  });
 }

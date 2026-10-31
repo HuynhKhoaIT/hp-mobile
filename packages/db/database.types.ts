@@ -127,6 +127,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"banners": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"cta_label": string | null,"ends_at": string | null,"id": string,"image_path": string | null,"is_active": boolean,"link_url": string | null,"locale": string | null,"placement": string,"sort": number,"starts_at": string | null,"subtitle": string | null,"title": string,"tone": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"cta_label"?: string | null,"ends_at"?: string | null,"id"?: string,"image_path"?: string | null,"is_active"?: boolean,"link_url"?: string | null,"locale"?: string | null,"placement": string,"sort"?: number,"starts_at"?: string | null,"subtitle"?: string | null,"title": string,"tone"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"cta_label"?: string | null,"ends_at"?: string | null,"id"?: string,"image_path"?: string | null,"is_active"?: boolean,"link_url"?: string | null,"locale"?: string | null,"placement"?: string,"sort"?: number,"starts_at"?: string | null,"subtitle"?: string | null,"title"?: string,"tone"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "banners_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "banners_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"blocks": {
                   Row: {
                     "blocked_id": string,"blocker_id": string,"created_at": string
@@ -588,6 +614,11 @@ isOneToOne: false
                            },
 "log_search":
 { Args: { "p_category"?: Database["public"]['Enums']["listing_category"],"p_query": string,"p_results"?: number }; Returns: undefined
+                           },
+"my_listing_stats":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "active": number,"drafts": number,"expiring_soon": number,"pending": number,"rejected": number,"total_views": number
+            }[]
                            },
 "public_stats":
 { Args: Record<PropertyKey, never>; Returns: {
