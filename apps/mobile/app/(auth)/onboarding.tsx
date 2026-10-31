@@ -1,6 +1,6 @@
 // Screen type: Form
 // Onboarding 3 bước (giống web): 1 ngôn ngữ (đổi ngay) · 2 tên + đồng ý điều khoản (bắt buộc, Nghị định 13/2023) ·
-// 3 nơi làm việc + quan tâm (bỏ qua được). Lưu một lần ở bước cuối (useCompleteOnboarding của @hp/core).
+// 3 nơi làm việc + quan tâm (bỏ qua được). Ảnh đại diện ở bước 2, không bắt buộc, upload ngay khi chọn. Lưu một lần ở bước cuối (useCompleteOnboarding của @hp/core).
 import { needsOnboarding } from '@hp/core';
 import { useCompleteOnboarding, useMyProfile, useSites } from '@hp/core/react';
 import { CONSENT_VERSION, FEATURES, type Feature, LOCALES, type Locale } from '@hp/shared';
@@ -8,6 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { finishAuthFlow } from '@/core/auth';
+import { AvatarPicker } from '@/features/profile/components/AvatarPicker';
 import { getLocale, setLocale } from '@/core/i18n';
 import { useErrorText } from '@/lib/errors';
 import { webPageUrl } from '@/lib/urls';
@@ -116,6 +117,7 @@ export default function OnboardingScreen() {
           <Text variant="heading" accessibilityRole="header">
             {t('auth:onboarding.name_title')}
           </Text>
+          {me.data ? <AvatarPicker userId={me.data.id} value={me.data.avatar_url} name={name} /> : null}
           <Input
             label={t('auth:onboarding.name_label')}
             hint={t('auth:onboarding.name_hint')}

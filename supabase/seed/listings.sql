@@ -90,7 +90,8 @@ begin
       v_loc := extensions.st_setsrid(extensions.st_makepoint(
                  extensions.st_x(v_site_loc::extensions.geometry) + (random() - 0.5) * 0.05,
                  extensions.st_y(v_site_loc::extensions.geometry) + (random() - 0.5) * 0.05), 4326)::extensions.geography;
-      v_created := now() - (i * interval '5 hours') - (array_position(enum_range(null::public.listing_category), v_cat) * interval '17 minutes');
+      -- lùi > 24 giờ: không tính vào giới hạn 10 tin / ngày của tài khoản seed khi thử đăng tin
+      v_created := now() - interval '25 hours' - (i * interval '5 hours') - (array_position(enum_range(null::public.listing_category), v_cat) * interval '17 minutes');
       v_price_type := 'fixed';
       v_desc := v_title || E'.\n' || case v_lang
         when 'en' then 'Contact me via in-app chat. Viewing after shift is fine.'
@@ -158,3 +159,10 @@ begin
   end loop;
 end;
 $$;
+
+-- Webhook revalidate cho web local (trg_listings_revalidate), đặt SAU khi seed tin để không bắn 500 request.
+-- Khớp REVALIDATE_SECRET trong apps/web/.env.local. Staging / prod: insert tay (docs/RUNBOOK.md), không commit giá trị thật.
+insert into public.app_settings (key, value) values
+  ('web_revalidate_url', 'http://host.docker.internal:3000/api/revalidate'),
+  ('web_revalidate_secret', 'local-dev-revalidate-secret')
+on conflict (key) do update set value = excluded.value, updated_at = now();

@@ -11,4 +11,5 @@ export const jobConfig: ListingFeatureConfig = {
   // Tin việc ít ảnh, cần đọc lương + khu → thẻ hàng ngang, một cột.
   card: { variant: 'row', estimatedHeight: 140 },
   filters: ['subcategory', 'site'],
+  form: { photos: 'optional', price: false, defaultPriceType: 'negotiable' },
 };

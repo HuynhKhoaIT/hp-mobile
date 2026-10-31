@@ -14,7 +14,9 @@ export const keys = {
   listing: (id: string) => ['hp', 'listing', id] as const,
   listingBySlug: (slug: string) => ['hp', 'listing', 'slug', slug] as const,
   similarListings: (id: string) => ['hp', 'listing', id, 'similar'] as const,
-  myListings: () => ['hp', 'my-listings'] as const,
+  myListings: (tab?: string) => (tab ? (['hp', 'my-listings', tab] as const) : (['hp', 'my-listings'] as const)),
+  myListing: (id: string) => ['hp', 'my-listing', id] as const,
+  savedListings: () => ['hp', 'bookmarks', 'listing', 'items'] as const,
 
   groups: (kind?: string, filters?: Filters) =>
     kind ? (['hp', 'groups', kind, filters ?? {}] as const) : (['hp', 'groups'] as const),

@@ -15,5 +15,9 @@
   "too_long": "Nội dung quá dài",
   "file_too_large": "Ảnh quá lớn, hãy chọn ảnh nhỏ hơn.",
   "upload_failed": "Tải ảnh lên không thành công. Thử lại nhé.",
-  "file_type": "Chỉ nhận ảnh JPG, PNG hoặc WebP."
+  "file_type": "Chỉ nhận ảnh JPG, PNG hoặc WebP.",
+  "too_short": "Quá ngắn.",
+  "price_required": "Hãy nhập giá, hoặc chọn \"Thoả thuận\" / \"Miễn phí\".",
+  "too_many_images": "Tối đa 10 ảnh.",
+  "too_early": "Chỉ gia hạn được trong 3 ngày cuối trước khi hết hạn."
 }

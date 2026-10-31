@@ -72,7 +72,8 @@
     "messages": "Tin nhắn",
     "me": "Tôi",
     "notifications": "Thông báo",
-    "search_placeholder": "Tìm xe, phòng trọ, việc làm…"
+    "search_placeholder": "Tìm xe, phòng trọ, việc làm…",
+    "search": "Tìm kiếm"
   },
   "states": {
     "empty_title": "Chưa có gì ở đây",
@@ -90,5 +91,8 @@
   "coming_soon": {
     "title": "Sắp ra mắt",
     "body": "Tính năng này đang được xây dựng."
+  },
+  "settings": {
+    "language": "Ngôn ngữ"
   }
 }

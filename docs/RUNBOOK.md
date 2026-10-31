@@ -62,6 +62,18 @@ Tạm thời OTP cố định qua tính năng số test của Supabase — khôn
 
 Không áp dụng cho prod: prod chỉ mở khi `send-otp` gửi OTP thật.
 
+### Webhook revalidate web (staging / prod)
+Trigger `trg_listings_revalidate` gọi web khi tin đổi; chưa cấu hình thì không gửi. Sau khi có domain Vercel, chạy trong SQL Editor của project (secret = `REVALIDATE_SECRET` trên Vercel, không ghi vào git):
+```sql
+insert into public.app_settings (key, value) values
+  ('web_revalidate_url', 'https://<domain>/api/revalidate'),
+  ('web_revalidate_secret', '<REVALIDATE_SECRET>')
+on conflict (key) do update set value = excluded.value, updated_at = now();
+```
+
+### Duyệt tin chờ (chưa có màn /admin/moderation)
+Tin của tài khoản < 7 ngày / có từ khoá / giá thấp bất thường vào `moderation_queue`. Moderator đăng nhập rồi gọi RPC `review_listing(listing_id, true|false, 'ghi chú')` (local: Studio → SQL với `set role authenticated` + JWT, hoặc qua `@hp/core` sau khi có màn admin). Danh sách chờ: `select * from moderation_queue where status = 'pending' order by created_at`.
+
 ### Auth hook trên staging / prod
 Dashboard → Authentication → Hooks → **Customize Access Token (JWT) Claims** → Postgres function `public.custom_access_token_hook`. Bật sau khi migration `20261030100000_core` đã lên project đó.
 

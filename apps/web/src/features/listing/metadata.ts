@@ -39,7 +39,8 @@ export async function listMetadata(scope: ListScope, searchParams: Promise<RawPa
     alternates: localeAlternates(canonicalPath, locale),
     openGraph: { type: 'website', siteName: APP_NAME, title, description, url: absoluteUrl(canonicalPath, locale), locale },
     twitter: { card: 'summary' },
-    ...(activeFilterCount(filters) > 2 ? { robots: { index: false, follow: true } } : {}),
+    // Lọc sâu (> 2 tham số) và trang kết quả tìm kiếm có từ khoá: noindex (trang mỏng, vô hạn biến thể).
+    ...(activeFilterCount(filters) > 2 || (scope === 'search' && filters.query) ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

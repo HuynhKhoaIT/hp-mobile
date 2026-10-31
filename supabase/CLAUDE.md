@@ -94,7 +94,12 @@ Hết hạn mặc định (`expires_at`): pass/room 30 ngày, job 14 ngày, lost
 ### Moderation
 - `reports(reporter_id, target_type listing|group|profile|message, target_id, reason scam|spam|inappropriate|other, detail, status open|reviewing|resolved|dismissed, resolved_by)`.
 - `blocks(blocker_id, blocked_id)`.
-- `moderation_queue(listing_id, reason, risk_score, status, reviewed_by)`.
+- `moderation_queue(listing_id, reasons text[] keyword|keyword_reject|new_account|low_price|image_dup|report, risk_score, status pending|approved|rejected, reviewed_by, reviewed_at, note)` — 1 dòng pending / tin; staff đọc / sửa; chỉ trigger / RPC ghi (migration `20261101090000_listing_write_moderation`).
+- `banned_keywords(keyword, action reject|review, categories[] | null = mọi category)` — staff đọc, admin ghi; so khớp sau `f_unaccent` theo ranh giới từ.
+- Kiểm duyệt tự động là **trigger** `trg_listings_moderate` (không Edge Function): chỉ khi người dùng đăng / sửa tin thành `active` — 10 tin / 24 giờ (`P0001 rate_limited`), từ khoá reject → `rejected`, từ khoá review / tài khoản < 7 ngày / giá < 30% trung vị 30 ngày cùng category (≥ 5 mẫu) → `pending_review`; lý do vào `listings.moderation_reasons` (nội bộ) + `trg_listings_queue` ghi hàng chờ. `review_listing(id, approve, note)` (staff): đổi trạng thái + `audit_log` (`listing.approve` / `listing.reject`) + `notifications` (`listing_approved` / `listing_rejected`, khoá ns `push`). `renew_listing(id)` (chủ, 3 ngày cuối / hết hạn). `reveal_contact(id)` (đăng nhập, 20 / giờ, `audit_log contact.reveal`).
+- `notifications.title_key` / `body_key` là khoá trong namespace i18n **`push`** (vd `listing_approved.title`), `params` điền vào placeholder.
+- `app_settings(key, value)` — cấu hình nội bộ cho trigger / cron (`web_revalidate_url`, `web_revalidate_secret`), không policy, đọc qua `app_setting(key)` (definer). Local: seed; staging / prod: insert tay (`docs/RUNBOOK.md`).
+- Webhook `trg_listings_revalidate`: tin đổi nội dung / trạng thái → `net.http_post(web_revalidate_url, {"tags": ["listing:{id}", "listings"]}, header x-revalidate-secret)`.
 - `audit_log(actor_id, action, target_type, target_id, meta jsonb)` — chỉ insert, không update/delete.
 - `rate_limits(user_id, action, window_start, count)`.
 
@@ -149,7 +154,7 @@ export default handler(async ({ req, user, admin }) => {
 | `respond-join` | App (host) | Duyệt/từ chối, thêm vào chat nhóm, notification người xin |
 | `send-push` | DB webhook insert `notifications` | Expo Push theo `push_tokens`, template theo `locale`, gộp tin nhắn 1 phút/người gửi, xoá token hỏng |
 | `match-lost-found` | DB webhook insert listings lost/found | Khớp `item_type`, ±2 ngày, < 2 km → notification cả hai |
-| `moderate-listing` | DB webhook insert listings | Rule: từ khoá cấm → `rejected`; tài khoản < 7 ngày, giá < 30% trung vị 30 ngày, việc có "đặt cọc/phí hồ sơ/chuyển khoản trước", ảnh trùng hash tin bị từ chối → `pending_review` + `moderation_queue`; 3 báo cáo/24h → ẩn tạm |
+| `moderate-listing` | DB webhook insert listings | **Chỉ phần cần dịch vụ ngoài**: ảnh trùng hash tin bị từ chối → thêm lý do `image_dup` vào hàng chờ. Luật nội dung (từ khoá, tài khoản mới, giá thấp, 10 tin / ngày) đã ở trigger `trg_listings_moderate` (chạy đồng bộ, tin rủi ro không lộ công khai). 3 báo cáo / 24h → ẩn tạm (trigger, tuần 5) |
 | `translate-content` | App | Đọc cache `listing_translations`; chưa có → API dịch → lưu cache |
 | `expire-content` | pg_cron mỗi giờ | Tin quá `expires_at` → `expired`; nhóm qua `starts_at` 3h → `completed` + mời đánh giá; nhắc gia hạn trước 3 ngày |
 | `remind-groups` | pg_cron 15 phút | Notification trước giờ đi/giờ đá 60 phút |

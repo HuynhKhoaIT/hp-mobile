@@ -4,17 +4,18 @@
 // - Fallback của <Suspense> = trang đầu KHÔNG lọc (dữ liệu cache 300s) → nằm trong static shell: HTML có tin thật ngay cả khi
 //   tắt JS hoặc với bot chỉ đọc HTML (không phải skeleton).
 // - Phần đọc searchParams (bộ lọc, H1 theo khu, kết quả lọc) chạy theo request trong <Suspense> và thay fallback khi xong.
-//   Không lọc → nội dung giống hệt fallback. Có từ khoá → không cache.
+//   Không lọc → nội dung giống hệt fallback. Có từ khoá → không cache + ghi từ khoá (log_search) sau khi trả trang (after()).
 // - "Xem thêm" đọc trang tiếp ở trình duyệt.
 import { Inbox, SearchX } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { after } from 'next/server';
 import { Suspense } from 'react';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { getPathname, Link } from '@/i18n/navigation';
 import { asLocale } from '../display';
 import { activeFilterCount, type ListFilterState, parseListFilters } from '../filters';
-import { getListPage, getPublicSites, LIST_PAGE_SIZE } from '../queries';
+import { getListPage, getPublicSites, LIST_PAGE_SIZE, logSearchTerm } from '../queries';
 import { type ListScope, scopeInfo } from '../scope';
 import { ListFilters } from './list-filters';
 import { ListingGrid } from './listing-grid';
@@ -49,6 +50,10 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
     getListPage({ categories: filters.category ? [filters.category] : categories, site: filters.site, query: filters.query }),
     getPublicSites(),
   ]);
+  if (filters.query) {
+    const results = page.items.length;
+    after(() => logSearchTerm(filters.query, results, filters.category ?? undefined).catch(() => undefined));
+  }
   const siteName = sites.find((s) => s.code === filters.site)?.name;
   const heading = siteName ? t(`web.listing.${seoKey}.heading_site`, { site: siteName }) : t(`web.listing.${seoKey}.title`);
   const featureName = feature ? t(`common.feature.${feature}`) : t('listing.list.title_all');
@@ -58,7 +63,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-fg">{heading}</h1>
-        <PostListingButton />
+        <PostListingButton feature={feature} />
       </div>
 
       <ListFilters
@@ -92,7 +97,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
             icon={Inbox}
             title={t('listing.list.empty_title')}
             description={t('listing.list.empty_body')}
-            action={<PostListingButton />}
+            action={<PostListingButton feature={feature} />}
           />
         )
       ) : (

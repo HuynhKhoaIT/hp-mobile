@@ -1,13 +1,12 @@
 // Layout
 // Gốc app: CSS NativeWind, i18n, providers (src/core/providers.tsx). Splash giữ tới khi font Be Vietnam Pro tải xong.
 import '../global.css';
-import {
-  BeVietnamPro_400Regular,
-  BeVietnamPro_500Medium,
-  BeVietnamPro_600SemiBold,
-  BeVietnamPro_700Bold,
-  useFonts,
-} from '@expo-google-fonts/be-vietnam-pro';
+// Import từng độ đậm (đường dẫn con): import gói gốc kéo cả 18 file font (~2,3 MB) vào bundle.
+import { BeVietnamPro_400Regular } from '@expo-google-fonts/be-vietnam-pro/400Regular';
+import { BeVietnamPro_500Medium } from '@expo-google-fonts/be-vietnam-pro/500Medium';
+import { BeVietnamPro_600SemiBold } from '@expo-google-fonts/be-vietnam-pro/600SemiBold';
+import { BeVietnamPro_700Bold } from '@expo-google-fonts/be-vietnam-pro/700Bold';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';

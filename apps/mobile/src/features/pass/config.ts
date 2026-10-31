@@ -11,4 +11,5 @@ export const passConfig: ListingFeatureConfig = {
   // Đồ cần nhìn ảnh → lưới 2 cột.
   card: { variant: 'grid', estimatedHeight: 300 },
   filters: ['subcategory', 'site'],
+  form: { photos: 'recommended', price: true, defaultPriceType: 'fixed' },
 };

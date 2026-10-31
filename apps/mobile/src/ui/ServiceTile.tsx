@@ -10,12 +10,19 @@ export type ServiceTileProps = {
   service: ServiceKey;
   label: string;
   onPress?: () => void;
+  /** Ô đang chọn (bước chọn loại tin): viền primary + accessibilityState.selected. */
+  selected?: boolean;
   className?: string;
 };
 
-export function ServiceTile({ service, label, onPress, className }: ServiceTileProps) {
+export function ServiceTile({ service, label, onPress, selected, className }: ServiceTileProps) {
   return (
-    <Card onPress={onPress} accessibilityLabel={label} className={['min-h-24 items-center gap-2', className].filter(Boolean).join(' ')}>
+    <Card
+      onPress={onPress}
+      accessibilityLabel={label}
+      selected={selected}
+      className={['min-h-24 items-center gap-2 border-2', selected ? 'border-primary' : 'border-transparent', className].filter(Boolean).join(' ')}
+    >
       <View className={`h-12 w-12 items-center justify-center rounded-full ${SERVICE[service].soft}`}>
         <Icon icon={SERVICE[service].icon} service={service} size="tab" />
       </View>

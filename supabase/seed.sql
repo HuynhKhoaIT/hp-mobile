@@ -39,6 +39,10 @@ where u.id::text like '00000000-0000-4000-8000-00000000000_'
 update public.profiles set site = 'hoa_phat_dung_quat', consent_at = now(), consent_version = 'seed'
 where id::text like '00000000-0000-4000-8000-00000000000_'
   and id <> '00000000-0000-4000-8000-000000000002';   -- 0900000002 thử luồng onboarding
+-- Hồ sơ tạo bởi trigger lúc seed (created_at = now) → đặt bằng ngày tạo auth.users để không dính luật kiểm duyệt
+-- "tài khoản < 7 ngày" (trg_listings_moderate). Riêng 0900000002 giữ là tài khoản mới.
+update public.profiles p set created_at = u.created_at from auth.users u
+where p.id = u.id and p.id::text like '00000000-0000-4000-8000-00000000000_' and p.id <> '00000000-0000-4000-8000-000000000002';
 update public.profiles set is_banned = true where id = '00000000-0000-4000-8000-000000000003';   -- banned
 update public.profiles set role = 'moderator' where id = '00000000-0000-4000-8000-000000000004';
 update public.profiles set role = 'admin' where id = '00000000-0000-4000-8000-000000000005';

@@ -72,7 +72,8 @@
     "messages": "消息",
     "me": "我的",
     "notifications": "通知",
-    "search_placeholder": "搜索摩托车、房间、工作…"
+    "search_placeholder": "搜索摩托车、房间、工作…",
+    "search": "搜索"
   },
   "states": {
     "empty_title": "这里还没有内容",
@@ -90,5 +91,8 @@
   "coming_soon": {
     "title": "即将推出",
     "body": "此功能正在开发中。"
+  },
+  "settings": {
+    "language": "语言"
   }
 }

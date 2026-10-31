@@ -2,10 +2,12 @@
 // (readAttributes) → mô tả → khu vực (gần đúng ~300 m) → người đăng → Nhắn tin / Chia sẻ → tin tương tự.
 // ≥ 1024px: 2 cột — gallery + thông số trái; tiêu đề, giá, người đăng, nút dính bên phải. Điện thoại: một cột đúng thứ tự trên
 // (khối phải dùng `contents` + `order` để xen giữa các khối trái mà không lặp DOM).
-// Trang công khai: không SĐT, không toạ độ, không địa chỉ chi tiết; tên người đăng đã rút gọn ở view.
-import type { PublicListing } from '@hp/core';
+// Trang công khai: không SĐT (chỉ lộ sau "Hiện số" ở client), không toạ độ, không địa chỉ chi tiết; tên người đăng đã rút gọn ở view.
+// Tin đã bán / đóng / hết hạn (≤ 30 ngày — sau đó page chuyển sang 410): banner state.* + ẩn liên hệ, không JSON-LD
+// (Google yêu cầu gỡ JobPosting / Offer khi hết hiệu lực), vẫn có tin tương tự.
+import { listingDisplayStatus, type PublicListing } from '@hp/core';
 import { formatDistance, formatRelative, priceLabel, readAttributes } from '@hp/shared';
-import { ChevronLeft, MapPin, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, Info, MapPin, ShieldAlert } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Badge } from '@/components/shared/badge';
 import { JsonLd } from '@/components/shared/json-ld';
@@ -15,6 +17,7 @@ import { attributeText, asLocale, priceText } from '../display';
 import { configOfCategory } from '../features';
 import { listingJsonLd } from '../json-ld';
 import { getSimilarListings } from '../queries';
+import { BookmarkButton } from './bookmark-button';
 import { ListingActions } from './listing-actions';
 import { ListingGallery } from './listing-gallery';
 import { ListingGrid } from './listing-grid';
@@ -28,7 +31,11 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
   const attributes = readAttributes(listing.category, listing.attributes);
   const similar = await getSimilarListings(listing.id);
   const categoryName = t(`common.category.${listing.category}`);
-  const jsonLd = listingJsonLd(listing, cfg.jsonLd, { url: absoluteUrl(`/tin/${listing.slug}`, locale), categoryName });
+  const displayStatus = listingDisplayStatus(listing);
+  const active = displayStatus === 'active';
+  const jsonLd = active
+    ? listingJsonLd(listing, cfg.jsonLd, { url: absoluteUrl(`/tin/${listing.slug}`, locale), categoryName })
+    : null;
 
   return (
     <article className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
@@ -42,6 +49,16 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
           {t('listing.detail.back_to_list')}
         </Link>
       </nav>
+
+      {!active ? (
+        <div role="status" className="flex items-start gap-3 rounded-md bg-surface-2 p-4 text-md text-fg">
+          <Info strokeWidth={1.75} className="mt-0.5 size-5 shrink-0 text-muted" aria-hidden />
+          <div className="flex flex-col gap-1">
+            <p className="font-semibold">{t(`listing.state.${displayStatus}`)}</p>
+            <p className="text-muted">{t('listing.state.inactive_hint')}</p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
         <div className="order-1 lg:col-span-7 lg:row-start-1">
@@ -58,6 +75,7 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
         <div className="contents lg:sticky lg:top-20 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
           <header className="order-2 flex flex-col gap-2">
             <div className="flex flex-wrap gap-1">
+              {!active ? <Badge tone="danger">{t(`common.status.${displayStatus}`)}</Badge> : null}
               <Badge>{categoryName}</Badge>
               {listing.lang !== locale ? (
                 <Badge tone="primary" lang={listing.lang}>
@@ -65,9 +83,12 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                 </Badge>
               ) : null}
             </div>
-            <h1 lang={listing.lang} className="text-2xl font-semibold text-fg">
-              {listing.title}
-            </h1>
+            <div className="flex items-start gap-3">
+              <h1 lang={listing.lang} className="flex-1 text-2xl font-semibold text-fg">
+                {listing.title}
+              </h1>
+              <BookmarkButton listingId={listing.id} />
+            </div>
             <p className="text-2xl font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
             <p className="text-sm text-muted">
               <time dateTime={listing.created_at}>
@@ -87,7 +108,13 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
             <PosterCard listing={listing} locale={locale} />
           </div>
           <div className="order-8">
-            <ListingActions listingId={listing.id} slug={listing.slug} title={listing.title} />
+            <ListingActions
+              listingId={listing.id}
+              slug={listing.slug}
+              title={listing.title}
+              ownerId={listing.owner_id}
+              active={active}
+            />
           </div>
         </div>
 

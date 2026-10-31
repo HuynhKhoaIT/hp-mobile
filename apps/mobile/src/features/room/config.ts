@@ -10,4 +10,5 @@ export const roomConfig: ListingFeatureConfig = {
   titleKey: 'common:feature.room',
   card: { variant: 'grid', estimatedHeight: 300 },
   filters: ['subcategory', 'site'],
+  form: { photos: 'recommended', price: true, defaultPriceType: 'fixed' },
 };

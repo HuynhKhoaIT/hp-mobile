@@ -15,5 +15,9 @@
   "too_long": "内容过长",
   "file_too_large": "图片太大，请选择更小的图片。",
   "upload_failed": "图片上传失败，请重试。",
-  "file_type": "仅支持 JPG、PNG 或 WebP 图片。"
+  "file_type": "仅支持 JPG、PNG 或 WebP 图片。",
+  "too_short": "太短了。",
+  "price_required": "请输入价格，或选择“面议” / “免费”。",
+  "too_many_images": "最多 10 张图片。",
+  "too_early": "只能在到期前最后 3 天内续期。"
 }

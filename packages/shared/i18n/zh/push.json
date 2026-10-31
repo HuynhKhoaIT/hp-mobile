@@ -1,1 +1,10 @@
-{}
+{
+  "listing_approved": {
+    "title": "信息已通过审核",
+    "body": "你的信息“{{title}}”已公开显示。"
+  },
+  "listing_rejected": {
+    "title": "信息未通过审核",
+    "body": "你的信息“{{title}}”违反规定，未能发布。你可以修改后重新发布。"
+  }
+}

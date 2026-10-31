@@ -23,7 +23,21 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "audit_log": {
+            "app_settings": {
+                  Row: {
+                    "key": string,"updated_at": string,"value": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "key": string,"updated_at"?: string,"value": string
+                  }
+                  Update: {
+                    "key"?: string,"updated_at"?: string,"value"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"audit_log": {
                   Row: {
                     "action": string,"actor_id": string | null,"created_at": string,"id": number,"meta": NonNullable<Json>,"target_id": string | null,"target_type": string | null
                   }
@@ -82,6 +96,32 @@ isOneToOne: false
     },{
       foreignKeyName: "badge_requests_user_id_fkey"
       columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"banned_keywords": {
+                  Row: {
+                    "action": string,"categories": (Database["public"]['Enums']["listing_category"])[] | null,"created_at": string,"created_by": string | null,"id": string,"keyword": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action"?: string,"categories"?: (Database["public"]['Enums']["listing_category"])[] | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"keyword": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "action"?: string,"categories"?: (Database["public"]['Enums']["listing_category"])[] | null,"created_at"?: string,"created_by"?: string | null,"id"?: string,"keyword"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "banned_keywords_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "banned_keywords_created_by_fkey"
+      columns: ["created_by"]
 isOneToOne: false
       referencedRelation: "public_profiles"
       referencedColumns: ["id"]
@@ -217,14 +257,14 @@ isOneToOne: false
                   ]
                 },"listings": {
                   Row: {
-                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"deleted_at": string | null,"description": string | null,"expires_at": string | null,"id": string,"images": (string)[],"lang": string,"location": unknown,"owner_id": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
+                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"deleted_at": string | null,"description": string | null,"expires_at": string | null,"id": string,"images": (string)[],"lang": string,"location": unknown,"moderation_reasons": (string)[],"owner_id": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id": string,"site"?: string | null,"slug": string,"status"?: Database["public"]['Enums']["listing_status"],"title": string,"updated_at"?: string,"view_count"?: number
+                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title": string,"updated_at"?: string,"view_count"?: number
                   }
                   Update: {
-                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category"?: Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title"?: string,"updated_at"?: string,"view_count"?: number
+                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category"?: Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title"?: string,"updated_at"?: string,"view_count"?: number
                   }
                   Relationships: [
                     {
@@ -245,6 +285,44 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "sites"
       referencedColumns: ["code"]
+    }
+                  ]
+                },"moderation_queue": {
+                  Row: {
+                    "created_at": string,"id": string,"listing_id": string,"note": string | null,"reasons": (string)[],"reviewed_at": string | null,"reviewed_by": string | null,"risk_score": number,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"listing_id": string,"note"?: string | null,"reasons": (string)[],"reviewed_at"?: string | null,"reviewed_by"?: string | null,"risk_score"?: number,"status"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"listing_id"?: string,"note"?: string | null,"reasons"?: (string)[],"reviewed_at"?: string | null,"reviewed_by"?: string | null,"risk_score"?: number,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "moderation_queue_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "moderation_queue_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "public_listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "moderation_queue_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "moderation_queue_reviewed_by_fkey"
+      columns: ["reviewed_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
     }
                   ]
                 },"notifications": {
@@ -390,7 +468,7 @@ isOneToOne: false
           Views: {
             "public_listings": {
                   Row: {
-                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"description": string | null,"distance_to_site_m": number | null,"expires_at": string | null,"id": string,"images": (string)[],"lang": string,"lat": number | null,"lng": number | null,"owner_avatar_url": string | null,"owner_badges": (string)[],"owner_id": string,"owner_name": string | null,"owner_rating_avg": number,"owner_rating_count": number,"owner_since": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"site_name": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
+                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"description": string | null,"distance_to_site_m": number | null,"expires_at": string | null,"id": string,"images": (string)[],"inactive_since": string | null,"is_expired": boolean | null,"lang": string,"lat": number | null,"lng": number | null,"owner_avatar_url": string | null,"owner_badges": (string)[],"owner_id": string,"owner_name": string | null,"owner_rating_avg": number,"owner_rating_count": number,"owner_since": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"site_name": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
                   }
                   ComputedFields: never
                   Relationships: [
@@ -437,7 +515,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "assert_rate_limit":
+            "app_setting":
+{ Args: { "p_key": string }; Returns: string
+                           },
+"assert_rate_limit":
 { Args: { "p_action": string,"p_key": string,"p_max": number,"p_window_seconds": number }; Returns: undefined
                            },
 "custom_access_token_hook":
@@ -460,6 +541,8 @@ isOneToOne: false
 "expires_at": string | null,
 "id": string,
 "images": (string)[],
+"inactive_since": string | null,
+"is_expired": boolean | null,
 "lang": string,
 "lat": number | null,
 "lng": number | null,
@@ -506,8 +589,22 @@ isOneToOne: false
 "log_search":
 { Args: { "p_category"?: Database["public"]['Enums']["listing_category"],"p_query": string,"p_results"?: number }; Returns: undefined
                            },
+"public_stats":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "listings": number,"sites": number,"users": number
+            }[]
+                           },
 "record_listing_view":
 { Args: { "p_listing_id": string }; Returns: undefined
+                           },
+"renew_listing":
+{ Args: { "p_listing_id": string }; Returns: string
+                           },
+"reveal_contact":
+{ Args: { "p_listing_id": string }; Returns: string
+                           },
+"review_listing":
+{ Args: { "p_approve": boolean,"p_listing_id": string,"p_note"?: string }; Returns: undefined
                            },
 "search_listings":
 { Args: { "p_attributes"?: Json,"p_categories"?: (Database["public"]['Enums']["listing_category"])[],"p_cursor"?: string,"p_lat"?: number,"p_limit"?: number,"p_lng"?: number,"p_price_max"?: number,"p_price_min"?: number,"p_query"?: string,"p_radius_m"?: number,"p_site"?: string }; Returns: {
@@ -520,6 +617,8 @@ isOneToOne: false
 "expires_at": string | null,
 "id": string,
 "images": (string)[],
+"inactive_since": string | null,
+"is_expired": boolean | null,
 "lang": string,
 "lat": number | null,
 "lng": number | null,
@@ -562,6 +661,8 @@ isOneToOne: false
 "expires_at": string | null,
 "id": string,
 "images": (string)[],
+"inactive_since": string | null,
+"is_expired": boolean | null,
 "lang": string,
 "lat": number | null,
 "lng": number | null,
@@ -590,6 +691,11 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"sitemap_listings":
+{ Args: { "p_page"?: number }; Returns: {
+              "slug": string,"updated_at": string
+            }[]
+                           },
 "slugify":
 { Args: { "p_text": string }; Returns: string
                            }

@@ -8,12 +8,14 @@ export type CardProps = {
   children?: ReactNode;
   onPress?: () => void;
   accessibilityLabel?: string;
+  /** Card chọn được (vd ô dịch vụ ở bước chọn loại tin). */
+  selected?: boolean;
   /** false: bỏ padding (ảnh tràn mép như ListingCard). */
   padded?: boolean;
   className?: string;
 };
 
-export function Card({ children, onPress, accessibilityLabel, padded = true, className }: CardProps) {
+export function Card({ children, onPress, accessibilityLabel, selected, padded = true, className }: CardProps) {
   const press = usePressScale();
   const box = ['rounded-md bg-surface shadow-card', padded && 'p-3', className].filter(Boolean).join(' ');
   if (!onPress) return <View className={box}>{children}</View>;
@@ -22,6 +24,7 @@ export function Card({ children, onPress, accessibilityLabel, padded = true, cla
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
+        accessibilityState={selected === undefined ? undefined : { selected }}
         onPress={onPress}
         onPressIn={press.onPressIn}
         onPressOut={press.onPressOut}

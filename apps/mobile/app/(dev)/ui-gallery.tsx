@@ -4,7 +4,7 @@
 import type { PublicListing } from '@hp/core';
 import { LOCALES, type ListingCategory, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
-import { Bell, MessageCircle, Plus, Search, Share2 } from 'lucide-react-native';
+import { Bell, Heart, ListChecks, LogOut, MessageCircle, Plus, Search, Share2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -13,6 +13,7 @@ import { type ThemePref, useSettings } from '@/core/settings';
 import {
   Avatar,
   Badge,
+  BookmarkButton,
   BottomSheet,
   Button,
   type ButtonVariant,
@@ -28,9 +29,12 @@ import {
   Header,
   IconButton,
   ImageGallery,
+  ImagePicker,
+  type ImagePickerItem,
   Input,
   ListingCard,
   ListingCover,
+  MenuItem,
   Notice,
   MultiSelect,
   PriceInput,
@@ -44,6 +48,7 @@ import {
   SkeletonListingDetail,
   StaggerItem,
   StickyCta,
+  SuccessScreen,
   Text,
   type TextTone,
   type TextVariant,
@@ -77,10 +82,17 @@ function sampleListing(over: Partial<PublicListing>): PublicListing {
     lat: null, lng: null, distance_to_site_m: 1200, address_text: null, images: [], lang: 'vi', view_count: 12,
     expires_at: null, created_at: HOUR_AGO, updated_at: HOUR_AGO, owner_id: 'owner', owner_name: 'An', owner_avatar_url: null,
     owner_badges: ['phone'], owner_rating_avg: 4.6, owner_rating_count: 5, owner_since: '2026-01-01T00:00:00Z',
+    is_expired: false, inactive_since: null,
     ...over,
   };
 }
 const SAMPLE_CATEGORIES: ListingCategory[] = ['pass_vehicle', 'room_rent', 'job_parttime', 'lost'];
+// Ảnh mẫu cho ImagePicker: ô màu (không có file thật) với đủ trạng thái đã tải / đang tải / lỗi.
+const SAMPLE_PHOTOS: ImagePickerItem[] = [
+  { key: 'a', uri: '', status: 'done' },
+  { key: 'b', uri: '', status: 'uploading' },
+  { key: 'c', uri: '', status: 'error' },
+];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -105,6 +117,9 @@ export default function UiGalleryScreen() {
   const [search, setSearch] = useState('');
   const [chip, setChip] = useState<FeatureKey>('pass');
   const [area, setArea] = useState<string>('');
+  const [saved, setSaved] = useState(false);
+  const [tile, setTile] = useState<FeatureKey>('pass');
+  const [photos, setPhotos] = useState<ImagePickerItem[]>(SAMPLE_PHOTOS);
   const samples = [
     sampleListing({ id: 's1', title: t('dev.sample') }),
     sampleListing({ id: 's2', category: 'room_rent', title: t('dev.sample'), price: 1_800_000, lang: 'en' }),
@@ -294,6 +309,74 @@ export default function UiGalleryScreen() {
             </Card>
           </StaggerItem>
         ))}
+      </Section>
+
+      <Section title="BookmarkButton · MenuItem">
+        <Row gap={2}>
+          <BookmarkButton saved={saved} onToggle={setSaved} labels={{ save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') }} />
+          <BookmarkButton saved variant="filled" onToggle={() => undefined} labels={{ save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') }} />
+          <BookmarkButton saved={false} disabled onToggle={() => undefined} labels={{ save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') }} />
+        </Row>
+        <Card padded={false}>
+          <MenuItem icon={ListChecks} label={t('listing:manage.title')} value="3" onPress={() => toast.show(t('listing:manage.title'))} />
+          <Divider />
+          <MenuItem icon={Heart} label={t('listing:saved.title')} onPress={() => toast.show(t('listing:saved.title'))} />
+          <Divider />
+          <MenuItem icon={LogOut} label={t('auth:sign_out')} tone="danger" chevron={false} onPress={() => toast.show(t('auth:signed_out'))} />
+        </Card>
+      </Section>
+
+      <Section title="ImagePicker">
+        <ImagePicker
+          items={photos}
+          max={10}
+          onAdd={() => toast.show(t('listing:form.add_photo'))}
+          onRemove={(key) => setPhotos((p) => p.filter((x) => x.key !== key))}
+          onMakeCover={(key) => setPhotos((p) => [...p.filter((x) => x.key === key), ...p.filter((x) => x.key !== key)])}
+          onRetry={(key) => setPhotos((p) => p.map((x) => (x.key === key ? { ...x, status: 'done' } : x)))}
+        />
+        <ImagePicker items={[]} max={10} onAdd={() => undefined} onRemove={() => undefined} onMakeCover={() => undefined} disabled />
+      </Section>
+
+      <Section title="SuccessScreen · Notice">
+        <SuccessScreen
+          title={t('listing:form.success_title')}
+          description={t('listing:form.success_body')}
+          primary={{ label: t('listing:form.view_listing'), onPress: () => toast.show(t('listing:form.view_listing')) }}
+          secondary={[{ label: t('listing:form.post_another'), onPress: () => toast.show(t('listing:form.post_another')) }]}
+        />
+        <SuccessScreen
+          tone="warning"
+          title={t('listing:form.pending_title')}
+          description={t('listing:form.pending_body')}
+          primary={{ label: t('listing:form.my_listings'), onPress: () => toast.show(t('listing:form.my_listings')) }}
+        >
+          <Row gap={1} justify="center">
+            <Badge label={t('listing:manage.reason.new_account')} tone="warning" />
+          </Row>
+        </SuccessScreen>
+        <SuccessScreen
+          tone="danger"
+          title={t('listing:form.rejected_title')}
+          description={t('listing:form.rejected_body')}
+          primary={{ label: t('listing:form.title_edit'), onPress: () => toast.show(t('listing:form.title_edit')) }}
+        />
+        <Notice tone="danger" text={t('errors:upload_failed')} />
+        <Notice tone="warning" title={t('listing:state.sold')} text={t('listing:state.inactive_hint')} />
+        <Notice text={t('listing:form.draft_restored')}>
+          <Button size="sm" variant="ghost" label={t('listing:form.start_over')} className="-ml-4" />
+        </Notice>
+      </Section>
+
+      <Section title="SearchBar (button) · ServiceTile selected">
+        <SearchBar onPress={() => toast.show(t('nav.search'))} placeholder={t('nav.search_placeholder')} />
+        <View className="flex-row flex-wrap">
+          {FEATURE_KEYS.slice(0, 4).map((f) => (
+            <View key={f} className="w-1/2 p-1.5">
+              <ServiceTile service={f} label={t(`feature.${f}`)} selected={tile === f} onPress={() => setTile(f)} />
+            </View>
+          ))}
+        </View>
       </Section>
 
       <Section title="Chip">

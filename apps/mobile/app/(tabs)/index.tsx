@@ -1,24 +1,23 @@
 // Screen type: Hub
-// Trang chủ: header xanh (chào + đăng nhập / đăng xuất) → lưới 6 dịch vụ → "Tin mới" (quanh khu của người dùng
-// nếu đã chọn khu) → dòng miễn trừ. Tuần sau chuyển vào (tabs)/index khi có TabBar; ô tìm kiếm khi có màn search.
+// Trang chủ (tab đầu): header xanh (chào + ảnh đại diện → tab Tôi, hoặc nút Đăng nhập) + ô tìm kiếm (→ màn Tìm kiếm)
+// → lưới 6 dịch vụ → "Tin mới" (quanh khu của người dùng nếu đã chọn khu) → dòng miễn trừ.
 import { useListingList, useMyProfile, useSites } from '@hp/core/react';
 import { FEATURES, type Feature, type ListingFeature } from '@hp/shared';
 import { Link, router } from 'expo-router';
-import { LogOut } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
-import { requireAuth, signOutApp } from '@/core/auth';
+import { requireAuth } from '@/core/auth';
 import { ListingRail } from '@/features/listing/components/ListingRail';
 import { usePostListing } from '@/features/listing/hooks';
-import { LISTING_ROUTE_SLUG, openListingList } from '@/features/listing/navigation';
+import { LISTING_ROUTE_SLUG, openListingList, openSearch } from '@/features/listing/navigation';
 import { profileAvatarUrl } from '@/lib/images';
 import {
   Avatar,
   Button,
   EmptyState,
   ErrorState,
-  IconButton,
   Screen,
+  SearchBar,
   SectionHeader,
   ServiceTile,
   Skeleton,
@@ -44,14 +43,9 @@ export default function HubScreen() {
   const siteName = site ? sites.data?.find((s) => s.code === site)?.name : undefined;
   const post = usePostListing();
 
-  const signOut = async () => {
-    await signOutApp();
-    toast.show(t('auth:signed_out'));
-  };
-
   return (
-    <Screen scroll edgeToEdge>
-      <View className="gap-1 rounded-b-xl bg-primary px-4 pb-6 pt-4">
+    <Screen scroll edgeToEdge tab>
+      <View className="gap-3 rounded-b-xl bg-primary px-4 pb-5 pt-4">
         <View className="min-h-12 flex-row items-center gap-3">
           <View className="flex-1 gap-1">
             <Text variant="heading" tone="onPrimary" accessibilityRole="header">
@@ -62,10 +56,15 @@ export default function HubScreen() {
           {me.isLoading ? (
             <Skeleton className="h-10 w-10 rounded-full" />
           ) : me.data ? (
-            <View className="flex-row items-center gap-1">
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t('common:nav.me')}
+              hitSlop={4}
+              onPress={() => router.navigate('/me')}
+              className="h-11 w-11 items-center justify-center"
+            >
               <Avatar name={me.data.full_name || '?'} uri={profileAvatarUrl(me.data.avatar_url)} />
-              <IconButton icon={LogOut} tone="onPrimary" accessibilityLabel={t('auth:sign_out')} onPress={() => void signOut()} />
-            </View>
+            </Pressable>
           ) : (
             <Button
               size="sm"
@@ -75,6 +74,7 @@ export default function HubScreen() {
             />
           )}
         </View>
+        <SearchBar onPress={openSearch} placeholder={t('common:nav.search_placeholder')} />
       </View>
 
       {/* Lưới 3 cột: ô w-1/3 + p-1.5, khung px-2.5 → lề màn 16, khoảng cách ô 12. */}
