@@ -10,6 +10,7 @@ import { routing } from '@/i18n/routing';
 
 export function LocaleSwitcher() {
   const t = useTranslations('web');
+  const tCommon = useTranslations('common');
   const current = useLocale();
   const pathname = usePathname();
   const router = useRouter();
@@ -34,7 +35,7 @@ export function LocaleSwitcher() {
           className={current === locale ? 'bg-primary-light text-primary' : 'text-muted'}
           onClick={() => change(locale)}
         >
-          {t(`locale.${locale}`)}
+          {tCommon(`locale.${locale}`)}
         </Button>
       ))}
     </div>

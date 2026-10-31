@@ -5,7 +5,7 @@
 // Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card, bg-service-pass-soft + text-service-pass.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { colors, font, radius, serviceColors, shadow, type ColorScheme, type ColorToken } from '../src/index.ts';
+import { aspect, colors, font, radius, serviceColors, shadow, type ColorScheme, type ColorToken } from '../src/index.ts';
 
 // Tên token → tên biến CSS (class Tailwind). text* đổi tên để tránh "text-text".
 const COLOR_NAME: Record<ColorToken, string> = {
@@ -53,6 +53,7 @@ const lines = [
   ]),
   '',
   `  --shadow-card: ${shadow.card.x}px ${shadow.card.y}px ${shadow.card.blur}px ${shadow.card.color};`,
+  ...Object.entries(aspect).map(([k, v]) => `  --aspect-${k}: ${v};`),
   '  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;',
   '  --font-zh: var(--font-noto-sans-sc), var(--font-be-vietnam-pro), sans-serif;',
   '}',
@@ -114,6 +115,7 @@ const preset = {
     },
     extend: {
       boxShadow: { card: `${shadow.card.x}px ${shadow.card.y}px ${shadow.card.blur}px ${shadow.card.color}` },
+      aspectRatio: aspect,
     },
   },
 };

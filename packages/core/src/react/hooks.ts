@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { keys } from '../keys';
 import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile } from '../profile';
 import type { AppError, Result } from '../result';
-import { listSites } from '../social';
+import { listSites, type Site } from '../social';
 import { useSupabase } from './provider';
 
 /** Result → data, hoặc ném AppError cho TanStack. */
@@ -56,7 +56,7 @@ export function useMyProfile() {
 /** Danh mục địa điểm làm việc (admin quản lý; đổi hiếm → cache 1 giờ). */
 export function useSites() {
   const client = useSupabase();
-  return useQuery({
+  return useQuery<Site[], AppError>({
     queryKey: keys.sites(),
     queryFn: () => unwrap(listSites(client)),
     staleTime: 60 * 60_000,

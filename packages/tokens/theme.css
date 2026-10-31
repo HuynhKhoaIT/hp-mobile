@@ -51,6 +51,8 @@
   --text-3xl--line-height: 1.4;
 
   --shadow-card: 0px 1px 3px rgba(0,0,0,0.06);
+  --aspect-card: 4 / 3;
+  --aspect-avatar: 1 / 1;
   --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
   --font-zh: var(--font-noto-sans-sc), var(--font-be-vietnam-pro), sans-serif;
 }

@@ -10,7 +10,9 @@
     "share": "Chia sẻ",
     "report": "Báo cáo",
     "block": "Chặn",
-    "close": "Đóng"
+    "close": "Đóng",
+    "back": "Quay lại",
+    "done": "Xong"
   },
   "category": {
     "pass_electronics": "Điện thoại, máy tính, điện tử",
@@ -76,5 +78,13 @@
     "empty_title": "Chưa có gì ở đây",
     "error_title": "Không tải được dữ liệu",
     "offline": "Bạn đang ngoại tuyến"
+  },
+  "select": {
+    "placeholder": "Chọn"
+  },
+  "locale": {
+    "vi": "Tiếng Việt",
+    "en": "English",
+    "zh": "中文"
   }
 }

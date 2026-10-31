@@ -13,11 +13,6 @@
     "light": "浅色",
     "dark": "深色"
   },
-  "locale": {
-    "vi": "Tiếng Việt",
-    "en": "English",
-    "zh": "中文"
-  },
   "footer": {
     "rights": "© {{year}} {{appName}}"
   },

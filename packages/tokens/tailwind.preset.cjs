@@ -167,6 +167,10 @@ module.exports = {
     "extend": {
       "boxShadow": {
         "card": "0px 1px 3px rgba(0,0,0,0.06)"
+      },
+      "aspectRatio": {
+        "card": "4 / 3",
+        "avatar": "1 / 1"
       }
     }
   },

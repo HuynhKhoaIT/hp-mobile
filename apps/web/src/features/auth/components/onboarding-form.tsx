@@ -75,7 +75,7 @@ export function OnboardingForm({ profile, onDone }: { profile: MyProfile; onDone
           <div className="flex flex-wrap gap-2">
             {LOCALES.map((l) => (
               <ChoiceChip key={l} lang={l} selected={locale === l} onClick={() => setLocale(l)}>
-                {t(`web.locale.${l}`)}
+                {t(`common.locale.${l}`)}
               </ChoiceChip>
             ))}
           </div>
