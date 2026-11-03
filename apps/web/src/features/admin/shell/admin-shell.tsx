@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { redirect } from '@/i18n/navigation';
 import { getPendingCounts } from '../moderation/queries';
+import { getNavStats } from '../overview/queries';
 import { requireStaff } from '../session';
 import { AccessDeniedActions } from './access-denied-actions';
 import { AdminFrame, SIDEBAR_COOKIE } from './admin-frame';
@@ -19,11 +20,16 @@ export async function AdminShell({ children }: { children: ReactNode }) {
     if (check.code === 'mfa_required') redirect({ href: '/admin/login/mfa', locale });
     return <AccessDenied />;
   }
-  const [counts, cookieStore] = await Promise.all([getPendingCounts(), cookies()]);
+  const [counts, stats, cookieStore] = await Promise.all([getPendingCounts(), getNavStats(), cookies()]);
   return (
     <AdminFrame
       staff={{ name: check.staff.name, role: check.staff.role }}
-      pendingCount={counts?.pending ?? null}
+      counts={{
+        pending: counts?.pending,
+        reports: stats?.reports_open,
+        badges: stats?.badges_pending,
+        venues: stats?.venues_pending,
+      }}
       initialCollapsed={cookieStore.get(SIDEBAR_COOKIE)?.value === 'collapsed'}
     >
       {children}

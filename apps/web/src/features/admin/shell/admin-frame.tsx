@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { Link, usePathname } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { ADMIN_NAV, type AdminNavItem } from '../nav';
+import { ADMIN_NAV, type AdminNavCounts, type AdminNavItem } from '../nav';
 import { hasRole, type StaffRole } from '../roles';
 import { StaffMenu } from './staff-menu';
 
@@ -20,7 +20,7 @@ export const SIDEBAR_COOKIE = 'hp_admin_sidebar';
 
 type Props = {
   staff: { name: string; role: StaffRole };
-  pendingCount: number | null;
+  counts: AdminNavCounts;
   initialCollapsed: boolean;
   children: ReactNode;
 };
@@ -48,12 +48,12 @@ function Brand({ compact = false }: { compact?: boolean }) {
 
 function NavList({
   role,
-  pendingCount,
+  counts,
   collapsed = false,
   onNavigate,
 }: {
   role: StaffRole;
-  pendingCount: number | null;
+  counts: AdminNavCounts;
   collapsed?: boolean;
   onNavigate?: () => void;
 }) {
@@ -64,7 +64,7 @@ function NavList({
     <ul className="flex flex-col gap-1">
       {items.map(({ key, href, Icon, badge }) => {
         const active = isActive(pathname, href);
-        const count = badge === 'pending' && pendingCount ? pendingCount : 0;
+        const count = badge ? (counts[badge] ?? 0) : 0;
         const label = t(key);
         return (
           <li key={key}>
@@ -83,7 +83,7 @@ function NavList({
               {collapsed ? <span className="sr-only">{label}</span> : <span className="flex-1 truncate">{label}</span>}
               {count > 0 ? (
                 <span
-                  aria-label={t('pending_count', { count })}
+                  aria-label={t(`count.${badge ?? 'pending'}`, { count })}
                   className={cn(
                     'inline-flex min-w-6 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-on-accent',
                     collapsed && 'absolute top-1 right-1 min-w-5 px-1',
@@ -117,7 +117,7 @@ function BackToSite({ collapsed = false }: { collapsed?: boolean }) {
   );
 }
 
-export function AdminFrame({ staff, pendingCount, initialCollapsed, children }: Props) {
+export function AdminFrame({ staff, counts, initialCollapsed, children }: Props) {
   const t = useTranslations('admin');
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -142,7 +142,7 @@ export function AdminFrame({ staff, pendingCount, initialCollapsed, children }: 
           <Brand compact={collapsed} />
         </div>
         <nav aria-label={t('nav.label')} className={cn('flex-1 overflow-y-auto py-4', collapsed ? 'px-3' : 'px-3')}>
-          <NavList role={staff.role} pendingCount={pendingCount} collapsed={collapsed} />
+          <NavList role={staff.role} counts={counts} collapsed={collapsed} />
         </nav>
         <div className={cn('flex flex-col gap-1 border-t border-border py-3', collapsed ? 'px-3' : 'px-3')}>
           <BackToSite collapsed={collapsed} />
@@ -168,7 +168,7 @@ export function AdminFrame({ staff, pendingCount, initialCollapsed, children }: 
           <SheetTitle className="sr-only">{t('nav.label')}</SheetTitle>
           <SheetDescription className="sr-only">{t('brand.staff_only')}</SheetDescription>
           <nav aria-label={t('nav.label')} className="flex-1 overflow-y-auto px-3 py-4">
-            <NavList role={staff.role} pendingCount={pendingCount} onNavigate={() => setMenuOpen(false)} />
+            <NavList role={staff.role} counts={counts} onNavigate={() => setMenuOpen(false)} />
           </nav>
           <div className="border-t border-border px-3 py-3 pb-safe">
             <BackToSite />

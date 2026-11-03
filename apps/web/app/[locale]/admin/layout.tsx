@@ -24,6 +24,7 @@ export default async function AdminRootLayout({ children }: { children: ReactNod
         errors: messages.errors,
         auth: messages.auth,
         listing: messages.listing,
+        group: messages.group,
         web: messages.web,
       }}
     >

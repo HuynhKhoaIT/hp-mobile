@@ -1,4 +1,4 @@
-// /admin — tổng quan (tạm thời: số liệu hàng chờ kiểm duyệt). Theo request, trong <Suspense>.
+// /admin — dashboard: hàng chờ cần xử lý + số liệu cộng đồng (RPC admin_stats). Theo request, trong <Suspense>.
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';

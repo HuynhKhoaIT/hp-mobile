@@ -1,23 +1,69 @@
 // Mục thanh bên khu quản trị. Mỗi mục có `minRole`: moderator thấy mục moderator, admin thấy tất cả.
 // Ẩn mục chỉ là giao diện — trang / action tự kiểm requireStaff(minRole) lại ở server.
 // Thêm màn admin mới (apps/web/CLAUDE.md mục 10) = thêm một dòng ở đây + key `admin.nav.<key>`.
-import { LayoutDashboard, type LucideIcon, ShieldCheck } from 'lucide-react';
+import {
+  BadgeCheck,
+  CalendarClock,
+  FileText,
+  Flag,
+  LayoutDashboard,
+  type LucideIcon,
+  Megaphone,
+  ScrollText,
+  ShieldCheck,
+  Store,
+  Users,
+} from 'lucide-react';
 import type { StaffRole } from './roles';
 
-export type AdminNavKey = 'overview' | 'moderation';
+export type AdminNavKey =
+  | 'overview'
+  | 'moderation'
+  | 'reports'
+  | 'badges'
+  | 'users'
+  | 'listings'
+  | 'groups'
+  | 'catalog'
+  | 'marketing'
+  | 'audit';
+
+export type AdminNavHref =
+  | '/admin'
+  | '/admin/moderation'
+  | '/admin/reports'
+  | '/admin/badges'
+  | '/admin/users'
+  | '/admin/listings'
+  | '/admin/groups'
+  | '/admin/catalog'
+  | '/admin/marketing'
+  | '/admin/audit';
+
+/** Số cạnh mục thanh bên: tin chờ duyệt, báo cáo mở, huy hiệu chờ, sân chờ duyệt. */
+export type AdminNavCount = 'pending' | 'reports' | 'badges' | 'venues';
+export type AdminNavCounts = Partial<Record<AdminNavCount, number>>;
 
 export type AdminNavItem = {
   key: AdminNavKey;
-  href: '/admin' | '/admin/moderation';
+  href: AdminNavHref;
   Icon: LucideIcon;
   minRole: StaffRole;
-  /** Hiện số tin chờ duyệt cạnh mục. */
-  badge?: 'pending';
+  badge?: AdminNavCount;
 };
 
 export const ADMIN_NAV: readonly AdminNavItem[] = [
   { key: 'overview', href: '/admin', Icon: LayoutDashboard, minRole: 'moderator' },
   { key: 'moderation', href: '/admin/moderation', Icon: ShieldCheck, minRole: 'moderator', badge: 'pending' },
+  { key: 'reports', href: '/admin/reports', Icon: Flag, minRole: 'moderator', badge: 'reports' },
+  { key: 'badges', href: '/admin/badges', Icon: BadgeCheck, minRole: 'moderator', badge: 'badges' },
+  { key: 'users', href: '/admin/users', Icon: Users, minRole: 'moderator' },
+  { key: 'listings', href: '/admin/listings', Icon: FileText, minRole: 'moderator' },
+  { key: 'groups', href: '/admin/groups', Icon: CalendarClock, minRole: 'moderator' },
+  // Catalog: moderator duyệt sân; tab khu / từ khoá cấm chỉ admin (lọc trong trang).
+  { key: 'catalog', href: '/admin/catalog', Icon: Store, minRole: 'moderator', badge: 'venues' },
+  { key: 'marketing', href: '/admin/marketing', Icon: Megaphone, minRole: 'admin' },
+  { key: 'audit', href: '/admin/audit', Icon: ScrollText, minRole: 'admin' },
 ];
 
 /**

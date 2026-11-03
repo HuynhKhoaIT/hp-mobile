@@ -4,6 +4,7 @@
 //   2. vai trò đọc từ profiles (không chỉ claim trong JWT — claim có thể cũ tới 1 giờ sau khi bị thu quyền).
 // RLS / RPC (is_staff()) vẫn là chốt cuối; hàm này để trả lỗi sớm, rõ ràng và để UI biết vai trò.
 import 'server-only';
+import { connection } from 'next/server';
 import { cache } from 'react';
 import { createServerClient } from '@/lib/supabase/server';
 import { hasRole, type StaffRole } from './roles';
@@ -22,6 +23,9 @@ export type StaffCheck = { ok: true; staff: StaffSession } | { ok: false; code: 
 
 /** Kiểm phiên staff. Gọi trong mọi Server Action admin và trong layout (dedupe theo request bằng cache()). */
 export const requireStaff = cache(async (minRole: StaffRole = 'moderator'): Promise<StaffCheck> => {
+  // Dữ liệu staff luôn theo request: báo cho Next trước khi supabase-js đọc giờ (getClaims) để không lỗi
+  // "unstable value Date.now() while prerendering" (cacheComponents).
+  await connection();
   const supabase = await createServerClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
