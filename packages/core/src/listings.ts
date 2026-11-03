@@ -42,6 +42,7 @@ export async function searchListings(client: Client, query: ListingQuery = {}): 
       p_attributes: f.attributes,
       p_limit: limit,
       p_cursor: cursor ?? undefined,
+      p_max_distance_m: f.maxDistanceM,
     })
     .select(LISTING_COLUMNS);
   const result = fromSupabase<PublicListing[]>(res);
@@ -120,4 +121,45 @@ export async function listSavedListings(client: Client): Promise<Result<PublicLi
   if (res.error) return res;
   const byId = new Map((res.data ?? []).map((l) => [l.id, l]));
   return ok(ids.flatMap((id) => byId.get(id) ?? []));
+}
+
+/** Tin đang hiện của một người (trang hồ sơ công khai). view public_listings đã ẩn tin của người chặn mình. */
+export async function listListingsByOwner(
+  client: Client,
+  v: { ownerId: string; cursor?: string | null; limit?: number },
+): Promise<Result<Page<PublicListing>>> {
+  const limit = Math.min(Math.max(v.limit ?? 20, 1), 50);
+  let q = client
+    .from('public_listings')
+    .select(LISTING_COLUMNS)
+    .eq('owner_id', v.ownerId)
+    .eq('status', 'active')
+    .eq('is_expired', false)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (v.cursor) q = q.lt('created_at', v.cursor);
+  const res = fromSupabase<PublicListing[]>(await q);
+  return res.error ? res : ok(toPage(res.data ?? [], limit));
+}
+
+/** "Gợi ý cho bạn" ở Hub (RPC home_feed): cùng khu → danh mục hay xem → mới nhất, 30 ngày, không gồm tin của mình. */
+export async function getHomeFeed(client: Client, opts: { site?: string | null; limit?: number } = {}): Promise<Result<PublicListing[]>> {
+  const res = await client
+    .rpc('home_feed', { p_site: opts.site ?? undefined, p_limit: Math.min(Math.max(opts.limit ?? 20, 1), 50) })
+    .select(LISTING_COLUMNS);
+  const result = fromSupabase<PublicListing[]>(res);
+  return result.error ? result : ok(result.data ?? []);
+}
+
+/** Tin mất / nhặt khớp với một tin của mình (trigger khớp tự động — LOST_FOUND_MATCH ở @hp/shared). */
+export async function listLostFoundMatches(client: Client, listingId: string): Promise<Result<PublicListing[]>> {
+  const res = await client.rpc('list_lost_found_matches', { p_listing_id: listingId }).select(LISTING_COLUMNS);
+  const result = fromSupabase<PublicListing[]>(res);
+  return result.error ? result : ok(result.data ?? []);
+}
+
+/** Chủ tin thất lạc: "Đã nhận lại đồ" — attributes.returned = true + đóng tin trong một lệnh (RPC mark_listing_returned). */
+export async function markListingReturned(client: Client, listingId: string): Promise<Result<null>> {
+  const res = await client.rpc('mark_listing_returned', { p_listing_id: listingId });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
 }

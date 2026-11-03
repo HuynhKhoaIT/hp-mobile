@@ -213,7 +213,8 @@
       "km": "公里",
       "months": "个月",
       "people": "人"
-    }
+    },
+    "photos_min": "此类信息至少需要 {{min}} 张照片。"
   },
   "manage": {
     "title": "我的信息",
@@ -279,5 +280,27 @@
     "unsave": "取消收藏",
     "saved": "已收藏",
     "removed": "已取消收藏"
+  },
+  "translate": {
+    "action": "翻译成中文",
+    "show_original": "查看原文",
+    "translated_note": "自动翻译",
+    "translating": "翻译中…"
+  },
+  "distance": {
+    "label": "距工作地点",
+    "any": "不限距离",
+    "within": "{{km}} 公里内",
+    "to_site": "距{{site}} {{distance}}"
+  },
+  "lost_found": {
+    "matches_title": "可能匹配的信息",
+    "matches_hint": "物品类型相同，时间和地点相近。",
+    "matches_empty": "暂无匹配。一有匹配会立即通知你。",
+    "mark_returned": "已物归原主",
+    "mark_returned_confirm_title": "标记为已物归原主？",
+    "mark_returned_confirm_body": "该信息将关闭，不再公开显示。",
+    "returned_done": "太好了！物品已物归原主。",
+    "returned_badge": "已归还"
   }
 }

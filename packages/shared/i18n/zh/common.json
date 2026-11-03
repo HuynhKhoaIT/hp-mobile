@@ -171,6 +171,120 @@
     "get_app_title": "下载 App，第一时间收到通知",
     "get_app_body": "有人发消息、信息通过审核或附近有新房源时立即知道。",
     "section_error": "此栏目加载失败",
-    "refreshing": "正在刷新…"
+    "refreshing": "正在刷新…",
+    "for_you_feed_hint": "根据你的园区和常看的信息"
+  },
+  "report": {
+    "title": "举报{{target}}",
+    "subtitle": "请选择原因，审核团队会在 2 小时内处理。",
+    "reasons": {
+      "scam": "诈骗、索要定金",
+      "spam": "垃圾信息、重复发布",
+      "inappropriate": "内容不当",
+      "other": "其他原因"
+    },
+    "detail_label": "补充说明（选填）",
+    "detail_placeholder": "发生了什么？",
+    "submit": "提交举报",
+    "success": "举报已提交，谢谢！",
+    "already": "你已经举报过此内容。",
+    "targets": {
+      "listing": "信息",
+      "group": "小组",
+      "profile": "用户",
+      "message": "消息"
+    }
+  },
+  "block": {
+    "title": "屏蔽{{name}}？",
+    "body": "你们将无法互相发消息，你也不会再看到对方发布的信息。可随时取消屏蔽。",
+    "confirm": "屏蔽",
+    "success": "已屏蔽",
+    "unblock": "取消屏蔽",
+    "unblocked": "已取消屏蔽",
+    "someone": "此人"
+  },
+  "notifications": {
+    "title": "通知",
+    "mark_all_read": "全部标为已读",
+    "empty_title": "还没有通知",
+    "empty_body": "新消息、信息审核结果和提醒会显示在这里。",
+    "login_body": "登录后即可收到消息和信息的通知。",
+    "unread": "未读",
+    "prefs": {
+      "title": "推送通知",
+      "subtitle": "选择在锁屏上显示的通知类型。应用内列表不受影响。",
+      "messages": "消息",
+      "messages_hint": "有人给你发消息时",
+      "listings": "你的信息",
+      "listings_hint": "审核通过、被拒、即将过期",
+      "groups": "拼车、组局",
+      "groups_hint": "加入申请、出发提醒",
+      "lost_found": "失物招领",
+      "lost_found_hint": "有信息与你寻找的物品匹配"
+    },
+    "system_off": "手机设置中已关闭本应用的通知。",
+    "open_settings": "打开设置",
+    "permission": {
+      "title": "开启通知？",
+      "body": "有人给你发消息或你的信息通过审核时，第一时间知道。",
+      "allow": "开启通知",
+      "later": "以后再说"
+    }
+  },
+  "profile": {
+    "title": "个人主页",
+    "member_since": "{{date}} 加入",
+    "listings": "在售信息",
+    "no_listings": "此人目前没有在发布的信息。",
+    "rating": "{{avg}} · {{count}} 条评价",
+    "no_rating": "还没有评价",
+    "not_found": "找不到该用户",
+    "view": "查看主页"
+  },
+  "badge_request": {
+    "title": "认证徽章",
+    "intro": "徽章让别人更信任你。证件仅审核员可见，30 天后删除。",
+    "choose_badge": "选择徽章",
+    "doc_hint_worker": "工牌或劳动合同（可遮挡身份证号）。",
+    "doc_hint_landlord": "房产证明或租赁合同。",
+    "doc_hint_venue": "场地营业执照，或你与招牌的合影。",
+    "doc_hint_employer": "营业执照或公司介绍信。",
+    "pick_photo": "拍摄或选择证件照片",
+    "submit": "提交认证",
+    "submitted": "已提交，1–2 天内会有结果。",
+    "status_pending": "等待审核",
+    "status_approved": "已通过",
+    "status_rejected": "未通过",
+    "owned": "已拥有",
+    "reason": "原因：{{reason}}",
+    "request": "申请徽章",
+    "request_again": "重新提交",
+    "take_photo": "拍照",
+    "from_library": "从相册选择",
+    "change_photo": "更换照片",
+    "photo_label": "已选的证件照片",
+    "camera_denied": "未开启相机权限。请在手机设置中开启，或从相册选择照片。"
+  },
+  "account": {
+    "delete_title": "删除账号",
+    "delete_body": "你的信息、小组和资料会立即隐藏，并在 30 天后永久删除。已发送的消息将匿名保留。此操作无法撤销。",
+    "delete_confirm_label": "输入 DELETE 以确认",
+    "delete_confirm_word": "DELETE",
+    "delete_action": "永久删除账号",
+    "deleted": "账号已删除。"
+  },
+  "coach": {
+    "label": "快速指南",
+    "step": "{{current}}/{{total}}",
+    "next": "下一步",
+    "skip": "跳过",
+    "done": "知道了",
+    "search_title": "快速查找",
+    "search_body": "在顶部搜索框输入物品、房间或工作。",
+    "post_title": "免费发布",
+    "post_body": "点击底部中间的发布 (+) 按钮，转让物品、出租房间或招人。",
+    "chat_title": "在应用内聊天",
+    "chat_body": "与买家、卖家的消息都在“消息”标签中，无需留电话号码。"
   }
 }

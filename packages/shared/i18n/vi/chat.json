@@ -1,1 +1,58 @@
-{}
+{
+  "title": "Tin nhắn",
+  "inbox": {
+    "empty_title": "Chưa có tin nhắn",
+    "empty_body": "Nhắn cho người đăng tin để hỏi thêm. Cuộc trò chuyện sẽ hiện ở đây.",
+    "empty_cta": "Xem tin mới đăng",
+    "login_title": "Đăng nhập để nhắn tin",
+    "login_body": "Nhắn tin trực tiếp với người bán, chủ trọ, nhà tuyển dụng.",
+    "image": "Đã gửi một ảnh",
+    "you": "Bạn: {{text}}",
+    "sender": "{{name}}: {{text}}",
+    "no_messages": "Chưa có tin nhắn",
+    "deleted_user": "Người dùng",
+    "listing_gone": "Tin không còn hiển thị",
+    "muted": "Đã tắt thông báo",
+    "unread": "{{count}} tin chưa đọc"
+  },
+  "thread": {
+    "placeholder": "Nhập tin nhắn…",
+    "send": "Gửi",
+    "attach_image": "Gửi ảnh",
+    "sending": "Đang gửi",
+    "sent": "Đã gửi",
+    "seen": "Đã xem",
+    "failed": "Chưa gửi được. Chạm để gửi lại",
+    "retry": "Gửi lại",
+    "discard": "Bỏ tin này",
+    "typing": "Đang nhập…",
+    "load_older": "Xem tin cũ hơn",
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "start_hint": "Chào hỏi và hỏi thêm về tin này nhé",
+    "view_listing": "Xem tin",
+    "image_alt": "Ảnh trong tin nhắn",
+    "too_long": "Tin nhắn tối đa {{max}} ký tự",
+    "mute": "Tắt thông báo",
+    "unmute": "Bật thông báo",
+    "not_found": "Không tìm thấy cuộc trò chuyện",
+    "options": "Tuỳ chọn cuộc trò chuyện"
+  },
+  "blocked": {
+    "by_me": "Bạn đã chặn người này. Bỏ chặn để nhắn tin tiếp.",
+    "by_them": "Bạn không thể nhắn tin cho người này nữa."
+  },
+  "safety": {
+    "title": "Giao dịch an toàn",
+    "intro": "Vài lưu ý trước khi bạn nhắn tin:",
+    "tip_meet": "Hẹn gặp ở nơi đông người trong khu, vào ban ngày.",
+    "tip_check": "Xem kỹ hàng, phòng hoặc công việc trước khi trả tiền.",
+    "tip_deposit": "Không chuyển khoản đặt cọc trước cho người lạ.",
+    "tip_report": "Thấy dấu hiệu lừa đảo, hãy bấm Báo cáo.",
+    "accept": "Tôi đã hiểu"
+  },
+  "cta": {
+    "chat": "Nhắn tin",
+    "own_listing": "Đây là tin của bạn"
+  }
+}

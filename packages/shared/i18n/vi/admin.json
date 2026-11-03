@@ -4,7 +4,16 @@
     "login": "Đăng nhập quản trị",
     "mfa": "Xác thực hai bước",
     "moderation": "Kiểm duyệt tin",
-    "overview": "Tổng quan"
+    "overview": "Tổng quan",
+    "reports": "Báo cáo",
+    "badges": "Huy hiệu",
+    "users": "Người dùng",
+    "user": "Hồ sơ người dùng",
+    "listings": "Tin đăng",
+    "groups": "Nhóm ghép",
+    "catalog": "Danh mục",
+    "marketing": "Marketing",
+    "audit": "Nhật ký"
   },
   "brand": {
     "area": "Quản trị",
@@ -19,8 +28,24 @@
     "collapse": "Thu gọn thanh bên",
     "expand": "Mở rộng thanh bên",
     "back_to_site": "Về trang người dùng",
-    "pending_count_one": "{{count}} tin chờ duyệt",
-    "pending_count_other": "{{count}} tin chờ duyệt"
+    "reports": "Báo cáo",
+    "badges": "Huy hiệu",
+    "users": "Người dùng",
+    "listings": "Tin đăng",
+    "groups": "Nhóm ghép",
+    "catalog": "Danh mục",
+    "marketing": "Marketing",
+    "audit": "Nhật ký",
+    "count": {
+      "pending_one": "{{count}} tin chờ duyệt",
+      "pending_other": "{{count}} tin chờ duyệt",
+      "reports_one": "{{count}} báo cáo cần xử lý",
+      "reports_other": "{{count}} báo cáo cần xử lý",
+      "badges_one": "{{count}} yêu cầu huy hiệu chờ duyệt",
+      "badges_other": "{{count}} yêu cầu huy hiệu chờ duyệt",
+      "venues_one": "{{count}} sân chờ duyệt",
+      "venues_other": "{{count}} sân chờ duyệt"
+    }
   },
   "role": {
     "user": "Người dùng",
@@ -36,7 +61,9 @@
   "access": {
     "denied_title": "Không có quyền truy cập",
     "denied_body": "Tài khoản này không phải kiểm duyệt viên hoặc quản trị viên.",
-    "sign_in_again": "Đăng nhập bằng tài khoản khác"
+    "sign_in_again": "Đăng nhập bằng tài khoản khác",
+    "admin_only_title": "Chỉ quản trị viên",
+    "admin_only_body": "Mục này chỉ dành cho quản trị viên. Nếu cần thay đổi, hãy nhờ quản trị viên thực hiện."
   },
   "login": {
     "title": "Đăng nhập khu quản trị",
@@ -70,13 +97,27 @@
   },
   "overview": {
     "title": "Tổng quan",
-    "subtitle": "Tình hình hàng chờ kiểm duyệt tin.",
-    "pending": "Tin chờ duyệt",
-    "pending_hint": "Tin của tài khoản mới, có từ khoá cần kiểm tra hoặc giá bất thường.",
-    "approved": "Đã duyệt",
-    "rejected": "Đã từ chối",
-    "open_queue": "Mở hàng chờ",
-    "more_soon": "Thống kê người dùng, báo cáo và lượt truy cập sẽ có ở các bản sau."
+    "subtitle": "Việc cần xử lý và tình hình cộng đồng hôm nay.",
+    "queues_title": "Cần xử lý",
+    "queue": {
+      "moderation": "Tin chờ duyệt",
+      "reports": "Báo cáo đang mở",
+      "badges": "Huy hiệu chờ duyệt",
+      "venues": "Sân chờ duyệt"
+    },
+    "queue_open": "Mở hàng chờ để xử lý",
+    "queue_clear": "Đã xử lý hết",
+    "community_title": "Cộng đồng",
+    "users_total": "Người dùng",
+    "users_banned": "Đang bị khoá hoặc cấm",
+    "listings_active": "Tin đang đăng",
+    "groups_upcoming": "Nhóm sắp diễn ra",
+    "messages_24h": "Tin nhắn trong 24 giờ",
+    "new_7d_one": "+{{count}} trong 7 ngày",
+    "new_7d_other": "+{{count}} trong 7 ngày",
+    "by_category_title": "Tin đang đăng theo danh mục",
+    "by_category_hint": "Chỉ tính tin đang hiển thị công khai.",
+    "gaps_note": "Chưa có: tách người dùng mới theo web / app, thời gian xử lý hàng chờ, lượt vào từ Google, lượt tải app, lead. Sẽ bổ sung khi có dữ liệu nguồn."
   },
   "moderation": {
     "title": "Kiểm duyệt tin",
@@ -216,5 +257,657 @@
   "error": {
     "title": "Không tải được trang quản trị",
     "body": "Có lỗi khi đọc dữ liệu. Thử lại sau giây lát."
+  },
+  "table": {
+    "select_all": "Chọn tất cả dòng trong trang",
+    "select_col": "Chọn",
+    "select_row": "Chọn dòng",
+    "selected_one": "Đã chọn {{count}} dòng",
+    "selected_other": "Đã chọn {{count}} dòng",
+    "sort_by": "Sắp xếp theo cột này",
+    "pagination": "Phân trang",
+    "prev": "Trang trước",
+    "next": "Trang sau",
+    "page": "Trang {{page}}/{{total}}",
+    "none": "Không có kết quả",
+    "range": "{{from}}–{{to}} trong {{total}}",
+    "tabs": "Bộ lọc trạng thái"
+  },
+  "filters": {
+    "label": "Bộ lọc",
+    "all": "Tất cả",
+    "apply": "Lọc",
+    "clear": "Bỏ lọc"
+  },
+  "confirm": {
+    "count": "{{count}}/{{max}}"
+  },
+  "reports": {
+    "title": "Báo cáo",
+    "subtitle": "Báo cáo từ người dùng, cũ trước. Mục tiêu xử lý trong 2 giờ.",
+    "table_label": "Danh sách báo cáo",
+    "tabs": {
+      "active": "Cần xử lý",
+      "open": "Mới",
+      "reviewing": "Đang xem",
+      "resolved": "Đã xử lý",
+      "dismissed": "Đã bỏ qua"
+    },
+    "filter": {
+      "type": "Đối tượng",
+      "reason": "Lý do"
+    },
+    "status": {
+      "open": "Mới",
+      "reviewing": "Đang xem",
+      "resolved": "Đã xử lý",
+      "dismissed": "Đã bỏ qua"
+    },
+    "col": {
+      "target": "Đối tượng",
+      "reason": "Lý do",
+      "reporter": "Người báo cáo",
+      "created": "Thời gian",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "message_hidden": "Tin nhắn (nội dung riêng tư, không hiển thị)",
+    "target_missing": "Không tìm thấy đối tượng",
+    "target_deleted": "Đã bị xoá",
+    "open_count_one": "{{count}} báo cáo",
+    "open_count_other": "{{count}} báo cáo",
+    "unknown_user": "Không rõ",
+    "resolved_by": "{{name}} · {{time}}",
+    "actions_for": "Thao tác với báo cáo về “{{target}}”",
+    "set": {
+      "reviewing": "Đánh dấu đang xem",
+      "resolved": "Đánh dấu đã xử lý",
+      "dismissed": "Bỏ qua báo cáo"
+    },
+    "hide_listing": "Ẩn tin và đóng báo cáo",
+    "cancel_group": "Huỷ nhóm và đóng báo cáo",
+    "open_user": "Mở hồ sơ để khoá",
+    "open_owner": "Mở hồ sơ người đăng",
+    "opens_new_tab": "(mở tab mới)",
+    "select_row": "Chọn báo cáo về “{{target}}”",
+    "clear_selection": "Bỏ chọn",
+    "bulk": {
+      "resolve_one": "Đã xử lý {{count}} báo cáo",
+      "resolve_other": "Đã xử lý {{count}} báo cáo",
+      "dismiss_one": "Bỏ qua {{count}} báo cáo",
+      "dismiss_other": "Bỏ qua {{count}} báo cáo",
+      "title_one": "Chuyển {{count}} báo cáo sang “{{status}}”?",
+      "title_other": "Chuyển {{count}} báo cáo sang “{{status}}”?",
+      "description": "Người báo cáo không nhận thông báo. Mọi thay đổi được ghi vào nhật ký."
+    },
+    "hide": {
+      "title": "Ẩn tin “{{title}}”?",
+      "description": "Tin sẽ không còn hiện công khai và mọi báo cáo đang mở về tin này được đánh dấu đã xử lý.",
+      "confirm": "Ẩn tin"
+    },
+    "cancel": {
+      "title": "Huỷ nhóm “{{title}}”?",
+      "description": "Các thành viên nhận thông báo nhóm bị huỷ. Mọi báo cáo đang mở về nhóm được đánh dấu đã xử lý.",
+      "confirm": "Huỷ nhóm"
+    },
+    "note_label": "Ghi chú nội bộ (bắt buộc)",
+    "note_hint": "Chỉ kiểm duyệt viên và quản trị viên xem được.",
+    "toast": {
+      "status_one": "Đã chuyển {{count}} báo cáo sang “{{status}}”",
+      "status_other": "Đã chuyển {{count}} báo cáo sang “{{status}}”",
+      "hidden": "Đã ẩn tin và đóng báo cáo",
+      "cancelled": "Đã huỷ nhóm và đóng báo cáo"
+    },
+    "empty": {
+      "active_title": "Không có báo cáo cần xử lý",
+      "active_body": "Báo cáo mới từ người dùng sẽ hiện ở đây.",
+      "other_title": "Chưa có báo cáo nào",
+      "other_body": "Báo cáo đã xử lý sẽ hiện ở đây, mới nhất trước."
+    }
+  },
+  "badges": {
+    "title": "Huy hiệu",
+    "subtitle": "Đối chiếu giấy tờ với họ tên trước khi duyệt. Giấy tờ tự xoá 30 ngày sau khi xử lý.",
+    "table_label": "Danh sách yêu cầu huy hiệu",
+    "filter": {
+      "badge": "Huy hiệu"
+    },
+    "status": {
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối"
+    },
+    "col": {
+      "user": "Người xin",
+      "badge": "Huy hiệu",
+      "created": "Gửi lúc",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "unknown_user": "Không rõ người xin",
+    "reviewed_by": "{{name}} · {{time}}",
+    "review": "Xem và duyệt",
+    "view": "Xem",
+    "approve": "Duyệt",
+    "reject": "Từ chối",
+    "dialog": {
+      "title": "Huy hiệu “{{badge}}” của {{name}}",
+      "submitted": "Gửi {{time}}",
+      "privacy": "Giấy tờ là dữ liệu riêng tư — không chụp màn hình, không chia sẻ.",
+      "document": "Giấy tờ xác minh",
+      "open_new_tab": "Mở tab mới",
+      "document_purged": "Giấy tờ đã được xoá theo chính sách lưu trữ (30 ngày sau khi xử lý).",
+      "document_alt": "Giấy tờ xin huy hiệu “{{badge}}” của {{name}}",
+      "url_expiry": "Liên kết xem giấy tờ hết hạn sau 5 phút. Đóng rồi mở lại để xem tiếp.",
+      "reject_reason": "Lý do từ chối"
+    },
+    "approve_confirm": {
+      "title": "Duyệt huy hiệu “{{badge}}” cho {{name}}?",
+      "description": "Huy hiệu hiện ngay trên hồ sơ và tin của người này. Người dùng nhận thông báo.",
+      "confirm": "Duyệt huy hiệu"
+    },
+    "reject_confirm": {
+      "title": "Từ chối huy hiệu “{{badge}}” của {{name}}?",
+      "description": "Người dùng nhận thông báo kèm lý do và có thể gửi lại.",
+      "confirm": "Từ chối huy hiệu",
+      "reason_label": "Lý do (người dùng sẽ thấy)",
+      "note_label": "Ghi thêm cho người dùng (không bắt buộc)",
+      "note_hint": "Viết ngắn, lịch sự; không ghi số giấy tờ."
+    },
+    "reject_reasons": {
+      "unreadable": "Ảnh mờ, không đọc được",
+      "name_mismatch": "Họ tên không khớp với hồ sơ",
+      "wrong_document": "Không đúng loại giấy tờ",
+      "expired": "Giấy tờ đã hết hạn",
+      "other": "Lý do khác"
+    },
+    "toast": {
+      "approved": "Đã duyệt huy hiệu “{{badge}}” cho {{name}}",
+      "rejected": "Đã từ chối huy hiệu “{{badge}}” của {{name}}"
+    },
+    "empty": {
+      "pending_title": "Không có yêu cầu chờ duyệt",
+      "pending_body": "Yêu cầu huy hiệu mới sẽ hiện ở đây, cũ trước.",
+      "other_title": "Chưa có yêu cầu nào",
+      "other_body": "Yêu cầu đã xử lý sẽ hiện ở đây, mới nhất trước."
+    }
+  },
+  "users": {
+    "title": "Người dùng",
+    "subtitle": "Tìm theo họ tên hoặc số điện thoại. Số điện thoại luôn được che một phần.",
+    "table_label": "Danh sách người dùng",
+    "no_name": "Chưa đặt tên",
+    "no_phone": "Không có SĐT",
+    "no_badges": "Chưa có huy hiệu",
+    "open": "Chi tiết",
+    "suspended_until": "Đến {{date}}",
+    "filter": {
+      "q": "Tìm",
+      "q_placeholder": "Họ tên hoặc 0912…",
+      "role": "Vai trò",
+      "state": "Tình trạng"
+    },
+    "field": {
+      "name": "Họ tên",
+      "phone": "Số điện thoại",
+      "joined": "Tham gia",
+      "state": "Tình trạng",
+      "badges": "Huy hiệu",
+      "site": "Khu",
+      "rating": "Đánh giá",
+      "suspended_until": "Khoá tới"
+    },
+    "state": {
+      "active": "Bình thường",
+      "suspended": "Đang khoá tạm",
+      "banned": "Bị cấm",
+      "deleted": "Đã xoá tài khoản"
+    },
+    "badge_status": {
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "rejected": "Đã từ chối"
+    },
+    "col": {
+      "name": "Người dùng",
+      "role": "Vai trò",
+      "state": "Tình trạng",
+      "badges": "Huy hiệu",
+      "joined": "Tham gia",
+      "reputation": "Uy tín",
+      "actions": "Thao tác"
+    },
+    "empty": {
+      "title": "Chưa có người dùng",
+      "filtered_title": "Không tìm thấy người dùng phù hợp",
+      "filtered_body": "Thử từ khoá khác hoặc bỏ bớt bộ lọc."
+    },
+    "detail": {
+      "public_name": "Tên công khai: {{name}}",
+      "back": "Danh sách",
+      "audit": "Xem nhật ký",
+      "rating": "{{avg}} · {{count}} đánh giá",
+      "listings": "Tin đã đăng",
+      "listings_active_one": "{{count}} tin đang đăng",
+      "listings_active_other": "{{count}} tin đang đăng",
+      "groups": "Nhóm đã tạo",
+      "reports_against": "Báo cáo đang mở về người này",
+      "reports_filed_one": "Đã gửi {{count}} báo cáo",
+      "reports_filed_other": "Đã gửi {{count}} báo cáo",
+      "badge_requests": "Yêu cầu huy hiệu",
+      "no_badge_requests": "Chưa gửi yêu cầu nào.",
+      "actions": "Thao tác"
+    },
+    "actions": {
+      "self": "Đây là tài khoản của bạn. Hãy nhờ một quản trị viên khác thay đổi.",
+      "staff_target": "Người này là kiểm duyệt viên / quản trị viên. Chỉ quản trị viên được thao tác.",
+      "deleted": "Tài khoản đã xoá — không còn thao tác nào.",
+      "suspend_title": "Khoá tạm",
+      "suspend_hint": "Không đăng tin, nhắn tin, tham gia nhóm trong thời gian khoá.",
+      "days_label": "Thời gian khoá",
+      "days_one": "{{count}} ngày",
+      "days_other": "{{count}} ngày",
+      "suspend": "Khoá tạm",
+      "unsuspend": "Mở khoá ngay",
+      "badges_title": "Huy hiệu",
+      "badges_hint": "Thêm hoặc gỡ huy hiệu xác minh. Thường duyệt qua mục Huy hiệu để có giấy tờ.",
+      "save_badges": "Lưu huy hiệu",
+      "ban_title": "Cấm vĩnh viễn",
+      "ban_hint": "Chặn tài khoản không thời hạn. Chỉ dùng khi vi phạm nghiêm trọng.",
+      "ban": "Cấm tài khoản",
+      "unban": "Bỏ cấm",
+      "role_title": "Vai trò",
+      "role_hint": "Kiểm duyệt viên / quản trị viên cần đăng nhập lại và bật xác thực hai bước.",
+      "role_label": "Vai trò mới",
+      "change_role": "Đổi vai trò",
+      "admin_only_note": "Cấm vĩnh viễn và đổi vai trò chỉ quản trị viên làm được."
+    },
+    "confirm": {
+      "suspend_title_one": "Khoá tạm {{name}} trong {{count}} ngày?",
+      "suspend_title_other": "Khoá tạm {{name}} trong {{count}} ngày?",
+      "suspend_body": "Người dùng vẫn đăng nhập được nhưng không đăng tin, nhắn tin hay tham gia nhóm cho tới khi hết hạn.",
+      "suspend_cta_one": "Khoá {{count}} ngày",
+      "suspend_cta_other": "Khoá {{count}} ngày",
+      "unsuspend_title": "Mở khoá cho {{name}}?",
+      "unsuspend_body": "Người dùng dùng lại được mọi tính năng ngay.",
+      "unsuspend_cta": "Mở khoá",
+      "ban_title": "Cấm vĩnh viễn {{name}}?",
+      "ban_body": "Tài khoản bị chặn không thời hạn cho tới khi quản trị viên bỏ cấm.",
+      "ban_cta": "Cấm tài khoản",
+      "unban_title": "Bỏ cấm {{name}}?",
+      "unban_body": "Tài khoản dùng lại được bình thường (khoá tạm, nếu có, vẫn giữ).",
+      "unban_cta": "Bỏ cấm",
+      "role_title": "Đổi vai trò của {{name}} thành “{{role}}”?",
+      "role_body": "Kiểm duyệt viên và quản trị viên vào được khu quản trị. Thay đổi có hiệu lực ngay.",
+      "role_cta": "Đổi thành {{role}}",
+      "badges_title": "Lưu huy hiệu cho {{name}}?",
+      "badges_body": "Huy hiệu hiển thị trên hồ sơ và tin của người này.",
+      "badges_cta": "Lưu huy hiệu"
+    },
+    "toast": {
+      "suspended_one": "Đã khoá tạm {{name}} {{count}} ngày",
+      "suspended_other": "Đã khoá tạm {{name}} {{count}} ngày",
+      "unsuspended": "Đã mở khoá cho {{name}}",
+      "banned": "Đã cấm {{name}}",
+      "unbanned": "Đã bỏ cấm {{name}}",
+      "role": "Đã đổi vai trò của {{name}} thành {{role}}",
+      "badges": "Đã lưu huy hiệu cho {{name}}"
+    }
+  },
+  "listings": {
+    "title": "Tin đăng",
+    "subtitle": "Mọi tin ở mọi trạng thái. Tin chờ duyệt xử lý ở mục Kiểm duyệt tin.",
+    "table_label": "Danh sách tin",
+    "opens_new_tab": "(mở tab mới)",
+    "owner_filter": "Đang xem tin của một người dùng.",
+    "filter": {
+      "q": "Tìm",
+      "q_placeholder": "Tiêu đề hoặc mã tin",
+      "status": "Trạng thái",
+      "category": "Danh mục",
+      "site": "Khu"
+    },
+    "col": {
+      "title": "Tin",
+      "owner": "Người đăng",
+      "status": "Trạng thái",
+      "views": "Lượt xem",
+      "created": "Đăng lúc",
+      "actions": "Thao tác"
+    },
+    "unknown_owner": "Không rõ",
+    "actions_for": "Thao tác với tin “{{title}}”",
+    "open_queue": "Mở hàng chờ kiểm duyệt",
+    "open_owner": "Mở hồ sơ người đăng",
+    "set": {
+      "active": "Mở lại tin",
+      "closed": "Ẩn tin",
+      "rejected": "Từ chối tin"
+    },
+    "select_row": "Chọn tin “{{title}}”",
+    "clear_selection": "Bỏ chọn",
+    "bulk_hide_one": "Ẩn {{count}} tin",
+    "bulk_hide_other": "Ẩn {{count}} tin",
+    "confirm": {
+      "active_title": "Mở lại tin “{{title}}”?",
+      "closed_title": "Ẩn tin “{{title}}”?",
+      "rejected_title": "Từ chối tin “{{title}}”?",
+      "active_many_one": "Mở lại {{count}} tin?",
+      "active_many_other": "Mở lại {{count}} tin?",
+      "closed_many_one": "Ẩn {{count}} tin đã chọn?",
+      "closed_many_other": "Ẩn {{count}} tin đã chọn?",
+      "rejected_many_one": "Từ chối {{count}} tin?",
+      "rejected_many_other": "Từ chối {{count}} tin?",
+      "active_body": "Tin hiện công khai trở lại.",
+      "closed_body": "Tin không còn hiện công khai. Chủ tin vẫn thấy tin trong “Tin của tôi”.",
+      "rejected_body": "Tin bị gỡ khỏi trang công khai với trạng thái bị từ chối."
+    },
+    "note_label": "Ghi chú nội bộ",
+    "note_hint": "Lưu vào nhật ký; chỉ staff xem được.",
+    "toast": {
+      "active": "Đã mở lại tin",
+      "closed": "Đã ẩn tin",
+      "rejected": "Đã từ chối tin",
+      "bulk_done_one": "Đã cập nhật {{count}} tin",
+      "bulk_done_other": "Đã cập nhật {{count}} tin",
+      "bulk_partial": "Đã cập nhật {{ok}} tin, {{failed}} tin không đổi được"
+    },
+    "empty": {
+      "title": "Chưa có tin nào",
+      "filtered_title": "Không có tin phù hợp",
+      "filtered_body": "Thử từ khoá khác hoặc bỏ bớt bộ lọc."
+    }
+  },
+  "groups": {
+    "title": "Nhóm ghép",
+    "subtitle": "Ghép xe và ghép trận. Huỷ nhóm vi phạm — thành viên nhận thông báo.",
+    "table_label": "Danh sách nhóm",
+    "opens_new_tab": "(mở tab mới)",
+    "host_filter": "Đang xem nhóm của một người dùng.",
+    "filter": {
+      "q": "Tìm",
+      "q_placeholder": "Tiêu đề hoặc mã nhóm",
+      "kind": "Loại",
+      "status": "Trạng thái"
+    },
+    "col": {
+      "title": "Nhóm",
+      "host": "Chủ nhóm",
+      "starts": "Bắt đầu",
+      "seats": "Chỗ",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "unknown_host": "Không rõ",
+    "seats": "{{taken}}/{{total}}",
+    "cancel": "Huỷ nhóm",
+    "confirm": {
+      "title": "Huỷ nhóm “{{title}}” của {{host}}?",
+      "body": "Nhóm chuyển sang “Đã huỷ”, mọi thành viên nhận thông báo. Không hoàn tác được."
+    },
+    "note_label": "Lý do (ghi vào nhật ký)",
+    "note_hint": "Chỉ staff xem được.",
+    "toast": {
+      "cancelled": "Đã huỷ nhóm"
+    },
+    "empty": {
+      "title": "Chưa có nhóm nào",
+      "filtered_title": "Không có nhóm phù hợp",
+      "filtered_body": "Thử từ khoá khác hoặc bỏ bớt bộ lọc."
+    }
+  },
+  "catalog": {
+    "title": "Danh mục",
+    "subtitle": "Sân thể thao, khu làm việc và từ khoá kiểm duyệt.",
+    "tabs": {
+      "venues": "Sân",
+      "sites": "Khu",
+      "keywords": "Từ khoá cấm"
+    },
+    "venues": {
+      "table_label": "Danh sách sân",
+      "filter": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Đã từ chối",
+        "hidden": "Đã ẩn"
+      },
+      "search": "Tìm sân",
+      "search_placeholder": "Tên sân",
+      "col": {
+        "name": "Sân",
+        "site": "Khu",
+        "price": "Giá tham khảo",
+        "phone": "SĐT sân",
+        "created_by": "Người góp",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "per_hour": "{{price}}/giờ",
+      "unknown": "Không rõ",
+      "hidden": "Đã ẩn",
+      "status": {
+        "pending": "Chờ duyệt",
+        "approved": "Đã duyệt",
+        "rejected": "Đã từ chối"
+      },
+      "approve": "Duyệt",
+      "reject": "Từ chối",
+      "edit": "Sửa thông tin",
+      "hide": "Ẩn sân",
+      "unhide": "Hiện lại",
+      "actions_for": "Thao tác với sân “{{name}}”",
+      "empty_title": "Không có sân nào",
+      "empty_body": "Sân người dùng góp sẽ hiện ở tab Chờ duyệt.",
+      "confirm": {
+        "approve_title": "Duyệt sân “{{name}}”?",
+        "approve_body": "Sân hiện cho mọi người khi tạo kèo ghép trận.",
+        "reject_title": "Từ chối sân “{{name}}”?",
+        "reject_body": "Sân không được dùng khi tạo kèo.",
+        "hide_title": "Ẩn sân “{{name}}”?",
+        "hide_body": "Sân không còn hiện khi tạo kèo; nhóm cũ vẫn giữ tên sân.",
+        "unhide_title": "Hiện lại sân “{{name}}”?",
+        "unhide_body": "Sân dùng lại được theo trạng thái duyệt hiện tại."
+      },
+      "reject_reason": "Lý do từ chối",
+      "reject_hint": "Tối đa 200 ký tự.",
+      "toast": {
+        "approve": "Đã duyệt sân",
+        "reject": "Đã từ chối sân",
+        "hide": "Đã ẩn sân",
+        "unhide": "Đã hiện lại sân",
+        "updated": "Đã lưu thông tin sân"
+      },
+      "form": {
+        "title": "Sửa sân “{{name}}”",
+        "description": "Thông tin hiện cho người tạo kèo. SĐT là số của cơ sở, không phải SĐT cá nhân.",
+        "name": "Tên sân",
+        "sports": "Môn",
+        "site": "Khu",
+        "price": "Giá tham khảo (đ/giờ)",
+        "address": "Địa chỉ",
+        "phone": "SĐT sân",
+        "save": "Lưu"
+      }
+    },
+    "sites": {
+      "hint": "Khu làm việc người dùng chọn trong hồ sơ. Nên ẩn thay vì xoá để hồ sơ cũ giữ khu đã chọn.",
+      "add": "Thêm khu",
+      "empty": "Chưa có khu nào",
+      "table_label": "Danh sách khu",
+      "col": {
+        "name": "Tên",
+        "code": "Mã",
+        "sort": "Thứ tự",
+        "status": "Hiển thị",
+        "actions": "Thao tác"
+      },
+      "active": "Đang hiện",
+      "inactive": "Đang ẩn",
+      "edit": "Sửa",
+      "hide": "Ẩn",
+      "show": "Hiện",
+      "confirm": {
+        "hide_title": "Ẩn khu “{{name}}”?",
+        "hide_body": "Khu không còn hiện ở app / web; người đã chọn khu này vẫn giữ.",
+        "show_title": "Hiện lại khu “{{name}}”?",
+        "show_body": "Khu hiện lại trong danh sách chọn ở app / web."
+      },
+      "toast": {
+        "updated": "Đã lưu khu",
+        "created": "Đã thêm khu"
+      },
+      "form": {
+        "new_title": "Thêm khu",
+        "edit_title": "Sửa khu “{{name}}”",
+        "description": "Toạ độ là tâm khu, dùng để lọc khoảng cách.",
+        "code": "Mã khu",
+        "code_hint": "Chữ thường không dấu, số, gạch dưới (vd hoa_phat_dung_quat). Không đổi được sau khi tạo.",
+        "name": "Tên hiển thị",
+        "lat": "Vĩ độ",
+        "lng": "Kinh độ",
+        "sort": "Thứ tự",
+        "coords_hint": "Bỏ trống vĩ độ / kinh độ để giữ toạ độ hiện tại.",
+        "save": "Lưu",
+        "create": "Thêm khu"
+      }
+    },
+    "keywords": {
+      "search": "Tìm từ khoá",
+      "search_placeholder": "vd vay nóng",
+      "action": "Hành động",
+      "actions": {
+        "reject": "Từ chối ngay",
+        "review": "Đưa vào hàng chờ"
+      },
+      "add_title": "Thêm từ khoá",
+      "keyword": "Từ khoá",
+      "add": "Thêm",
+      "hint": "2–60 ký tự, chỉ chữ, số và khoảng trắng. So khớp không phân biệt dấu (“vay nong” cũng bắt).",
+      "categories_label_one": "Chỉ áp cho danh mục (đang chọn {{count}})",
+      "categories_label_other": "Chỉ áp cho danh mục (đang chọn {{count}}; bỏ trống = mọi danh mục)",
+      "categories": "Danh mục áp dụng",
+      "all_categories": "Mọi danh mục",
+      "col_actions": "Thao tác",
+      "table_label_one": "{{count}} từ khoá",
+      "table_label_other": "{{count}} từ khoá",
+      "empty": "Chưa có từ khoá nào",
+      "empty_filtered": "Không có từ khoá phù hợp",
+      "switch_to": {
+        "reject": "Chuyển sang từ chối ngay",
+        "review": "Chuyển sang hàng chờ"
+      },
+      "remove": "Gỡ từ khoá",
+      "confirm_remove": "Gỡ từ khoá “{{keyword}}”?",
+      "confirm_remove_body": "Tin mới chứa từ này không còn bị chặn. Việc gỡ được ghi vào nhật ký.",
+      "toast": {
+        "created": "Đã thêm từ khoá",
+        "updated": "Đã đổi hành động",
+        "removed": "Đã gỡ từ khoá"
+      }
+    }
+  },
+  "audit": {
+    "title": "Nhật ký",
+    "subtitle": "Mọi thao tác của staff và hệ thống, mới nhất trước. Chỉ thêm, không sửa / xoá.",
+    "table_label": "Nhật ký thao tác",
+    "filter": {
+      "from": "Từ ngày",
+      "to": "Đến ngày",
+      "action": "Hành động"
+    },
+    "prefix": {
+      "listing": "Tin đăng",
+      "report": "Báo cáo",
+      "badge": "Huy hiệu",
+      "user": "Người dùng",
+      "group": "Nhóm ghép",
+      "venue": "Sân",
+      "site": "Khu",
+      "keyword": "Từ khoá cấm",
+      "banner": "Banner",
+      "contact": "Xem liên hệ",
+      "account": "Tài khoản",
+      "audit": "Xuất nhật ký"
+    },
+    "col": {
+      "time": "Thời gian",
+      "actor": "Người làm",
+      "action": "Hành động",
+      "target": "Đối tượng",
+      "meta": "Chi tiết"
+    },
+    "unknown_actor": "Không rõ",
+    "system": "Hệ thống",
+    "filter_actor": "Lọc theo người này",
+    "filter_target": "Lọc theo đối tượng",
+    "clear_actor": "Bỏ lọc người làm",
+    "clear_target": "Bỏ lọc đối tượng {{id}}",
+    "export": "Xuất CSV",
+    "export_hint": "Xuất theo khoảng ngày và hành động đang lọc (tối đa 10.000 dòng). Việc xuất cũng được ghi vào nhật ký.",
+    "empty": "Chưa có thao tác nào",
+    "empty_filtered": "Không có thao tác phù hợp với bộ lọc"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "subtitle": "Banner trên trang chủ app, trang chủ web và trang danh sách. Lead và blog sẽ có ở bản sau.",
+    "hint": "Banner chỉ có chữ (ảnh banner chưa hỗ trợ ở đây). Tắt banner thay vì xoá.",
+    "add": "Thêm banner",
+    "empty_title": "Chưa có banner",
+    "empty_body": "Tạo banner để giới thiệu tính năng hoặc sự kiện.",
+    "placement": {
+      "all": "Tất cả",
+      "app_home": "Trang chủ app",
+      "web_home": "Trang chủ web",
+      "web_listing": "Danh sách web"
+    },
+    "all_locales": "Mọi ngôn ngữ",
+    "state": {
+      "live": "Đang hiện",
+      "scheduled": "Đã lên lịch",
+      "ended": "Đã hết hạn",
+      "off": "Đang tắt"
+    },
+    "window": "{{from}} → {{to}}",
+    "no_start": "Ngay",
+    "no_end": "Không hạn",
+    "sort": "Thứ tự {{sort}}",
+    "edit": "Sửa",
+    "disable": "Tắt",
+    "enable": "Bật",
+    "tone": {
+      "primary": "Xanh thương hiệu",
+      "accent": "Cam",
+      "pass": "Pass đồ",
+      "room": "Tìm trọ",
+      "job": "Tìm việc",
+      "lost-found": "Đồ thất lạc",
+      "ride": "Ghép xe",
+      "sport": "Ghép trận"
+    },
+    "toast": {
+      "enabled": "Đã bật “{{title}}”",
+      "disabled": "Đã tắt “{{title}}”",
+      "saved": "Đã lưu banner",
+      "created": "Đã tạo banner"
+    },
+    "form": {
+      "new_title": "Thêm banner",
+      "edit_title": "Sửa banner “{{title}}”",
+      "description": "Chữ hiển thị đúng như nhập, theo ngôn ngữ đã chọn.",
+      "placement": "Vị trí",
+      "locale": "Ngôn ngữ",
+      "title": "Tiêu đề",
+      "subtitle": "Dòng phụ",
+      "cta": "Chữ trên nút",
+      "link": "Liên kết (/… hoặc https://…)",
+      "tone": "Tông màu",
+      "starts": "Bắt đầu",
+      "ends": "Kết thúc",
+      "sort": "Thứ tự",
+      "active": "Bật banner",
+      "save": "Lưu",
+      "create": "Tạo banner"
+    }
   }
 }

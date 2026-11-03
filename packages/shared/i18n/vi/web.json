@@ -24,7 +24,8 @@
     "rail_prev": "Cuộn sang trái",
     "rail_next": "Cuộn sang phải",
     "get_app_ios": "Tải trên App Store",
-    "get_app_android": "Tải trên Google Play"
+    "get_app_android": "Tải trên Google Play",
+    "for_you_hint": "Gợi ý theo khu và loại tin bạn hay xem"
   },
   "dev": {
     "title": "Thư viện giao diện web",
@@ -100,5 +101,40 @@
     "step_basics": "Thông tin chính",
     "preparing_photos": "Đang xử lý ảnh…",
     "restore_body": "Bạn có một tin đang soạn dở trên trình duyệt này."
+  },
+  "chat": {
+    "select_title": "Chọn một cuộc trò chuyện",
+    "select_body": "Chọn người bạn muốn nhắn ở danh sách bên trái.",
+    "composer_hint": "Enter để gửi, Shift + Enter để xuống dòng",
+    "open_image": "Mở ảnh cỡ lớn",
+    "group_preview": "{{name}}: {{text}}"
+  },
+  "group": {
+    "ride": {
+      "title": "Ghép xe về quê quanh Dung Quất",
+      "description": "Rủ đồng nghiệp đi chung xe về quê, ra sân bay, chia tiền xăng: các chuyến sắp khởi hành quanh khu Dung Quất."
+    },
+    "sport": {
+      "title": "Ghép trận quanh Dung Quất",
+      "description": "Tìm thêm người đá bóng, đánh cầu lông, pickleball sau ca quanh khu Dung Quất."
+    },
+    "upcoming_ride": "Chuyến sắp khởi hành",
+    "upcoming_sport": "Kèo sắp diễn ra",
+    "sub_kinds_label": "Loại nhóm",
+    "when_label": "Thời gian",
+    "create_section": "Hoặc tạo nhóm ghép",
+    "cancel_request_body": "Bạn có thể xin tham gia lại sau nếu nhóm còn chỗ.",
+    "members_label": "Thành viên đã tham gia",
+    "route": "{{from}} → {{to}}",
+    "starts_hint": "Từ 15 phút tới 60 ngày nữa.",
+    "form_invalid": "Kiểm tra lại các ô được đánh dấu.",
+    "seats_max": "Tối đa {{max}}.",
+    "manage_title": "Quản lý nhóm"
+  },
+  "badge": {
+    "status_none": "Chưa xác minh",
+    "file_hint": "Ảnh (JPG, PNG, WebP) hoặc PDF, tối đa 5 MB.",
+    "file_type": "Chỉ nhận ảnh hoặc tệp PDF.",
+    "submitting": "Đang gửi…"
   }
 }

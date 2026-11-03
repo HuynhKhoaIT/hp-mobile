@@ -24,7 +24,8 @@
     "rail_prev": "Scroll left",
     "rail_next": "Scroll right",
     "get_app_ios": "Download on the App Store",
-    "get_app_android": "Get it on Google Play"
+    "get_app_android": "Get it on Google Play",
+    "for_you_hint": "Based on your area and what you often view"
   },
   "dev": {
     "title": "Web UI gallery",
@@ -100,5 +101,40 @@
     "step_basics": "Main details",
     "preparing_photos": "Processing photos…",
     "restore_body": "You have an unfinished listing in this browser."
+  },
+  "chat": {
+    "select_title": "Select a conversation",
+    "select_body": "Pick someone from the list on the left to keep chatting.",
+    "composer_hint": "Press Enter to send, Shift + Enter for a new line",
+    "open_image": "Open full-size image",
+    "group_preview": "{{name}}: {{text}}"
+  },
+  "group": {
+    "ride": {
+      "title": "Ride sharing around Dung Quat",
+      "description": "Share a ride home or to the airport with co-workers and split the fuel: upcoming trips around Dung Quat."
+    },
+    "sport": {
+      "title": "Pickup games around Dung Quat",
+      "description": "Find more players for football, badminton or pickleball after your shift around Dung Quat."
+    },
+    "upcoming_ride": "Upcoming trips",
+    "upcoming_sport": "Upcoming games",
+    "sub_kinds_label": "Group type",
+    "when_label": "Time",
+    "create_section": "Or create a group",
+    "cancel_request_body": "You can ask to join again later if there are seats left.",
+    "members_label": "Members who joined",
+    "route": "{{from}} → {{to}}",
+    "starts_hint": "From 15 minutes to 60 days from now.",
+    "form_invalid": "Please check the highlighted fields.",
+    "seats_max": "Up to {{max}}.",
+    "manage_title": "Manage group"
+  },
+  "badge": {
+    "status_none": "Not verified",
+    "file_hint": "Photo (JPG, PNG, WebP) or PDF, up to 5 MB.",
+    "file_type": "Only photos or PDF files are accepted.",
+    "submitting": "Sending…"
   }
 }

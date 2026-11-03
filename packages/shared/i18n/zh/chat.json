@@ -1,1 +1,58 @@
-{}
+{
+  "title": "消息",
+  "inbox": {
+    "empty_title": "还没有消息",
+    "empty_body": "给发布者发消息了解更多，对话会显示在这里。",
+    "empty_cta": "看看最新信息",
+    "login_title": "登录后即可聊天",
+    "login_body": "直接联系卖家、房东和招聘方。",
+    "image": "发送了一张图片",
+    "you": "你：{{text}}",
+    "sender": "{{name}}：{{text}}",
+    "no_messages": "还没有消息",
+    "deleted_user": "用户",
+    "listing_gone": "信息已不再显示",
+    "muted": "已关闭通知",
+    "unread": "{{count}} 条未读"
+  },
+  "thread": {
+    "placeholder": "输入消息…",
+    "send": "发送",
+    "attach_image": "发送图片",
+    "sending": "发送中",
+    "sent": "已发送",
+    "seen": "已读",
+    "failed": "发送失败，点按重试",
+    "retry": "重试",
+    "discard": "放弃此消息",
+    "typing": "正在输入…",
+    "load_older": "查看更早的消息",
+    "today": "今天",
+    "yesterday": "昨天",
+    "start_hint": "打个招呼，问问这条信息吧",
+    "view_listing": "查看信息",
+    "image_alt": "消息中的图片",
+    "too_long": "消息最多 {{max}} 个字符",
+    "mute": "关闭通知",
+    "unmute": "开启通知",
+    "not_found": "找不到该对话",
+    "options": "对话选项"
+  },
+  "blocked": {
+    "by_me": "你已屏蔽此人。取消屏蔽后可继续聊天。",
+    "by_them": "你无法再给此人发消息。"
+  },
+  "safety": {
+    "title": "安全交易",
+    "intro": "开始聊天前请注意：",
+    "tip_meet": "白天在园区附近人多的公共场所见面。",
+    "tip_check": "付款前仔细查看物品、房间或工作。",
+    "tip_deposit": "不要给陌生人转账定金。",
+    "tip_report": "发现诈骗迹象，请点“举报”。",
+    "accept": "我知道了"
+  },
+  "cta": {
+    "chat": "发消息",
+    "own_listing": "这是你发布的信息"
+  }
+}

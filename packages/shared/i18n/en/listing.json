@@ -213,7 +213,8 @@
       "km": "km",
       "months": "months",
       "people": "people"
-    }
+    },
+    "photos_min": "This type of listing needs at least {{min}} photos."
   },
   "manage": {
     "title": "My listings",
@@ -279,5 +280,27 @@
     "unsave": "Unsave",
     "saved": "Listing saved",
     "removed": "Removed from saved"
+  },
+  "translate": {
+    "action": "Translate to English",
+    "show_original": "Show original",
+    "translated_note": "Automatic translation",
+    "translating": "Translating…"
+  },
+  "distance": {
+    "label": "Distance to work site",
+    "any": "Any distance",
+    "within": "Within {{km}} km",
+    "to_site": "{{distance}} from {{site}}"
+  },
+  "lost_found": {
+    "matches_title": "Possible matches",
+    "matches_hint": "Same kind of item, close in time and place.",
+    "matches_empty": "No matches yet. We will notify you as soon as there is one.",
+    "mark_returned": "Item returned",
+    "mark_returned_confirm_title": "Mark as returned?",
+    "mark_returned_confirm_body": "The listing will be closed and hidden from public view.",
+    "returned_done": "Great! The item is back with its owner.",
+    "returned_badge": "Returned"
   }
 }

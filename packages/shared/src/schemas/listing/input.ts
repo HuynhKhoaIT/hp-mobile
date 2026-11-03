@@ -2,6 +2,7 @@
 // Mã lỗi (message) là key ns errors. Kiểm duyệt nội dung ở DB (trigger), không ở đây.
 import { z } from 'zod';
 import { LISTING_CATEGORIES, PRICE_TYPES, type ListingCategory } from '../../enums';
+import { LISTING_IMAGES } from '../../constants';
 import { LOCALES } from '../../locales';
 import { featureOfCategory } from '../../listing-display';
 import { SiteCode } from '../profile';
@@ -39,6 +40,8 @@ type Checked = {
   price_type?: string;
   price?: number | null;
   attributes?: Record<string, unknown>;
+  status?: string;
+  images?: string[];
 };
 
 /** Kiểm attributes theo category + giá bắt buộc. Lỗi gắn vào path để form hiện dưới đúng ô. */
@@ -50,6 +53,11 @@ function refineListing(v: Checked, ctx: z.RefinementCtx) {
         ctx.addIssue({ code: 'custom', path: ['attributes', ...issue.path], message: issue.code === 'unrecognized_keys' ? 'invalid_input' : issue.message.startsWith('too_') ? issue.message : 'invalid_input' });
       }
     }
+  }
+  // Trọ cần ≥ LISTING_IMAGES.roomMin ảnh khi đăng (nháp thì chưa) — trigger trg_listings_images_min kiểm lại ở DB.
+  if (v.status === 'active' && v.images && (v.category === 'room_rent' || v.category === 'room_share')
+      && v.images.length < LISTING_IMAGES.roomMin) {
+    ctx.addIssue({ code: 'custom', path: ['images'], message: 'images_min' });
   }
   if (v.price_type && priceRequired(v.category, v.price_type) && !(v.price && v.price > 0)) {
     ctx.addIssue({ code: 'custom', path: ['price'], message: 'price_required' });

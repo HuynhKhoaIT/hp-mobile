@@ -213,7 +213,8 @@
       "km": "km",
       "months": "tháng",
       "people": "người"
-    }
+    },
+    "photos_min": "Cần ít nhất {{min}} ảnh cho loại tin này."
   },
   "manage": {
     "title": "Tin của tôi",
@@ -279,5 +280,27 @@
     "unsave": "Bỏ lưu",
     "saved": "Đã lưu tin",
     "removed": "Đã bỏ lưu"
+  },
+  "translate": {
+    "action": "Dịch sang tiếng Việt",
+    "show_original": "Xem bản gốc",
+    "translated_note": "Bản dịch tự động",
+    "translating": "Đang dịch…"
+  },
+  "distance": {
+    "label": "Cách khu làm việc",
+    "any": "Mọi khoảng cách",
+    "within": "Dưới {{km}} km",
+    "to_site": "Cách {{site}} {{distance}}"
+  },
+  "lost_found": {
+    "matches_title": "Tin có thể khớp",
+    "matches_hint": "Cùng loại đồ, gần thời điểm và gần vị trí bạn đăng.",
+    "matches_empty": "Chưa có tin khớp. Bạn sẽ được báo ngay khi có.",
+    "mark_returned": "Đã nhận lại đồ",
+    "mark_returned_confirm_title": "Đánh dấu đã nhận lại?",
+    "mark_returned_confirm_body": "Tin sẽ đóng lại và không còn hiện công khai.",
+    "returned_done": "Tuyệt vời! Đồ đã về với chủ.",
+    "returned_badge": "Đã trả lại"
   }
 }

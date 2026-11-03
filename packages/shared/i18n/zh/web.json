@@ -24,7 +24,8 @@
     "rail_prev": "向左滚动",
     "rail_next": "向右滚动",
     "get_app_ios": "在 App Store 下载",
-    "get_app_android": "在 Google Play 下载"
+    "get_app_android": "在 Google Play 下载",
+    "for_you_hint": "根据你的区域和常看的内容推荐"
   },
   "dev": {
     "title": "网页界面组件库",
@@ -100,5 +101,40 @@
     "step_basics": "主要信息",
     "preparing_photos": "正在处理图片…",
     "restore_body": "您在此浏览器中有一条未完成的信息。"
+  },
+  "chat": {
+    "select_title": "选择一个对话",
+    "select_body": "从左侧列表中选择要聊天的人。",
+    "composer_hint": "按 Enter 发送，Shift + Enter 换行",
+    "open_image": "查看大图",
+    "group_preview": "{{name}}：{{text}}"
+  },
+  "group": {
+    "ride": {
+      "title": "Dung Quat 周边拼车",
+      "description": "和同事拼车回老家或去机场，分摊油费：Dung Quat 周边即将出发的行程。"
+    },
+    "sport": {
+      "title": "Dung Quat 周边约球",
+      "description": "下班后在 Dung Quat 周边找人踢足球、打羽毛球、匹克球。"
+    },
+    "upcoming_ride": "即将出发的行程",
+    "upcoming_sport": "即将开始的约球",
+    "sub_kinds_label": "类型",
+    "when_label": "时间",
+    "create_section": "或创建拼组",
+    "cancel_request_body": "如果还有空位，你之后可以再次申请加入。",
+    "members_label": "已加入的成员",
+    "route": "{{from}} → {{to}}",
+    "starts_hint": "15 分钟后至 60 天内。",
+    "form_invalid": "请检查标出的字段。",
+    "seats_max": "最多 {{max}}。",
+    "manage_title": "管理拼组"
+  },
+  "badge": {
+    "status_none": "未认证",
+    "file_hint": "照片（JPG、PNG、WebP）或 PDF，最大 5 MB。",
+    "file_type": "仅接受照片或 PDF 文件。",
+    "submitting": "正在提交…"
   }
 }

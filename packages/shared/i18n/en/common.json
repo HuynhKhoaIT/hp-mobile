@@ -171,6 +171,120 @@
     "get_app_title": "Get the app for instant alerts",
     "get_app_body": "Know right away when someone messages you, your listing is approved or a room appears nearby.",
     "section_error": "Couldn't load this section",
-    "refreshing": "Refreshing…"
+    "refreshing": "Refreshing…",
+    "for_you_feed_hint": "Based on your area and what you often view"
+  },
+  "report": {
+    "title": "Report {{target}}",
+    "subtitle": "Pick a reason. Moderators review reports within 2 hours.",
+    "reasons": {
+      "scam": "Scam or deposit request",
+      "spam": "Spam or duplicate",
+      "inappropriate": "Inappropriate content",
+      "other": "Something else"
+    },
+    "detail_label": "More details (optional)",
+    "detail_placeholder": "What happened?",
+    "submit": "Send report",
+    "success": "Report sent. Thank you!",
+    "already": "You have already reported this.",
+    "targets": {
+      "listing": "listing",
+      "group": "group",
+      "profile": "user",
+      "message": "message"
+    }
+  },
+  "block": {
+    "title": "Block {{name}}?",
+    "body": "You won’t be able to message each other and you won’t see their listings. You can unblock at any time.",
+    "confirm": "Block",
+    "success": "Blocked",
+    "unblock": "Unblock",
+    "unblocked": "Unblocked",
+    "someone": "this person"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty_title": "No notifications yet",
+    "empty_body": "New messages, listing reviews and reminders will show up here.",
+    "login_body": "Log in to get updates about your messages and listings.",
+    "unread": "Unread",
+    "prefs": {
+      "title": "Push notifications",
+      "subtitle": "Choose what shows on your lock screen. The in-app list stays complete.",
+      "messages": "Messages",
+      "messages_hint": "When someone messages you",
+      "listings": "Your listings",
+      "listings_hint": "Approved, rejected, expiring soon",
+      "groups": "Rides and games",
+      "groups_hint": "Join requests, departure reminders",
+      "lost_found": "Lost and found",
+      "lost_found_hint": "A post matches what you are looking for"
+    },
+    "system_off": "Notifications for this app are turned off in your phone settings.",
+    "open_settings": "Open settings",
+    "permission": {
+      "title": "Turn on notifications?",
+      "body": "Know right away when someone messages you or your listing is approved.",
+      "allow": "Turn on",
+      "later": "Not now"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "member_since": "Joined {{date}}",
+    "listings": "Active listings",
+    "no_listings": "This person has no active listings.",
+    "rating": "{{avg}} · {{count}} reviews",
+    "no_rating": "No reviews yet",
+    "not_found": "User not found",
+    "view": "View profile"
+  },
+  "badge_request": {
+    "title": "Verification badges",
+    "intro": "Badges help others trust you. Documents are only seen by moderators and deleted after 30 days.",
+    "choose_badge": "Choose a badge",
+    "doc_hint_worker": "Employee card or labour contract (you may cover your ID number).",
+    "doc_hint_landlord": "Property papers or a rental contract.",
+    "doc_hint_venue": "Business licence of the venue, or a photo of you at its sign.",
+    "doc_hint_employer": "Business licence or a company introduction letter.",
+    "pick_photo": "Take or choose a photo of the document",
+    "submit": "Submit for verification",
+    "submitted": "Submitted. You will hear back within 1–2 days.",
+    "status_pending": "Pending review",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "owned": "You have it",
+    "reason": "Reason: {{reason}}",
+    "request": "Request badge",
+    "request_again": "Send again",
+    "take_photo": "Take photo",
+    "from_library": "Choose from library",
+    "change_photo": "Change photo",
+    "photo_label": "Selected document photo",
+    "camera_denied": "Camera access is off. Turn it on in your phone settings or choose a photo from your library."
+  },
+  "account": {
+    "delete_title": "Delete account",
+    "delete_body": "Your listings, groups and profile are hidden immediately and permanently deleted after 30 days. Sent messages are kept anonymously. This cannot be undone.",
+    "delete_confirm_label": "Type DELETE to confirm",
+    "delete_confirm_word": "DELETE",
+    "delete_action": "Delete my account",
+    "deleted": "Your account has been deleted."
+  },
+  "coach": {
+    "label": "Quick tour",
+    "step": "{{current}}/{{total}}",
+    "next": "Next",
+    "skip": "Skip",
+    "done": "Got it",
+    "search_title": "Find anything fast",
+    "search_body": "Type an item, a room or a job into the search box at the top.",
+    "post_title": "Post for free",
+    "post_body": "Tap the Post (+) button in the middle of the bottom bar to sell items, rent a room or hire.",
+    "chat_title": "Chat in the app",
+    "chat_body": "Messages with buyers and sellers are in the Messages tab — no need to share your phone number."
   }
 }

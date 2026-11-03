@@ -171,6 +171,120 @@
     "get_app_title": "Dùng app để nhận thông báo ngay",
     "get_app_body": "Biết ngay khi có người nhắn tin, tin được duyệt hoặc có phòng mới gần bạn.",
     "section_error": "Không tải được mục này",
-    "refreshing": "Đang làm mới…"
+    "refreshing": "Đang làm mới…",
+    "for_you_feed_hint": "Theo khu của bạn và loại tin bạn hay xem"
+  },
+  "report": {
+    "title": "Báo cáo {{target}}",
+    "subtitle": "Chọn lý do. Đội kiểm duyệt xem báo cáo trong vòng 2 giờ.",
+    "reasons": {
+      "scam": "Lừa đảo, đòi đặt cọc",
+      "spam": "Spam, đăng lặp lại",
+      "inappropriate": "Nội dung không phù hợp",
+      "other": "Lý do khác"
+    },
+    "detail_label": "Mô tả thêm (không bắt buộc)",
+    "detail_placeholder": "Chuyện gì đã xảy ra?",
+    "submit": "Gửi báo cáo",
+    "success": "Đã gửi báo cáo. Cảm ơn bạn!",
+    "already": "Bạn đã báo cáo nội dung này rồi.",
+    "targets": {
+      "listing": "tin đăng",
+      "group": "nhóm",
+      "profile": "người dùng",
+      "message": "tin nhắn"
+    }
+  },
+  "block": {
+    "title": "Chặn {{name}}?",
+    "body": "Hai bạn sẽ không nhắn tin được cho nhau và bạn không thấy tin đăng của người này nữa. Có thể bỏ chặn bất cứ lúc nào.",
+    "confirm": "Chặn",
+    "success": "Đã chặn",
+    "unblock": "Bỏ chặn",
+    "unblocked": "Đã bỏ chặn",
+    "someone": "người này"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "mark_all_read": "Đánh dấu đã đọc",
+    "empty_title": "Chưa có thông báo",
+    "empty_body": "Tin nhắn mới, kết quả duyệt tin và nhắc lịch sẽ hiện ở đây.",
+    "login_body": "Đăng nhập để nhận thông báo về tin nhắn và tin đăng của bạn.",
+    "unread": "Chưa đọc",
+    "prefs": {
+      "title": "Thông báo đẩy",
+      "subtitle": "Chọn loại thông báo hiện trên màn hình khoá. Danh sách trong app vẫn đủ.",
+      "messages": "Tin nhắn",
+      "messages_hint": "Khi có người nhắn cho bạn",
+      "listings": "Tin đăng của bạn",
+      "listings_hint": "Duyệt, từ chối, sắp hết hạn",
+      "groups": "Ghép xe, ghép trận",
+      "groups_hint": "Yêu cầu tham gia, nhắc giờ đi",
+      "lost_found": "Đồ thất lạc",
+      "lost_found_hint": "Có tin khớp với đồ bạn tìm"
+    },
+    "system_off": "Thông báo của ứng dụng đang tắt trong cài đặt điện thoại.",
+    "open_settings": "Mở cài đặt",
+    "permission": {
+      "title": "Bật thông báo?",
+      "body": "Để biết ngay khi có người nhắn tin hoặc tin của bạn được duyệt.",
+      "allow": "Bật thông báo",
+      "later": "Để sau"
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "member_since": "Tham gia {{date}}",
+    "listings": "Tin đang đăng",
+    "no_listings": "Người này chưa có tin nào đang đăng.",
+    "rating": "{{avg}} · {{count}} đánh giá",
+    "no_rating": "Chưa có đánh giá",
+    "not_found": "Không tìm thấy người dùng",
+    "view": "Xem hồ sơ"
+  },
+  "badge_request": {
+    "title": "Huy hiệu xác minh",
+    "intro": "Huy hiệu giúp người khác tin bạn hơn. Giấy tờ chỉ kiểm duyệt viên xem và được xoá sau 30 ngày.",
+    "choose_badge": "Chọn huy hiệu",
+    "doc_hint_worker": "Thẻ nhân viên hoặc hợp đồng lao động (che số CCCD nếu muốn).",
+    "doc_hint_landlord": "Giấy tờ nhà hoặc hợp đồng cho thuê.",
+    "doc_hint_venue": "Giấy phép kinh doanh của sân hoặc ảnh biển hiệu kèm bạn.",
+    "doc_hint_employer": "Giấy phép kinh doanh hoặc giấy giới thiệu của công ty.",
+    "pick_photo": "Chụp hoặc chọn ảnh giấy tờ",
+    "submit": "Gửi xác minh",
+    "submitted": "Đã gửi. Kết quả sẽ có trong 1–2 ngày.",
+    "status_pending": "Đang chờ duyệt",
+    "status_approved": "Đã duyệt",
+    "status_rejected": "Bị từ chối",
+    "owned": "Bạn đã có",
+    "reason": "Lý do: {{reason}}",
+    "request": "Xin huy hiệu",
+    "request_again": "Gửi lại",
+    "take_photo": "Chụp ảnh",
+    "from_library": "Chọn từ thư viện",
+    "change_photo": "Đổi ảnh",
+    "photo_label": "Ảnh giấy tờ đã chọn",
+    "camera_denied": "Chưa có quyền dùng máy ảnh. Hãy bật trong Cài đặt của máy hoặc chọn ảnh từ thư viện."
+  },
+  "account": {
+    "delete_title": "Xoá tài khoản",
+    "delete_body": "Tin đăng, nhóm và hồ sơ của bạn sẽ ẩn ngay và bị xoá hẳn sau 30 ngày. Tin nhắn đã gửi được giữ lại ẩn danh. Không thể hoàn tác.",
+    "delete_confirm_label": "Gõ XOA để xác nhận",
+    "delete_confirm_word": "XOA",
+    "delete_action": "Xoá vĩnh viễn tài khoản",
+    "deleted": "Tài khoản đã được xoá."
+  },
+  "coach": {
+    "label": "Hướng dẫn nhanh",
+    "step": "{{current}}/{{total}}",
+    "next": "Tiếp",
+    "skip": "Bỏ qua",
+    "done": "Đã hiểu",
+    "search_title": "Tìm nhanh mọi thứ",
+    "search_body": "Gõ tên món đồ, phòng trọ hay công việc vào ô tìm kiếm ở đầu trang.",
+    "post_title": "Đăng tin miễn phí",
+    "post_body": "Bấm nút Đăng (+) ở giữa thanh dưới để pass đồ, cho thuê phòng hay tìm người.",
+    "chat_title": "Nhắn tin trong app",
+    "chat_body": "Tin nhắn với người mua, người bán nằm ở tab Tin nhắn — không cần đưa số điện thoại."
   }
 }

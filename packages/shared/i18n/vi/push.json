@@ -6,5 +6,57 @@
   "listing_rejected": {
     "title": "Tin chưa được duyệt",
     "body": "Tin \"{{title}}\" vi phạm quy định nên chưa được đăng. Bạn có thể sửa và đăng lại."
+  },
+  "new_message": {
+    "title": "{{sender_name}}",
+    "body": "{{preview}}",
+    "image": "Đã gửi một ảnh",
+    "group_title": "{{title}}",
+    "group_body": "{{sender_name}}: {{preview}}",
+    "group_image": "{{sender_name}} đã gửi một ảnh"
+  },
+  "join_request": {
+    "title": "{{title}}",
+    "body": "{{name}} xin tham gia nhóm của bạn",
+    "body_joined": "{{name}} đã tham gia nhóm của bạn",
+    "body_left": "{{name}} đã rời nhóm, có thêm 1 chỗ trống"
+  },
+  "join_accepted": {
+    "title": "Bạn đã được nhận",
+    "body": "Chủ nhóm đã nhận bạn vào \"{{title}}\""
+  },
+  "join_declined": {
+    "title": "Yêu cầu chưa được nhận",
+    "body": "Chủ nhóm chưa nhận bạn vào \"{{title}}\". Tìm nhóm khác nhé."
+  },
+  "group_cancelled": {
+    "title": "Nhóm đã bị huỷ",
+    "body": "\"{{title}}\" đã bị chủ nhóm huỷ."
+  },
+  "group_reminder": {
+    "title": "Sắp tới giờ: {{title}}",
+    "body_ride": "Chuyến xe khởi hành lúc {{time}}. Có mặt đúng giờ nhé!",
+    "body_sport": "Kèo bắt đầu lúc {{time}}. Chuẩn bị ra sân nhé!"
+  },
+  "group_completed": {
+    "title": "Buổi \"{{title}}\" thế nào?",
+    "body": "Chấm điểm chủ nhóm để mọi người tìm được nhóm uy tín."
+  },
+  "listing_expiring": {
+    "title": "Tin sắp hết hạn",
+    "body": "Tin \"{{title}}\" sẽ hết hạn trong vài ngày tới. Gia hạn để tiếp tục hiển thị."
+  },
+  "lost_found_match": {
+    "title": "Có tin có thể khớp đồ của bạn",
+    "body_found": "Có người nhặt được \"{{title}}\" — giống đồ bạn báo mất. Xem ngay!",
+    "body_lost": "Có người đang tìm \"{{title}}\" — giống đồ bạn nhặt được."
+  },
+  "badge_approved": {
+    "title": "Huy hiệu đã được duyệt",
+    "body": "Hồ sơ của bạn đã có huy hiệu mới. Mọi người sẽ tin tưởng bạn hơn!"
+  },
+  "badge_rejected": {
+    "title": "Huy hiệu chưa được duyệt",
+    "body": "Giấy tờ chưa hợp lệ. {{reason}} Bạn có thể gửi lại."
   }
 }
