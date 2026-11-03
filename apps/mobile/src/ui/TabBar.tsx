@@ -16,9 +16,11 @@ export type TabBarProps = BottomTabBarProps & {
   icons: Record<string, LucideIcon>;
   /** Route hiện dạng nút Đăng (nền accent). */
   accent?: string;
+  /** Tên route → chữ trên chấm đỏ (vd số hội thoại chưa đọc "3", "99+"); null / thiếu → không hiện. */
+  badges?: Record<string, string | null | undefined>;
 };
 
-export function TabBar({ state, descriptors, emitter, navigateToTab, insets, icons, accent }: TabBarProps) {
+export function TabBar({ state, descriptors, emitter, navigateToTab, insets, icons, accent, badges }: TabBarProps) {
   return (
     <View
       accessibilityRole="tablist"
@@ -36,7 +38,15 @@ export function TabBar({ state, descriptors, emitter, navigateToTab, insets, ico
           if (!focused && !event.defaultPrevented) navigateToTab(route.key);
         };
         return (
-          <TabItem key={route.key} label={label} icon={icon} focused={focused} accent={route.name === accent} onPress={onPress} />
+          <TabItem
+            key={route.key}
+            label={label}
+            icon={icon}
+            focused={focused}
+            accent={route.name === accent}
+            badge={badges?.[route.name] ?? null}
+            onPress={onPress}
+          />
         );
       })}
     </View>
@@ -48,12 +58,14 @@ function TabItem({
   icon,
   focused,
   accent,
+  badge,
   onPress,
 }: {
   label: string;
   icon: LucideIcon;
   focused: boolean;
   accent: boolean;
+  badge: string | null;
   onPress: () => void;
 }) {
   const { motion } = useTheme();
@@ -78,7 +90,7 @@ function TabItem({
     <Pressable
       accessibilityRole="tab"
       accessibilityState={{ selected: focused }}
-      accessibilityLabel={label}
+      accessibilityLabel={badge ? `${label}, ${badge}` : label}
       onPress={onPress}
       className="min-h-12 flex-1 items-center justify-center gap-0.5 py-1"
     >
@@ -89,6 +101,17 @@ function TabItem({
       ) : (
         <AnimatedView style={style}>
           <Icon icon={icon} tone={focused ? 'primary' : 'muted'} size="tab" />
+          {badge ? (
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              className="absolute -right-3 -top-1 min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-surface bg-accent px-1"
+            >
+              <Text variant="micro" weight="bold" tone="onAccent" maxFontSizeMultiplier={1.2}>
+                {badge}
+              </Text>
+            </View>
+          ) : null}
         </AnimatedView>
       )}
       <Text

@@ -5,8 +5,11 @@
 import type { ListingCategory, ListingFeature, PriceType } from '@hp/shared';
 import type { ListingCardLayout, ServiceKey } from '@/ui';
 
-/** subcategory: chip category con · site: chip chọn khu (sites). Phải nằm trong tập RPC search_listings hỗ trợ. */
-export type ListingFilterKey = 'subcategory' | 'site';
+/**
+ * subcategory: chip category con · site: chip chọn khu (sites) · distance: hàng chip "cách khu làm việc ≤ x km"
+ * (maxDistanceM của search_listings — tin không có vị trí bị loại). Phải nằm trong tập RPC search_listings hỗ trợ.
+ */
+export type ListingFilterKey = 'subcategory' | 'site' | 'distance';
 
 /** Cấu hình form "Đăng nhanh" — trường chi tiết lấy từ ATTRIBUTE_FIELDS[category] của @hp/shared (không khai báo lại). */
 export type ListingFormConfig = {
@@ -16,6 +19,14 @@ export type ListingFormConfig = {
   price: boolean;
   /** price_type gửi lên khi form không có ô giá / giá trị mặc định. */
   defaultPriceType: PriceType;
+  /** Số ảnh tối thiểu khi đăng / lưu tin (không chặn Lưu nháp), vd trọ LISTING_IMAGES.roomMin. Bỏ trống = không bắt buộc. */
+  minPhotos?: number;
+};
+
+/** Khối thêm ở màn chi tiết khi người xem là chủ tin. */
+export type ListingDetailConfig = {
+  /** "Tin có thể khớp" (useLostFoundMatches) + "Đã nhận lại đồ" (attributes.returned + đóng tin) — đồ thất lạc. */
+  lostFound?: boolean;
 };
 
 export type ListingFeatureConfig = {
@@ -39,6 +50,10 @@ export type ListingFeatureConfig = {
   };
   /** Bộ lọc trên màn danh sách, theo thứ tự hiển thị. Thêm filter (price, condition, radius, sort…) → thêm mã ở đây + engine. */
   filters: readonly ListingFilterKey[];
+  /** Mốc của filter 'distance' (km, tăng dần) — mặc định DISTANCE_OPTIONS_KM của engine. */
+  distanceOptionsKm?: readonly number[];
+  /** Khối riêng ở chi tiết (chủ tin). */
+  detail?: ListingDetailConfig;
   /** Form đăng tin; không có ở danh sách tổng hợp 'all'. */
   form?: ListingFormConfig;
 };

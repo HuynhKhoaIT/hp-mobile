@@ -1,5 +1,6 @@
 // Cài đặt cục bộ của máy (không đồng bộ server): giao diện sáng / tối; khu làm việc đã chọn ở Hub (khách chỉ lưu ở
-// máy; đã đăng nhập còn ghi profiles.site). Ngôn ngữ ở i18n.ts (còn ghi profiles.locale).
+// máy; đã đăng nhập còn ghi profiles.site); đã xem hướng dẫn lần đầu ở Hub (coach mark). Ngôn ngữ ở i18n.ts (còn ghi
+// profiles.locale).
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { kv, storage } from './storage';
@@ -12,6 +13,9 @@ type SettingsState = {
   /** Mã khu chọn lần trước ở Hub (sites.code) — mặc định khi chưa có profiles.site. */
   homeSite: string | null;
   setHomeSite: (site: string | null) => void;
+  /** Đã xem / bỏ qua coach mark 3 bước (tìm, đăng, nhắn) ở Hub — chỉ hiện một lần trên máy. */
+  coachSeen: boolean;
+  setCoachSeen: () => void;
 };
 
 export const useSettings = create<SettingsState>()(
@@ -21,6 +25,8 @@ export const useSettings = create<SettingsState>()(
       setThemePref: (themePref) => set({ themePref }),
       homeSite: null,
       setHomeSite: (homeSite) => set({ homeSite }),
+      coachSeen: false,
+      setCoachSeen: () => set({ coachSeen: true }),
     }),
     { name: 'settings', storage: createJSONStorage(() => kv(storage)) },
   ),

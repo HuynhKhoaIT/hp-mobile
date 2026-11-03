@@ -1,7 +1,7 @@
 // Screen type: Hub
 // Thư viện giao diện: mọi component + variant của @/ui. Chỉ mở khi __DEV__. Thêm component mới → thêm mục ở đây.
 // Có sẵn bộ chuyển sáng / tối và ngôn ngữ để rà màn ở cả 3 ngôn ngữ, 2 giao diện.
-import type { PublicListing } from '@hp/core';
+import type { PublicGroup, PublicListing } from '@hp/core';
 import { LOCALES, type ListingCategory, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
 import {
@@ -19,6 +19,7 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  SquarePlus,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,12 +29,18 @@ import { type ThemePref, useSettings } from '@/core/settings';
 import {
   AlertRow,
   Avatar,
+  AvatarStack,
+  type AvatarStackPerson,
   Badge,
   BannerCarousel,
   type BannerSlide,
   BookmarkButton,
   BottomSheet,
   Button,
+  Composer,
+  CoachMark,
+  ConfirmSheet,
+  DateTimePicker,
   type ButtonVariant,
   Card,
   Checkbox,
@@ -44,6 +51,7 @@ import {
   ErrorState,
   Fab,
   FilterBar,
+  GroupCard,
   Header,
   HomeHeader,
   HomeHeaderCurve,
@@ -56,8 +64,12 @@ import {
   ListingCard,
   ListingCover,
   MenuItem,
+  MessageBubble,
   Notice,
   NotificationBell,
+  ReportSheet,
+  RouteSummary,
+  ToggleRow,
   MultiSelect,
   OptionSheet,
   PriceInput,
@@ -70,16 +82,21 @@ import {
   ServiceGrid,
   ServiceTile,
   SiteChip,
+  SkeletonGroupCard,
+  SkeletonGroupDetail,
   SkeletonListingCard,
   SkeletonListingDetail,
   StaggerItem,
+  StarRating,
   StatColumns,
   StatTile,
+  Stepper,
   StickyCta,
   SuccessScreen,
   Text,
   type TextTone,
   type TextVariant,
+  Ticker,
   toast,
 } from '@/ui';
 
@@ -115,6 +132,47 @@ function sampleListing(over: Partial<PublicListing>): PublicListing {
   };
 }
 const SAMPLE_CATEGORIES: ListingCategory[] = ['pass_vehicle', 'room_rent', 'job_parttime', 'lost'];
+
+// Nhóm mẫu cho GroupCard (dữ liệu giả, chỉ ở gallery): giờ hẹn 1 ngày tới, tính một lần khi nạp module.
+const TOMORROW = new Date(Date.now() + 86_400_000).toISOString();
+const SAMPLE_PEOPLE: AvatarStackPerson[] = ['An N.', 'Bình T.', 'Chi L.', 'Dũng P.', 'Hà V.', 'Khoa N.', 'Lan Đ.'].map((name, i) => ({
+  id: `p${i}`,
+  name,
+}));
+function sampleGroup(over: Partial<PublicGroup>): PublicGroup {
+  return {
+    id: 'g', slug: 'sample-g1', short_id: 'g1', kind: 'ride', sub_kind: 'car_owner', status: 'open', title: 'Dung Quất → Đà Nẵng',
+    description: null, site: 'dung_quat', site_name: 'Dung Quất', starts_at: TOMORROW, ends_at: null, seats_total: 4, seats_taken: 2,
+    seats_left: 2, fee_per_person: 150_000, origin_text: 'Cổng Dung Quất', origin_lat: null, origin_lng: null,
+    destination_text: 'Đà Nẵng', destination_lat: 16.059, destination_lng: 108.172, attributes: {}, requires_approval: true, lang: 'vi',
+    created_at: HOUR_AGO, updated_at: HOUR_AGO, host_id: 'host', host_name: 'An N.', host_avatar_url: null, host_badges: [],
+    host_rating_avg: 0, host_rating_count: 0, host_since: '2026-01-01T00:00:00Z',
+    members: SAMPLE_PEOPLE.slice(0, 2).map((p) => ({ id: p.id, name: p.name, avatar_url: null })), is_past: false,
+    venue_id: null, venue_name: null, venue_address: null,
+    ...over,
+  };
+}
+const SAMPLE_GROUPS: PublicGroup[] = [
+  sampleGroup({ id: 'g1' }),
+  sampleGroup({
+    id: 'g2', kind: 'sport', sub_kind: 'football', title: 'Đá bóng 7 người sau ca chiều', origin_text: 'Sân Vạn Tường',
+    destination_text: null, fee_per_person: 0, seats_total: 10, seats_taken: 7, seats_left: 3, requires_approval: false,
+    members: SAMPLE_PEOPLE.map((p) => ({ id: p.id, name: p.name, avatar_url: null })),
+  }),
+  sampleGroup({ id: 'g3', sub_kind: 'motorbike', status: 'full', seats_total: 1, seats_taken: 1, seats_left: 0 }),
+  sampleGroup({ id: 'g4', sub_kind: 'bus_pool', status: 'cancelled', members: [], seats_taken: 0, seats_left: 4 }),
+  // Kèo đội có sẵn (attributes.players_have): đội 7 có 5, cần thêm 2, 1 người đã vào → "Đã có 6/7 người · cần thêm 1".
+  sampleGroup({
+    id: 'g7', kind: 'sport', sub_kind: 'football', title: 'Đá bóng 7 người, đội có sẵn 5', origin_text: 'Sân Vạn Tường',
+    destination_text: null, fee_per_person: 50_000, seats_total: 2, seats_taken: 1, seats_left: 1, requires_approval: false,
+    attributes: { players_have: 5 }, members: SAMPLE_PEOPLE.slice(0, 1).map((p) => ({ id: p.id, name: p.name, avatar_url: null })),
+  }),
+  // Đội hình đã đủ (need = 0) → giữ trạng thái "Đã đủ người".
+  sampleGroup({
+    id: 'g8', kind: 'sport', sub_kind: 'pickleball', status: 'full', title: 'Pickleball đôi tối nay', origin_text: 'Sân Vạn Tường',
+    destination_text: null, fee_per_person: 0, seats_total: 1, seats_taken: 1, seats_left: 0, attributes: { players_have: 3 },
+  }),
+];
 // Ảnh mẫu cho ImagePicker: ô màu (không có file thật) với đủ trạng thái đã tải / đang tải / lỗi.
 const SAMPLE_PHOTOS: ImagePickerItem[] = [
   { key: 'a', uri: '', status: 'done' },
@@ -156,7 +214,18 @@ export default function UiGalleryScreen() {
   const [photos, setPhotos] = useState<ImagePickerItem[]>(SAMPLE_PHOTOS);
   const [unread, setUnread] = useState(3);
   const [siteSheet, setSiteSheet] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [reportSheet, setReportSheet] = useState(false);
+  const [confirmSheet, setConfirmSheet] = useState(false);
+  const [coach, setCoach] = useState(false);
+  const [toggle, setToggle] = useState(true);
   const [site, setSite] = useState('dung_quat');
+  const [people, setPeople] = useState<AvatarStackPerson[]>(SAMPLE_PEOPLE.slice(0, 2));
+  const [seats, setSeats] = useState(3);
+  const [when, setWhen] = useState<Date | null>(null);
+  const [stars, setStars] = useState(0);
+  // Mốc giờ mẫu cho DateTimePicker: tính một lần (luật nhóm: 15 phút → 60 ngày).
+  const [bounds] = useState(() => ({ min: new Date(Date.now() + 15 * 60_000), max: new Date(Date.now() + 60 * 86_400_000) }));
   const siteLabel = SAMPLE_SITES.find((x) => x.value === site)?.label ?? null;
   // Banner mẫu: tone accent / dịch vụ / primary, có và không CTA.
   const slides: BannerSlide[] = [
@@ -463,6 +532,92 @@ export default function UiGalleryScreen() {
         <ListingCover listing={{ category: 'pass_home', images: [] }} size="full" className="aspect-card w-full rounded-md" />
       </Section>
 
+      <Section title="GroupCard · SkeletonGroupCard · SkeletonGroupDetail">
+        {SAMPLE_GROUPS.map((g) => (
+          <GroupCard key={g.id} group={g} onPress={() => toast.show(g.title)} />
+        ))}
+        <GroupCard group={sampleGroup({ id: 'g5', status: 'in_progress' })} roleLabel={t('group:mine.role_host')} />
+        <GroupCard
+          group={sampleGroup({ id: 'g6', status: 'completed', kind: 'sport', sub_kind: 'badminton', destination_text: null })}
+          roleLabel={t('group:mine.role_accepted')}
+        />
+        <SkeletonGroupCard />
+        <SkeletonGroupDetail />
+      </Section>
+
+      <Section title="AvatarStack · Ticker">
+        <Row gap={3}>
+          <AvatarStack people={people} max={5} accessibilityLabel={t('group:card.members_count', { count: people.length })} />
+          <Ticker text={t('group:card.seats_left', { count: Math.max(0, SAMPLE_PEOPLE.length - people.length) })} variant="label" tone="success" />
+        </Row>
+        <AvatarStack size="sm" people={SAMPLE_PEOPLE} total={12} max={4} moreLabel={(count) => t('group:card.members_more', { count })} />
+        <Row gap={2} wrap>
+          <Button
+            size="sm"
+            label={t('group:action.join')}
+            disabled={people.length >= SAMPLE_PEOPLE.length}
+            onPress={() => setPeople(SAMPLE_PEOPLE.slice(0, people.length + 1))}
+          />
+          <Button size="sm" variant="outline" label={t('group:action.leave')} onPress={() => setPeople(people.slice(0, -1))} />
+        </Row>
+      </Section>
+
+      <Section title="RouteSummary · Stepper · DateTimePicker">
+        <Card>
+          <RouteSummary from="Cổng Dung Quất" to="Đà Nẵng — Sân bay" fromLabel={t('group:detail.from')} toLabel={t('group:detail.to')} />
+        </Card>
+        <RouteSummary from="Sân Vạn Tường" fromLabel={t('group:detail.venue')} />
+        <RouteSummary variant="compact" from="Cổng Dung Quất" to="Đà Nẵng" fromLabel={t('group:detail.from')} toLabel={t('group:detail.to')} />
+        <Stepper
+          label={t('group:form.seats_label_ride')}
+          hint={t('group:form.seats_hint')}
+          value={seats}
+          onChange={setSeats}
+          max={6}
+          decreaseLabel={t('group:form.seats_decrease')}
+          increaseLabel={t('group:form.seats_increase')}
+        />
+        <Stepper
+          label={t('group:form.seats_label_ride')}
+          value={2}
+          onChange={() => undefined}
+          max={2}
+          error={t('errors:invalid_input')}
+          decreaseLabel={t('group:form.seats_decrease')}
+          increaseLabel={t('group:form.seats_increase')}
+        />
+        <DateTimePicker
+          label={t('group:form.starts_at_label_ride')}
+          value={when}
+          onChange={setWhen}
+          minimumDate={bounds.min}
+          maximumDate={bounds.max}
+          dateLabel={t('group:form.date_label')}
+          timeLabel={t('group:form.time_label')}
+          datePlaceholder={t('group:form.pick_date')}
+          timePlaceholder={t('group:form.pick_time')}
+          hint={t('group:form.starts_at_hint', { minutes: 15, days: 60 })}
+        />
+        <DateTimePicker
+          value={null}
+          onChange={() => undefined}
+          dateLabel={t('group:form.date_label')}
+          timeLabel={t('group:form.time_label')}
+          datePlaceholder={t('group:form.pick_date')}
+          timePlaceholder={t('group:form.pick_time')}
+          error={t('errors:required')}
+        />
+        <DateTimePicker
+          value={bounds.min}
+          onChange={() => undefined}
+          disabled
+          dateLabel={t('group:form.date_label')}
+          timeLabel={t('group:form.time_label')}
+          datePlaceholder={t('group:form.pick_date')}
+          timePlaceholder={t('group:form.pick_time')}
+        />
+      </Section>
+
       <Section title="SkeletonListingCard · SkeletonListingDetail">
         <SkeletonListingCard count={2} layout="grid" columns={2} />
         <SkeletonListingCard layout="row" />
@@ -517,6 +672,28 @@ export default function UiGalleryScreen() {
           onRetry={(key) => setPhotos((p) => p.map((x) => (x.key === key ? { ...x, status: 'done' } : x)))}
         />
         <ImagePicker items={[]} max={10} onAdd={() => undefined} onRemove={() => undefined} onMakeCover={() => undefined} disabled />
+        {/* Một ảnh, không ảnh bìa (giấy tờ xin huy hiệu). */}
+        <ImagePicker
+          items={photos.slice(0, 1)}
+          max={1}
+          cover={false}
+          addLabel={t('badge_request.from_library')}
+          onAdd={() => toast.show(t('badge_request.from_library'))}
+          onRemove={(key) => setPhotos((p) => p.filter((x) => x.key !== key))}
+        />
+      </Section>
+
+      <Section title="CoachMark">
+        <Button label={t('coach.label')} variant="outline" onPress={() => setCoach(true)} />
+        <CoachMark
+          open={coach}
+          onDone={() => setCoach(false)}
+          steps={[
+            { icon: Search, title: t('coach.search_title'), body: t('coach.search_body') },
+            { icon: SquarePlus, title: t('coach.post_title'), body: t('coach.post_body') },
+            { icon: MessageCircle, title: t('coach.chat_title'), body: t('coach.chat_body') },
+          ]}
+        />
       </Section>
 
       <Section title="SuccessScreen · Notice">
@@ -597,6 +774,64 @@ export default function UiGalleryScreen() {
             </View>
           ))}
         </View>
+      </Section>
+
+      <Section title="StarRating">
+        <StarRating
+          value={stars}
+          onChange={setStars}
+          accessibilityLabel={t('group:rate.title')}
+          starLabel={(n) => t('group:rate.score_label', { count: n })}
+        />
+        <Text tone="muted">{stars > 0 ? t(`group:rate.score_${stars}`) : t('group:rate.title')}</Text>
+        <StarRating value={4} onChange={() => undefined} disabled accessibilityLabel={t('group:rate.title')} />
+        <Row gap={2}>
+          <StarRating value={4} size="sm" accessibilityLabel={t('group:rate.your_score', { score: 4 })} />
+          <Text variant="caption" tone="muted">
+            {t('group:rate.your_score', { score: 4 })}
+          </Text>
+        </Row>
+      </Section>
+
+      <Section title="MessageBubble · Composer · ReportSheet · ConfirmSheet">
+        <MessageBubble mine={false} body={t('chat:thread.start_hint')} time="09:30" />
+        <MessageBubble mine body={t('chat:safety.tip_meet')} time="09:31" status="seen" />
+        <MessageBubble mine body={t('chat:safety.tip_check')} time="09:32" status="sending" />
+        <MessageBubble mine body={t('chat:safety.tip_deposit')} time="09:33" status="failed" onRetry={() => toast.show(t('chat:thread.retry'))} />
+        <MessageBubble mine={false} imagePending time="09:34" />
+        <MessageBubble mine={false} body={t('group:chat.empty')} time="09:35" author={{ name: 'Bình T.' }} showAuthor showMeta={false} />
+        <MessageBubble mine={false} body={t('group:detail.instant_hint')} time="09:35" author={{ name: 'Bình T.' }} showAvatar />
+        <Composer value={draft} onChangeText={setDraft} onSend={() => setDraft('')} onPickImage={() => undefined} maxLength={2000} />
+        <Composer value="" onChangeText={() => undefined} onSend={() => undefined} maxLength={2000} error={t('errors:message_has_phone')} />
+        <Composer
+          value=""
+          onChangeText={() => undefined}
+          onSend={() => undefined}
+          maxLength={2000}
+          disabledText={t('chat:blocked.by_me')}
+          disabledAction={{ label: t('block.unblock'), onPress: () => undefined }}
+        />
+        <Row gap={2}>
+          <Button label={t('actions.report')} variant="outline" size="sm" onPress={() => setReportSheet(true)} />
+          <Button label={t('actions.block')} variant="outline" size="sm" onPress={() => setConfirmSheet(true)} />
+        </Row>
+        <ReportSheet open={reportSheet} onClose={() => setReportSheet(false)} target="listing" onSubmit={() => setReportSheet(false)} />
+        <ConfirmSheet
+          open={confirmSheet}
+          onClose={() => setConfirmSheet(false)}
+          title={t('block.title', { name: t('block.someone') })}
+          body={t('block.body')}
+          confirmLabel={t('block.confirm')}
+          onConfirm={() => setConfirmSheet(false)}
+        />
+      </Section>
+
+      <Section title="ToggleRow">
+        <Card padded={false}>
+          <ToggleRow label={t('notifications.prefs.messages')} hint={t('notifications.prefs.messages_hint')} value={toggle} onValueChange={setToggle} />
+          <Divider />
+          <ToggleRow label={t('notifications.prefs.groups')} value={false} onValueChange={() => undefined} disabled />
+        </Card>
       </Section>
 
       <Section title={t('dev.service_colors')}>

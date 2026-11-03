@@ -1,5 +1,5 @@
-// Các dải tin của Hub theo thứ tự §3: "Gần {khu}" (luôn hiện; rỗng → thẻ mời đăng gọn) → "Dành cho bạn" (chỉ khi có
-// mối quan tâm) → 4 dải theo dịch vụ (rỗng → ẩn). Cả Hub chưa có tin nào → một EmptyState thay cho mọi dải (§5).
+// Các dải tin của Hub theo thứ tự §3: "Gần {khu}" (luôn hiện; rỗng → thẻ mời đăng gọn) → "Dành cho bạn" (đã đăng
+// nhập; home_feed, rỗng → ẩn) → 4 dải theo dịch vụ (rỗng → ẩn). Cả Hub chưa có tin nào → một EmptyState thay cho mọi dải (§5).
 import { MapPin, Plus, Sparkles } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
@@ -51,7 +51,7 @@ export function HomeListings({ site, rails }: { site: HomeSite; rails: ReturnTyp
         <HomeRail
           rail="for_you"
           title={t('home.for_you_title')}
-          subtitle={t('home.for_you_hint')}
+          subtitle={t('home.for_you_feed_hint')}
           icon={{ icon: Sparkles, tone: 'accent' }}
           items={rails.forYou.items}
           isLoading={rails.forYou.isLoading}

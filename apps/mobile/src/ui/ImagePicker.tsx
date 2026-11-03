@@ -1,6 +1,7 @@
 // ImagePicker — lưới ảnh của form đăng tin: ô "Thêm ảnh" (đếm n/max), ảnh đầu là ảnh bìa (có nhãn), trạng thái
 // từng ảnh (đang tải / lỗi). Chạm một ảnh → BottomSheet: Đặt làm ảnh bìa · Tải lại · Xoá ảnh (nút lớn, dùng một tay).
 // Chỉ hiển thị: chọn ảnh từ máy (expo-image-picker), nén, upload do feature + src/core/upload làm.
+// `cover={false}` (vd ảnh giấy tờ xin huy hiệu): không nhãn / nút ảnh bìa; `addLabel` thay chữ ô thêm ảnh.
 import { CircleAlert, ImagePlus, RotateCw, Star, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,13 +21,28 @@ export type ImagePickerProps = {
   max: number;
   onAdd: () => void;
   onRemove: (key: string) => void;
-  onMakeCover: (key: string) => void;
+  /** Bỏ trống khi `cover={false}`. */
+  onMakeCover?: (key: string) => void;
   onRetry?: (key: string) => void;
   /** Đang đăng / đang tải: khoá thêm, xoá, đổi bìa. */
   disabled?: boolean;
+  /** Ảnh đầu là ảnh bìa (nhãn + "Đặt làm ảnh bìa") — mặc định có. */
+  cover?: boolean;
+  /** Chữ ô thêm ảnh (mặc định "Thêm ảnh"). */
+  addLabel?: string;
 };
 
-export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry, disabled = false }: ImagePickerProps) {
+export function ImagePicker({
+  items,
+  max,
+  onAdd,
+  onRemove,
+  onMakeCover,
+  onRetry,
+  disabled = false,
+  cover = true,
+  addLabel,
+}: ImagePickerProps) {
   const { t } = useTranslation('listing');
   const theme = useTheme();
   const [selected, setSelected] = useState<string | null>(null);
@@ -43,7 +59,7 @@ export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry,
             accessibilityRole="button"
             accessibilityLabel={[
               t('detail.image_count', { current: index + 1, total: items.length }),
-              index === 0 ? t('form.cover') : null,
+              cover && index === 0 ? t('form.cover') : null,
               item.status === 'error' ? t('errors:upload_failed') : null,
             ]
               .filter(Boolean)
@@ -54,7 +70,7 @@ export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry,
             className="aspect-avatar w-full overflow-hidden rounded-md bg-surface-2"
           >
             <Image source={{ uri: item.uri }} contentFit="cover" className="h-full w-full" accessibilityIgnoresInvertColors />
-            {index === 0 ? (
+            {cover && index === 0 ? (
               <View className="absolute bottom-1 left-1 rounded-full bg-primary px-2 py-0.5">
                 <Text variant="caption" tone="onPrimary">
                   {t('form.cover')}
@@ -80,7 +96,7 @@ export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry,
         <View className="w-1/3 p-1">
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`${t('form.add_photo')}, ${items.length}/${max}`}
+            accessibilityLabel={`${addLabel ?? t('form.add_photo')}, ${items.length}/${max}`}
             accessibilityState={{ disabled: !canAdd }}
             disabled={!canAdd}
             onPress={onAdd}
@@ -93,7 +109,7 @@ export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry,
           >
             <Icon icon={ImagePlus} tone="primary" size="tab" />
             <Text variant="caption" tone="primary" className="text-center">
-              {t('form.add_photo')}
+              {addLabel ?? t('form.add_photo')}
             </Text>
             <Text variant="caption" tone="primary">
               {items.length}/{max}
@@ -120,7 +136,7 @@ export function ImagePicker({ items, max, onAdd, onRemove, onMakeCover, onRetry,
                 }}
               />
             ) : null}
-            {selectedIndex > 0 ? (
+            {cover && onMakeCover && selectedIndex > 0 ? (
               <Button
                 label={t('form.make_cover')}
                 icon={Star}

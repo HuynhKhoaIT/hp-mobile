@@ -1,7 +1,9 @@
 // Ảnh upload: chọn từ thư viện (expo-image-picker) → nén cạnh dài 1280 px, WebP q0.8 (> 2 MB thì q0.6, q0.4)
 // → ArrayBuffer cho uploadListingImage của @hp/core. Thử lại do hook useUploadListingImage (retry lũy thừa) +
 // nút "Tải lại ảnh lỗi" ở form. Giống web (canvas → webp) để ảnh hai nơi cùng cỡ.
-import { LISTING_IMAGES } from '@hp/shared';
+// Giấy tờ xác minh (huy hiệu, tuần 10): chụp bằng máy ảnh hoặc chọn thư viện → nén cạnh dài 1600 px, WebP ≤ 5 MB
+// (VERIFICATION_FILE) → uploadVerificationDocument (bucket riêng tư verification) qua useRequestBadge.
+import { LISTING_IMAGES, VERIFICATION_FILE } from '@hp/shared';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -9,9 +11,6 @@ export type PickedImage = { uri: string; width: number; height: number };
 export type PreparedImage = { body: ArrayBuffer; contentType: 'image/webp' };
 /** `error` là mã i18n trong ns errors. */
 export type PrepareResult = { data: PreparedImage } | { error: 'file_too_large' | 'file_type' };
-
-/** Giải mã tối đa 2× cạnh đích để không nạp nguyên ảnh 48 MP vào bộ nhớ máy tầm trung. */
-const DECODE_MAX = LISTING_IMAGES.longEdgePx * 2;
 
 /** Chọn tối đa `limit` ảnh (nhiều ảnh một lần, giữ thứ tự chọn). Huỷ → mảng rỗng. */
 export async function pickImages(limit: number): Promise<PickedImage[]> {
@@ -27,11 +26,22 @@ export async function pickImages(limit: number): Promise<PickedImage[]> {
   return res.assets.slice(0, limit).map((a) => ({ uri: a.uri, width: a.width, height: a.height }));
 }
 
-/** Nén một ảnh tin: cạnh dài ≤ 1280 px, WebP ≤ 2 MB. */
-export async function prepareListingImage(image: PickedImage): Promise<PrepareResult> {
-  const long = LISTING_IMAGES.longEdgePx;
+/** Chụp một ảnh bằng máy ảnh (xin quyền khi bấm). Huỷ → null; không có quyền → 'denied'. */
+export async function takePhoto(): Promise<PickedImage | null | 'denied'> {
+  const perm = await ImagePicker.requestCameraPermissionsAsync();
+  if (!perm.granted) return 'denied';
+  const res = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 1 });
+  const asset = res.canceled ? undefined : res.assets[0];
+  return asset ? { uri: asset.uri, width: asset.width, height: asset.height } : null;
+}
+
+/** Nén WebP: cạnh dài ≤ `longEdgePx`, thử q0.8 → 0.6 → 0.4 tới khi ≤ `maxBytes`. */
+async function compressImage(image: PickedImage, opts: { longEdgePx: number; maxBytes: number }): Promise<PrepareResult> {
+  const long = opts.longEdgePx;
+  // Giải mã tối đa 2× cạnh đích để không nạp nguyên ảnh 48 MP vào bộ nhớ máy tầm trung.
+  const decodeMax = long * 2;
   try {
-    const source = ImageManipulator.manipulate(image.uri, { maxWidth: DECODE_MAX, maxHeight: DECODE_MAX });
+    const source = ImageManipulator.manipulate(image.uri, { maxWidth: decodeMax, maxHeight: decodeMax });
     const ctx =
       Math.max(image.width, image.height) > long
         ? source.resize(image.width >= image.height ? { width: long } : { height: long })
@@ -41,12 +51,22 @@ export async function prepareListingImage(image: PickedImage): Promise<PrepareRe
       const out = await ref.saveAsync({ format: SaveFormat.WEBP, compress, base64: true });
       if (!out.base64) break;
       const body = base64ToArrayBuffer(out.base64);
-      if (body.byteLength <= LISTING_IMAGES.maxBytes) return { data: { body, contentType: 'image/webp' } };
+      if (body.byteLength <= opts.maxBytes) return { data: { body, contentType: 'image/webp' } };
     }
     return { error: 'file_too_large' };
   } catch {
     return { error: 'file_type' };
   }
+}
+
+/** Nén một ảnh tin: cạnh dài ≤ 1280 px, WebP ≤ 2 MB. */
+export function prepareListingImage(image: PickedImage): Promise<PrepareResult> {
+  return compressImage(image, { longEdgePx: LISTING_IMAGES.longEdgePx, maxBytes: LISTING_IMAGES.maxBytes });
+}
+
+/** Nén ảnh giấy tờ xác minh: cạnh dài ≤ 1600 px (đọc được chữ), WebP ≤ 5 MB. */
+export function prepareVerificationImage(image: PickedImage): Promise<PrepareResult> {
+  return compressImage(image, { longEdgePx: VERIFICATION_FILE.longEdgePx, maxBytes: VERIFICATION_FILE.maxBytes });
 }
 
 /** Base64 → ArrayBuffer bằng atob có sẵn trong Hermes (không cần expo-file-system). */

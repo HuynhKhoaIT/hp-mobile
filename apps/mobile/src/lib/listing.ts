@@ -1,7 +1,7 @@
 // Chữ hiển thị của tin dùng chung card và chi tiết: giá (priceLabel của @hp/shared) và dòng khu vực.
 // Quy tắc (cái gì hiện) ở @hp/shared để khớp web; ở đây chỉ dịch + định dạng theo ngôn ngữ đang dùng.
 import type { PublicListing } from '@hp/core';
-import { type ListingStatus, type PriceLabel, type PricePer, priceLabel } from '@hp/shared';
+import { featureOfCategory, type ListingStatus, type PriceLabel, type PricePer, priceLabel } from '@hp/shared';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BadgeTone } from '@/ui';
@@ -65,3 +65,10 @@ export const LISTING_STATUS_TONE: Record<ListingStatus, BadgeTone> = {
   closed: 'neutral',
   expired: 'neutral',
 };
+
+/** Tin đồ thất lạc chủ tin đã bấm "Đã nhận lại đồ" (attributes.returned) — thẻ + chi tiết hiện nhãn "Đã trả lại". */
+export function isReturned(listing: Pick<PublicListing, 'category' | 'attributes'>): boolean {
+  if (featureOfCategory(listing.category) !== 'lostFound') return false;
+  const attrs = listing.attributes;
+  return !!attrs && typeof attrs === 'object' && !Array.isArray(attrs) && attrs.returned === true;
+}

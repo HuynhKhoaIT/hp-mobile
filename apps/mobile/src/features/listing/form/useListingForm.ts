@@ -7,6 +7,7 @@
 //     → updateListing({ id, category, …, images, status }). Ảnh lỗi giữ lại để thử lại; tin còn ở Nháp.
 // `status` trả về là kết quả thật sau kiểm duyệt của DB: active / pending_review / rejected / draft.
 // Bản đang soạn tự lưu cục bộ (useDraft, app-only `offlineDrafts`) cho tin mới.
+// `config.form.minPhotos` (trọ ≥ 3): Đăng / Lưu thay đổi khi thiếu ảnh → về bước Ảnh + báo lỗi; Lưu nháp vẫn được.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type AppError, type MyListing, removeListingImages, type SavedListingResult } from '@hp/core';
 import { useCreateListing, useSupabase, useUpdateListing, useUploadListingImage } from '@hp/core/react';
@@ -156,6 +157,10 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [result, setResult] = useState<SavedListingResult | null>(null);
   const [restored, setRestored] = useState(!!restoredDraft && mode.kind === 'new');
+  /** Đã bấm Đăng khi chưa đủ ảnh tối thiểu → nhắc ở bước Ảnh chuyển sang tông lỗi. */
+  const [photoError, setPhotoError] = useState(false);
+  const minPhotos = formConfig.minPhotos ?? 0;
+  const photosShort = photos.length < minPhotos;
   const lastTarget = useRef<SubmitTarget>('publish');
   /** Path upload trong phiên này (dọn Storage nếu cuối cùng không dùng). */
   const uploadedPaths = useRef(new Set<string>());
@@ -315,6 +320,12 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
 
   const submit = (target: SubmitTarget) => {
     if (busy) return;
+    if (target === 'publish' && photosShort) {
+      setPhotoError(true);
+      setStep(1);
+      toast.show(t('form.photos_min', { min: minPhotos }), 'danger');
+      return;
+    }
     void form.handleSubmit(
       (out) => persist(out, target),
       (errors) => {
@@ -380,6 +391,9 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
     progress,
     result,
     restored,
+    minPhotos,
+    photosShort,
+    photoError: photoError && photosShort,
     startOver,
     dirty,
     discard,

@@ -2,6 +2,7 @@
 // → lỗi có Thử lại → lưới / hàng theo config.card.variant; kéo để làm mới; chân danh sách: đang tải / hết tin / thử lại.
 import type { PublicListing } from '@hp/core';
 import { FlashList } from '@shopify/flash-list';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions, View } from 'react-native';
 import {
@@ -35,6 +36,8 @@ export type ListingFeedProps = {
   onPost: () => void;
   /** Thay trạng thái rỗng mặc định ("Chưa có tin" + Đăng tin), vd màn Tin đã lưu. */
   empty?: EmptyStateProps;
+  /** Khối cuộn cùng danh sách, trên thẻ đầu tiên (vd dải nhóm ở tab Khám phá). */
+  header?: ReactNode;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -97,6 +100,7 @@ export function ListingFeed(p: ListingFeedProps) {
       onEndReachedThreshold={threshold}
       refreshing={p.isRefetching && !p.isFetchingNextPage}
       onRefresh={p.refetch}
+      ListHeaderComponent={p.header ? <View className="pb-3">{p.header}</View> : null}
       ListFooterComponent={footer}
       // Chừa chỗ cho nút Đăng nổi (Fab) ở cuối danh sách.
       contentContainerStyle={{ paddingTop: space[2], paddingBottom: space[8] * 3 }}

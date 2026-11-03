@@ -2,7 +2,8 @@
 // Trang chủ (docs/design/home.md): header xanh (chào + chip khu + chuông / Đăng nhập) → ô tìm kiếm dính trên cùng khi
 // cuộn → lưới 8 dịch vụ nổi đè đáy header → banner trượt → thẻ cá nhân → Tìm nhanh → Gần {khu} / Dành cho bạn / dải
 // theo dịch vụ → cộng đồng + an toàn + miễn trừ. Mỗi khối tự có khung chờ / lỗi riêng; kéo xuống làm mới mọi khối;
-// mở app đọc cache MMKV trước rồi làm mới. Header thu gọn theo cuộn (Reduce Motion: chỉ mờ).
+// mở app đọc cache MMKV trước rồi làm mới. Header thu gọn theo cuộn (Reduce Motion: chỉ mờ). Lần đầu: coach mark
+// 3 bước (tìm, đăng, nhắn), bỏ qua được.
 import { StatusBar } from 'expo-status-bar';
 import { Link, useIsFocused } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +13,7 @@ import { HomeFooter } from '@/features/home/components/HomeFooter';
 import { HomeListings } from '@/features/home/components/HomeListings';
 import { HomeServices } from '@/features/home/components/HomeServices';
 import { HomeTopBar } from '@/features/home/components/HomeTopBar';
+import { HubCoachMark } from '@/features/home/components/HubCoachMark';
 import { PersonalCard } from '@/features/home/components/PersonalCard';
 import { QuickSearch } from '@/features/home/components/QuickSearch';
 import { useHomeRails, useHomeSite, useHomeViewEvent, useHubRefresh, useHubScroll } from '@/features/home/hooks';
@@ -60,6 +62,8 @@ export default function HubScreen() {
           </Link>
         ) : null}
       </View>
+
+      <HubCoachMark active={focused} />
 
       {/* Header xanh: chữ / icon thanh trạng thái tương phản với primary (sáng → chữ trắng, tối → chữ tối). */}
       {focused ? <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} /> : null}

@@ -3,7 +3,8 @@
 // Hub: `statusBar="primary"` tô dải trạng thái màu primary (header xanh tràn lên vùng an toàn), `onScroll` nhận
 // handler Reanimated (header thu gọn), `stickyHeaderIndices` giữ ô tìm kiếm trên cùng, `onRefresh` kéo xuống làm mới.
 import type { ComponentProps, ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedScrollView } from './interop';
 import { useTheme } from './theme';
@@ -13,7 +14,12 @@ export type ScreenProps = {
   scroll?: boolean;
   /** Bỏ padding ngang khi nội dung tự tràn mép (carousel, header cong). */
   edgeToEdge?: boolean;
-  /** Màn có ô nhập: đẩy nội dung lên khi bàn phím mở. */
+  /**
+   * Màn có ô nhập: tránh bàn phím bằng react-native-keyboard-controller (animation bám từng khung hình bàn phím, iOS +
+   * Android edge-to-edge). scroll → KeyboardAwareScrollView (tự cuộn tới ô đang nhập); không scroll →
+   * KeyboardAvoidingView `padding`, trừ vùng an toàn đáy (bàn phím đã che home indicator) để nút / ô dưới cùng dính
+   * sát bàn phím, không hở. Màn chat tự xử lý (KeyboardChatScrollView + KeyboardStickyView), không dùng prop này.
+   */
   keyboard?: boolean;
   /** Màn trong tab: thanh tab đã chừa vùng an toàn đáy → không cộng thêm. */
   tab?: boolean;
@@ -30,9 +36,15 @@ export type ScreenProps = {
 };
 
 export function Screen({ keyboard = false, ...props }: ScreenProps) {
+  const insets = useSafeAreaInsets();
   if (!keyboard) return <ScreenBody {...props} />;
+  if (props.scroll) return <ScreenBody {...props} keyboardAware />;
   return (
-    <KeyboardAvoidingView className="flex-1 bg-bg" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      className="flex-1 bg-bg"
+      behavior="padding"
+      keyboardVerticalOffset={props.tab ? 0 : -insets.bottom}
+    >
       <ScreenBody {...props} />
     </KeyboardAvoidingView>
   );
@@ -49,7 +61,8 @@ function ScreenBody({
   refreshing,
   onRefresh,
   className,
-}: Omit<ScreenProps, 'keyboard'>) {
+  keyboardAware = false,
+}: Omit<ScreenProps, 'keyboard'> & { keyboardAware?: boolean }) {
   const insets = useSafeAreaInsets();
   const t = useTheme();
   const bottom = tab ? 0 : insets.bottom;
@@ -86,6 +99,21 @@ function ScreenBody({
           {children}
         </AnimatedScrollView>
       </View>
+    );
+  }
+
+  if (scroll && keyboardAware) {
+    return (
+      <KeyboardAwareScrollView
+        className="flex-1 bg-bg"
+        style={safe}
+        contentContainerClassName={[padding, 'pb-8', className].filter(Boolean).join(' ')}
+        contentContainerStyle={{ paddingBottom: bottom }}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={t.space[4]}
+      >
+        {children}
+      </KeyboardAwareScrollView>
     );
   }
 
