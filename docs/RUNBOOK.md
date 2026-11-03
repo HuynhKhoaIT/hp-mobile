@@ -71,6 +71,47 @@ insert into public.app_settings (key, value) values
 on conflict (key) do update set value = excluded.value, updated_at = now();
 ```
 
+### Push notification (staging / prod)
+Trigger `trg_notifications_push` gọi Edge Function `send-push` khi có thông báo cho người có push token; chưa cấu hình thì không gửi. Cần (không ghi giá trị vào git):
+1. Secret cho function: `supabase secrets set --project-ref <ref> WEBHOOK_SECRET=<chuỗi ngẫu nhiên> EXPO_ACCESS_TOKEN=<expo.dev → Access tokens>`.
+2. Deploy: `supabase functions deploy send-push --project-ref <ref>` (`config.toml` đã đặt `verify_jwt = false` cho webhook).
+3. SQL Editor của project:
+```sql
+insert into public.app_settings (key, value) values
+  ('functions_url', 'https://<ref>.supabase.co/functions/v1'),
+  ('webhook_secret', '<WEBHOOK_SECRET ở bước 1>')
+on conflict (key) do update set value = excluded.value, updated_at = now();
+```
+4. App: `eas init` để có `extra.eas.projectId` (app không lấy được push token khi thiếu) → build dev / staging mới (module native `expo-notifications`).
+
+Local: `supabase/.env.example` → `supabase/.env.local`, `pnpm exec supabase functions serve send-push --env-file supabase/.env.local`; seed đã có `functions_url` / `webhook_secret`. Thử không gọi Expo thật: đặt `EXPO_PUSH_URL` trỏ tới server giả lập.
+
+### Ghép nhóm — Edge Function `join-group`, `respond-join` (staging / prod)
+Không cần secret mới (gọi RPC bằng JWT người dùng). Deploy khi được yêu cầu: `supabase functions deploy join-group --project-ref <ref>` và `respond-join` (giữ `verify_jwt` mặc định = true). Thiếu function thì app / web báo lỗi khi bấm "Tham gia" / "Nhận". Local: `pnpm exec supabase functions serve --env-file supabase/.env.local` (phục vụ mọi function; cần container edge-runtime — đừng loại `edge-runtime` khi `supabase start`).
+
+### Huy hiệu, dịch, dọn dữ liệu — Edge Function `request-badge`, `translate-content`, `purge-files` (tuần 10)
+- Deploy khi được yêu cầu: `supabase functions deploy request-badge translate-content purge-files --project-ref <ref>` (`purge-files` có `verify_jwt = false` trong `config.toml`).
+- Secret: `supabase secrets set CRON_SECRET=<chuỗi ngẫu nhiên> TRANSLATE_API_KEY=<Google Cloud Translation API key>`. Chưa có `TRANSLATE_API_KEY` → nút Dịch báo "Tính năng dịch đang tạm ngưng" (503 `translate_unavailable`), không lỗi gì khác.
+- `app_settings` (SQL Editor): `insert into public.app_settings (key, value) values ('cron_secret', '<trùng CRON_SECRET>') on conflict (key) do update set value = excluded.value;` (cùng `functions_url` đã đặt cho send-push). Thiếu → cron `purge-files` không gọi gì.
+- Kiểm tra / chạy tay: `curl -X POST <functions_url>/purge-files -H "x-cron-secret: <CRON_SECRET>" -d '{}'` → `{ documents, accounts, files }`. Tài khoản chỉ bị xoá hẳn khi `deleted_at` quá 30 ngày; xoá hẳn là không khôi phục được (ngoài PITR).
+- Google Cloud Translation: bật API "Cloud Translation API" trong project, tạo API key giới hạn chỉ API đó; chi phí theo ký tự — rate limit 30 lượt dịch mới / người / giờ, bản dịch được cache trong `listing_translations`.
+
+### Cron nhắc giờ / hết hạn (pg_cron, tuần 8)
+Hai job tạo bởi migration `20261103100000_group_lifecycle_chat` (lên cùng `supabase db push`, không cần secret / Edge Function):
+- `remind-groups` (`*/15 * * * *`) → `select public.remind_groups()`: `group_reminder` trước giờ diễn ra 60 phút (cửa sổ thực tế 45–60 phút vì chạy 15 phút / lần).
+- `expire-content` (`5 * * * *`) → `select public.expire_content()`: nhóm → `in_progress` / `completed` (+ `group_completed`), tin → `expired`, `listing_expiring` trước 3 ngày.
+
+Kiểm tra (SQL Editor): `select jobname, schedule, active from cron.job;` và lần chạy gần nhất `select jobid, status, return_message, start_time from cron.job_run_details order by start_time desc limit 20;`. Chạy tay khi cần: `select public.expire_content();` (trả số dòng mỗi việc). Tạm dừng: `select cron.unschedule('remind-groups');` — bật lại bằng `cron.schedule` như trong migration. Push chỉ đi khi `send-push` + webhook đã cấu hình (mục Push notification).
+
+### Duyệt sân góp (venues) — tạm thời bằng SQL
+Màn admin catalog chưa có (tuần 10). Moderator xem sân chờ duyệt và duyệt bằng phiên của chính mình (không dùng service role — trigger ghi `audit_log venue.approve / reject`):
+```sql
+select id, name, sports, address_text, phone, created_at from public.venues where status = 'pending' order by created_at;
+update public.venues set status = 'approved' where id = '<uuid>';
+update public.venues set status = 'rejected', reject_reason = 'Trùng sân đã có' where id = '<uuid>';
+```
+Chạy từ SQL Editor (quyền owner) thì trigger không ghi audit — ghi tay `insert into audit_log (actor_id, action, target_type, target_id) values ('<uuid staff>', 'venue.approve', 'venue', '<id>')`.
+
 ### Duyệt tin chờ — màn `/admin/moderation`
 Tin của tài khoản < 7 ngày / có từ khoá / giá thấp bất thường / gửi duyệt lại vào `moderation_queue`. Moderator xử lý trên web:
 1. Mở `https://<domain>/admin` → đăng nhập bằng SĐT + OTP → **xác thực hai bước** (lần đầu: quét QR bằng Google Authenticator / Microsoft Authenticator / Authy rồi nhập mã 6 số; các lần sau chỉ nhập mã).
