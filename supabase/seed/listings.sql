@@ -164,5 +164,11 @@ $$;
 -- Khớp REVALIDATE_SECRET trong apps/web/.env.local. Staging / prod: insert tay (docs/RUNBOOK.md), không commit giá trị thật.
 insert into public.app_settings (key, value) values
   ('web_revalidate_url', 'http://host.docker.internal:3000/api/revalidate'),
-  ('web_revalidate_secret', 'local-dev-revalidate-secret')
+  ('web_revalidate_secret', 'local-dev-revalidate-secret'),
+  -- Webhook notifications → Edge Function send-push (migration 20261102100000). Khớp WEBHOOK_SECRET trong
+  -- supabase/functions/.env.local (xem supabase/functions/.env.example).
+  ('functions_url', 'http://host.docker.internal:54321/functions/v1'),
+  ('webhook_secret', 'local-dev-webhook-secret'),
+  -- Cron → Edge Function purge-files (migration 20261104100000). Khớp CRON_SECRET trong supabase/.env.local.
+  ('cron_secret', 'local-dev-cron-secret')
 on conflict (key) do update set value = excluded.value, updated_at = now();
