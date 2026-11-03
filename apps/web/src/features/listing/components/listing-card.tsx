@@ -1,7 +1,7 @@
 // ListingCard — thẻ tin dùng chung danh sách, "Xem thêm", tin tương tự. Hợp đồng hình ảnh với app
 // (apps/mobile/src/ui/ListingCard.tsx — đổi một bên thì đổi cả hai, cùng tên prop):
 //   1 ảnh bìa 4:3 tràn mép (row: ô vuông bên trái) — chưa có ảnh: nền service-<x>-soft + icon tính năng
-//   2 badge danh mục (+ badge ngôn ngữ khi ngôn ngữ tin khác ngôn ngữ trang)
+//   2 badge danh mục (+ "Đã trả lại" cho đồ thất lạc đã về với chủ, + badge ngôn ngữ khi ngôn ngữ tin khác ngôn ngữ trang)
 //   3 tiêu đề 2 dòng (16 medium)   4 giá 18 px đậm 700   5 "Cách {khu} {khoảng cách}" (hoặc tên khu) · thời gian đăng
 // Cả thẻ là một link tới /tin/{slug}. Không 'use client', không async: render được ở Server Component (SSR danh sách)
 // lẫn Client Component (trang tiếp theo của "Xem thêm").
@@ -13,7 +13,7 @@ import { Badge } from '@/components/shared/badge';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { listingImageUrl } from '@/lib/images';
-import { asLocale, priceText } from '../display';
+import { asLocale, isReturned, priceText } from '../display';
 import { ListingPlaceholder } from './listing-placeholder';
 
 export type ListingCardProps = {
@@ -75,6 +75,7 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
       <div className={cn('flex min-w-0 flex-1 flex-col gap-1', !isRow && 'p-3')}>
         <div className="flex flex-wrap gap-1">
           <Badge>{t(`common.category.${listing.category}`)}</Badge>
+          {isReturned(listing) ? <Badge tone="success">{t('listing.lost_found.returned_badge')}</Badge> : null}
           {listing.lang !== locale ? (
             <Badge tone="primary" lang={listing.lang}>
               {t(`common.locale.${listing.lang}`)}

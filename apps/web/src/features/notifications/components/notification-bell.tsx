@@ -2,38 +2,25 @@
 
 // Chuông thông báo kèm số chưa đọc (docs/design/home.md §4.1, §10): > 9 → "9+", 0 / khách → không hiện số.
 // Hai kiểu: `onPrimary` (header xanh của trang chủ trên điện thoại: nút tròn size-11 nền on-primary/15) và `ghost`
-// (header chung). Số tăng khi quay lại tab → chuông lắc nhẹ một lần (tắt khi giảm chuyển động).
+// (header chung). Số từ useUnreadNotificationCount (@hp/core/react, cùng key với /thong-bao): Realtime (DataProvider) và
+// focus lại tab làm mới; đánh dấu đã đọc giảm số ngay. Số tăng → chuông lắc nhẹ một lần (tắt khi giảm chuyển động).
+import { useUnreadNotificationCount } from '@hp/core/react';
 import { Bell } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { loadUnreadCount } from '../unread-count';
 
 export function NotificationBell({ variant = 'ghost', className }: { variant?: 'ghost' | 'onPrimary'; className?: string }) {
   const t = useTranslations('common.home');
-  const [count, setCount] = useState<number | null>(null);
+  const count = useUnreadNotificationCount().data ?? null;
   const [ring, setRing] = useState(0);
-  const last = useRef<number | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    const apply = (value: number | null) => {
-      if (!active) return;
-      if (value !== null && last.current !== null && value > last.current) setRing((r) => r + 1);
-      last.current = value;
-      setCount(value);
-    };
-    void loadUnreadCount().then(apply);
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') void loadUnreadCount(true).then(apply);
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      active = false;
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, []);
+  // Số tăng so với lần trước (không tính lần tải đầu) → lắc chuông. Đặt state khi render theo mẫu "giá trị trước" của React.
+  const [last, setLast] = useState<number | null>(count);
+  if (count !== last) {
+    if (count !== null && last !== null && count > last) setRing((r) => r + 1);
+    setLast(count);
+  }
 
   const label = count ? t('notifications_unread', { count }) : t('notifications');
   return (

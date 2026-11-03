@@ -18,4 +18,8 @@ export type ListingFeatureConfig = {
   cardLayout: 'grid' | 'row';
   /** Loại JSON-LD của trang chi tiết (.claude/rules/web-seo-public.md). null = không có loại phù hợp. */
   jsonLd: 'product' | 'accommodation' | 'job' | null;
+  /** Lựa chọn lọc "Cách khu làm việc dưới N km" (?distance=N). Rỗng / thiếu = không có bộ lọc khoảng cách. */
+  distanceFilterKm?: readonly number[];
+  /** Đồ thất lạc: chủ tin thấy "Tin có thể khớp" + "Đã nhận lại đồ"; thẻ / chi tiết có nhãn "Đã trả lại". */
+  returnable?: boolean;
 };

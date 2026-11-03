@@ -1,7 +1,7 @@
 // /toi — trang "Tôi" (giống tab Tôi của app). Khách vào được (proxy.ts GUEST_OK): thẻ đăng nhập + cài đặt; đã đăng nhập:
-// hồ sơ + lối vào Tin của tôi / Tin đã lưu. Hồ sơ đọc theo request → trong Suspense. /toi/* vẫn cần đăng nhập.
+// hồ sơ + lối vào Tin của tôi / Nhóm của tôi / Tin đã lưu / Huy hiệu xác minh / Cài đặt (xoá tài khoản). Hồ sơ đọc theo request → trong Suspense. /toi/* vẫn cần đăng nhập.
 import type { Metadata } from 'next';
-import { ChevronRight, FileText, Heart } from 'lucide-react';
+import { BadgeCheck, ChevronRight, FileText, Heart, Settings, Users } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 import { TextLinesSkeleton } from '@/components/shared/skeletons';
@@ -16,9 +16,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MePage() {
   const t = await getTranslations('listing');
+  const tg = await getTranslations('group.mine');
+  const tc = await getTranslations();
   const links = [
     { href: '/toi/tin-cua-toi', label: t('manage.title'), Icon: FileText },
+    { href: '/toi/nhom-cua-toi', label: tg('title'), Icon: Users },
     { href: '/toi/da-luu', label: t('saved.title'), Icon: Heart },
+    { href: '/toi/huy-hieu', label: tc('common.badge_request.title'), Icon: BadgeCheck },
+    { href: '/toi/cai-dat', label: tc('web.me.settings'), Icon: Settings },
   ] as const;
 
   return (

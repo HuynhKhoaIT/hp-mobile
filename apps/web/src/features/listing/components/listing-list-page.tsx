@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
 import { getPathname, Link } from '@/i18n/navigation';
 import { asLocale } from '../display';
-import { activeFilterCount, type ListFilterState, parseListFilters } from '../filters';
+import { activeFilterCount, distanceMeters, type ListFilterState, parseListFilters } from '../filters';
 import { getListPage, getPublicSites, LIST_PAGE_SIZE, logSearchTerm } from '../queries';
 import { type ListScope, scopeInfo } from '../scope';
 import { ListFilters } from './list-filters';
@@ -24,7 +24,7 @@ import { PostListingButton } from './post-listing-button';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
-const NO_FILTERS: ListFilterState = { category: null, query: '', site: null, attributes: {} };
+const NO_FILTERS: ListFilterState = { category: null, query: '', site: null, distanceKm: null, attributes: {} };
 
 export function ListingListPage({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
   return (
@@ -37,12 +37,13 @@ export function ListingListPage({ scope, searchParams }: { scope: ListScope; sea
 }
 
 async function ListContent({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
-  const filters = parseListFilters(await searchParams, scopeInfo(scope).categories);
+  const { categories, distanceKm } = scopeInfo(scope);
+  const filters = parseListFilters(await searchParams, categories, distanceKm);
   return <ListBody scope={scope} filters={filters} />;
 }
 
 async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFilterState }) {
-  const { feature, path, categories, seoKey, cardLayout } = scopeInfo(scope);
+  const { feature, path, categories, seoKey, cardLayout, distanceKm } = scopeInfo(scope);
   const locale = asLocale(await getLocale());
   const t = await getTranslations();
 
@@ -52,6 +53,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
       site: filters.site,
       query: filters.query,
       attributes: filters.attributes,
+      maxDistanceM: distanceMeters(filters.distanceKm),
     }),
     getPublicSites(),
   ]);
@@ -78,6 +80,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
         categories={categories}
         filters={filters}
         sites={sites}
+        distanceOptions={distanceKm}
         searchPlaceholder={t('listing.list.search_placeholder', { feature: featureName })}
       />
 
@@ -113,6 +116,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
             query={filters.query}
             site={filters.site}
             attributes={filters.attributes}
+            maxDistanceM={distanceMeters(filters.distanceKm)}
             pageSize={LIST_PAGE_SIZE}
             initialCursor={page.nextCursor}
             layout={cardLayout}

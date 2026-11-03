@@ -1,5 +1,5 @@
 // Tìm trọ — /tro. Chỉ khác biệt so với tính năng Listing khác; logic chung ở features/listing.
-// Bản đồ + lọc khoảng cách tới nhà máy: tuần 8.
+// Lọc khoảng cách tới khu làm việc (?distance=1|2|5, tuần 9). Chế độ bản đồ: chờ key Goong.
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { LISTING_FEATURES } from '@hp/shared';
 import { House } from 'lucide-react';
@@ -13,4 +13,5 @@ export const roomConfig: ListingFeatureConfig = {
   tone: { soft: 'bg-service-room-soft', fg: 'text-service-room' },
   cardLayout: 'grid',
   jsonLd: 'accommodation',
+  distanceFilterKm: [1, 2, 5],
 };

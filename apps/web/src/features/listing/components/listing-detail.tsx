@@ -5,6 +5,8 @@
 // Trang công khai: không SĐT (chỉ lộ sau "Hiện số" ở client), không toạ độ, không địa chỉ chi tiết; tên người đăng đã rút gọn ở view.
 // Tin đã bán / đóng / hết hạn (≤ 30 ngày — sau đó page chuyển sang 410): banner state.* + ẩn liên hệ, không JSON-LD
 // (Google yêu cầu gỡ JobPosting / Offer khi hết hiệu lực), vẫn có tin tương tự.
+// Tin khác ngôn ngữ trang: nút "Dịch" (client island TranslateBar) — HTML server giữ bản gốc, bản dịch chỉ thay ở trình duyệt.
+// Đồ thất lạc (config.returnable): nhãn "Đã trả lại" (server) + khối chủ tin "Tin có thể khớp" / "Đã nhận lại đồ" (client).
 import { listingDisplayStatus, type PublicListing } from '@hp/core';
 import { formatDistance, formatRelative, priceLabel, readAttributes } from '@hp/shared';
 import { ChevronLeft, Info, MapPin, ShieldAlert } from 'lucide-react';
@@ -13,7 +15,7 @@ import { Badge } from '@/components/shared/badge';
 import { JsonLd } from '@/components/shared/json-ld';
 import { absoluteUrl } from '@/i18n/alternates';
 import { Link } from '@/i18n/navigation';
-import { attributeText, asLocale, priceText } from '../display';
+import { attributeText, asLocale, isReturned, priceText } from '../display';
 import { configOfCategory } from '../features';
 import { listingJsonLd } from '../json-ld';
 import { getSimilarListings } from '../queries';
@@ -22,6 +24,8 @@ import { ListingActions } from './listing-actions';
 import { ListingGallery } from './listing-gallery';
 import { ListingGrid } from './listing-grid';
 import { ListingPlaceholder } from './listing-placeholder';
+import { TranslatableText, TranslateBar, TranslationProvider } from './listing-translation';
+import { LostFoundOwnerPanel } from './lost-found-owner-panel';
 import { PosterCard } from './poster-card';
 
 export async function ListingDetail({ listing, now }: { listing: PublicListing; now: number }) {
@@ -33,151 +37,169 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
   const categoryName = t(`common.category.${listing.category}`);
   const displayStatus = listingDisplayStatus(listing);
   const active = displayStatus === 'active';
+  const returned = !!cfg.returnable && isReturned(listing);
+  const foreign = listing.lang !== locale;
   const jsonLd = active
     ? listingJsonLd(listing, cfg.jsonLd, { url: absoluteUrl(`/tin/${listing.slug}`, locale), categoryName })
     : null;
 
   return (
-    <article className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
-      {jsonLd ? <JsonLd data={jsonLd} /> : null}
-      <nav>
-        <Link
-          href={cfg.path}
-          className="inline-flex min-h-11 items-center gap-1 rounded-md text-md font-medium text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <ChevronLeft strokeWidth={1.75} className="size-5" aria-hidden />
-          {t('listing.detail.back_to_list')}
-        </Link>
-      </nav>
+    <TranslationProvider listingId={listing.id}>
+      <article className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
+        {jsonLd ? <JsonLd data={jsonLd} /> : null}
+        <nav>
+          <Link
+            href={cfg.path}
+            className="inline-flex min-h-11 items-center gap-1 rounded-md text-md font-medium text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <ChevronLeft strokeWidth={1.75} className="size-5" aria-hidden />
+            {t('listing.detail.back_to_list')}
+          </Link>
+        </nav>
 
-      {!active ? (
-        <div role="status" className="flex items-start gap-3 rounded-md bg-surface-2 p-4 text-md text-fg">
-          <Info strokeWidth={1.75} className="mt-0.5 size-5 shrink-0 text-muted" aria-hidden />
-          <div className="flex flex-col gap-1">
-            <p className="font-semibold">{t(`listing.state.${displayStatus}`)}</p>
-            <p className="text-muted">{t('listing.state.inactive_hint')}</p>
-          </div>
-        </div>
-      ) : null}
-
-      <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
-        <div className="order-1 lg:col-span-7 lg:row-start-1">
-          {listing.images.length > 0 ? (
-            <ListingGallery images={listing.images} title={listing.title} />
-          ) : (
-            <div className="aspect-card w-full overflow-hidden rounded-lg">
-              <ListingPlaceholder category={listing.category} size="lg" />
+        {!active ? (
+          <div role="status" className="flex items-start gap-3 rounded-md bg-surface-2 p-4 text-md text-fg">
+            <Info strokeWidth={1.75} className="mt-0.5 size-5 shrink-0 text-muted" aria-hidden />
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold">{t(`listing.state.${displayStatus}`)}</p>
+              <p className="text-muted">{t('listing.state.inactive_hint')}</p>
             </div>
-          )}
-        </div>
-
-        {/* Cột phải (desktop, dính khi cuộn). Điện thoại: `contents` để các khối con xếp theo order giữa cột trái. */}
-        <div className="contents lg:sticky lg:top-20 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
-          <header className="order-2 flex flex-col gap-2">
-            <div className="flex flex-wrap gap-1">
-              {!active ? <Badge tone="danger">{t(`common.status.${displayStatus}`)}</Badge> : null}
-              <Badge>{categoryName}</Badge>
-              {listing.lang !== locale ? (
-                <Badge tone="primary" lang={listing.lang}>
-                  {t(`common.locale.${listing.lang}`)}
-                </Badge>
-              ) : null}
-            </div>
-            <div className="flex items-start gap-3">
-              <h1 lang={listing.lang} className="flex-1 text-2xl font-semibold text-fg">
-                {listing.title}
-              </h1>
-              <BookmarkButton listingId={listing.id} />
-            </div>
-            <p className="text-2xl font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
-            <p className="text-sm text-muted">
-              <time dateTime={listing.created_at}>
-                {t('listing.detail.posted_at', { time: formatRelative(listing.created_at, locale, new Date(now)) })}
-              </time>
-              {' · '}
-              {t('listing.detail.views', { count: listing.view_count })}
-            </p>
-          </header>
-
-          <p role="note" className="order-3 flex items-start gap-3 rounded-md bg-warning/15 p-3 text-md text-fg">
-            <ShieldAlert strokeWidth={1.75} className="mt-0.5 size-5 shrink-0" aria-hidden />
-            {t('listing.detail.safety_tip')}
-          </p>
-
-          <div className="order-7">
-            <PosterCard listing={listing} locale={locale} />
           </div>
-          <div className="order-8">
-            <ListingActions
-              listingId={listing.id}
-              slug={listing.slug}
-              title={listing.title}
-              ownerId={listing.owner_id}
-              active={active}
-            />
-          </div>
-        </div>
+        ) : null}
 
-        <div className="contents lg:col-span-7 lg:row-start-2 lg:flex lg:flex-col lg:gap-6">
-          {attributes.length > 0 ? (
-            <section aria-labelledby="attributes-heading" className="order-4 flex flex-col gap-2">
-              <h2 id="attributes-heading" className="text-lg font-semibold text-fg">
-                {t('listing.detail.attributes')}
-              </h2>
-              <dl className="grid gap-x-6 sm:grid-cols-2">
-                {attributes.map(({ field, value }) => (
-                  <div key={field.key} className="flex justify-between gap-4 border-b border-border py-3">
-                    <dt className="text-md text-muted">{t(`listing.attr.${field.key}`)}</dt>
-                    <dd lang={field.kind === 'text' ? listing.lang : undefined} className="text-right text-md font-medium text-fg">
-                      {attributeText(field, value, t, locale)}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-          ) : null}
-
-          <section aria-labelledby="description-heading" className="order-5 flex flex-col gap-2">
-            <h2 id="description-heading" className="text-lg font-semibold text-fg">
-              {t('listing.detail.description')}
-            </h2>
-            {listing.description?.trim() ? (
-              <p lang={listing.lang} className="text-md whitespace-pre-line text-fg">
-                {listing.description}
-              </p>
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
+          <div className="order-1 lg:col-span-7 lg:row-start-1">
+            {listing.images.length > 0 ? (
+              <ListingGallery images={listing.images} title={listing.title} />
             ) : (
-              <p className="text-md text-muted">{t('listing.detail.no_description')}</p>
+              <div className="aspect-card w-full overflow-hidden rounded-lg">
+                <ListingPlaceholder category={listing.category} size="lg" />
+              </div>
             )}
-          </section>
+          </div>
 
-          {listing.site_name ? (
-            <section aria-labelledby="location-heading" className="order-6 flex flex-col gap-2">
-              <h2 id="location-heading" className="text-lg font-semibold text-fg">
-                {t('listing.detail.location')}
-              </h2>
-              <p className="flex items-start gap-2 text-md text-fg">
-                <MapPin strokeWidth={1.75} className="mt-0.5 size-5 shrink-0 text-muted" aria-hidden />
-                {listing.distance_to_site_m !== null
-                  ? t('listing.card.distance_to_site', {
-                      site: listing.site_name,
-                      distance: formatDistance(listing.distance_to_site_m, locale),
-                    })
-                  : listing.site_name}
+          {/* Cột phải (desktop, dính khi cuộn). Điện thoại: `contents` để các khối con xếp theo order giữa cột trái. */}
+          <div className="contents lg:sticky lg:top-20 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
+            <header className="order-2 flex flex-col gap-2">
+              <div className="flex flex-wrap gap-1">
+                {!active ? <Badge tone="danger">{t(`common.status.${displayStatus}`)}</Badge> : null}
+                <Badge>{categoryName}</Badge>
+                {returned ? <Badge tone="success">{t('listing.lost_found.returned_badge')}</Badge> : null}
+                {foreign ? (
+                  <Badge tone="primary" lang={listing.lang}>
+                    {t(`common.locale.${listing.lang}`)}
+                  </Badge>
+                ) : null}
+              </div>
+              <div className="flex items-start gap-3">
+                <TranslatableText
+                  as="h1"
+                  field="title"
+                  original={listing.title}
+                  lang={listing.lang}
+                  className="flex-1 text-2xl font-semibold text-fg"
+                />
+                <BookmarkButton listingId={listing.id} />
+              </div>
+              <p className="text-2xl font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
+              <p className="text-sm text-muted">
+                <time dateTime={listing.created_at}>
+                  {t('listing.detail.posted_at', { time: formatRelative(listing.created_at, locale, new Date(now)) })}
+                </time>
+                {' · '}
+                {t('listing.detail.views', { count: listing.view_count })}
               </p>
-              <p className="text-sm text-muted">{t('listing.detail.approx_location')}</p>
-            </section>
-          ) : null}
-        </div>
-      </div>
+              {foreign ? <TranslateBar /> : null}
+            </header>
 
-      {similar.length > 0 ? (
-        <section aria-labelledby="similar-heading" className="flex flex-col gap-3 pt-4">
-          <h2 id="similar-heading" className="text-xl font-semibold text-fg">
-            {t('listing.detail.similar')}
-          </h2>
-          <ListingGrid items={similar} now={now} layout={cfg.cardLayout} />
-        </section>
-      ) : null}
-    </article>
+            <p role="note" className="order-3 flex items-start gap-3 rounded-md bg-warning/15 p-3 text-md text-fg">
+              <ShieldAlert strokeWidth={1.75} className="mt-0.5 size-5 shrink-0" aria-hidden />
+              {t('listing.detail.safety_tip')}
+            </p>
+
+            <div className="order-7">
+              <PosterCard listing={listing} locale={locale} />
+            </div>
+            <div className="order-8">
+              <ListingActions
+                listingId={listing.id}
+                slug={listing.slug}
+                title={listing.title}
+                ownerId={listing.owner_id}
+                active={active}
+              />
+            </div>
+          </div>
+
+          <div className="contents lg:col-span-7 lg:row-start-2 lg:flex lg:flex-col lg:gap-6">
+            {attributes.length > 0 ? (
+              <section aria-labelledby="attributes-heading" className="order-4 flex flex-col gap-2">
+                <h2 id="attributes-heading" className="text-lg font-semibold text-fg">
+                  {t('listing.detail.attributes')}
+                </h2>
+                <dl className="grid gap-x-6 sm:grid-cols-2">
+                  {attributes.map(({ field, value }) => (
+                    <div key={field.key} className="flex justify-between gap-4 border-b border-border py-3">
+                      <dt className="text-md text-muted">{t(`listing.attr.${field.key}`)}</dt>
+                      <dd lang={field.kind === 'text' ? listing.lang : undefined} className="text-right text-md font-medium text-fg">
+                        {attributeText(field, value, t, locale)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
+
+            <section aria-labelledby="description-heading" className="order-5 flex flex-col gap-2">
+              <h2 id="description-heading" className="text-lg font-semibold text-fg">
+                {t('listing.detail.description')}
+              </h2>
+              {listing.description?.trim() ? (
+                <TranslatableText
+                  as="p"
+                  field="description"
+                  original={listing.description}
+                  lang={listing.lang}
+                  className="text-md whitespace-pre-line text-fg"
+                />
+              ) : (
+                <p className="text-md text-muted">{t('listing.detail.no_description')}</p>
+              )}
+            </section>
+
+            {listing.site_name ? (
+              <section aria-labelledby="location-heading" className="order-6 flex flex-col gap-2">
+                <h2 id="location-heading" className="text-lg font-semibold text-fg">
+                  {t('listing.detail.location')}
+                </h2>
+                <p className="flex items-start gap-2 text-md text-fg">
+                  <MapPin strokeWidth={1.75} className="mt-0.5 size-5 shrink-0 text-muted" aria-hidden />
+                  {listing.distance_to_site_m !== null
+                    ? t('listing.card.distance_to_site', {
+                        site: listing.site_name,
+                        distance: formatDistance(listing.distance_to_site_m, locale),
+                      })
+                    : listing.site_name}
+                </p>
+                <p className="text-sm text-muted">{t('listing.detail.approx_location')}</p>
+              </section>
+            ) : null}
+          </div>
+        </div>
+
+        {cfg.returnable ? (
+          <LostFoundOwnerPanel listingId={listing.id} ownerId={listing.owner_id} active={active} returned={returned} />
+        ) : null}
+
+        {similar.length > 0 ? (
+          <section aria-labelledby="similar-heading" className="flex flex-col gap-3 pt-4">
+            <h2 id="similar-heading" className="text-xl font-semibold text-fg">
+              {t('listing.detail.similar')}
+            </h2>
+            <ListingGrid items={similar} now={now} layout={cfg.cardLayout} />
+          </section>
+        ) : null}
+      </article>
+    </TranslationProvider>
   );
 }

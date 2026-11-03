@@ -1,8 +1,8 @@
 'use client';
 
 // "Xem thêm": trang đầu đã server render (SEO, tắt JS vẫn đọc được); các trang sau đọc ở trình duyệt bằng
-// searchListings (@hp/core) với con trỏ nextCursor. Web chưa có TanStack Query (thêm thư viện cần hỏi) nên gọi hàm thuần
-// với createBrowserClient(), giống onboarding-form. Hết trang → dòng "Bạn đã xem hết tin".
+// searchListings (@hp/core) với con trỏ nextCursor, gọi hàm thuần với createBrowserClient() (giống onboarding-form) —
+// danh sách công khai không cần cache client; khu đăng nhập (chat, thông báo) dùng hook TanStack của @hp/core/react. Hết trang → dòng "Bạn đã xem hết tin".
 import { type PublicListing, searchListings } from '@hp/core';
 import type { ListingCategory } from '@hp/shared';
 import { useTranslations } from 'next-intl';
@@ -19,12 +19,14 @@ type Props = {
   query: string;
   site: string | null;
   attributes: AttributeFilter;
+  /** Lọc khoảng cách tới khu làm việc (m), giống trang đầu. */
+  maxDistanceM?: number;
   pageSize: number;
   initialCursor: string | null;
   layout: 'grid' | 'row';
 };
 
-export function LoadMore({ categories, query, site, attributes, pageSize, initialCursor, layout }: Props) {
+export function LoadMore({ categories, query, site, attributes, maxDistanceM, pageSize, initialCursor, layout }: Props) {
   const t = useTranslations('listing.list');
   const [items, setItems] = useState<PublicListing[]>([]);
   const [fetchedAt, setFetchedAt] = useState(0);
@@ -40,6 +42,7 @@ export function LoadMore({ categories, query, site, attributes, pageSize, initia
       query: query || undefined,
       site: site ?? undefined,
       attributes: Object.keys(attributes).length > 0 ? { ...attributes } : undefined,
+      maxDistanceM,
       cursor,
       limit: pageSize,
     });

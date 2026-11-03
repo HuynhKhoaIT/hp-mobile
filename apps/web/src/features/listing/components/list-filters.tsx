@@ -2,6 +2,7 @@
 // Trang một tính năng: chip theo category của tính năng. Trang /tin (tất cả): chip là 4 tính năng (link sang trang riêng).
 // Lọc thuộc tính (chip "Tìm nhanh" của trang chủ, vd ?has_loft=1): giữ qua form tìm (input ẩn) và qua chip category
 // khi còn hợp lệ với category đó; hiện thành viên thuốc có nút bỏ lọc để người dùng biết danh sách đang bị lọc.
+// Khoảng cách tới khu làm việc (trọ: `distanceOptions` từ config): ô chọn trong cùng form GET (?distance=N, km).
 import type { Site } from '@hp/core';
 import type { ListingCategory, ListingFeature } from '@hp/shared';
 import { Search, X } from 'lucide-react';
@@ -13,7 +14,7 @@ import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { LISTING_FEATURE_CONFIGS, LISTING_FEATURE_ORDER } from '../features';
 import { attributeQuery, attributesFor, filterQuery, type ListFilterState } from '../filters';
-import { SiteSelect } from './site-select';
+import { FilterSelect, SiteSelect } from './site-select';
 
 type Props = {
   /** Đường dẫn trang (chưa có tiền tố ngôn ngữ) cho Link. */
@@ -25,6 +26,8 @@ type Props = {
   categories: readonly ListingCategory[];
   filters: ListFilterState;
   sites: Site[];
+  /** Lựa chọn km của bộ lọc khoảng cách (rỗng = không hiện). */
+  distanceOptions?: readonly number[];
   searchPlaceholder: string;
 };
 
@@ -43,9 +46,9 @@ function Chip({ href, selected, children }: { href: Parameters<typeof Link>[0]['
   );
 }
 
-export function ListFilters({ path, action, feature, categories, filters, sites, searchPlaceholder }: Props) {
+export function ListFilters({ path, action, feature, categories, filters, sites, distanceOptions = [], searchPlaceholder }: Props) {
   const t = useTranslations();
-  const keep = { query: filters.query, site: filters.site };
+  const keep = { query: filters.query, site: filters.site, distanceKm: filters.distanceKm };
   /** Chữ của một thuộc tính đang lọc: enum → tên giá trị ("Ca đêm"), bool → tên thuộc tính ("Có gác") / "…: Không". */
   const attributeLabel = (key: string, value: string | boolean) =>
     typeof value === 'boolean'
@@ -71,7 +74,17 @@ export function ListFilters({ path, action, feature, categories, filters, sites,
           />
           <Input name="q" type="search" defaultValue={filters.query} placeholder={searchPlaceholder} maxLength={100} className="pl-10" />
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {distanceOptions.length > 0 ? (
+            <FilterSelect
+              name="distance"
+              options={distanceOptions.map((km) => ({ value: String(km), label: t('listing.distance.within', { km }) }))}
+              value={filters.distanceKm === null ? null : String(filters.distanceKm)}
+              label={t('listing.distance.label')}
+              anyLabel={t('listing.distance.any')}
+              className="flex-1 sm:w-48 sm:flex-none"
+            />
+          ) : null}
           {sites.length > 0 ? (
             <SiteSelect
               sites={sites}

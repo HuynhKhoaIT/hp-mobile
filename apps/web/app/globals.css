@@ -56,6 +56,12 @@
   }
 }
 
+/* Chat (/tin-nhan, từ 640px): khung hộp thư + khung chat cao vừa màn hình, cuộn bên trong — màn hình − header (~4rem)
+   − lề trên dưới (2rem). Điện thoại: khung chat phủ toàn màn hình (fixed inset-0), không dùng utility này. */
+@utility h-chat-panel {
+  height: calc(100dvh - 6.25rem);
+}
+
 /* Khu admin: panel chi tiết hàng chờ dính dưới thanh trên (h-16) và tự cuộn bên trong — cao tối đa = màn hình − 6rem. */
 @utility max-h-admin-panel {
   max-height: calc(100dvh - 6rem);

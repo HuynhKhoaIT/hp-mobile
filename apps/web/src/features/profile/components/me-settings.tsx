@@ -8,6 +8,23 @@ import { LocaleSwitcher } from '@/components/shared/locale-switcher';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { Link } from '@/i18n/navigation';
 
+/** Ngôn ngữ + giao diện — dùng ở /toi và /toi/cai-dat. */
+export async function PreferencesCard() {
+  const t = await getTranslations();
+  return (
+    <div className="flex flex-col divide-y divide-border rounded-lg bg-surface shadow-card">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+        <span className="text-md font-medium text-fg">{t('common.settings.language')}</span>
+        <LocaleSwitcher />
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+        <span className="text-md font-medium text-fg">{t('web.me.theme')}</span>
+        <ThemeToggle />
+      </div>
+    </div>
+  );
+}
+
 export async function MeSettings() {
   const t = await getTranslations();
   return (
@@ -15,16 +32,7 @@ export async function MeSettings() {
       <h2 id="me-settings" className="text-lg font-semibold text-fg">
         {t('web.me.settings')}
       </h2>
-      <div className="flex flex-col divide-y divide-border rounded-lg bg-surface shadow-card">
-        <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <span className="text-md font-medium text-fg">{t('common.settings.language')}</span>
-          <LocaleSwitcher />
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-          <span className="text-md font-medium text-fg">{t('web.me.theme')}</span>
-          <ThemeToggle />
-        </div>
-      </div>
+      <PreferencesCard />
       <nav aria-label={t('web.me.about')} className="rounded-lg bg-surface shadow-card">
         <ul className="flex flex-col divide-y divide-border">
           {LEGAL_LINKS.map(({ href, key }) => (

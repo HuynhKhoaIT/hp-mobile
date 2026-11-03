@@ -13,6 +13,12 @@ import {
   type PriceLabel,
 } from '@hp/shared';
 
+/** Đồ thất lạc đã về với chủ (chủ tin bấm "Đã nhận lại đồ" → attributes.returned = true + đóng tin). */
+export function isReturned(listing: { attributes: unknown }): boolean {
+  const a = listing.attributes;
+  return !!a && typeof a === 'object' && !Array.isArray(a) && (a as Record<string, unknown>).returned === true;
+}
+
 /** `useLocale()` / root param trả string → Locale của @hp/shared (lạ → vi). */
 export function asLocale(value: string): Locale {
   return (LOCALES as readonly string[]).includes(value) ? (value as Locale) : DEFAULT_LOCALE;

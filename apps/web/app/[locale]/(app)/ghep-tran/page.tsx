@@ -1,14 +1,12 @@
-// /ghep-tran — Ghép trận (mẫu Group, tuần 7–8). Ô "Sắp có" trên trang chủ trỏ tới đây: giữ đúng URL đã chốt, không 404.
+// /ghep-tran — Ghép trận: danh sách dùng chung features/group (khác biệt ở features/sport/config.ts).
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { ComingSoon } from '@/components/shared/coming-soon';
+import { GroupListPage } from '@/features/group/components/group-list-page';
+import { groupListMetadata } from '@/features/group/metadata';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('common.feature');
-  return { title: t('sport'), robots: { index: false, follow: true } };
+export function generateMetadata({ searchParams }: PageProps<'/[locale]/ghep-tran'>): Promise<Metadata> {
+  return groupListMetadata('sport', searchParams);
 }
 
-export default async function Page() {
-  const t = await getTranslations('common.feature');
-  return <ComingSoon title={t('sport')} />;
+export default function Page({ searchParams }: PageProps<'/[locale]/ghep-tran'>) {
+  return <GroupListPage kind="sport" searchParams={searchParams} />;
 }
