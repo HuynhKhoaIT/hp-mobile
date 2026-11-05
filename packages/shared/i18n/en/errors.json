@@ -46,5 +46,7 @@
   "already_requested": "Your request is waiting for review.",
   "translate_unavailable": "Translation is temporarily unavailable.",
   "translate_failed": "Could not translate. Please try again later.",
-  "images_min": "Room listings need at least 3 photos."
+  "images_min": "Room listings need at least 3 photos.",
+  "contact_invalid": "Enter a valid phone number (e.g. 0912 345 678) or email.",
+  "consent_required": "Please agree so we can contact you."
 }

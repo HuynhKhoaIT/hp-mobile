@@ -491,14 +491,14 @@ isOneToOne: false
                   ]
                 },"listings": {
                   Row: {
-                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"deleted_at": string | null,"description": string | null,"expires_at": string | null,"id": string,"images": (string)[],"lang": string,"location": unknown,"moderation_reasons": (string)[],"owner_id": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
+                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"deleted_at": string | null,"description": string | null,"expires_at": string | null,"id": string,"images": (string)[],"lang": string,"location": unknown,"moderation_hold": boolean,"moderation_reasons": (string)[],"owner_id": string,"price": number | null,"price_type": string,"published_at": string | null,"search_vector": unknown,"short_id": string,"site": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"title_search": string | null,"updated_at": string,"view_count": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title": string,"updated_at"?: string,"view_count"?: number
+                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_hold"?: boolean,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"published_at"?: string | null,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title": string,"title_search"?: never,"updated_at"?: string,"view_count"?: number
                   }
                   Update: {
-                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category"?: Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title"?: string,"updated_at"?: string,"view_count"?: number
+                    "address_text"?: string | null,"attributes"?: NonNullable<Json>,"category"?: Database["public"]['Enums']["listing_category"],"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string | null,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"moderation_hold"?: boolean,"moderation_reasons"?: (string)[],"owner_id"?: string,"price"?: number | null,"price_type"?: string,"published_at"?: string | null,"search_vector"?: never,"short_id"?: string,"site"?: string | null,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"title"?: string,"title_search"?: never,"updated_at"?: string,"view_count"?: number
                   }
                   Relationships: [
                     {
@@ -557,6 +557,38 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "public_listings"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"marketing_leads": {
+                  Row: {
+                    "consent_at": string,"consent_version": string,"contact": string,"contact_type": string,"created_at": string,"handled_at": string | null,"handled_by": string | null,"id": string,"kind": string,"locale": string,"message": string | null,"name": string | null,"note": string | null,"site": string | null,"source": string,"status": string,"updated_at": string,"utm": NonNullable<Json>
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "consent_at": string,"consent_version": string,"contact": string,"contact_type": string,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"kind": string,"locale"?: string,"message"?: string | null,"name"?: string | null,"note"?: string | null,"site"?: string | null,"source"?: string,"status"?: string,"updated_at"?: string,"utm"?: NonNullable<Json>
+                  }
+                  Update: {
+                    "consent_at"?: string,"consent_version"?: string,"contact"?: string,"contact_type"?: string,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"kind"?: string,"locale"?: string,"message"?: string | null,"name"?: string | null,"note"?: string | null,"site"?: string | null,"source"?: string,"status"?: string,"updated_at"?: string,"utm"?: NonNullable<Json>
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "marketing_leads_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "marketing_leads_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "marketing_leads_site_fkey"
+      columns: ["site"]
+isOneToOne: false
+      referencedRelation: "sites"
+      referencedColumns: ["code"]
     }
                   ]
                 },"messages": {
@@ -918,7 +950,7 @@ isOneToOne: false
                   ]
                 },"public_listings": {
                   Row: {
-                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"description": string | null,"distance_to_site_m": number | null,"expires_at": string | null,"id": string,"images": (string)[],"inactive_since": string | null,"is_expired": boolean | null,"lang": string,"lat": number | null,"lng": number | null,"owner_avatar_url": string | null,"owner_badges": (string)[],"owner_id": string,"owner_name": string | null,"owner_rating_avg": number,"owner_rating_count": number,"owner_since": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"site_name": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"updated_at": string,"view_count": number
+                    "address_text": string | null,"attributes": NonNullable<Json>,"category": Database["public"]['Enums']["listing_category"],"created_at": string,"description": string | null,"distance_to_site_m": number | null,"expires_at": string | null,"id": string,"images": (string)[],"inactive_since": string | null,"is_expired": boolean | null,"lang": string,"lat": number | null,"lng": number | null,"owner_avatar_url": string | null,"owner_badges": (string)[],"owner_id": string,"owner_name": string | null,"owner_rating_avg": number,"owner_rating_count": number,"owner_since": string,"price": number | null,"price_type": string,"search_vector": unknown,"short_id": string,"site": string | null,"site_name": string | null,"slug": string,"status": Database["public"]['Enums']["listing_status"],"title": string,"title_search": string | null,"updated_at": string,"view_count": number
                   }
                   ComputedFields: never
                   Relationships: [
@@ -983,6 +1015,9 @@ isOneToOne: false
 "chat_message_violation":
 { Args: { "p_body": string }; Returns: string
                            },
+"check_rate_limit":
+{ Args: { "p_action": string,"p_key": string }; Returns: boolean
+                           },
 "count_unread_conversations":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
@@ -998,6 +1033,11 @@ isOneToOne: false
 "export_audit_log":
 { Args: { "p_action_prefix"?: string,"p_from"?: string,"p_limit"?: number,"p_to"?: string }; Returns: {
               "action": string,"actor_id": string,"actor_name": string,"created_at": string,"id": number,"meta": Json,"target_id": string,"target_type": string
+            }[]
+                           },
+"export_marketing_leads":
+{ Args: { "p_from"?: string,"p_limit"?: number,"p_status"?: string,"p_to"?: string }; Returns: {
+              "contact": string,"contact_type": string,"created_at": string,"handled_at": string,"id": string,"kind": string,"locale": string,"message": string,"name": string,"note": string,"site": string,"source": string,"status": string,"utm": Json
             }[]
                            },
 "f_unaccent":
@@ -1086,6 +1126,7 @@ isOneToOne: false
 "slug": string,
 "status": Database["public"]['Enums']["listing_status"],
 "title": string,
+"title_search": string | null,
 "updated_at": string,
 "view_count": number
             }[]
@@ -1130,6 +1171,7 @@ isOneToOne: false
 "slug": string,
 "status": Database["public"]['Enums']["listing_status"],
 "title": string,
+"title_search": string | null,
 "updated_at": string,
 "view_count": number
             }[]
@@ -1216,6 +1258,7 @@ isOneToOne: false
 "slug": string,
 "status": Database["public"]['Enums']["listing_status"],
 "title": string,
+"title_search": string | null,
 "updated_at": string,
 "view_count": number
             }[]
@@ -1363,6 +1406,7 @@ isOneToOne: false
 "slug": string,
 "status": Database["public"]['Enums']["listing_status"],
 "title": string,
+"title_search": string | null,
 "updated_at": string,
 "view_count": number
             }[]
@@ -1412,6 +1456,7 @@ isOneToOne: false
 "slug": string,
 "status": Database["public"]['Enums']["listing_status"],
 "title": string,
+"title_search": string | null,
 "updated_at": string,
 "view_count": number
             }[]

@@ -16,6 +16,7 @@ export * from './moderation';
 export * from './schemas/actions/moderation';
 export * from './chat';
 export * from './schemas/actions/chat';
+export * from './schemas/actions/marketing';
 export * from './notifications';
 export * from './group-display';
 export * from './schemas/group';

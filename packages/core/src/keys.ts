@@ -66,5 +66,6 @@ export const keys = {
   adminVenues: (filters?: Filters) => ['hp', 'admin', 'venues', filters ?? {}] as const,
   adminKeywords: (filters?: Filters) => ['hp', 'admin', 'keywords', filters ?? {}] as const,
   adminBanners: (filters?: Filters) => ['hp', 'admin', 'banners', filters ?? {}] as const,
+  adminLeads: (filters?: Filters) => ['hp', 'admin', 'leads', filters ?? {}] as const,
   adminAudit: (filters?: Filters) => ['hp', 'admin', 'audit', filters ?? {}] as const,
 } as const;

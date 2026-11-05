@@ -4,6 +4,7 @@
 //   reports → report.update · badge_requests → badge.approve|reject · profiles → user.role|ban|unban|suspend|unsuspend|badges
 //   staff_set_listing_status → listing.status · staff_cancel_group → group.cancel · sites → site.* · venues → venue.*
 //   banned_keywords → keyword.* · banners → banner.* · export_audit_log → audit.export
+//   marketing_leads → lead.update · export_marketing_leads → lead.export
 // Thu nhỏ PII: SĐT luôn che (maskVnPhone) ngay tại đây, không đọc toạ độ (location) của tin / nhà / sân.
 // Kiểm input bằng hàm nhỏ trong file này (enum + uuid + độ dài) vì Zod schema admin chưa có ở @hp/shared — xem
 // docs/plan/web.md mục 3l (chuyển sang @hp/shared khi backend thêm).
@@ -26,6 +27,11 @@ import {
   type ReportTarget,
   ROLES,
   type Role,
+  LEAD_KINDS,
+  LEAD_STATUSES,
+  type LeadKind,
+  type LeadStatus,
+  LeadUpdateInput,
 } from '@hp/shared';
 import { type Client, fail, fromSupabase, ok, type Result } from './result';
 
@@ -149,9 +155,10 @@ export type AdminStats = {
   reports_open: number;
   badges_pending: number;
   venues_pending: number;
+  leads_new: number;
 };
 
-/** Số liệu dashboard (RPC admin_stats, staff). Chưa tách nguồn web / app (backend tuần 11). */
+/** Số liệu dashboard (RPC admin_stats, staff). Chưa tách nguồn web / app (cần PostHog). */
 export async function getAdminStats(client: Client): Promise<Result<AdminStats>> {
   const res = await client.rpc('admin_stats');
   if (res.error) return fromSupabase<AdminStats>({ data: null, error: res.error });
@@ -175,6 +182,7 @@ export async function getAdminStats(client: Client): Promise<Result<AdminStats>>
     reports_open: num(j.reports_open),
     badges_pending: num(j.badges_pending),
     venues_pending: num(j.venues_pending),
+    leads_new: num(j.leads_new),
   });
 }
 
@@ -1050,6 +1058,93 @@ export async function setBannerActive(client: Client, input: { id: unknown; acti
   const res = await client.from('banners').update({ is_active: input.active }).eq('id', input.id).select('id').maybeSingle();
   if (res.error) return fromSupabase<null>({ data: null, error: res.error });
   return res.data ? ok(null) : fail('forbidden');
+}
+
+// ── Lead (marketing) ─────────────────────────────────────────────────────────────
+export type AdminLead = Omit<Tables<'marketing_leads'>, 'kind' | 'status' | 'utm'> & {
+  kind: LeadKind;
+  status: LeadStatus;
+  utm: Record<string, string>;
+  handler_name: string | null;
+};
+export type LeadQuery = PageInput & { status?: string; kind?: string; q?: string };
+export const LEAD_EXPORT_MAX = 10000;
+
+const utmRecord = (v: Json): Record<string, string> =>
+  v && typeof v === 'object' && !Array.isArray(v)
+    ? Object.fromEntries(Object.entries(v).flatMap(([k, x]) => (typeof x === 'string' ? [[k, x] as const] : [])))
+    : {};
+
+/** Lead (moderator+ — policy marketing_leads_select_staff). Mặc định lead mới, cũ trước để xử lý theo thứ tự. */
+export async function listLeads(client: Client, input: LeadQuery = {}): Promise<Result<AdminPage<AdminLead>>> {
+  const w = pageWindow(input);
+  let q = client.from('marketing_leads').select('*', { count: 'exact' });
+  if (oneOf(LEAD_STATUSES, input.status)) q = q.eq('status', input.status);
+  if (oneOf(LEAD_KINDS, input.kind)) q = q.eq('kind', input.kind);
+  const search = sanitizeSearch(input.q);
+  if (search) q = q.or(`contact.ilike.*${search}*,name.ilike.*${search}*`);
+  const r = rangeResult(await q.order('created_at', { ascending: input.status === 'new' || !input.status }).range(w.from, w.to));
+  if (r.error) return fail(r.error.code, r.error.message);
+  const names = await shortNames(client, r.data.rows.map((l) => l.handled_by));
+  return ok(
+    toPage(
+      r.data.rows.map((l) => ({
+        ...l,
+        kind: (oneOf(LEAD_KINDS, l.kind) ? l.kind : 'user') as LeadKind,
+        status: (oneOf(LEAD_STATUSES, l.status) ? l.status : 'new') as LeadStatus,
+        utm: utmRecord(l.utm),
+        handler_name: l.handled_by ? (names.get(l.handled_by) ?? null) : null,
+      })),
+      r.data.total,
+      w,
+    ),
+  );
+}
+
+/** Đổi trạng thái / ghi chú lead (moderator+). Trigger ghi người xử lý + audit `lead.update`. */
+export async function updateLead(client: Client, input: LeadUpdateInput): Promise<Result<null>> {
+  const parsed = LeadUpdateInput.safeParse(input);
+  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'invalid_input');
+  const v = parsed.data;
+  const res = await client
+    .from('marketing_leads')
+    .update({ status: v.status, ...(v.note !== undefined ? { note: v.note || null } : {}) })
+    .eq('id', v.id)
+    .select('id')
+    .maybeSingle();
+  if (res.error) return fromSupabase<null>({ data: null, error: res.error });
+  return res.data ? ok(null) : fail('forbidden');
+}
+
+export type LeadExportRow = Database['public']['Functions']['export_marketing_leads']['Returns'][number];
+
+/** Xuất lead (admin, RPC export_marketing_leads ghi audit `lead.export`). Ngày theo giờ VN như nhật ký. */
+export async function exportLeads(
+  client: Client,
+  input: { from?: string; to?: string; status?: string; limit?: number } = {},
+): Promise<Result<LeadExportRow[]>> {
+  const from = vnDayStart(input.from);
+  const to = vnDayStart(input.to, 1);
+  const limit = Math.min(Math.max(1, Math.floor(input.limit ?? 5000)), LEAD_EXPORT_MAX);
+  const res = await client.rpc('export_marketing_leads', {
+    ...(from ? { p_from: from } : {}),
+    ...(to ? { p_to: to } : {}),
+    ...(oneOf(LEAD_STATUSES, input.status) ? { p_status: input.status } : {}),
+    p_limit: limit,
+  });
+  if (res.error) return fromSupabase<LeadExportRow[]>({ data: null, error: res.error });
+  return ok(res.data ?? []);
+}
+
+/** CSV lead (cùng quy tắc csvCell / BOM với nhật ký). */
+export function leadsCsv(rows: LeadExportRow[]): string {
+  const header = ['id', 'created_at', 'kind', 'name', 'contact', 'contact_type', 'site', 'message', 'source', 'locale', 'utm', 'status', 'note', 'handled_at'];
+  const lines = rows.map((r) =>
+    [r.id, r.created_at, r.kind, r.name, r.contact, r.contact_type, r.site, r.message, r.source, r.locale, r.utm, r.status, r.note, r.handled_at]
+      .map(csvCell)
+      .join(','),
+  );
+  return `﻿${[header.join(','), ...lines].join('\r\n')}\r\n`;
 }
 
 // ── Audit log ────────────────────────────────────────────────────────────────────

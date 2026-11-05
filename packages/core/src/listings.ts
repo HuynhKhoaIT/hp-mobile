@@ -7,8 +7,8 @@ import type { Page } from './social';
 
 type PublicListingRow = Database['public']['Views']['public_listings']['Row'];
 
-/** Một tin công khai (card + chi tiết). Không có search_vector — cột đó chỉ để RPC dùng index. */
-export type PublicListing = Omit<PublicListingRow, 'search_vector'>;
+/** Một tin công khai (card + chi tiết). Không có search_vector / title_search — hai cột đó chỉ để RPC dùng index. */
+export type PublicListing = Omit<PublicListingRow, 'search_vector' | 'title_search'>;
 
 /** Cột client đọc từ public_listings / RPC. Thêm cột vào view → thêm ở đây. Một chuỗi literal để supabase-js suy ra type. */
 // prettier-ignore

@@ -46,5 +46,7 @@
   "already_requested": "你的申请正在等待审核。",
   "translate_unavailable": "翻译功能暂时不可用。",
   "translate_failed": "翻译失败，请稍后再试。",
-  "images_min": "房屋信息至少需要 3 张照片。"
+  "images_min": "房屋信息至少需要 3 张照片。",
+  "contact_invalid": "请输入有效的电话号码（例如 0912 345 678）或电子邮箱。",
+  "consent_required": "请同意后我们才能联系您。"
 }

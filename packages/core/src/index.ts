@@ -15,6 +15,7 @@ export * from './keys';
 export * from './home';
 export * from './listings';
 export * from './listings-write';
+export * from './marketing';
 export * from './moderation';
 export * from './notifications';
 export * from './result';

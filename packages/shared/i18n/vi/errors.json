@@ -46,5 +46,7 @@
   "already_requested": "Yêu cầu của bạn đang chờ duyệt.",
   "translate_unavailable": "Tính năng dịch đang tạm ngưng.",
   "translate_failed": "Chưa dịch được, vui lòng thử lại sau.",
-  "images_min": "Tin phòng trọ cần ít nhất 3 ảnh."
+  "images_min": "Tin phòng trọ cần ít nhất 3 ảnh.",
+  "contact_invalid": "Hãy nhập số điện thoại (ví dụ 0912 345 678) hoặc email đúng.",
+  "consent_required": "Bạn cần đồng ý để chúng tôi liên hệ lại."
 }
