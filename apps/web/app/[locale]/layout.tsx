@@ -6,7 +6,6 @@ import '../globals.css';
 import { APP_NAME } from '@hp/shared';
 import type { Metadata, Viewport } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import type { Messages } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { Be_Vietnam_Pro } from 'next/font/google';
 import { notFound } from 'next/navigation';
@@ -15,6 +14,7 @@ import { Suspense } from 'react';
 import { CookieConsent } from '@/components/shared/cookie-consent';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { ToastProvider } from '@/components/shared/toast';
+import { clientWebMessages } from '@/i18n/client-messages';
 import { routing } from '@/i18n/routing';
 import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
@@ -40,11 +40,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t('description'),
     robots: publicEnv.allowIndex ? undefined : { index: false, follow: false },
   };
-}
-
-/** Chữ marketing chỉ dùng ở server; form lead tự nhận phần của nó (LeadSection). Không gửi xuống mọi trang. */
-function clientWebMessages(web: Messages['web']) {
-  return Object.fromEntries(Object.entries(web).filter(([key]) => key !== 'marketing'));
 }
 
 export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'>) {

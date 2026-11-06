@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { clientWebMessages } from '@/i18n/client-messages';
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin.meta');
@@ -25,7 +26,7 @@ export default async function AdminRootLayout({ children }: { children: ReactNod
         auth: messages.auth,
         listing: messages.listing,
         group: messages.group,
-        web: messages.web,
+        web: clientWebMessages(messages.web),
       }}
     >
       {children}

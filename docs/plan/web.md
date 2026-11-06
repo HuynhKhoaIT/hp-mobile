@@ -244,7 +244,17 @@ Quyết định: **`/` vẫn là Hub, landing ở `/gioi-thieu`** (không đổi
 
   Số giả lập LCP 3,9–4,9 s cao hơn thực tế: đo không giới hạn tốc độ LCP = FCP = 146 ms (chữ hero), localhost tải xong mọi JS trước khi vẽ nên Lantern tính hết JS vào LCP. Số throttle thật có nhiễu (máy còn ~1,4 GB RAM, Docker chạy cùng; TBT Hub 380–1.880 ms). **Phải đo lại trên staging / Vercel** (CDN, brotli) mới chốt
   - Đã sửa: (1) 404 `@font-face` Noto Sans SC (372 KB CSS chặn render) tải ở **mọi** ngôn ngữ → bỏ `next/font` cho zh, dùng font CJK hệ thống, CSS còn 69 KB, FCP giả lập 2,9 → 1,5 s; (2) **metadata bị đẩy xuống `<body>`** ở trang đọc `searchParams`, cả với Googlebot (Google bỏ qua canonical ngoài `<head>`) → `htmlLimitedBots: /.*/`; (3) `web.marketing` không còn gửi xuống mọi trang (`LeadSection` tự nhận phần của nó); (4) tương phản: badge `success` 2,9:1 → `text-fg` (web + app), chữ phụ trên `surface-2` 4,23:1 → `text-fg`; (5) carousel Hub bỏ `<li role="group">`
-  - Còn lại: Hub Speed Index ~5,8 s, TBT cao; JS công khai ~346 KB nén gồm `@supabase/supabase-js` 66 KB + `zod` 31 KB + TanStack ở cả trang khách (header đọc phiên) — hướng giảm: tách phần phiên khỏi bundle đầu, giảm prefetch `Link` (landing tải thêm ~175 KB RSC khi vừa mở); chưa đo riêng trang `zh`
+- [x] **Tối ưu tải trang** (2026-11-06): trước đó mở Hub là Next tự prefetch ~1 MB các trang có link trong màn hình, kéo dài tới giây thứ 13 trên Slow 4G. `Link` ở `@/i18n/navigation` nay prefetch theo ý định (`src/i18n/link.tsx`: rê chuột / chạm / focus; muốn đổi chính sách sửa một chỗ này). Bỏ `web.marketing` khỏi provider của `(app)` và admin (`src/i18n/client-messages.ts`); dải tin Hub không gửi `description` / `address_text` xuống client. Dữ liệu tải khi mở trang (đo Lighthouse, không phụ thuộc máy):
+
+  | Trang | Trước | Sau |
+  |---|---|---|
+  | `/` (Hub) | 1.552 KB | 532 KB |
+  | `/pass-do` | 1.300 KB | 515 KB |
+  | `/tin/[slug]` | 1.189 KB | 512 KB |
+  | `/gioi-thieu` | 704 KB | 483 KB |
+
+  Đã thử bằng Chrome thật: mở Hub 0 prefetch, rê chuột / chạm mới tải, bấm link không tải lại trang, Back chạy, 0 lỗi JS. **Điểm Performance sau bước này không so được** (máy còn 0,6 GB RAM, TBT 180–1.310 ms giữa các lần): Hub 64 / 66 / 85, landing 88 / 81 / 86, trang tin 91 / 88 / 74, danh sách 86 / 67 / 87. Phải đo lại trên staging / Vercel
+  - Còn lại: Speed Index Hub ~6,2 s do **lời chào + thẻ cá nhân là skeleton chờ JS đọc phiên** (nội dung chính đã hiện lúc ~4,3 s). Bỏ được bằng cách đọc cookie trong script chèn sẵn và render song song giao diện khách, nhưng thêm rủi ro lệch hydration: chưa làm. JS công khai ~340 KB nén gồm `@supabase/supabase-js` 66 KB + `zod` 31 KB (client dùng đồng bộ ở nhiều hook; `searchListings`, `updateMyProfile` cần zod): tách là việc lớn, chưa làm. Prefetch theo ý định đổi lại lần bấm đầu chậm hơn một chút trên trang chưa rê chuột / chạm. Chưa đo riêng trang `zh`
 - [ ] **Còn lại / lệch có chủ đích**
   - Chưa thử zoom 200%
   - Hiệu ứng vào viewport + số đếm tăng chưa làm (`motion` chưa cài); mockup là minh hoạ CSS vì chưa có ảnh chụp thật; cover blog chưa có

@@ -9,13 +9,14 @@ import { AppHeader } from '@/components/shared/app-header';
 import { BottomNav } from '@/components/shared/bottom-nav';
 import { DataProvider } from '@/components/shared/data-provider';
 import { MobileDisclaimer, SiteFooter } from '@/components/shared/site-footer';
+import { clientWebMessages } from '@/i18n/client-messages';
 
 export default async function AppLayout({ children }: LayoutProps<'/[locale]'>) {
   const messages = await getMessages();
   return (
     <NextIntlClientProvider
       messages={{
-        web: messages.web,
+        web: clientWebMessages(messages.web),
         common: messages.common,
         errors: messages.errors,
         auth: messages.auth,
