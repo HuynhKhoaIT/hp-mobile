@@ -124,7 +124,8 @@ export function useSetListingStatus() {
     onMutate: async (v) => {
       await qc.cancelQueries({ queryKey: keys.myListings() });
       const snapshot = snapshotMine(qc);
-      patchMine(qc, v.id, (l) => ({ ...l, status: v.status }));
+      // Mở lại (active): server có thể chuyển thành pending_review (kiểm duyệt, khoá) nên không đoán trước; chờ kết quả thật.
+      if (v.status !== 'active') patchMine(qc, v.id, (l) => ({ ...l, status: v.status }));
       return { snapshot };
     },
     onError: (_e, _v, ctx) => ctx && restoreMine(qc, ctx.snapshot),
