@@ -221,12 +221,31 @@ Code: `app/[locale]/admin/(dashboard)/**`, `src/features/admin/**`, `src/compone
   - Banner chưa upload ảnh (bucket `banners`), lead / blog chưa có bảng (tuần 11); "Sửa danh mục" khi duyệt tin vẫn chưa có RPC
   - Bộ lọc ngày nhật ký dùng giờ VN cố định (+07:00)
 
+## 3m. Tuần 11 — landing, lead, pháp lý, cookie (cập nhật 2026-11-05)
+Quyết định: **`/` vẫn là Hub, landing ở `/gioi-thieu`** (không đổi route; chiến dịch quảng cáo trỏ thẳng `/gioi-thieu`). Tên người vận hành + email đọc từ env, chưa có thì trang ghi "đang cập nhật".
+- [x] **Landing** `/gioi-thieu` (`features/marketing/components/landing-page.tsx`): Hero (2 nút, QR desktop, mockup CSS) → 6 dịch vụ → 4 tin mới nhất (thật, server render) → 3 bước → an toàn → số liệu (chỉ khi ≥ 100 tin **và** ≥ 100 thành viên) → chủ trọ / sân / tuyển dụng + form lead → FAQ (JSON-LD) → CTA. JSON-LD `Organization`, `MobileApplication`, `FAQPage`. Khối "Cảm nhận" chưa có: chỉ thêm khi có phản hồi thật đã xin phép
+- [x] `/tinh-nang/[slug]` (`pass-do`, `tim-tro`, `tim-viec`, `do-that-lac`, `ghep-xe`, `ghep-tran`), `/tai-app` (tĩnh; điện thoại tự chuyển sang kho ở trình duyệt, desktop QR + 2 nút; chưa có link kho → báo sắp lên kho), `/cho-chu-tro`, `/blog` + `/blog/[slug]`; sitemap thêm các trang này, chỉ bài `published`; footer thêm Tải app, Blog, Cho chủ trọ, Cài đặt cookie
+- [x] **Pháp lý MDX 3 ngôn ngữ** `content/legal/{vi,en,zh}/{dieu-khoan,chinh-sach-bao-mat,xoa-tai-khoan,lien-he}.mdx`, 1 bài blog `content/blog/vi/giao-dich-an-toan.mdx` (en / zh hiện bản vi + `web.content.not_translated`). Dùng `export const metadata` thay frontmatter (@next/mdx không đọc frontmatter, tránh thêm plugin). Thêm bài = thêm file + một dòng ở `features/marketing/content.ts`
+- [x] **Lead**: `features/marketing/actions.ts` (form action, tắt JS vẫn gửi được), honeypot `website`, hash IP `sha256(IP_HASH_SALT:ip)` (ưu tiên `x-real-ip`; tự host phải đặt sau proxy tin cậy), utm giữ trong sessionStorage. ESLint cho riêng file này dùng client service role. Đã thử qua HTTP thật: thiếu đồng ý / liên hệ sai báo lỗi tại ô, honeypot không lưu, 5 lần qua, lần 6 `rate_limited`, IP khác vẫn gửi, SĐT / email chuẩn hoá, DB không có IP thô
+- [x] **Admin** `/admin/leads` (moderator+, badge lead mới), `/admin/leads/export` (chỉ admin). Thử bằng phiên thật ở tầng `@hp/core`: moderator xem / tìm / đổi trạng thái, không xuất; admin xuất + audit `lead.export`; user 0 dòng, `forbidden`; khách 307. **Chưa mở màn này bằng trình duyệt với phiên aal2**
+- [x] **Cookie + PostHog**: `lib/analytics` (dynamic import sau đồng ý, không autocapture, không replay), `components/shared/cookie-consent.tsx` (chỉ hiện khi có `NEXT_PUBLIC_POSTHOG_KEY`, không hiện ở `/admin`). Đã thử bằng Chrome thật với key giả: trước đồng ý 0 request, 0 cookie `ph_`; từ chối vẫn 0 sau khi mở lại; đồng ý mới gửi. Bản production: chunk `posthog-js` 351 KB không có trong HTML. Sự kiện đã gắn: `cta_web_start`, `cta_store_click`, `qr_view`, `lead_submit`; **chưa gắn** `open_in_app_click`, `app_promo_click`
+- [x] `.well-known` `apple-app-site-association` (khai cả `/en`, `/zh`) + `assetlinks.json`: đọc env **lúc build** (route tĩnh), thiếu env → 404. Đã thử với giá trị giả
+- [x] `noindex` chuyển sang `NEXT_PUBLIC_ALLOW_INDEX` (mặc định chặn, chỉ production đặt `true`)
+- [x] Đã kiểm: `tsc`, `pnpm --filter web lint`, `i18n:check`, **`pnpm --filter web build` xanh** (bắt được lỗi `CookieConsent` chặn prerender, đã bọc `Suspense`); không tràn ngang 12 trang ở 360 và 1440 px; ảnh sáng / tối, vi / en / zh
+- [ ] **Còn lại / lệch có chủ đích**
+  - Chưa chạy Lighthouse (`/seo-check`) nên chưa xác nhận mốc ≥ 90 / 100 / 95; chưa thử zoom 200%
+  - Hiệu ứng vào viewport + số đếm tăng chưa làm (`motion` chưa cài); mockup là minh hoạ CSS vì chưa có ảnh chụp thật; cover blog chưa có
+  - Trang admin "blog (trạng thái)" chưa làm: blog là file trong repo
+  - "Đã bán" ở web chỉ hiện với tin `active`, app hiện cả `closed` / `expired` (đều hợp lệ với backend) — nên thống nhất
+  - Tin bị khoá kiểm duyệt: chủ tin mở từ "Tin của tôi" ra trang "tin không còn" (`MyListing` chưa có `moderation_hold`)
+  - **Trước khi lên store:** đặt `NEXT_PUBLIC_OPERATOR_NAME`, `NEXT_PUBLIC_CONTACT_EMAIL`; luật sư xem văn bản pháp lý (độ tuổi, chuyển dữ liệu sang Singapore, không có tuỳ chọn tắt hiện số, giữ ảnh chat và lead, ghép xe có thu phí). `purge-files` không xoá `chat-images` nên văn bản ghi ảnh chat còn lại
+
 ## 4. Danh sách trang
 
 | Route | Khu | Render | Tuần |
 |---|---|---|---|
-| `/` | (app) — Hub | PPR tĩnh + cache 300 (phần người dùng ở client) | 4b Hub; landing marketing tuần 11 |
-| `/tinh-nang/[slug]`, `/tai-app`, `/cho-chu-tro`, `/blog/[slug]`, `/gioi-thieu`, `/lien-he`, `/chinh-sach-bao-mat`, `/dieu-khoan`, `/xoa-tai-khoan` | marketing | SSG | 2 khung, 11 |
+| `/` | (app) — Hub | PPR tĩnh + cache 300 (phần người dùng ở client) | 4b Hub (landing ở `/gioi-thieu`, tuần 11) |
+| `/tinh-nang/[slug]`, `/tai-app`, `/cho-chu-tro`, `/blog`, `/blog/[slug]`, `/gioi-thieu` (landing), `/lien-he`, `/chinh-sach-bao-mat`, `/dieu-khoan`, `/xoa-tai-khoan` | marketing | SSG | 2 khung, 11 |
 | `/tin`, `/pass-do`, `/viec-lam`, `/tro`, `/that-lac` | public | SSR + cache 300 | 3 (trang `/[site]`: 4) |
 | `/tin/[slug]` | public | cache 300 + tag | 3 (`opengraph-image`: 4) |
 | `/u/[id]`, `/tim-kiem` | public | SSR + ISR / dynamic | 4 |

@@ -69,7 +69,8 @@ select ok((public.admin_stats() ->> 'leads_new')::int >= 1, 'admin_stats: có le
 select tests.authenticate_as('lead_boss');
 select is((select count(*)::int from public.export_marketing_leads() where id::text like 'd0000000%'), 2, 'admin: xuất lead');
 reset role;
-select is((select count(*)::int from public.audit_log where action = 'lead.export'), 1, 'xuất lead → audit lead.export');
+select is((select count(*)::int from public.audit_log where action = 'lead.export' and actor_id = tests.get_uid('lead_boss')), 1,
+  'xuất lead → audit lead.export');
 select is((select meta ->> 'to' from public.audit_log where action = 'lead.update' and target_id = 'd0000000-0000-4000-8000-000000000001'),
   'contacted', 'đổi trạng thái lead → audit lead.update');
 select is((select count(*)::int from public.audit_log where action like 'lead.%' and meta::text like '%84912345678%'), 0,
