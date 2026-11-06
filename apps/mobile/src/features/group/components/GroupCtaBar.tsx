@@ -161,7 +161,7 @@ function StatusLine({ icon, text, tone = 'primary' }: { icon: LucideIcon; text: 
   return (
     <View accessibilityRole="text" className="min-h-11 flex-row items-center justify-center gap-2">
       <Icon icon={icon} tone={tone} />
-      <Text variant="label" tone={tone}>
+      <Text variant="label" tone={tone} className="shrink text-center">
         {text}
       </Text>
     </View>

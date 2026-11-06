@@ -241,6 +241,8 @@
     "sold_body": "Tin sẽ hiện nhãn \"Đã bán\" và không còn trong danh sách.",
     "sold_confirm": "Đã bán",
     "sold_done": "Đã đánh dấu đã bán",
+    "sold_forbidden": "Chỉ đánh dấu đã bán được với tin đã đăng công khai.",
+    "status_forbidden": "Trạng thái tin vừa thay đổi. Hãy tải lại danh sách rồi thử lại.",
     "closed_done": "Đã đóng tin",
     "reopened": "Đã mở lại tin",
     "deleted": "Đã xoá tin",

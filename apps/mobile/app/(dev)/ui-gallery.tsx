@@ -698,6 +698,7 @@ export default function UiGalleryScreen() {
 
       <Section title="SuccessScreen · Notice">
         <SuccessScreen
+          celebrate
           title={t('listing:form.success_title')}
           description={t('listing:form.success_body')}
           primary={{ label: t('listing:form.view_listing'), onPress: () => toast.show(t('listing:form.view_listing')) }}

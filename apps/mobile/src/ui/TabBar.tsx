@@ -118,6 +118,9 @@ function TabItem({
         variant="caption"
         tone={focused ? 'primary' : 'muted'}
         numberOfLines={1}
+        // 5 tab ở 360px, cỡ chữ 150%: thu nhỏ cho vừa ô thay vì cắt "Mess…".
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
         className={focused ? 'font-sans-medium' : undefined}
       >
         {label}

@@ -119,7 +119,7 @@ function ListingContext({ conversation: c }: { conversation: ConversationSummary
         <Text variant="label" numberOfLines={1} tone={gone ? 'muted' : 'default'}>
           {c.listing_title ?? t('inbox.listing_gone')}
         </Text>
-        <View className="flex-row items-center gap-2">
+        <View className="flex-row flex-wrap items-center gap-x-2">
           {priceText ? (
             <Text variant="caption" weight="bold" tone="accent">
               {priceText}

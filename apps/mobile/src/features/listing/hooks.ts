@@ -228,7 +228,8 @@ export function ownerActions(listing: Pick<MyListing, 'status' | 'expires_at'>, 
   const expired = listing.status === 'expired' || (listing.status === 'active' && expiresAt !== null && expiresAt <= now);
   const live = listing.status === 'active' && !expired;
   return {
-    markSold: live,
+    // Khớp trg_listings_guard: chỉ từ tin đã công khai; nháp / chờ duyệt / bị từ chối → forbidden nên không hiện.
+    markSold: listing.status === 'active' || listing.status === 'closed' || listing.status === 'expired',
     close: live,
     // Chờ duyệt / bị từ chối / hết hạn không tự mở lại được (DB guard) → không hiện.
     reopen: listing.status === 'sold' || listing.status === 'closed',
@@ -247,16 +248,32 @@ export function useOwnerListingActions() {
   const remove = useDeleteListing();
   const renew = useRenewListing();
   const fail = (e: { code: string }) => toast.show(errorText(e.code), 'danger');
+  // `forbidden` ở đây là guard trạng thái (DB) — thường do danh sách trên máy đã cũ, nói rõ hơn "không có quyền".
+  const failStatus = (status: OwnerListingStatus) => (e: { code: string }) =>
+    e.code === 'forbidden' ? toast.show(t(status === 'sold' ? 'manage.sold_forbidden' : 'manage.status_forbidden'), 'danger') : fail(e);
 
-  const changeStatus = (id: string, status: OwnerListingStatus, doneKey: string) =>
-    setStatus.mutate({ id, status }, { onSuccess: () => toast.show(t(doneKey), 'success'), onError: fail });
+  const changeStatus = (id: string, status: 'sold' | 'closed', doneKey: string) =>
+    setStatus.mutate({ id, status }, { onSuccess: () => toast.show(t(doneKey), 'success'), onError: failStatus(status) });
+
+  // Mở lại / gửi duyệt lại: DB quyết định kết quả (tin bị khoá kiểm duyệt → pending_review, từ khoá cấm → rejected) → báo theo status trả về.
+  const publish = (id: string) =>
+    setStatus.mutate(
+      { id, status: 'active' },
+      {
+        onSuccess: (saved) => {
+          if (saved.status === 'pending_review') toast.show(t('form.pending_title'), 'info');
+          else if (saved.status === 'rejected') toast.show(t('form.rejected_title'), 'danger');
+          else toast.show(t('manage.reopened'), 'success');
+        },
+        onError: failStatus('active'),
+      },
+    );
 
   return {
     markSold: (id: string) => changeStatus(id, 'sold', 'manage.sold_done'),
     close: (id: string) => changeStatus(id, 'closed', 'manage.closed_done'),
-    reopen: (id: string) => changeStatus(id, 'active', 'manage.reopened'),
-    /** Kết quả luôn là chờ duyệt → toast "Tin đang chờ duyệt". */
-    resubmit: (id: string) => changeStatus(id, 'active', 'form.pending_title'),
+    reopen: publish,
+    resubmit: publish,
     renew: (id: string) =>
       renew.mutate(id, {
         onSuccess: (expires) => toast.show(t('manage.renewed', { date: formatDate(expires) }), 'success'),

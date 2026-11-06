@@ -51,6 +51,7 @@ export function PostResult({ result, isEdit }: { result: SavedListingResult; isE
     body = (
       <SuccessScreen
         tone="success"
+        celebrate={!isEdit}
         title={isEdit ? t('form.saved') : t('form.success_title')}
         description={t('form.success_body')}
         primary={{ label: t('form.view_listing'), onPress: () => openListing(result.id, { replace: true }) }}

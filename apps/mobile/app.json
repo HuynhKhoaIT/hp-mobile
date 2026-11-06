@@ -8,9 +8,27 @@
     "scheme": "hoaphat",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "vn.tenapp.app",
+      "associatedDomains": ["applinks:tenapp.vn"]
     },
     "android": {
+      "package": "vn.tenapp.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/nhom/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/nhom/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/nhom/" }
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6EFFA",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

@@ -241,6 +241,8 @@
     "sold_body": "信息将显示“已售”标签并从列表中移除。",
     "sold_confirm": "已售",
     "sold_done": "已标记为已售",
+    "sold_forbidden": "只有已公开发布的信息才能标记为已售。",
+    "status_forbidden": "信息状态刚刚发生变化，请刷新列表后重试。",
     "closed_done": "信息已关闭",
     "reopened": "信息已重新开启",
     "deleted": "信息已删除",

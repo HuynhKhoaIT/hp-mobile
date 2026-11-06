@@ -241,6 +241,8 @@
     "sold_body": "The listing will show a \"Sold\" label and leave the lists.",
     "sold_confirm": "Sold",
     "sold_done": "Marked as sold",
+    "sold_forbidden": "Only published listings can be marked as sold.",
+    "status_forbidden": "This listing's status has just changed. Refresh the list and try again.",
     "closed_done": "Listing closed",
     "reopened": "Listing reopened",
     "deleted": "Listing deleted",
