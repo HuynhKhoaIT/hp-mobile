@@ -232,8 +232,21 @@ Quyết định: **`/` vẫn là Hub, landing ở `/gioi-thieu`** (không đổi
 - [x] `.well-known` `apple-app-site-association` (khai cả `/en`, `/zh`) + `assetlinks.json`: đọc env **lúc build** (route tĩnh), thiếu env → 404. Đã thử với giá trị giả
 - [x] `noindex` chuyển sang `NEXT_PUBLIC_ALLOW_INDEX` (mặc định chặn, chỉ production đặt `true`)
 - [x] Đã kiểm: `tsc`, `pnpm --filter web lint`, `i18n:check`, **`pnpm --filter web build` xanh** (bắt được lỗi `CookieConsent` chặn prerender, đã bọc `Suspense`); không tràn ngang 12 trang ở 360 và 1440 px; ảnh sáng / tối, vi / en / zh
+- [x] **Lighthouse mobile lần 1** (2026-11-06, `next start` local, chạy `npx lighthouse@12`, không thêm vào dự án). A11y / Best Practices / SEO = **100 / 100 / 100** ở 6 trang (trước sửa 96–100 / 100 / 91–92), CLS 0. Performance **chưa đạt ≥ 90 ở mọi trang**:
+
+  | Trang | Giả lập (mặc định), trước → sau | Throttle thật, 3 lần (Slow 4G, CPU ×4) | LCP thật |
+  |---|---|---|---|
+  | `/tin/[slug]` | 75 → 84 | 92 / 92 / 92 | 2,3–2,4 s |
+  | `/pass-do` | 77 → 85 | 93 / 86 / 92 | 2,4–2,5 s |
+  | `/gioi-thieu` | 75 → 85 | 81 / 77 / 89 | 2,5–2,6 s |
+  | `/` (Hub) | 73 → 81 | 80 / 58 / 72 | 2,4–3,0 s |
+  | `/tai-app` | 79 → 87 | chưa đo | |
+
+  Số giả lập LCP 3,9–4,9 s cao hơn thực tế: đo không giới hạn tốc độ LCP = FCP = 146 ms (chữ hero), localhost tải xong mọi JS trước khi vẽ nên Lantern tính hết JS vào LCP. Số throttle thật có nhiễu (máy còn ~1,4 GB RAM, Docker chạy cùng; TBT Hub 380–1.880 ms). **Phải đo lại trên staging / Vercel** (CDN, brotli) mới chốt
+  - Đã sửa: (1) 404 `@font-face` Noto Sans SC (372 KB CSS chặn render) tải ở **mọi** ngôn ngữ → bỏ `next/font` cho zh, dùng font CJK hệ thống, CSS còn 69 KB, FCP giả lập 2,9 → 1,5 s; (2) **metadata bị đẩy xuống `<body>`** ở trang đọc `searchParams`, cả với Googlebot (Google bỏ qua canonical ngoài `<head>`) → `htmlLimitedBots: /.*/`; (3) `web.marketing` không còn gửi xuống mọi trang (`LeadSection` tự nhận phần của nó); (4) tương phản: badge `success` 2,9:1 → `text-fg` (web + app), chữ phụ trên `surface-2` 4,23:1 → `text-fg`; (5) carousel Hub bỏ `<li role="group">`
+  - Còn lại: Hub Speed Index ~5,8 s, TBT cao; JS công khai ~346 KB nén gồm `@supabase/supabase-js` 66 KB + `zod` 31 KB + TanStack ở cả trang khách (header đọc phiên) — hướng giảm: tách phần phiên khỏi bundle đầu, giảm prefetch `Link` (landing tải thêm ~175 KB RSC khi vừa mở); chưa đo riêng trang `zh`
 - [ ] **Còn lại / lệch có chủ đích**
-  - Chưa chạy Lighthouse (`/seo-check`) nên chưa xác nhận mốc ≥ 90 / 100 / 95; chưa thử zoom 200%
+  - Chưa thử zoom 200%
   - Hiệu ứng vào viewport + số đếm tăng chưa làm (`motion` chưa cài); mockup là minh hoạ CSS vì chưa có ảnh chụp thật; cover blog chưa có
   - Trang admin "blog (trạng thái)" chưa làm: blog là file trong repo
   - "Đã bán" ở web chỉ hiện với tin `active`, app hiện cả `closed` / `expired` (đều hợp lệ với backend) — nên thống nhất
@@ -292,6 +305,7 @@ Quyết định: **`/` vẫn là Hub, landing ở `/gioi-thieu`** (không đổi
 
 ## 8. Lệch so với ARCHITECTURE (có chủ đích)
 - `/admin/moderation` tối thiểu kéo lên tuần 6 thay vì tuần 11–12, vì beta tuần 7–8 cần SLA kiểm duyệt 2 giờ. Phần admin còn lại vẫn tuần 9–10.
+- Chữ Hán trên web dùng font CJK của hệ thống (`--font-zh`), không tải Noto Sans SC qua `next/font` (2026-11-06): CSS của nó nằm trong layout gốc nên chặn render ở cả vi / en, mà layout gốc không tách theo ngôn ngữ được. Đã chốt, rule `web-ui-design.md` / `web-i18n.md` cập nhật theo. App vẫn tải Noto Sans SC khi chọn tiếng Trung.
 - Namespace i18n `web`, `admin` đặt cùng chỗ với 6 ns chung trong `packages/shared/i18n` để một script `i18n:check` kiểm cả ba repo.
 
 ## 9. Sau MVP

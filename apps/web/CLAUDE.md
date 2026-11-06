@@ -169,7 +169,7 @@ Luật:
 ## 8. Design & motion
 
 - Token từ `@hp/tokens` (giống app): `primary #0B4F9C` (xanh thép), `primaryLight #E6EFFA`, `accent #F2762E`, `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F6F7F9`, `surface #FFFFFF`; gradient thương hiệu `#0B4F9C → #1E6FD9`; màu dịch vụ: pass cam, trọ tím, việc xanh lá, ghép xe xanh ngọc, thể thao đỏ, thất lạc vàng. Dark mode bằng class.
-- Font: Be Vietnam Pro (vi/en), Noto Sans SC (zh) qua `next/font`.
+- Font: Be Vietnam Pro qua `next/font`; chữ Hán dùng font CJK của hệ thống (`--font-zh`).
 - Responsive mobile-first: < 640px giống app (bottom nav 5 mục, nút Đăng nổi giữa), ≥ 1024px header ngang + lưới 3–4 cột, chi tiết tin 2 cột (gallery trái, thông tin + CTA dính phải).
 - Card tin, badge, trạng thái nhìn giống app để người dùng chuyển qua lại không bỡ ngỡ.
 - Chữ thân ≥ 16px, vùng chạm ≥ 44px, tương phản ≥ 4.5:1, hỗ trợ zoom 200%.

@@ -55,7 +55,7 @@ const lines = [
   `  --shadow-card: ${shadow.card.x}px ${shadow.card.y}px ${shadow.card.blur}px ${shadow.card.color};`,
   ...Object.entries(aspect).map(([k, v]) => `  --aspect-${k}: ${v};`),
   '  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;',
-  '  --font-zh: var(--font-noto-sans-sc), var(--font-be-vietnam-pro), sans-serif;',
+  "  --font-zh: var(--font-be-vietnam-pro), 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;",
   '}',
   '',
   '/* Dark mode bằng class `dark` trên <html> (next-themes). */',

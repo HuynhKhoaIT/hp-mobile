@@ -55,7 +55,7 @@
   --aspect-avatar: 1 / 1;
   --aspect-banner: 16 / 7;
   --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
-  --font-zh: var(--font-noto-sans-sc), var(--font-be-vietnam-pro), sans-serif;
+  --font-zh: var(--font-be-vietnam-pro), 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 }
 
 /* Dark mode bằng class `dark` trên <html> (next-themes). */

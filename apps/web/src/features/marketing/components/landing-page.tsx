@@ -16,7 +16,7 @@ import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import { FEATURE_PAGES, qrPath } from '../links';
 import { getLandingStats, getLatestListings } from '../queries';
-import { LeadForm } from './lead-form';
+import { LeadSection } from './lead-section';
 import { PhoneMockup } from './phone-mockup';
 import { QrCode } from './qr-code';
 import { TrackedLink } from './tracked-link';
@@ -159,7 +159,7 @@ export async function LandingPage() {
                 </span>
                 <div className="flex flex-col gap-1">
                   <h3 className="text-md font-semibold text-fg">{t(`how.${step}.title`)}</h3>
-                  <p className="text-md text-muted">{t(`how.${step}.body`)}</p>
+                  <p className="text-md text-fg">{t(`how.${step}.body`)}</p>
                 </div>
               </li>
             ))}
@@ -211,7 +211,7 @@ export async function LandingPage() {
                   <Icon aria-hidden strokeWidth={1.75} className="mt-0.5 size-6 shrink-0 text-primary" />
                   <div className="flex flex-col gap-1">
                     <h3 className="text-md font-semibold text-fg">{t(`partners.${key}.title`)}</h3>
-                    <p className="text-md text-muted">{t(`partners.${key}.body`)}</p>
+                    <p className="text-md text-fg">{t(`partners.${key}.body`)}</p>
                   </div>
                 </li>
               ))}
@@ -220,7 +220,7 @@ export async function LandingPage() {
               {t('partners_cta')}
             </Link>
           </div>
-          <LeadForm source="landing" defaultKind="landlord" />
+          <LeadSection source="landing" defaultKind="landlord" />
         </div>
       </section>
 

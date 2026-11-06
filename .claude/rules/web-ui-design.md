@@ -11,7 +11,7 @@ paths:
 ## Token
 - Chỉ class Tailwind từ preset `@hp/tokens` (`bg-primary`, `text-muted`, `rounded-md`, `shadow-card`, `bg-service-pass`). Không `bg-[#...]`, không `style={{ color: '#...' }}`, không khai báo màu trong `tailwind.config` ngoài preset.
 - Dark mode bằng class `dark` (`next-themes`); component không tự kiểm tra theme.
-- Font: `next/font` Be Vietnam Pro (vi / en); Noto Sans SC chỉ load khi `locale === 'zh'`.
+- Font: `next/font` Be Vietnam Pro. Chữ Hán dùng font CJK của hệ thống qua `--font-zh` (lớp `lang-zh`); không tải Noto Sans SC bằng `next/font`: CSS của nó nằm trong layout gốc nên chặn render ở mọi ngôn ngữ.
 - Icon `lucide-react` 20 / 24, `strokeWidth={1.75}`; không trộn bộ icon khác.
 
 ## Component

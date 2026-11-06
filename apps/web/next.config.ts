@@ -10,6 +10,9 @@ const withMDX = createMDX();
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  // Luôn đặt metadata trong <head>. Mặc định Next stream metadata xuống <body> ở trang đọc searchParams (kể cả với Googlebot),
+  // mà Google bỏ qua rel=canonical ngoài <head>.
+  htmlLimitedBots: /.*/,
   // Chỉ có tác dụng với `next dev`: cho phép mở dev server qua IP LAN (điện thoại cùng wifi). Thiếu dòng này
   // Next chặn websocket HMR từ origin khác localhost → client kết nối lại thất bại rồi tự tải lại trang liên tục.
   allowedDevOrigins: ["10.*.*.*", "192.168.*.*", "172.*.*.*"],

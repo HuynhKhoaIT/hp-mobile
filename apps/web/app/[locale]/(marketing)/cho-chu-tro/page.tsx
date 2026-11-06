@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { asLocale } from '@/features/listing/display';
-import { LeadForm } from '@/features/marketing/components/lead-form';
+import { LeadSection } from '@/features/marketing/components/lead-section';
 import { localeAlternates } from '@/i18n/alternates';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,7 +28,7 @@ export default async function Page() {
           ))}
         </ul>
       </div>
-      <LeadForm source="cho-chu-tro" defaultKind="landlord" />
+      <LeadSection source="cho-chu-tro" defaultKind="landlord" />
     </div>
   );
 }
