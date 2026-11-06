@@ -9,3 +9,4 @@ allowBuilds:
   unrs-resolver: false
   "@parcel/watcher": false
   "@swc/core": false
+  core-js: false
