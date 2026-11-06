@@ -1,6 +1,6 @@
 // Layout gốc theo ngôn ngữ (root param `locale`: vi không tiền tố, /en, /zh): html, font, providers.
 // Font Be Vietnam Pro (vi / en); Noto Sans SC chỉ gắn khi zh. Dark mode theo class (next-themes).
-// Tạm noindex toàn site cho tới khi ra mắt (bỏ khi có landing + trang pháp lý — tuần 11).
+// noindex toàn site trừ khi NEXT_PUBLIC_ALLOW_INDEX=true (chỉ production).
 import '../globals.css';
 import { APP_NAME } from '@hp/shared';
 import type { Metadata, Viewport } from 'next';
@@ -9,9 +9,12 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { Be_Vietnam_Pro, Noto_Sans_SC } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { locale as rootLocale } from 'next/root-params';
+import { Suspense } from 'react';
+import { CookieConsent } from '@/components/shared/cookie-consent';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { ToastProvider } from '@/components/shared/toast';
 import { routing } from '@/i18n/routing';
+import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -41,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
     description: t('description'),
-    robots: { index: false, follow: false },
+    robots: publicEnv.allowIndex ? undefined : { index: false, follow: false },
   };
 }
 
@@ -71,7 +74,13 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
           }}
         >
           <ThemeProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              {children}
+              {/* Đọc URL ở client: Suspense để không chặn prerender của route động (Cache Components). */}
+              <Suspense fallback={null}>
+                <CookieConsent />
+              </Suspense>
+            </ToastProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

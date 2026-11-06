@@ -1,18 +1,17 @@
-// /xoa-tai-khoan — khung trang pháp lý; nội dung MDX 3 ngôn ngữ viết trước khi lên store (tuần 11).
+// /xoa-tai-khoan — nội dung MDX 3 ngôn ngữ ở content/legal/{vi,en,zh}/xoa-tai-khoan.mdx.
 import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { LegalPage } from '@/features/marketing/components/legal-page';
+import { getLocale } from 'next-intl/server';
+import { asLocale } from '@/features/listing/display';
+import { loadLegal } from '@/features/marketing/content';
+import { LegalDoc } from '@/features/marketing/components/legal-page';
+import { localeAlternates } from '@/i18n/alternates';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations('web.legal');
-  return { title: t('delete_account') };
+  const locale = asLocale(await getLocale());
+  const { meta } = await loadLegal('xoa-tai-khoan', locale);
+  return { title: meta.title, description: meta.description, alternates: localeAlternates('/xoa-tai-khoan', locale) };
 }
 
 export default async function Page() {
-  const t = await getTranslations('web.legal');
-  return (
-    <LegalPage title={t('delete_account')}>
-      <p className="text-muted">{t('drafting')}</p>
-    </LegalPage>
-  );
+  return <LegalDoc slug="xoa-tai-khoan" locale={asLocale(await getLocale())} />;
 }

@@ -50,6 +50,12 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    // Ngoại lệ duy nhất ngoài khu admin: Server Action lead thêm vào marketing_leads bằng service role
+    // (supabase/CLAUDE.md mục 4 "Marketing"). Chỉ file này, không cả features/marketing.
+    files: ["src/features/marketing/actions.ts"],
+    rules: { "no-restricted-imports": ["error", { paths: NAVIGATION }] },
+  },
+  {
     // Nơi định nghĩa navigation có locale và hạ tầng Supabase.
     files: ["src/i18n/**/*.ts", "src/lib/supabase/**/*.ts", "proxy.ts"],
     rules: { "no-restricted-imports": "off" },

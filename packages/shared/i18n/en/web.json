@@ -14,7 +14,10 @@
     "dark": "Dark"
   },
   "footer": {
-    "rights": "© {{year}} {{appName}}"
+    "rights": "© {{year}} {{appName}}",
+    "download": "Get the app",
+    "blog": "Blog",
+    "for_landlords": "For landlords"
   },
   "home": {
     "coming_soon": "Under construction, coming soon.",
@@ -136,5 +139,208 @@
     "file_hint": "Photo (JPG, PNG, WebP) or PDF, up to 5 MB.",
     "file_type": "Only photos or PDF files are accepted.",
     "submitting": "Sending…"
+  },
+  "marketing": {
+    "meta_title": "About {{appName}}",
+    "meta_description": "Second-hand goods, rooms, jobs, lost and found, ride sharing and sports matches for workers around Dung Quất.",
+    "hero": {
+      "title": "Everything around Dung Quất, in one app",
+      "subtitle": "Second-hand goods, rooms, jobs, lost and found, ride sharing and sports matches, made for workers in the area.",
+      "cta_web": "Use it on the web",
+      "cta_app": "Get the app",
+      "qr_hint": "Scan to get the app",
+      "mockup_label": "Illustration of the app screen"
+    },
+    "services_title": "6 services for workers",
+    "latest_title": "Latest listings",
+    "latest_all": "See all listings",
+    "latest_error": "Could not load the latest listings. Please try the listings page.",
+    "how_title": "How it works",
+    "how": {
+      "s1": {
+        "title": "Sign in with your phone number",
+        "body": "Enter the OTP sent to your phone, no password needed. Browsing needs no account."
+      },
+      "s2": {
+        "title": "Post or search",
+        "body": "Pick your work site and filter by distance, price and type."
+      },
+      "s3": {
+        "title": "Chat and meet",
+        "body": "Talk in the in-app chat, view the phone number when needed, then meet in person."
+      }
+    },
+    "safety_title": "Safety and trust",
+    "safety": {
+      "moderation": {
+        "title": "Listing moderation",
+        "body": "Automatic rules and human moderators review risky listings before they go live."
+      },
+      "privacy": {
+        "title": "Your details stay private",
+        "body": "Public pages never show your phone number, full name or exact location."
+      },
+      "report": {
+        "title": "Report and block",
+        "body": "If a listing or person looks like a scam, report or block them right in the app."
+      }
+    },
+    "stats_title": "The community today",
+    "partners_title": "For landlords, venue owners and employers",
+    "partners_subtitle": "Reach workers looking for rooms, courts and jobs around the area.",
+    "partners": {
+      "landlord": {
+        "title": "Landlords",
+        "body": "List rooms with photos and distance to the plant, and earn a verified landlord badge."
+      },
+      "venue": {
+        "title": "Venue owners",
+        "body": "Add your court so groups can pick it when they create a match."
+      },
+      "employer": {
+        "title": "Employers",
+        "body": "Post jobs to the people who already live and work in the area."
+      }
+    },
+    "partners_cta": "For landlords",
+    "faq_title": "Frequently asked questions",
+    "faq": {
+      "q1": {
+        "q": "Does this app belong to Hoa Phat Group?",
+        "a": "No. This is a community app built by an individual. It is independent and does not represent Hoa Phat Group."
+      },
+      "q2": {
+        "q": "Do I need to sign in to browse?",
+        "a": "No. You only sign in to post, chat, save listings or join groups."
+      },
+      "q3": {
+        "q": "Will my phone number be exposed?",
+        "a": "Public pages do not show phone numbers. Only signed-in users can reveal the number on a listing by tapping the button, and each reveal is logged."
+      },
+      "q4": {
+        "q": "What should I do about a scam listing?",
+        "a": "Never send a deposit before you meet and see the item. Tap Report on the listing or profile so moderators can review it."
+      },
+      "q5": {
+        "q": "How do I delete my account?",
+        "a": "Go to Settings and choose Delete account. Your content is hidden immediately and your data is permanently deleted after 30 days."
+      },
+      "q6": {
+        "q": "Which languages are available?",
+        "a": "Vietnamese, English and Chinese. Change the language in Settings or at the bottom of the page."
+      }
+    },
+    "cta_title": "Get started today",
+    "cta_body": "Browse on the web without an account, or get the app for notifications.",
+    "feature_cta_open": "See {{title}} listings",
+    "feature_cta_group": "See {{title}} groups",
+    "features": {
+      "pass": {
+        "title": "Second-hand",
+        "summary": "Buy and sell used goods nearby, meet in person and check the item before paying.",
+        "b1": "Post quickly with photos from your phone",
+        "b2": "Filter by category, price and work site",
+        "b3": "Talk in chat without sharing your number"
+      },
+      "room": {
+        "title": "Rooms",
+        "summary": "Find rooms near the plant, with the distance and real photos.",
+        "b1": "Filter by distance to your work site",
+        "b2": "Room listings have at least 3 photos",
+        "b3": "See the area on a map, with location rounded for privacy"
+      },
+      "job": {
+        "title": "Jobs",
+        "summary": "Full-time and part-time work nearby, with shifts and pay stated clearly.",
+        "b1": "Filter by full-time, part-time and shift",
+        "b2": "Contact employers by chat",
+        "b3": "Verified employers carry a badge"
+      },
+      "lostFound": {
+        "title": "Lost & found",
+        "summary": "Post what you lost or found, and the app looks for matches for you.",
+        "b1": "Automatic matching by item type, time and distance",
+        "b2": "Instant notification when a match appears (in the app)",
+        "b3": "Mark as returned when the item is back"
+      },
+      "ride": {
+        "title": "Ride sharing",
+        "summary": "Share the way to work or home and split the cost with people from your area.",
+        "b1": "Find rides by origin, destination and time",
+        "b2": "The host approves who joins",
+        "b3": "Reminder 60 minutes before departure (in the app)"
+      },
+      "sport": {
+        "title": "Sports matches",
+        "summary": "Find football, badminton and pickleball teams, or invite more players.",
+        "b1": "Pick a listed venue or add a new one",
+        "b2": "Teams with a line-up can still look for more players",
+        "b3": "Group chat and ratings after the match"
+      }
+    },
+    "download": {
+      "meta_title": "Get the app",
+      "meta_description": "Download {{appName}} for iPhone and Android.",
+      "title": "Get {{appName}}",
+      "subtitle": "Get notified about messages, departure times and lost-and-found matches.",
+      "app_store": "Download on the App Store",
+      "play_store": "Get it on Google Play",
+      "qr_label": "QR code to the download page",
+      "qr_hint": "Scan with your phone camera",
+      "unavailable": "The app is coming to the stores soon. Meanwhile, all the main features work on the web.",
+      "use_web": "Use it on the web"
+    },
+    "landlord": {
+      "meta_title": "For landlords",
+      "meta_description": "List your rooms for workers around Dung Quất.",
+      "title": "Rent your rooms to people who need them",
+      "subtitle": "Workers search for rooms by distance to the plant. Leave your contact and we will show you how to post.",
+      "b1": "List rooms with photos, price and amenities",
+      "b2": "Distance to the plant is calculated automatically",
+      "b3": "A verified landlord badge gives renters confidence"
+    },
+    "lead": {
+      "title": "Leave your contact",
+      "subtitle": "We only use this information to get back to you.",
+      "contact_label": "Phone number or email",
+      "name_label": "Your name (optional)",
+      "kind_label": "You are a",
+      "kinds": {
+        "user": "User",
+        "landlord": "Landlord",
+        "venue": "Venue owner",
+        "employer": "Employer"
+      },
+      "message_label": "Message (optional)",
+      "honeypot_label": "Leave this field empty",
+      "consent": "I agree that {{appName}} may store this information and contact me.",
+      "privacy": "Read the privacy policy",
+      "submit": "Send",
+      "sending": "Sending…",
+      "thanks_title": "Received",
+      "thanks_body": "Thank you. We will get back to you soon."
+    },
+    "blog": {
+      "meta_title": "Blog",
+      "meta_description": "Safe trading tips and life around Dung Quất.",
+      "title": "Blog",
+      "empty": "No articles yet.",
+      "back": "All articles"
+    }
+  },
+  "cookie": {
+    "title": "Analytics cookies",
+    "body": "We would like to use analytics cookies to learn which features help. The site works fully if you decline.",
+    "policy": "Privacy policy",
+    "accept": "Accept",
+    "decline": "Decline",
+    "settings": "Cookie settings"
+  },
+  "content": {
+    "not_translated": "This content has not been translated yet, so the Vietnamese version is shown.",
+    "updated": "Updated {{date}}",
+    "operator_pending": "(operator name to be updated)",
+    "email_pending": "(contact email to be updated)",
+    "delete_cta": "Open settings to delete your account"
   }
 }

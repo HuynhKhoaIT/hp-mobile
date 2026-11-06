@@ -1,0 +1,58 @@
+export const metadata = { title: 'Xoá tài khoản', description: 'Cách xoá tài khoản trên ứng dụng hoặc web, dữ liệu nào bị xoá, khi nào và dữ liệu nào còn lại.', updated: '2026-11-05' };
+
+## Cách xoá tài khoản
+
+Bạn tự xoá được, không cần xin phép ai.
+
+1. Đăng nhập trên ứng dụng hoặc web.
+2. Mở phần cài đặt tài khoản.
+3. Chọn Xoá tài khoản.
+4. Xác nhận theo hướng dẫn trên màn hình.
+
+<DeleteAccountLink />
+
+Sau khi xoá, bạn sẽ bị đăng xuất. Hiện chưa có chức năng tự khôi phục tài khoản, nên hãy cân nhắc trước khi xác nhận.
+
+## Điều gì xảy ra ngay lập tức
+
+- Hồ sơ, tin đăng và nhóm của bạn bị ẩn khỏi mọi trang công khai.
+- Nhóm ghép xe, ghép trận bạn tạo mà còn mở sẽ bị huỷ. Thành viên được thông báo.
+- Bạn rời khỏi các nhóm đang tham gia. Yêu cầu tham gia đang chờ cũng bị bỏ.
+- Mã nhận thông báo đẩy bị xoá, nên bạn không nhận thông báo nữa.
+- Không ai xem được số điện thoại của bạn qua tin đăng nữa.
+- Tài khoản không dùng được nữa.
+
+## Điều gì xảy ra sau 30 ngày
+
+Sau 30 ngày, hệ thống tự động xoá hẳn. Việc này chạy mỗi ngày theo từng đợt, nên có thể chậm hơn một chút.
+
+Những dữ liệu bị xoá hẳn:
+
+- Hồ sơ và thông tin đăng nhập, gồm số điện thoại hoặc liên kết Google.
+- Tin đăng và nhóm của bạn.
+- Ảnh đại diện, ảnh tin đăng, giấy tờ xác minh.
+- Đánh giá của bạn và đánh giá về bạn, báo cáo bạn đã gửi, tin đã lưu, thông báo và lịch sử xem tin.
+
+## Những gì còn lại
+
+Một số dữ liệu không bị xoá hoàn toàn:
+
+- **Tin nhắn:** tin nhắn và ảnh bạn đã gửi trong chat vẫn còn trong cuộc trò chuyện của người kia. Tên người gửi bị gỡ, tức là tin nhắn được ẩn danh. Nếu bạn đã tự ghi thông tin cá nhân trong tin nhắn, phần chữ đó vẫn còn.
+- **Từ khoá tìm kiếm:** được giữ lại nhưng không còn gắn với bạn.
+- **Nhật ký quản trị:** được giữ lại, phần người thực hiện để trống.
+- **Bản sao lưu:** dữ liệu đã xoá có thể còn trong bản sao lưu khoảng 7 ngày, sau đó hết.
+- **Form liên hệ trên web:** không gắn với tài khoản nên không tự xoá theo tài khoản. Nếu muốn xử lý, hãy viết cho chúng tôi.
+
+## Trước khi xoá
+
+- Lưu lại thông tin bạn cần, vì sau khi xoá bạn không vào lại được.
+- Báo cho những người đang giao dịch hoặc đi chung với bạn.
+- Nếu chỉ muốn tạm nghỉ, bạn có thể tắt thông báo hoặc đóng tin đăng thay vì xoá tài khoản.
+
+## Không đăng nhập được
+
+Nếu mất số điện thoại hoặc không vào được tài khoản, hãy viết cho chúng tôi qua <ContactEmail />. Nêu số điện thoại hoặc email của tài khoản. Chúng tôi có thể cần xác minh bạn là chủ tài khoản trước khi xử lý. Không gửi mã OTP cho chúng tôi.
+
+## Chỉ muốn xoá một phần dữ liệu
+
+Bạn có thể tự đóng tin đăng hoặc sửa hồ sơ. Nếu muốn xoá dữ liệu khác mà vẫn giữ tài khoản, hãy viết qua <ContactEmail />.

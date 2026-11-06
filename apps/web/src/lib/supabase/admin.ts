@@ -1,5 +1,6 @@
-// Supabase client quyền service role — BỎ QUA RLS. Chỉ dùng trong server action của app/[locale]/admin/**
-// (ESLint chặn import ở nơi khác). Luôn kiểm tra quyền người gọi ở server và ghi audit_log trước khi dùng.
+// Supabase client quyền service role — BỎ QUA RLS. Chỉ dùng trong server action của app/[locale]/admin/** và Server Action
+// lead src/features/marketing/actions.ts (marketing_leads chỉ cho service role thêm) — ESLint chặn import ở nơi khác.
+// Luôn kiểm tra quyền người gọi ở server và ghi audit_log trước khi dùng.
 import 'server-only';
 import type { Database } from '@hp/db';
 import { createClient } from '@supabase/supabase-js';

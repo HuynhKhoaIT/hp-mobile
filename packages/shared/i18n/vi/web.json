@@ -14,7 +14,10 @@
     "dark": "Tối"
   },
   "footer": {
-    "rights": "© {{year}} {{appName}}"
+    "rights": "© {{year}} {{appName}}",
+    "download": "Tải app",
+    "blog": "Blog",
+    "for_landlords": "Cho chủ trọ"
   },
   "home": {
     "coming_soon": "Đang xây dựng, sắp ra mắt.",
@@ -136,5 +139,208 @@
     "file_hint": "Ảnh (JPG, PNG, WebP) hoặc PDF, tối đa 5 MB.",
     "file_type": "Chỉ nhận ảnh hoặc tệp PDF.",
     "submitting": "Đang gửi…"
+  },
+  "marketing": {
+    "meta_title": "Giới thiệu {{appName}}",
+    "meta_description": "Mua bán đồ cũ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe và ghép trận cho người lao động quanh khu Dung Quất.",
+    "hero": {
+      "title": "Mọi việc quanh khu Dung Quất, gọn trong một ứng dụng",
+      "subtitle": "Pass đồ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe, ghép trận — dành cho người lao động trong khu.",
+      "cta_web": "Dùng ngay trên web",
+      "cta_app": "Tải app",
+      "qr_hint": "Quét mã để tải app",
+      "mockup_label": "Minh hoạ màn hình ứng dụng"
+    },
+    "services_title": "6 dịch vụ cho người lao động",
+    "latest_title": "Tin mới nhất",
+    "latest_all": "Xem tất cả tin",
+    "latest_error": "Chưa tải được tin mới. Bạn thử xem ở trang tin nhé.",
+    "how_title": "Dùng thế nào",
+    "how": {
+      "s1": {
+        "title": "Đăng nhập bằng số điện thoại",
+        "body": "Nhập mã OTP gửi về máy, không cần mật khẩu. Xem tin thì không cần đăng nhập."
+      },
+      "s2": {
+        "title": "Đăng tin hoặc tìm tin",
+        "body": "Chọn khu làm việc, lọc theo khoảng cách, giá và loại tin bạn cần."
+      },
+      "s3": {
+        "title": "Nhắn tin và hẹn gặp",
+        "body": "Trao đổi trong chat của ứng dụng, xem số điện thoại khi cần rồi gặp trực tiếp."
+      }
+    },
+    "safety_title": "An toàn và tin cậy",
+    "safety": {
+      "moderation": {
+        "title": "Kiểm duyệt tin đăng",
+        "body": "Quy tắc tự động và người kiểm duyệt xem các tin có dấu hiệu rủi ro trước khi lên trang."
+      },
+      "privacy": {
+        "title": "Giữ kín thông tin",
+        "body": "Trang công khai không hiện số điện thoại, họ tên đầy đủ và vị trí chính xác của bạn."
+      },
+      "report": {
+        "title": "Báo cáo và chặn",
+        "body": "Gặp tin hay người có dấu hiệu lừa đảo, bạn báo cáo hoặc chặn ngay trong ứng dụng."
+      }
+    },
+    "stats_title": "Cộng đồng hiện có",
+    "partners_title": "Cho chủ trọ, chủ sân và nhà tuyển dụng",
+    "partners_subtitle": "Tiếp cận người lao động đang tìm chỗ ở, sân chơi và việc làm quanh khu.",
+    "partners": {
+      "landlord": {
+        "title": "Chủ trọ",
+        "body": "Đăng phòng kèm ảnh, khoảng cách tới nhà máy và nhận huy hiệu chủ trọ đã xác minh."
+      },
+      "venue": {
+        "title": "Chủ sân",
+        "body": "Đưa sân lên danh sách để các nhóm ghép trận chọn khi tạo trận."
+      },
+      "employer": {
+        "title": "Nhà tuyển dụng",
+        "body": "Đăng tin tuyển dụng tới đúng người đang làm việc và sinh sống trong khu."
+      }
+    },
+    "partners_cta": "Dành cho chủ trọ",
+    "faq_title": "Câu hỏi thường gặp",
+    "faq": {
+      "q1": {
+        "q": "Ứng dụng này có thuộc Tập đoàn Hòa Phát không?",
+        "a": "Không. Đây là ứng dụng cộng đồng do cá nhân phát triển, độc lập và không đại diện cho Tập đoàn Hòa Phát."
+      },
+      "q2": {
+        "q": "Xem tin có cần đăng nhập không?",
+        "a": "Không. Bạn chỉ cần đăng nhập khi đăng tin, nhắn tin, lưu tin hoặc tham gia nhóm."
+      },
+      "q3": {
+        "q": "Số điện thoại của tôi có bị lộ không?",
+        "a": "Trang công khai không hiện số điện thoại. Chỉ người đã đăng nhập mới xem được số ở tin đăng khi bấm nút, và mỗi lượt xem đều được ghi lại."
+      },
+      "q4": {
+        "q": "Gặp tin lừa đảo thì làm gì?",
+        "a": "Không chuyển tiền đặt cọc khi chưa gặp và xem đồ. Bấm Báo cáo ở tin hoặc hồ sơ để người kiểm duyệt xem xét."
+      },
+      "q5": {
+        "q": "Xoá tài khoản thế nào?",
+        "a": "Vào Cài đặt và chọn Xoá tài khoản. Nội dung của bạn ẩn ngay và dữ liệu bị xoá hẳn sau 30 ngày."
+      },
+      "q6": {
+        "q": "Ứng dụng có những ngôn ngữ nào?",
+        "a": "Tiếng Việt, tiếng Anh và tiếng Trung. Bạn đổi ngôn ngữ ở Cài đặt hoặc cuối trang."
+      }
+    },
+    "cta_title": "Bắt đầu ngay hôm nay",
+    "cta_body": "Xem tin trên web không cần tài khoản, hoặc tải app để nhận thông báo.",
+    "feature_cta_open": "Xem tin {{title}}",
+    "feature_cta_group": "Xem nhóm {{title}}",
+    "features": {
+      "pass": {
+        "title": "Pass đồ",
+        "summary": "Mua bán đồ cũ ngay trong khu, gặp trực tiếp và xem hàng trước khi trả tiền.",
+        "b1": "Đăng tin nhanh với ảnh chụp từ điện thoại",
+        "b2": "Lọc theo danh mục, giá và khu làm việc",
+        "b3": "Trao đổi trong chat, không phải đưa số điện thoại"
+      },
+      "room": {
+        "title": "Tìm trọ",
+        "summary": "Tìm phòng trọ gần nhà máy, xem khoảng cách và ảnh thật của phòng.",
+        "b1": "Lọc theo khoảng cách tới khu làm việc",
+        "b2": "Tin phòng trọ có ít nhất 3 ảnh",
+        "b3": "Xem vùng phòng trên bản đồ, vị trí làm tròn để giữ riêng tư"
+      },
+      "job": {
+        "title": "Tìm việc",
+        "summary": "Việc chính và việc làm thêm quanh khu, ghi rõ ca làm và mức lương.",
+        "b1": "Lọc việc chính, việc làm thêm và ca làm",
+        "b2": "Liên hệ nhà tuyển dụng qua chat",
+        "b3": "Nhà tuyển dụng có huy hiệu khi đã xác minh"
+      },
+      "lostFound": {
+        "title": "Đồ thất lạc",
+        "summary": "Đăng đồ mất hoặc đồ nhặt được, ứng dụng tự tìm tin khớp cho bạn.",
+        "b1": "Tự khớp theo loại đồ, thời gian và khoảng cách",
+        "b2": "Nhận thông báo ngay khi có tin khớp (trên app)",
+        "b3": "Đánh dấu đã nhận lại khi tìm được đồ"
+      },
+      "ride": {
+        "title": "Ghép xe",
+        "summary": "Đi chung đường đi làm hoặc về quê, chia sẻ chi phí với người cùng khu.",
+        "b1": "Tìm chuyến theo điểm đi, điểm đến và giờ đi",
+        "b2": "Chủ chuyến duyệt người tham gia",
+        "b3": "Nhắc giờ đi trước 60 phút (trên app)"
+      },
+      "sport": {
+        "title": "Ghép trận",
+        "summary": "Tìm đội đá bóng, cầu lông, pickleball; thiếu người thì mời thêm.",
+        "b1": "Chọn sân có sẵn hoặc góp sân mới",
+        "b2": "Trận đã có đội hình vẫn tìm thêm người được",
+        "b3": "Chat nhóm và đánh giá sau trận"
+      }
+    },
+    "download": {
+      "meta_title": "Tải ứng dụng",
+      "meta_description": "Tải {{appName}} cho iPhone và Android.",
+      "title": "Tải {{appName}}",
+      "subtitle": "Nhận thông báo tin nhắn, nhắc giờ đi và tin đồ thất lạc khớp với bạn.",
+      "app_store": "Tải trên App Store",
+      "play_store": "Tải trên Google Play",
+      "qr_label": "Mã QR mở trang tải app",
+      "qr_hint": "Quét bằng camera điện thoại",
+      "unavailable": "Ứng dụng sắp lên kho. Trong lúc chờ, bạn dùng đầy đủ tính năng chính trên web.",
+      "use_web": "Dùng trên web"
+    },
+    "landlord": {
+      "meta_title": "Dành cho chủ trọ",
+      "meta_description": "Đăng phòng trọ tới người lao động quanh khu Dung Quất.",
+      "title": "Cho thuê phòng tới đúng người đang cần",
+      "subtitle": "Người lao động quanh khu tìm phòng theo khoảng cách tới nhà máy. Để lại liên hệ, chúng tôi hướng dẫn bạn đăng tin.",
+      "b1": "Đăng phòng kèm ảnh, giá và tiện ích",
+      "b2": "Khoảng cách tới nhà máy tự tính theo khu",
+      "b3": "Huy hiệu chủ trọ đã xác minh giúp người thuê yên tâm"
+    },
+    "lead": {
+      "title": "Để lại liên hệ",
+      "subtitle": "Chúng tôi chỉ dùng thông tin này để liên hệ lại với bạn.",
+      "contact_label": "Số điện thoại hoặc email",
+      "name_label": "Tên của bạn (không bắt buộc)",
+      "kind_label": "Bạn là",
+      "kinds": {
+        "user": "Người dùng",
+        "landlord": "Chủ trọ",
+        "venue": "Chủ sân",
+        "employer": "Nhà tuyển dụng"
+      },
+      "message_label": "Lời nhắn (không bắt buộc)",
+      "honeypot_label": "Không điền vào ô này",
+      "consent": "Tôi đồng ý để {{appName}} lưu thông tin trên và liên hệ lại với tôi.",
+      "privacy": "Xem chính sách bảo mật",
+      "submit": "Gửi",
+      "sending": "Đang gửi…",
+      "thanks_title": "Đã nhận thông tin",
+      "thanks_body": "Cảm ơn bạn. Chúng tôi sẽ liên hệ lại sớm."
+    },
+    "blog": {
+      "meta_title": "Blog",
+      "meta_description": "Mẹo giao dịch an toàn và kinh nghiệm sống quanh khu Dung Quất.",
+      "title": "Blog",
+      "empty": "Chưa có bài viết nào.",
+      "back": "Tất cả bài viết"
+    }
+  },
+  "cookie": {
+    "title": "Cookie thống kê",
+    "body": "Chúng tôi muốn dùng cookie thống kê để biết tính năng nào hữu ích. Web vẫn hoạt động đầy đủ nếu bạn từ chối.",
+    "policy": "Chính sách bảo mật",
+    "accept": "Đồng ý",
+    "decline": "Từ chối",
+    "settings": "Cài đặt cookie"
+  },
+  "content": {
+    "not_translated": "Nội dung này chưa được dịch nên đang hiện bản tiếng Việt.",
+    "updated": "Cập nhật ngày {{date}}",
+    "operator_pending": "(tên người vận hành đang cập nhật)",
+    "email_pending": "(email liên hệ đang cập nhật)",
+    "delete_cta": "Mở cài đặt để xoá tài khoản"
   }
 }

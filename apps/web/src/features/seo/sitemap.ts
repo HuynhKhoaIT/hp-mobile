@@ -11,6 +11,8 @@ import { absoluteUrl } from '@/i18n/alternates';
 import { routing } from '@/i18n/routing';
 import { publicEnv } from '@/lib/env';
 import { getPublicStats, getSitemapListings, SITEMAP_PAGE_SIZE } from '../listing/queries';
+import { listBlogPosts } from '../marketing/content';
+import { FEATURE_PAGES } from '../marketing/links';
 
 /** Trang công khai tĩnh (đổi route → sửa ở đây). Trang khu vực /tro/[site]… thêm khi có. */
 const STATIC_PATHS = [
@@ -21,11 +23,15 @@ const STATIC_PATHS = [
   '/viec-lam',
   '/that-lac',
   '/gioi-thieu',
+  '/tai-app',
+  '/cho-chu-tro',
+  '/blog',
+  ...FEATURE_PAGES.map((p) => `/tinh-nang/${p.slug}`),
   '/lien-he',
   '/dieu-khoan',
   '/chinh-sach-bao-mat',
   '/xoa-tai-khoan',
-] as const;
+];
 
 const XML_HEADERS = { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=0, s-maxage=3600' };
 
@@ -54,8 +60,11 @@ ${items}
 </sitemapindex>`;
 }
 
-export function staticSitemapXml(): string {
-  const urls = STATIC_PATHS.flatMap((path) =>
+export async function staticSitemapXml(): Promise<string> {
+  // Chỉ bài blog đã đăng (nháp không vào sitemap).
+  const posts = await listBlogPosts('vi');
+  const paths = [...STATIC_PATHS, ...posts.map((p) => `/blog/${p.slug}`)];
+  const urls = paths.flatMap((path) =>
     LOCALES.map((locale) => {
       const links = [
         ...LOCALES.map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${esc(absoluteUrl(path, l))}"/>`),

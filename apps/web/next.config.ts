@@ -1,8 +1,11 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 // next-intl đọc cấu hình theo request từ src/i18n/request.ts.
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+// content/{legal,blog}/**/*.mdx biên dịch lúc build (src/features/marketing/content.ts). Thành phần: mdx-components.tsx.
+const withMDX = createMDX();
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -22,4 +25,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(withMDX(nextConfig));
