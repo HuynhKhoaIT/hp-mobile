@@ -1,4 +1,4 @@
-// /admin/marketing?placement= — banner app + web (chỉ admin). Lead / blog: chưa có bảng (tuần 11). Theo request trong <Suspense>.
+// /admin/marketing?placement= — banner app + web (chỉ admin). Lead ở /admin/leads; blog là file MDX trong repo. Theo request trong <Suspense>.
 import { BANNER_PLACEMENTS } from '@hp/core';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';

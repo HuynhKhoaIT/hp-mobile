@@ -29,6 +29,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
         reports: stats?.reports_open,
         badges: stats?.badges_pending,
         venues: stats?.venues_pending,
+        leads: stats?.leads_new,
       }}
       initialCollapsed={cookieStore.get(SIDEBAR_COOKIE)?.value === 'collapsed'}
     >

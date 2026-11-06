@@ -13,7 +13,8 @@
     "groups": "Groups",
     "catalog": "Catalog",
     "marketing": "Marketing",
-    "audit": "Audit log"
+    "audit": "Audit log",
+    "leads": "Leads"
   },
   "brand": {
     "area": "Admin",
@@ -44,8 +45,11 @@
       "badges_one": "{{count}} badge request awaiting review",
       "badges_other": "{{count}} badge requests awaiting review",
       "venues_one": "{{count}} venue awaiting review",
-      "venues_other": "{{count}} venues awaiting review"
-    }
+      "venues_other": "{{count}} venues awaiting review",
+      "leads_one": "{{count}} new leads",
+      "leads_other": "{{count}} new leads"
+    },
+    "leads": "Leads"
   },
   "role": {
     "user": "User",
@@ -828,7 +832,8 @@
       "banner": "Banners",
       "contact": "Contact reveals",
       "account": "Accounts",
-      "audit": "Log exports"
+      "audit": "Log exports",
+      "lead": "Leads"
     },
     "col": {
       "time": "Time",
@@ -909,5 +914,47 @@
       "save": "Save",
       "create": "Create banner"
     }
+  },
+  "leads": {
+    "title": "Leads",
+    "subtitle": "Contacts from the forms on the about and landlord pages.",
+    "table_label": "Lead list",
+    "filter": {
+      "q": "Search contact or name",
+      "status": "Status",
+      "kind": "Type"
+    },
+    "col": {
+      "time": "Time",
+      "contact": "Contact",
+      "kind": "Type",
+      "message": "Message",
+      "source": "Source",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "kind": {
+      "user": "User",
+      "landlord": "Landlord",
+      "venue": "Venue owner",
+      "employer": "Employer"
+    },
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "closed": "Closed"
+    },
+    "to": {
+      "new": "Reopen",
+      "contacted": "Mark contacted",
+      "closed": "Close"
+    },
+    "toast": {
+      "updated": "Lead updated"
+    },
+    "export": "Export CSV",
+    "export_hint": "Exports the current status filter (up to 10,000 rows). The file contains contact details and the export is logged.",
+    "empty": "No leads yet",
+    "empty_filtered": "No leads match the filters"
   }
 }

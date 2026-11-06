@@ -10,7 +10,7 @@ import { AuditTable } from '@/features/admin/audit/components/audit-table';
 import { getAuditPage } from '@/features/admin/audit/queries';
 
 /** Tiền tố hành động gợi ý (khớp `<đối_tượng>.` trong audit_log). */
-const ACTION_PREFIXES = ['listing', 'report', 'badge', 'user', 'group', 'venue', 'site', 'keyword', 'banner', 'contact', 'account', 'audit'] as const;
+const ACTION_PREFIXES = ['listing', 'report', 'badge', 'user', 'group', 'venue', 'site', 'keyword', 'banner', 'lead', 'contact', 'account', 'audit'] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin.meta');

@@ -6,6 +6,7 @@ import {
   CalendarClock,
   FileText,
   Flag,
+  Inbox,
   LayoutDashboard,
   type LucideIcon,
   Megaphone,
@@ -25,6 +26,7 @@ export type AdminNavKey =
   | 'listings'
   | 'groups'
   | 'catalog'
+  | 'leads'
   | 'marketing'
   | 'audit';
 
@@ -37,11 +39,12 @@ export type AdminNavHref =
   | '/admin/listings'
   | '/admin/groups'
   | '/admin/catalog'
+  | '/admin/leads'
   | '/admin/marketing'
   | '/admin/audit';
 
-/** Số cạnh mục thanh bên: tin chờ duyệt, báo cáo mở, huy hiệu chờ, sân chờ duyệt. */
-export type AdminNavCount = 'pending' | 'reports' | 'badges' | 'venues';
+/** Số cạnh mục thanh bên: tin chờ duyệt, báo cáo mở, huy hiệu chờ, sân chờ duyệt, lead mới. */
+export type AdminNavCount = 'pending' | 'reports' | 'badges' | 'venues' | 'leads';
 export type AdminNavCounts = Partial<Record<AdminNavCount, number>>;
 
 export type AdminNavItem = {
@@ -62,6 +65,7 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   { key: 'groups', href: '/admin/groups', Icon: CalendarClock, minRole: 'moderator' },
   // Catalog: moderator duyệt sân; tab khu / từ khoá cấm chỉ admin (lọc trong trang).
   { key: 'catalog', href: '/admin/catalog', Icon: Store, minRole: 'moderator', badge: 'venues' },
+  { key: 'leads', href: '/admin/leads', Icon: Inbox, minRole: 'moderator', badge: 'leads' },
   { key: 'marketing', href: '/admin/marketing', Icon: Megaphone, minRole: 'admin' },
   { key: 'audit', href: '/admin/audit', Icon: ScrollText, minRole: 'admin' },
 ];

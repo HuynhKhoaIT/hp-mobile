@@ -13,7 +13,8 @@
     "groups": "Nhóm ghép",
     "catalog": "Danh mục",
     "marketing": "Marketing",
-    "audit": "Nhật ký"
+    "audit": "Nhật ký",
+    "leads": "Lead"
   },
   "brand": {
     "area": "Quản trị",
@@ -44,8 +45,11 @@
       "badges_one": "{{count}} yêu cầu huy hiệu chờ duyệt",
       "badges_other": "{{count}} yêu cầu huy hiệu chờ duyệt",
       "venues_one": "{{count}} sân chờ duyệt",
-      "venues_other": "{{count}} sân chờ duyệt"
-    }
+      "venues_other": "{{count}} sân chờ duyệt",
+      "leads_one": "{{count}} lead mới",
+      "leads_other": "{{count}} lead mới"
+    },
+    "leads": "Lead"
   },
   "role": {
     "user": "Người dùng",
@@ -828,7 +832,8 @@
       "banner": "Banner",
       "contact": "Xem liên hệ",
       "account": "Tài khoản",
-      "audit": "Xuất nhật ký"
+      "audit": "Xuất nhật ký",
+      "lead": "Lead"
     },
     "col": {
       "time": "Thời gian",
@@ -909,5 +914,47 @@
       "save": "Lưu",
       "create": "Tạo banner"
     }
+  },
+  "leads": {
+    "title": "Lead",
+    "subtitle": "Liên hệ từ form trên trang giới thiệu và trang cho chủ trọ.",
+    "table_label": "Danh sách lead",
+    "filter": {
+      "q": "Tìm liên hệ hoặc tên",
+      "status": "Trạng thái",
+      "kind": "Loại"
+    },
+    "col": {
+      "time": "Thời gian",
+      "contact": "Liên hệ",
+      "kind": "Loại",
+      "message": "Lời nhắn",
+      "source": "Nguồn",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "kind": {
+      "user": "Người dùng",
+      "landlord": "Chủ trọ",
+      "venue": "Chủ sân",
+      "employer": "Nhà tuyển dụng"
+    },
+    "status": {
+      "new": "Mới",
+      "contacted": "Đã liên hệ",
+      "closed": "Đã đóng"
+    },
+    "to": {
+      "new": "Mở lại",
+      "contacted": "Đã liên hệ",
+      "closed": "Đóng"
+    },
+    "toast": {
+      "updated": "Đã cập nhật lead"
+    },
+    "export": "Xuất CSV",
+    "export_hint": "Xuất theo trạng thái đang lọc (tối đa 10.000 dòng). File chứa liên hệ, việc xuất được ghi vào nhật ký.",
+    "empty": "Chưa có lead nào",
+    "empty_filtered": "Không có lead phù hợp với bộ lọc"
   }
 }
