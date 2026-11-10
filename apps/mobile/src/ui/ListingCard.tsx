@@ -93,15 +93,19 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
       <Text variant="label" numberOfLines={2}>
         {listing.title}
       </Text>
-      {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web). */}
-      <Text variant="price" numberOfLines={2}>
-        {price.lastIndexOf('/') > 0 ? price.slice(0, price.lastIndexOf('/')) : price}
-        {price.lastIndexOf('/') > 0 ? (
-          <Text variant="caption" tone="muted" weight="semibold">
-            {price.slice(price.lastIndexOf('/'))}
-          </Text>
-        ) : null}
-      </Text>
+      {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web).
+          ​ (giống <wbr /> của web) là chỗ được ngắt trước đơn vị; thiếu nó, bản web ngắt giữa chữ ("thá|ng"). */}
+      {price ? (
+        <Text variant="price" numberOfLines={2}>
+          {price.lastIndexOf('/') > 0 ? price.slice(0, price.lastIndexOf('/')) : price}
+          {price.lastIndexOf('/') > 0 ? (
+            <Text variant="caption" tone="muted" weight="semibold">
+              {'​'}
+              {price.slice(price.lastIndexOf('/'))}
+            </Text>
+          ) : null}
+        </Text>
+      ) : null}
       <Text variant="caption" tone="muted" numberOfLines={1}>
         {meta}
       </Text>

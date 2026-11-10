@@ -39,6 +39,7 @@ export function QueueRow({ item, locale, now, selected, selectable, checked, onS
   const cover = listing.images[0];
   const level = riskLevel(item.risk_score);
   const nowDate = new Date(now);
+  const price = priceText(priceLabel(listing), t, locale);
 
   return (
     <li ref={ref} className="relative">
@@ -80,7 +81,13 @@ export function QueueRow({ item, locale, now, selected, selectable, checked, onS
               </Badge>
             </div>
             <p className="truncate text-sm text-muted">
-              {t(`common.category.${listing.category}`)} · <span className="font-semibold text-fg">{priceText(priceLabel(listing), t, locale)}</span>
+              {t(`common.category.${listing.category}`)}
+              {price ? (
+                <>
+                  {' · '}
+                  <span className="font-semibold text-fg">{price}</span>
+                </>
+              ) : null}
             </p>
             {item.reasons.length > 0 ? (
               <ul className="flex flex-wrap gap-1">

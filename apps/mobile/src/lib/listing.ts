@@ -16,12 +16,16 @@ const PER_KEY: Record<PricePer, string> = {
 type PriceSource = Pick<PublicListing, 'category' | 'price' | 'price_type' | 'attributes'>;
 type SiteSource = Pick<PublicListing, 'site_name' | 'distance_to_site_m'>;
 
-/** Tin → chữ giá: "Miễn phí" / "Thoả thuận" / "1.500.000 ₫" / "1.500.000 ₫/tháng" / "Từ 8.000.000 ₫/tháng". */
+/**
+ * Tin → chữ giá: "Miễn phí" / "Thoả thuận" / "1.500.000 ₫" / "1.500.000 ₫/tháng" / "Từ 8.000.000 ₫/tháng";
+ * '' khi tin không có giá (đồ thất lạc) → nơi hiển thị bỏ dòng giá.
+ */
 export function usePriceText() {
   const { t } = useTranslation();
   return useCallback(
     (listing: PriceSource) => {
       const label: PriceLabel = priceLabel(listing);
+      if (label.type === 'none') return '';
       if (label.type === 'free') return t('common:price.free');
       if (label.type === 'negotiable') return t('common:price.negotiable');
       const amount =

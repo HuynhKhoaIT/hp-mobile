@@ -21,7 +21,8 @@ test('priceLabel: trọ theo tháng, đồ thất lạc không giá, miễn phí
     amount: 1_500_000,
     per: 'month',
   });
-  assert.deepEqual(priceLabel({ category: 'lost', price: null, price_type: 'free', attributes: {} }), { type: 'free' });
+  assert.deepEqual(priceLabel({ category: 'lost', price: null, price_type: 'free', attributes: {} }), { type: 'none' });
+  assert.deepEqual(priceLabel({ category: 'found', price: 0, price_type: 'fixed', attributes: {} }), { type: 'none' });
   assert.deepEqual(priceLabel({ category: 'pass_home', price: 0, price_type: 'free', attributes: {} }), { type: 'free' });
   assert.deepEqual(priceLabel({ category: 'pass_home', price: null, price_type: 'fixed', attributes: {} }), { type: 'negotiable' });
   assert.deepEqual(priceLabel({ category: 'pass_ppe', price: 150000, price_type: 'fixed', attributes: null }), {

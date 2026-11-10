@@ -27,9 +27,11 @@ export function asLocale(value: string): Locale {
 /** Hàm dịch tối thiểu (next-intl `t` của server lẫn client đều khớp). */
 export type Translate = (key: string, values?: Record<string, string | number>) => string;
 
-/** Giá: miễn phí / thoả thuận / tiền (+ /tháng, /giờ, /ngày) / khoảng lương. */
+/** Giá: miễn phí / thoả thuận / tiền (+ /tháng, /giờ, /ngày) / khoảng lương; '' khi tin không có giá (đồ thất lạc). */
 export function priceText(label: PriceLabel, t: Translate, locale: Locale): string {
   switch (label.type) {
+    case 'none':
+      return '';
     case 'free':
       return t('common.price.free');
     case 'negotiable':

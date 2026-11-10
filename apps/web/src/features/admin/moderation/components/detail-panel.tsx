@@ -80,6 +80,7 @@ export function DetailPanel(props: Props) {
   const canAct = actionable && item.status === 'pending' && !stale;
   const siteName = listing.site ? (sites[listing.site] ?? listing.site) : null;
   const headingId = `detail-${item.id}`;
+  const price = priceText(priceLabel(listing), t, locale);
 
   const actions = canAct ? (
     <div className="flex gap-2">
@@ -146,7 +147,7 @@ export function DetailPanel(props: Props) {
           <h2 id={headingId} lang={listing.lang} className="text-2xl font-semibold text-fg">
             {listing.title}
           </h2>
-          <p className="text-2xl font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
+          {price ? <p className="text-2xl font-bold text-fg">{price}</p> : null}
           <p className="text-sm text-muted">
             <time dateTime={listing.created_at}>{ta('posted', { time: formatRelative(listing.created_at, locale, nowDate) })}</time>
             {' · '}

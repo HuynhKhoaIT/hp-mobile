@@ -266,7 +266,7 @@
     "empty_body": "Tap the heart on a listing to see it again later."
   },
   "contact": {
-    "reveal": "Show phone number",
+    "reveal": "Show number",
     "call": "Call {{phone}}",
     "no_phone": "The poster hasn't added a phone number — send a message.",
     "hint": "Only call if you're really interested. Never pay before seeing the item."

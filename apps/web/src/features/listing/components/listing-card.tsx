@@ -100,6 +100,7 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
  * được → bị cắt ở thẻ hẹp. Tách đơn vị sau dấu "/" cuối thành chữ nhỏ, cho phép xuống dòng trước nó (giống app).
  */
 function ListingPrice({ text }: { text: string }) {
+  if (!text) return null;
   const cut = text.lastIndexOf('/');
   if (cut <= 0) return <p className="text-lg font-bold text-fg">{text}</p>;
   return (

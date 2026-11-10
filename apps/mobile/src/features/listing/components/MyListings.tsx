@@ -89,7 +89,7 @@ export function MyListings({ initialTab = 'active' }: { initialTab?: MyListingsT
 
 function MyListingRow({ listing, onMore }: { listing: MyListing; onMore: () => void }) {
   const { t, i18n } = useTranslation('listing');
-  const priceText = usePriceText();
+  const price = usePriceText()(listing);
   const actions = ownerActions(listing);
   const status = actions.expired ? 'expired' : listing.status;
   const reasons = listing.moderation_reasons.filter((r) => i18n.exists(`listing:manage.reason.${r}`));
@@ -108,7 +108,7 @@ function MyListingRow({ listing, onMore }: { listing: MyListing; onMore: () => v
       : openListing(listing.id);
 
   return (
-    <Card onPress={open} accessibilityLabel={[listing.title, t(`common:status.${status}`), priceText(listing)].join(', ')}>
+    <Card onPress={open} accessibilityLabel={[listing.title, t(`common:status.${status}`), price].filter(Boolean).join(', ')}>
       <View className="flex-row items-start gap-3">
         <ListingCover listing={listing} className="aspect-avatar w-20 rounded-sm" />
         <View className="flex-1 gap-1">
@@ -116,9 +116,11 @@ function MyListingRow({ listing, onMore }: { listing: MyListing; onMore: () => v
           <Text variant="label" numberOfLines={2}>
             {listing.title}
           </Text>
-          <Text variant="price" numberOfLines={1}>
-            {priceText(listing)}
-          </Text>
+          {price ? (
+            <Text variant="price" numberOfLines={1}>
+              {price}
+            </Text>
+          ) : null}
           <Text variant="caption" tone="muted" numberOfLines={1}>
             {meta}
           </Text>

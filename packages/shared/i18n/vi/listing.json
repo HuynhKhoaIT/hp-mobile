@@ -266,7 +266,7 @@
     "empty_body": "Bấm trái tim ở tin bạn quan tâm để xem lại sau."
   },
   "contact": {
-    "reveal": "Hiện số điện thoại",
+    "reveal": "Hiện số",
     "call": "Gọi {{phone}}",
     "no_phone": "Người đăng chưa có số điện thoại — hãy nhắn tin.",
     "hint": "Chỉ gọi khi thật sự quan tâm. Không chuyển tiền trước khi xem hàng."

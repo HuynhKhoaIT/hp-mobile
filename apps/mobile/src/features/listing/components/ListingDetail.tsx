@@ -88,7 +88,7 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
   const { t, i18n } = useTranslation('listing');
   const translation = useListingTranslation(listing);
   const returned = isReturned(listing);
-  const priceText = usePriceText();
+  const price = usePriceText()(listing);
   const siteText = useSiteText();
   const similar = useSimilarListings(listing.id);
   const isOwner = useIsOwner(listing);
@@ -122,7 +122,7 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
           <Text variant="heading" accessibilityRole="header" selectable>
             {translation.title}
           </Text>
-          <Text variant="price">{priceText(listing)}</Text>
+          {price ? <Text variant="price">{price}</Text> : null}
           <View className="flex-row flex-wrap gap-1">
             <Badge label={t(`common:category.${listing.category}`)} />
             {returned ? <Badge label={t('lost_found.returned_badge')} tone="success" /> : null}

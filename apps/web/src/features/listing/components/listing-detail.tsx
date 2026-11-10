@@ -35,6 +35,7 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
   const attributes = readAttributes(listing.category, listing.attributes);
   const similar = await getSimilarListings(listing.id);
   const categoryName = t(`common.category.${listing.category}`);
+  const price = priceText(priceLabel(listing), t, locale);
   const displayStatus = listingDisplayStatus(listing);
   const active = displayStatus === 'active';
   const returned = !!cfg.returnable && isReturned(listing);
@@ -101,7 +102,7 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                 />
                 <BookmarkButton listingId={listing.id} />
               </div>
-              <p className="text-2xl font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</p>
+              {price ? <p className="text-2xl font-bold text-fg">{price}</p> : null}
               <p className="text-sm text-muted">
                 <time dateTime={listing.created_at}>
                   {t('listing.detail.posted_at', { time: formatRelative(listing.created_at, locale, new Date(now)) })}
