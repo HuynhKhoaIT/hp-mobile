@@ -6,6 +6,16 @@
       "dependsOn": [
         "^build"
       ],
+      "env": [
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "REVALIDATE_SECRET",
+        "IP_HASH_SALT",
+        "SENTRY_AUTH_TOKEN",
+        "APP_IOS_TEAM_ID",
+        "APP_IOS_BUNDLE_ID",
+        "APP_ANDROID_PACKAGE",
+        "APP_ANDROID_SHA256"
+      ],
       "inputs": [
         "$TURBO_DEFAULT$",
         ".env*"
