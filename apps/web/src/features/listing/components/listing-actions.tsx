@@ -2,18 +2,20 @@
 
 // Hành động trang chi tiết (cột phải, dính khi cuộn). Ghi lượt xem khi người xem đã đăng nhập.
 // - Chủ tin xem tin của mình → "Sửa tin" + "Tin của tôi" (không liên hệ chính mình). Chỉ là UI: RLS mới quyết định quyền.
-// - Tin đang đăng: "Hiện số điện thoại" (ContactReveal) + Nhắn tin (khách → LoginDialog; chat ở tuần 6 → "sắp có").
+// - Tin đang đăng: "Hiện số điện thoại" (ContactReveal) + Nhắn tin (StartChatButton → /tin-nhan/[id]; khách → LoginDialog).
 // - Tin đã bán / đóng / hết hạn: ẩn liên hệ, chỉ còn Chia sẻ (banner trạng thái ở trang).
+// - Người xem không phải chủ tin: "Báo cáo tin" (ReportButton; khách → LoginDialog).
 // - Chia sẻ: Web Share API (điện thoại); không có → sao chép link web (shareUrl của @hp/core) + toast "Đã sao chép".
 import { recordListingView, shareUrl } from '@hp/core';
 import { APP_NAME } from '@hp/shared';
-import { MessageCircle, Pencil, Share2 } from 'lucide-react';
+import { Pencil, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-import { LoginDialog } from '@/components/shared/login-dialog';
 import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
 import { useSessionUser } from '@/features/auth/components/use-session-user';
+import { StartChatButton } from '@/features/chat/components/start-chat-button';
+import { ReportButton } from '@/features/report/components/report-button';
 import { Link } from '@/i18n/navigation';
 import { publicEnv } from '@/lib/env';
 import { createBrowserClient } from '@/lib/supabase/client';
@@ -91,28 +93,25 @@ export function ListingActions({
     );
   }
 
-  if (!active) return <div className="flex flex-col gap-2">{shareButton}</div>;
+  const reportButton = <ReportButton target="listing" targetId={listingId} label={t('listing.detail.report')} userId={userId} />;
 
-  const messageButton = (
-    <Button
-      type="button"
-      variant="outline"
-      size="lg"
-      className="flex-1"
-      onClick={userId ? () => toast.show(t('listing.detail.contact_soon')) : undefined}
-    >
-      <MessageCircle strokeWidth={1.75} aria-hidden />
-      {t('listing.detail.contact')}
-    </Button>
-  );
+  if (!active) {
+    return (
+      <div className="flex flex-col gap-2">
+        {shareButton}
+        {reportButton}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3">
       <ContactReveal listingId={listingId} userId={userId} />
       <div className="flex gap-2">
-        {userId === null ? <LoginDialog trigger={messageButton} /> : messageButton}
+        <StartChatButton listingId={listingId} userId={userId} />
         {shareButton}
       </div>
+      {reportButton}
     </div>
   );
 }

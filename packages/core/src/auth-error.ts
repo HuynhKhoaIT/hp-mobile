@@ -23,6 +23,16 @@ export function toAuthError(err: unknown): AppError {
       return { code: 'phone_invalid', message };
     case 'user_banned':
       return { code: 'banned', message };
+    // MFA TOTP (khu /admin web)
+    case 'mfa_verification_failed':
+    case 'mfa_challenge_expired':
+      return { code: 'mfa_code_invalid', message };
+    case 'mfa_totp_enroll_not_enabled':
+    case 'mfa_totp_verify_not_enabled':
+      return { code: 'mfa_disabled', message };
+    case 'too_many_enrolled_mfa_factors':
+    case 'mfa_factor_name_conflict':
+      return { code: 'conflict', message };
   }
   if (e.status === 429) return { code: 'rate_limited', message };
   if (e.name === 'AuthRetryableFetchError' || e.name === 'TypeError' || /fetch|network/i.test(message)) {

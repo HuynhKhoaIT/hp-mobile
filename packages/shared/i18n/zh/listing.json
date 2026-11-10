@@ -213,7 +213,8 @@
       "km": "公里",
       "months": "个月",
       "people": "人"
-    }
+    },
+    "photos_min": "此类信息至少需要 {{min}} 张照片。"
   },
   "manage": {
     "title": "我的信息",
@@ -240,6 +241,8 @@
     "sold_body": "信息将显示“已售”标签并从列表中移除。",
     "sold_confirm": "已售",
     "sold_done": "已标记为已售",
+    "sold_forbidden": "只有已公开发布的信息才能标记为已售。",
+    "status_forbidden": "信息状态刚刚发生变化，请刷新列表后重试。",
     "closed_done": "信息已关闭",
     "reopened": "信息已重新开启",
     "deleted": "信息已删除",
@@ -263,7 +266,7 @@
     "empty_body": "点击信息上的爱心，方便以后查看。"
   },
   "contact": {
-    "reveal": "显示电话号码",
+    "reveal": "显示号码",
     "call": "拨打 {{phone}}",
     "no_phone": "发布者没有填写电话号码——请发消息联系。",
     "hint": "确实有意向再拨打。看货前不要先付款。"
@@ -279,5 +282,27 @@
     "unsave": "取消收藏",
     "saved": "已收藏",
     "removed": "已取消收藏"
+  },
+  "translate": {
+    "action": "翻译成中文",
+    "show_original": "查看原文",
+    "translated_note": "自动翻译",
+    "translating": "翻译中…"
+  },
+  "distance": {
+    "label": "距工作地点",
+    "any": "不限距离",
+    "within": "{{km}} 公里内",
+    "to_site": "距{{site}} {{distance}}"
+  },
+  "lost_found": {
+    "matches_title": "可能匹配的信息",
+    "matches_hint": "物品类型相同，时间和地点相近。",
+    "matches_empty": "暂无匹配。一有匹配会立即通知你。",
+    "mark_returned": "已物归原主",
+    "mark_returned_confirm_title": "标记为已物归原主？",
+    "mark_returned_confirm_body": "该信息将关闭，不再公开显示。",
+    "returned_done": "太好了！物品已物归原主。",
+    "returned_badge": "已归还"
   }
 }

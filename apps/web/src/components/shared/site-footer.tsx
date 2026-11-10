@@ -4,10 +4,17 @@
 import { APP_NAME } from '@hp/shared';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { CookieSettingsButton } from './cookie-consent';
 import { cn } from '@/lib/utils';
 import { copyrightYear, LEGAL_LINKS } from './legal-links';
 import { LocaleSwitcher } from './locale-switcher';
 import { ThemeToggle } from './theme-toggle';
+
+const MARKETING_LINKS = [
+  { href: '/tai-app', key: 'download' },
+  { href: '/blog', key: 'blog' },
+  { href: '/cho-chu-tro', key: 'for_landlords' },
+] as const;
 
 export async function SiteFooter({ className }: { className?: string }) {
   const t = await getTranslations();
@@ -22,6 +29,16 @@ export async function SiteFooter({ className }: { className?: string }) {
               </Link>
             </li>
           ))}
+          {MARKETING_LINKS.map(({ href, key }) => (
+            <li key={key}>
+              <Link href={href} className="inline-flex min-h-11 items-center text-sm text-muted hover:text-fg">
+                {t(`web.footer.${key}`)}
+              </Link>
+            </li>
+          ))}
+          <li>
+            <CookieSettingsButton />
+          </li>
         </ul>
         <div className="flex flex-wrap items-center gap-2">
           <LocaleSwitcher />

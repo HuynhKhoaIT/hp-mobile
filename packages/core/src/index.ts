@@ -4,13 +4,23 @@
 // Provider + hooks TanStack ở entry riêng `@hp/core/react` (có 'use client').
 // Luật: .claude/rules/be-shared-packages.md.
 export { appOnly, isAppOnly, type AppOnlyFeature } from './capabilities';
+export * from './admin';
 export * from './auth';
+export * from './badges';
+export * from './chat';
 export { toAuthError } from './auth-error';
+export * from './functions';
+export * from './groups';
 export * from './keys';
 export * from './home';
 export * from './listings';
 export * from './listings-write';
+export * from './marketing';
+export * from './moderation';
+export * from './notifications';
 export * from './result';
 export * from './profile';
+export * from './reports';
 export * from './social';
 export * from './urls';
+export * from './venues';

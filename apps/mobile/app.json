@@ -8,9 +8,27 @@
     "scheme": "hoaphat",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "vn.tenapp.app",
+      "associatedDomains": ["applinks:tenapp.vn"]
     },
     "android": {
+      "package": "vn.tenapp.app",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": [
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/nhom/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/nhom/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/tin/" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/nhom/" }
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6EFFA",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -33,11 +51,19 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Cho phép Người Dung Quất truy cập ảnh để bạn chọn ảnh đại diện và ảnh tin đăng.",
-          "cameraPermission": false,
+          "photosPermission": "Cho phép Người Dung Quất truy cập ảnh để bạn chọn ảnh đại diện, ảnh tin đăng và ảnh giấy tờ xác minh.",
+          "cameraPermission": "Cho phép Người Dung Quất dùng máy ảnh để bạn chụp giấy tờ xin huy hiệu xác minh.",
           "microphonePermission": false
         }
-      ]
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#0B4F9C",
+          "defaultChannel": "default"
+        }
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

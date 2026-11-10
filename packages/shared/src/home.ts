@@ -13,8 +13,8 @@ export const HOME_TILES: readonly HomeTile[] = [
   { id: 'room', kind: 'service' },
   { id: 'job', kind: 'service' },
   { id: 'lostFound', kind: 'service' },
-  { id: 'ride', kind: 'service', soon: true },
-  { id: 'sport', kind: 'service', soon: true },
+  { id: 'ride', kind: 'service', isNew: true },
+  { id: 'sport', kind: 'service', isNew: true },
   { id: 'my_listings', kind: 'utility' },
   { id: 'all', kind: 'utility' },
 ];

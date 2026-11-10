@@ -124,7 +124,8 @@ export function useSetListingStatus() {
     onMutate: async (v) => {
       await qc.cancelQueries({ queryKey: keys.myListings() });
       const snapshot = snapshotMine(qc);
-      patchMine(qc, v.id, (l) => ({ ...l, status: v.status }));
+      // Mở lại (active): server có thể chuyển thành pending_review (kiểm duyệt, khoá) nên không đoán trước; chờ kết quả thật.
+      if (v.status !== 'active') patchMine(qc, v.id, (l) => ({ ...l, status: v.status }));
       return { snapshot };
     },
     onError: (_e, _v, ctx) => ctx && restoreMine(qc, ctx.snapshot),
@@ -171,9 +172,12 @@ export function useRevealContact() {
 /** id các tin đã lưu (để tô trái tim). Rỗng khi chưa đăng nhập. */
 export function useBookmarkedListingIds(opts: { enabled?: boolean } = {}) {
   const client = useSupabase();
-  return useQuery<Set<string>, AppError>({
+  // Cache giữ mảng id (persist MMKV / localStorage là JSON: Set lưu xuống thành {} → .has() lỗi khi mở lại app);
+  // component nhận Set qua select.
+  return useQuery<string[], AppError, Set<string>>({
     queryKey: keys.bookmarks('listing'),
-    queryFn: async () => new Set((await unwrap(listBookmarks(client, 'listing'))).map((b) => b.target_id)),
+    queryFn: async () => (await unwrap(listBookmarks(client, 'listing'))).map((b) => b.target_id),
+    select: toIdSet,
     enabled: opts.enabled ?? true,
     staleTime: 60_000,
   });
@@ -183,15 +187,13 @@ export function useBookmarkedListingIds(opts: { enabled?: boolean } = {}) {
 export function useToggleBookmark() {
   const client = useSupabase();
   const qc = useQueryClient();
-  return useMutation<null, AppError, { listingId: string; next: boolean }, { previous: Set<string> | undefined }>({
+  return useMutation<null, AppError, { listingId: string; next: boolean }, { previous: string[] | undefined }>({
     mutationFn: (v) => unwrap(setBookmark(client, { targetType: 'listing', targetId: v.listingId, next: v.next })),
     onMutate: async (v) => {
       await qc.cancelQueries({ queryKey: keys.bookmarks('listing') });
-      const previous = qc.getQueryData<Set<string>>(keys.bookmarks('listing'));
-      const nextSet = new Set(previous ?? []);
-      if (v.next) nextSet.add(v.listingId);
-      else nextSet.delete(v.listingId);
-      qc.setQueryData(keys.bookmarks('listing'), nextSet);
+      const previous = qc.getQueryData<string[]>(keys.bookmarks('listing'));
+      const rest = idArray(previous).filter((id) => id !== v.listingId);
+      qc.setQueryData<string[]>(keys.bookmarks('listing'), v.next ? [v.listingId, ...rest] : rest);
       return { previous };
     },
     onError: (_e, _v, ctx) => qc.setQueryData(keys.bookmarks('listing'), ctx?.previous),
@@ -211,4 +213,17 @@ export function useSavedListings(opts: { enabled?: boolean } = {}) {
     enabled: opts.enabled ?? true,
     staleTime: 30_000,
   });
+}
+
+/**
+ * Mảng id trong cache → Set cho component (tham chiếu ổn định để select được memo). Cache cũ khôi phục từ persist
+ * có thể sai hình dạng (bản trước lưu Set → JSON {}) → coi như rỗng, không crash.
+ */
+export function toIdSet(ids: unknown): Set<string> {
+  return new Set(idArray(ids));
+}
+
+/** Đọc mảng id từ cache, bỏ qua dữ liệu sai hình dạng. */
+export function idArray(ids: unknown): string[] {
+  return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string') : [];
 }

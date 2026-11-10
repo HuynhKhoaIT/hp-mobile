@@ -6,5 +6,57 @@
   "listing_rejected": {
     "title": "信息未通过审核",
     "body": "你的信息“{{title}}”违反规定，未能发布。你可以修改后重新发布。"
+  },
+  "new_message": {
+    "title": "{{sender_name}}",
+    "body": "{{preview}}",
+    "image": "发送了一张图片",
+    "group_title": "{{title}}",
+    "group_body": "{{sender_name}}：{{preview}}",
+    "group_image": "{{sender_name}} 发送了一张图片"
+  },
+  "join_request": {
+    "title": "{{title}}",
+    "body": "{{name}} 申请加入你的小组",
+    "body_joined": "{{name}} 加入了你的小组",
+    "body_left": "{{name}} 退出了小组，空出1个座位"
+  },
+  "join_accepted": {
+    "title": "你已被接受",
+    "body": "发起人已同意你加入“{{title}}”"
+  },
+  "join_declined": {
+    "title": "申请未被接受",
+    "body": "发起人未同意你加入“{{title}}”，看看其他小组吧。"
+  },
+  "group_cancelled": {
+    "title": "小组已取消",
+    "body": "“{{title}}”已被发起人取消。"
+  },
+  "group_reminder": {
+    "title": "即将开始：{{title}}",
+    "body_ride": "拼车将于 {{time}} 出发，请准时到达！",
+    "body_sport": "比赛将于 {{time}} 开始，准备出发吧！"
+  },
+  "group_completed": {
+    "title": "“{{title}}”怎么样？",
+    "body": "为组长评分，帮助大家找到靠谱的小组。"
+  },
+  "listing_expiring": {
+    "title": "信息即将过期",
+    "body": "“{{title}}”将在几天后过期，续期以继续展示。"
+  },
+  "lost_found_match": {
+    "title": "可能与你的物品匹配",
+    "body_found": "有人捡到“{{title}}”，与你丢失的物品相似，快去看看！",
+    "body_lost": "有人在找“{{title}}”，与你捡到的物品相似。"
+  },
+  "badge_approved": {
+    "title": "徽章已通过审核",
+    "body": "你的资料已显示新徽章。"
+  },
+  "badge_rejected": {
+    "title": "徽章未通过审核",
+    "body": "证件未通过。{{reason}} 你可以重新提交。"
   }
 }

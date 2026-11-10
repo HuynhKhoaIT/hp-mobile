@@ -14,4 +14,4 @@ paths:
 - Metadata và JSON-LD: chữ qua `getTranslations` với `locale` của route; `alternates.languages` đủ 3 + `x-default`.
 - Blog / pháp lý MDX: `content/<loại>/{vi,en,zh}/<slug>.mdx`; thiếu bản dịch → trang `en` / `zh` hiện bản `vi` kèm thông báo `web.content.not_translated` (không 404).
 - Nội dung người dùng giữ nguyên ngôn ngữ; `listing.lang !== locale` → nút Dịch (`translate-content`).
-- Review: xem trang ở `en` (dài hơn 30%, không tràn nút) và `zh` (ngắn, kiểm tra căn dòng và font Noto Sans SC).
+- Review: xem trang ở `en` (dài hơn 30%, không tràn nút) và `zh` (ngắn, kiểm tra căn dòng và chữ Hán hiện bằng font hệ thống).

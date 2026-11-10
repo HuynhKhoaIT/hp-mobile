@@ -91,7 +91,7 @@ export function Button({
         {...rest}
       >
         {loading ? <ActivityIndicator size="small" color={spinnerColor} /> : icon ? <Icon icon={icon} tone={tone} /> : null}
-        <Text variant="label" tone={tone} className="text-center">
+        <Text variant="label" tone={tone} className="shrink text-center">
           {label}
         </Text>
       </Pressable>

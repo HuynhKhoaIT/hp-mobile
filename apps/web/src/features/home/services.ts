@@ -1,10 +1,11 @@
 // Hình ảnh của 6 dịch vụ + 2 ô tiện ích trên trang chủ (docs/design/home.md §4.3, §10). Thứ tự / cờ (soon, isNew) lấy từ
 // HOME_TILES của @hp/shared (chung với app); file này chỉ map id → icon, màu, đường dẫn web.
-// Listing: icon + màu lấy từ config của tính năng (features/<x>/config.ts) để trang chủ, danh sách và thẻ tin cùng một
-// nhận diện. Group (ride / sport) chưa có config (tuần 7–8): khai báo tại đây, chuyển về features/ride|sport/config.ts khi có.
+// Listing + Group: icon + màu + đường dẫn lấy từ config của tính năng (features/<x>/config.ts) để trang chủ, danh sách và
+// thẻ cùng một nhận diện.
 // Class viết đầy đủ (Tailwind quét được, không ghép chuỗi động).
 import { type Feature, HOME_TILES, type HomeTile, type ListingFeature } from '@hp/shared';
-import { Car, ClipboardList, LayoutGrid, type LucideIcon, Trophy } from 'lucide-react';
+import { ClipboardList, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { GROUP_FEATURE_CONFIGS } from '@/features/group/features';
 import { LISTING_FEATURE_CONFIGS } from '@/features/listing/features';
 
 export type ServiceVisual = {
@@ -34,18 +35,18 @@ export const SERVICE_VISUALS: Record<Feature, ServiceVisual> = {
   room: listingVisual('room'),
   job: listingVisual('job'),
   lostFound: listingVisual('lostFound'),
-  ride: { Icon: Car, soft: 'bg-service-ride-soft', fg: 'text-service-ride', dot: 'bg-service-ride' },
-  sport: { Icon: Trophy, soft: 'bg-service-sport-soft', fg: 'text-service-sport', dot: 'bg-service-sport' },
+  ride: { Icon: GROUP_FEATURE_CONFIGS.ride.Icon, ...GROUP_FEATURE_CONFIGS.ride.tone },
+  sport: { Icon: GROUP_FEATURE_CONFIGS.sport.Icon, ...GROUP_FEATURE_CONFIGS.sport.tone },
 };
 
-/** Đường dẫn web của 6 dịch vụ. Ghép xe / ghép trận: trang "Sắp có" giữ đúng URL đã chốt (không 404). */
+/** Đường dẫn web của 6 dịch vụ. */
 const SERVICE_PATHS: Record<Feature, string> = {
   pass: LISTING_FEATURE_CONFIGS.pass.path,
   room: LISTING_FEATURE_CONFIGS.room.path,
   job: LISTING_FEATURE_CONFIGS.job.path,
   lostFound: LISTING_FEATURE_CONFIGS.lostFound.path,
-  ride: '/ghep-xe',
-  sport: '/ghep-tran',
+  ride: GROUP_FEATURE_CONFIGS.ride.path,
+  sport: GROUP_FEATURE_CONFIGS.sport.path,
 };
 
 export type TileView = {

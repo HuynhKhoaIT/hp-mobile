@@ -213,7 +213,8 @@
       "km": "km",
       "months": "months",
       "people": "people"
-    }
+    },
+    "photos_min": "This type of listing needs at least {{min}} photos."
   },
   "manage": {
     "title": "My listings",
@@ -240,6 +241,8 @@
     "sold_body": "The listing will show a \"Sold\" label and leave the lists.",
     "sold_confirm": "Sold",
     "sold_done": "Marked as sold",
+    "sold_forbidden": "Only published listings can be marked as sold.",
+    "status_forbidden": "This listing's status has just changed. Refresh the list and try again.",
     "closed_done": "Listing closed",
     "reopened": "Listing reopened",
     "deleted": "Listing deleted",
@@ -263,7 +266,7 @@
     "empty_body": "Tap the heart on a listing to see it again later."
   },
   "contact": {
-    "reveal": "Show phone number",
+    "reveal": "Show number",
     "call": "Call {{phone}}",
     "no_phone": "The poster hasn't added a phone number — send a message.",
     "hint": "Only call if you're really interested. Never pay before seeing the item."
@@ -279,5 +282,27 @@
     "unsave": "Unsave",
     "saved": "Listing saved",
     "removed": "Removed from saved"
+  },
+  "translate": {
+    "action": "Translate to English",
+    "show_original": "Show original",
+    "translated_note": "Automatic translation",
+    "translating": "Translating…"
+  },
+  "distance": {
+    "label": "Distance to work site",
+    "any": "Any distance",
+    "within": "Within {{km}} km",
+    "to_site": "{{distance}} from {{site}}"
+  },
+  "lost_found": {
+    "matches_title": "Possible matches",
+    "matches_hint": "Same kind of item, close in time and place.",
+    "matches_empty": "No matches yet. We will notify you as soon as there is one.",
+    "mark_returned": "Item returned",
+    "mark_returned_confirm_title": "Mark as returned?",
+    "mark_returned_confirm_body": "The listing will be closed and hidden from public view.",
+    "returned_done": "Great! The item is back with its owner.",
+    "returned_badge": "Returned"
   }
 }

@@ -22,6 +22,7 @@ import { CommunitySection } from './community-section';
 import { HomeProvider } from './home-context';
 import { FeatureRail, ForYouRail, NearRail } from './home-rails';
 import { HubHeader } from './hub-header';
+import { AccountDeletedToast } from '@/features/profile/components/delete-account';
 import { HubSearch } from './hub-search';
 import { PersonalCard } from './personal-card';
 import { QuickSearch } from './quick-search';
@@ -52,6 +53,7 @@ export async function HomePage() {
     <HomeProvider sites={sites} initialNear={defaultSite && near ? { site: defaultSite, data: near } : null}>
       <div className="flex flex-col">
         <h1 className="sr-only">{t('web.home.heading', { appName: APP_NAME })}</h1>
+        <AccountDeletedToast />
         <HubHeader />
         <HubSearch />
         {/* Phần đáy dải xanh (pb-16 của header) — lưới dịch vụ nổi đè lên 48px. */}

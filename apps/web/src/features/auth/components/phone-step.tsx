@@ -14,10 +14,13 @@ export function PhoneStep({
   next,
   initialError,
   onSent,
+  showGoogle = true,
 }: {
   next: string;
   initialError?: string | null;
   onSent: (phone: string) => void;
+  /** Khu /admin chỉ đăng nhập bằng SĐT (rồi TOTP) — ẩn Google. */
+  showGoogle?: boolean;
 }) {
   const t = useTranslations('auth.phone');
   const errorText = useErrorText();
@@ -78,14 +81,18 @@ export function PhoneStep({
           {t('submit')}
         </Button>
       </form>
-      <div className="flex items-center gap-3 text-sm text-muted">
-        <span className="h-px flex-1 bg-border" />
-        {t('or')}
-        <span className="h-px flex-1 bg-border" />
-      </div>
-      <Button type="button" variant="outline" size="lg" onClick={google} disabled={pending}>
-        {t('google')}
-      </Button>
+      {showGoogle ? (
+        <>
+          <div className="flex items-center gap-3 text-sm text-muted">
+            <span className="h-px flex-1 bg-border" />
+            {t('or')}
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <Button type="button" variant="outline" size="lg" onClick={google} disabled={pending}>
+            {t('google')}
+          </Button>
+        </>
+      ) : null}
     </div>
   );
 }

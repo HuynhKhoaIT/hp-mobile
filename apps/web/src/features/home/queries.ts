@@ -4,12 +4,15 @@
 // Lỗi: trả null (không cache lỗi) → component client của khối đó tự tải lại ở trình duyệt / hiện lỗi + Thử lại; một khối
 // lỗi không làm hỏng cả trang.
 import 'server-only';
-import { type Banner, listBanners } from '@hp/core';
+import { type Banner, listBanners, type PublicListing } from '@hp/core';
 import { HOME_RAIL_SIZE, LISTING_CATEGORIES, LISTING_FEATURES, type ListingFeature, type Locale } from '@hp/shared';
 import { cacheLife, cacheTag } from 'next/cache';
 import { getListPage, getPublicStats, type PublicStats } from '@/features/listing/queries';
 import { createPublicClient } from '@/lib/supabase/public';
 import type { RailData } from './types';
+
+/** Dải tin đi qua props xuống client: thẻ không dùng mô tả / địa chỉ, bỏ cho nhẹ HTML. */
+const forRail = (items: PublicListing[]) => items.map((l) => ({ ...l, description: null, address_text: null }));
 
 async function getCachedBanners(locale: Locale): Promise<Banner[]> {
   'use cache';
@@ -33,7 +36,7 @@ export async function getHomeBanners(locale: Locale): Promise<Banner[] | null> {
 export async function getFeatureRail(feature: ListingFeature): Promise<RailData | null> {
   try {
     const { page, now } = await getListPage({ categories: LISTING_FEATURES[feature], site: null, query: '' });
-    return { items: page.items.slice(0, HOME_RAIL_SIZE.feature), now };
+    return { items: forRail(page.items.slice(0, HOME_RAIL_SIZE.feature)), now };
   } catch {
     return null;
   }
@@ -43,7 +46,7 @@ export async function getFeatureRail(feature: ListingFeature): Promise<RailData 
 export async function getNearRail(site: string): Promise<RailData | null> {
   try {
     const { page, now } = await getListPage({ categories: LISTING_CATEGORIES, site, query: '' });
-    return { items: page.items.slice(0, HOME_RAIL_SIZE.near), now };
+    return { items: forRail(page.items.slice(0, HOME_RAIL_SIZE.near)), now };
   } catch {
     return null;
   }

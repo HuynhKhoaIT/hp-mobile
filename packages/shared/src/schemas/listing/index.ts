@@ -16,6 +16,8 @@ export const ListingFilters = z
     lat: z.number().min(-90).max(90),
     lng: z.number().min(-180).max(180),
     radiusM: z.number().int().min(100).max(50_000),
+    /** Cách khu làm việc của tin tối đa (m) — RPC search_listings p_max_distance_m (lọc trọ gần nhà máy). */
+    maxDistanceM: z.number().int().min(100).max(50_000),
     priceMin: z.number().int().min(0),
     priceMax: z.number().int().min(0),
     attributes: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])),

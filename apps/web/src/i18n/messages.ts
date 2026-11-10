@@ -1,28 +1,36 @@
 // Nạp file dịch dùng chung (packages/shared/i18n) cho next-intl.
 // File dùng cú pháp i18next ({{x}}, key_one / key_other) để app đọc trực tiếp; web chuyển sang ICU của next-intl
 // ({x}, {count, plural, one {…} other {…}}) một lần khi module được nạp.
-// Namespace `admin` chỉ nạp trong khu /admin (không gửi xuống trang công khai).
+// Namespace `admin`: server có cho mọi trang, nhưng chỉ layout /admin gửi xuống client (NextIntlClientProvider) —
+// trang công khai không nhận chữ admin. Thiếu bản zh của admin → dùng vi (ngoại lệ duy nhất, xem i18n-check).
+// Namespace `push`: chữ của bảng notifications (title_key / body_key lưu không có tiền tố `push.`) cho /thong-bao.
 import type { Locale } from '@hp/shared';
+import enAdmin from '@hp/shared/i18n/en/admin.json';
 import enAuth from '@hp/shared/i18n/en/auth.json';
 import enChat from '@hp/shared/i18n/en/chat.json';
 import enCommon from '@hp/shared/i18n/en/common.json';
 import enErrors from '@hp/shared/i18n/en/errors.json';
 import enGroup from '@hp/shared/i18n/en/group.json';
 import enListing from '@hp/shared/i18n/en/listing.json';
+import enPush from '@hp/shared/i18n/en/push.json';
 import enWeb from '@hp/shared/i18n/en/web.json';
+import viAdmin from '@hp/shared/i18n/vi/admin.json';
 import viAuth from '@hp/shared/i18n/vi/auth.json';
 import viChat from '@hp/shared/i18n/vi/chat.json';
 import viCommon from '@hp/shared/i18n/vi/common.json';
 import viErrors from '@hp/shared/i18n/vi/errors.json';
 import viGroup from '@hp/shared/i18n/vi/group.json';
 import viListing from '@hp/shared/i18n/vi/listing.json';
+import viPush from '@hp/shared/i18n/vi/push.json';
 import viWeb from '@hp/shared/i18n/vi/web.json';
+import zhAdmin from '@hp/shared/i18n/zh/admin.json';
 import zhAuth from '@hp/shared/i18n/zh/auth.json';
 import zhChat from '@hp/shared/i18n/zh/chat.json';
 import zhCommon from '@hp/shared/i18n/zh/common.json';
 import zhErrors from '@hp/shared/i18n/zh/errors.json';
 import zhGroup from '@hp/shared/i18n/zh/group.json';
 import zhListing from '@hp/shared/i18n/zh/listing.json';
+import zhPush from '@hp/shared/i18n/zh/push.json';
 import zhWeb from '@hp/shared/i18n/zh/web.json';
 
 type Tree = { [key: string]: string | Tree };
@@ -59,10 +67,30 @@ export function toIcu(tree: Tree): Tree {
   return out;
 }
 
+/** Ghép cây dịch: khoá có ở `override` thắng, thiếu thì lấy `base`. */
+function withFallback(base: Tree, override: Tree): Tree {
+  const out: Tree = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const fallback = base[key];
+    out[key] = typeof value !== 'string' && fallback && typeof fallback !== 'string' ? withFallback(fallback, value) : value;
+  }
+  return out;
+}
+
 const raw = {
-  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, auth: viAuth, web: viWeb },
-  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, auth: enAuth, web: enWeb },
-  zh: { common: zhCommon, errors: zhErrors, listing: zhListing, group: zhGroup, chat: zhChat, auth: zhAuth, web: zhWeb },
+  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, push: viPush, auth: viAuth, web: viWeb, admin: viAdmin },
+  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, push: enPush, auth: enAuth, web: enWeb, admin: enAdmin },
+  zh: {
+    common: zhCommon,
+    errors: zhErrors,
+    listing: zhListing,
+    group: zhGroup,
+    chat: zhChat,
+    push: zhPush,
+    auth: zhAuth,
+    web: zhWeb,
+    admin: withFallback(viAdmin as Tree, zhAdmin as Tree),
+  },
 } satisfies Record<Locale, Record<string, Tree>>;
 
 export const messages = Object.fromEntries(

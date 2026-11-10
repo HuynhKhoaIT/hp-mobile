@@ -13,11 +13,22 @@ export function scopeInfo(scope: ListScope): {
   seoKey: ListScope;
   /** /tin trộn nhiều tính năng → lưới. */
   cardLayout: 'grid' | 'row';
+  /** Lựa chọn km của bộ lọc khoảng cách (rỗng = không có). */
+  distanceKm: readonly number[];
 } {
-  if (scope === 'all') return { feature: null, path: '/tin', categories: LISTING_CATEGORIES, seoKey: 'all', cardLayout: 'grid' };
+  if (scope === 'all') {
+    return { feature: null, path: '/tin', categories: LISTING_CATEGORIES, seoKey: 'all', cardLayout: 'grid', distanceKm: [] };
+  }
   if (scope === 'search') {
-    return { feature: null, path: '/tim-kiem', categories: LISTING_CATEGORIES, seoKey: 'search', cardLayout: 'grid' };
+    return { feature: null, path: '/tim-kiem', categories: LISTING_CATEGORIES, seoKey: 'search', cardLayout: 'grid', distanceKm: [] };
   }
   const cfg = LISTING_FEATURE_CONFIGS[scope];
-  return { feature: scope, path: cfg.path, categories: cfg.categories, seoKey: scope, cardLayout: cfg.cardLayout };
+  return {
+    feature: scope,
+    path: cfg.path,
+    categories: cfg.categories,
+    seoKey: scope,
+    cardLayout: cfg.cardLayout,
+    distanceKm: cfg.distanceFilterKm ?? [],
+  };
 }

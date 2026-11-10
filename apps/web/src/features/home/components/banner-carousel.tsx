@@ -82,7 +82,7 @@ export function BannerSkeleton({ className }: { className?: string }) {
 function Carousel({ banners, className }: { banners: Banner[]; className?: string }) {
   const t = useTranslations('common.home.banner');
   const root = useRef<HTMLElement>(null);
-  const track = useRef<HTMLUListElement>(null);
+  const track = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const count = banners.length;
   const [index, setIndex] = useState(0);
@@ -163,7 +163,7 @@ function Carousel({ banners, className }: { banners: Banner[]; className?: strin
       }}
     >
       <div className="relative">
-        <ul
+        <div
           ref={track}
           onTouchStart={() => setTouched(true)}
           onWheel={(e) => {
@@ -172,7 +172,7 @@ function Carousel({ banners, className }: { banners: Banner[]; className?: strin
           className="no-scrollbar relative flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain rounded-xl"
         >
           {banners.map((banner, i) => (
-            <li
+            <div
               key={banner.id}
               role="group"
               aria-roledescription="slide"
@@ -180,9 +180,9 @@ function Carousel({ banners, className }: { banners: Banner[]; className?: strin
               className="flex w-full shrink-0 snap-start snap-always"
             >
               <Slide banner={banner} priority={i === 0} />
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
 
         {count > 1 ? (
           <>

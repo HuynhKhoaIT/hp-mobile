@@ -1,1 +1,58 @@
-{}
+{
+  "title": "Messages",
+  "inbox": {
+    "empty_title": "No messages yet",
+    "empty_body": "Message a poster to ask about their listing. Your chats will show up here.",
+    "empty_cta": "Browse new listings",
+    "login_title": "Log in to chat",
+    "login_body": "Message sellers, landlords and employers directly.",
+    "image": "Sent a photo",
+    "you": "You: {{text}}",
+    "sender": "{{name}}: {{text}}",
+    "no_messages": "No messages yet",
+    "deleted_user": "User",
+    "listing_gone": "Listing no longer available",
+    "muted": "Notifications off",
+    "unread": "{{count}} unread"
+  },
+  "thread": {
+    "placeholder": "Type a message…",
+    "send": "Send",
+    "attach_image": "Send photo",
+    "sending": "Sending",
+    "sent": "Sent",
+    "seen": "Seen",
+    "failed": "Not sent. Tap to retry",
+    "retry": "Retry",
+    "discard": "Discard",
+    "typing": "Typing…",
+    "load_older": "Load older messages",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "start_hint": "Say hi and ask about this listing",
+    "view_listing": "View listing",
+    "image_alt": "Photo in message",
+    "too_long": "Messages can be up to {{max}} characters",
+    "mute": "Mute notifications",
+    "unmute": "Unmute notifications",
+    "not_found": "Conversation not found",
+    "options": "Conversation options"
+  },
+  "blocked": {
+    "by_me": "You blocked this person. Unblock to keep chatting.",
+    "by_them": "You can no longer message this person."
+  },
+  "safety": {
+    "title": "Stay safe",
+    "intro": "A few tips before you start chatting:",
+    "tip_meet": "Meet in a busy public place near the site, in daylight.",
+    "tip_check": "Check the item, room or job before you pay.",
+    "tip_deposit": "Never send a deposit to someone you don’t know.",
+    "tip_report": "Spot a scam? Tap Report.",
+    "accept": "Got it"
+  },
+  "cta": {
+    "chat": "Message",
+    "own_listing": "This is your listing"
+  }
+}

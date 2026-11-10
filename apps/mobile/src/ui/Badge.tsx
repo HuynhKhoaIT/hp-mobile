@@ -14,7 +14,7 @@ const BOX: Record<BadgeTone, string> = {
 const TONE: Record<BadgeTone, TextTone> = {
   neutral: 'default',
   primary: 'primary',
-  success: 'success',
+  success: 'default',
   warning: 'default',
   danger: 'danger',
 };

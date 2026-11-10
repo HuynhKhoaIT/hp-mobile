@@ -138,7 +138,11 @@ function PhotosStep({ f }: { f: ListingFormState }) {
         onRetry={f.retryPhoto}
         disabled={f.busy}
       />
-      {f.formConfig.photos === 'recommended' && f.photos.length === 0 ? <Notice text={t('form.photos_required')} /> : null}
+      {f.photosShort ? (
+        <Notice tone={f.photoError ? 'danger' : 'info'} text={t('form.photos_min', { min: f.minPhotos })} />
+      ) : f.formConfig.photos === 'recommended' && f.photos.length === 0 ? (
+        <Notice text={t('form.photos_required')} />
+      ) : null}
     </Col>
   );
 }

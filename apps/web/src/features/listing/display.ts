@@ -13,6 +13,12 @@ import {
   type PriceLabel,
 } from '@hp/shared';
 
+/** Đồ thất lạc đã về với chủ (chủ tin bấm "Đã nhận lại đồ" → attributes.returned = true + đóng tin). */
+export function isReturned(listing: { attributes: unknown }): boolean {
+  const a = listing.attributes;
+  return !!a && typeof a === 'object' && !Array.isArray(a) && (a as Record<string, unknown>).returned === true;
+}
+
 /** `useLocale()` / root param trả string → Locale của @hp/shared (lạ → vi). */
 export function asLocale(value: string): Locale {
   return (LOCALES as readonly string[]).includes(value) ? (value as Locale) : DEFAULT_LOCALE;
@@ -21,9 +27,11 @@ export function asLocale(value: string): Locale {
 /** Hàm dịch tối thiểu (next-intl `t` của server lẫn client đều khớp). */
 export type Translate = (key: string, values?: Record<string, string | number>) => string;
 
-/** Giá: miễn phí / thoả thuận / tiền (+ /tháng, /giờ, /ngày) / khoảng lương. */
+/** Giá: miễn phí / thoả thuận / tiền (+ /tháng, /giờ, /ngày) / khoảng lương; '' khi tin không có giá (đồ thất lạc). */
 export function priceText(label: PriceLabel, t: Translate, locale: Locale): string {
   switch (label.type) {
+    case 'none':
+      return '';
     case 'free':
       return t('common.price.free');
     case 'negotiable':

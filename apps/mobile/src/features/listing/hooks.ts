@@ -5,12 +5,15 @@ import {
   useBookmarkedListingIds,
   useDeleteListing,
   useListingList,
+  useLostFoundMatches,
+  useMarkListingReturned,
   useRenewListing,
   useRevealContact,
   useSession,
   useSetListingStatus,
   useSupabase,
   useToggleBookmark,
+  useTranslateListing,
 } from '@hp/core/react';
 import {
   APP_NAME,
@@ -19,6 +22,8 @@ import {
   LISTING_CATEGORIES,
   type ListingCategory,
   type ListingFeature,
+  type Locale,
+  LOCALES,
   type OwnerListingStatus,
   toE164,
 } from '@hp/shared';
@@ -32,11 +37,15 @@ import { useErrorText } from '@/lib/errors';
 import { formatDate } from '@/lib/format';
 import { listingShareUrl } from '@/lib/urls';
 import { toast } from '@/ui';
+import { useOpenConversation } from '@/features/chat/hooks';
 import { openPostPicker } from './navigation';
 import type { ListingFeatureConfig } from './types';
 
-/** Giá trị chip "Tất cả" / "Mọi khu" (không lọc). Mã category / site không bao giờ rỗng. */
+/** Giá trị chip "Tất cả" / "Mọi khu" / "Mọi khoảng cách" (không lọc). Mã category / site không bao giờ rỗng. */
 export const ALL = '' as const;
+
+/** Mốc mặc định của filter 'distance' (km) khi config không khai báo distanceOptionsKm. */
+export const DISTANCE_OPTIONS_KM: readonly number[] = [1, 2, 5];
 
 /**
  * Bộ lọc đặt sẵn khi mở danh sách từ Hub (chip "Tìm nhanh", "Dành cho bạn → Xem tất cả"): nhóm category + lọc theo
@@ -82,6 +91,8 @@ export function useListingBrowser(
   const [query, setQuery] = useState(initial.query?.trim() ?? '');
   const [category, setCategory] = useState<ListingCategory | typeof ALL>(asChip ?? ALL);
   const [site, setSite] = useState<string>(initial.site ?? ALL);
+  /** Khoảng cách tới khu tối đa (mét, dạng chuỗi cho FilterBar); ALL = không lọc. */
+  const [distance, setDistance] = useState<string>(ALL);
   const [preset, setPreset] = useState<ListingPreset | null>(asChip ? null : (initial.preset ?? null));
 
   const filters = useMemo(
@@ -97,8 +108,9 @@ export function useListingBrowser(
       ...(preset?.attributes ? { attributes: { ...preset.attributes } } : {}),
       ...(query ? { query } : {}),
       ...(site !== ALL ? { site } : {}),
+      ...(distance !== ALL ? { maxDistanceM: Number(distance) } : {}),
     }),
-    [category, config.categories, config.key, preset, query, site],
+    [category, config.categories, config.key, preset, query, site, distance],
   );
   const list = useListingList(filters);
 
@@ -126,10 +138,12 @@ export function useListingBrowser(
     setCategory,
     site,
     setSite,
+    distance,
+    setDistance,
     preset,
     clearPreset: () => setPreset(null),
-    /** Đang lọc (từ khoá / category / khu / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
-    isFiltered: !!query || category !== ALL || site !== ALL || !!preset,
+    /** Đang lọc (từ khoá / category / khu / khoảng cách / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
+    isFiltered: !!query || category !== ALL || site !== ALL || distance !== ALL || !!preset,
   };
 }
 
@@ -139,14 +153,9 @@ export function usePostListing(feature?: ListingFeatureConfig['key']) {
   return () => requireAuth(() => openPostPicker(preset));
 }
 
-/** Nhắn tin với người đăng (chat ở tuần 5): bắt đăng nhập trước, hiện tại báo sắp có. */
+/** Nhắn tin với người đăng: khách → đăng nhập; mở (hoặc lấy lại) hội thoại rồi vào màn chat (features/chat). */
 export function useContactListing() {
-  const { t } = useTranslation();
-  return (listing: Pick<PublicListing, 'id' | 'category'>) =>
-    requireAuth(() => {
-      track('contact', { channel: 'chat', listing_id: listing.id, category: listing.category });
-      toast.show(t('listing:detail.contact_soon'));
-    });
+  return useOpenConversation();
 }
 
 /** Người đang xem là chủ tin → hiện Sửa / Quản lý thay cho Liên hệ (client chỉ ẩn / hiện; RLS quyết định quyền). */
@@ -219,7 +228,8 @@ export function ownerActions(listing: Pick<MyListing, 'status' | 'expires_at'>, 
   const expired = listing.status === 'expired' || (listing.status === 'active' && expiresAt !== null && expiresAt <= now);
   const live = listing.status === 'active' && !expired;
   return {
-    markSold: live,
+    // Khớp trg_listings_guard: chỉ từ tin đã công khai; nháp / chờ duyệt / bị từ chối → forbidden nên không hiện.
+    markSold: listing.status === 'active' || listing.status === 'closed' || listing.status === 'expired',
     close: live,
     // Chờ duyệt / bị từ chối / hết hạn không tự mở lại được (DB guard) → không hiện.
     reopen: listing.status === 'sold' || listing.status === 'closed',
@@ -238,16 +248,32 @@ export function useOwnerListingActions() {
   const remove = useDeleteListing();
   const renew = useRenewListing();
   const fail = (e: { code: string }) => toast.show(errorText(e.code), 'danger');
+  // `forbidden` ở đây là guard trạng thái (DB) — thường do danh sách trên máy đã cũ, nói rõ hơn "không có quyền".
+  const failStatus = (status: OwnerListingStatus) => (e: { code: string }) =>
+    e.code === 'forbidden' ? toast.show(t(status === 'sold' ? 'manage.sold_forbidden' : 'manage.status_forbidden'), 'danger') : fail(e);
 
-  const changeStatus = (id: string, status: OwnerListingStatus, doneKey: string) =>
-    setStatus.mutate({ id, status }, { onSuccess: () => toast.show(t(doneKey), 'success'), onError: fail });
+  const changeStatus = (id: string, status: 'sold' | 'closed', doneKey: string) =>
+    setStatus.mutate({ id, status }, { onSuccess: () => toast.show(t(doneKey), 'success'), onError: failStatus(status) });
+
+  // Mở lại / gửi duyệt lại: DB quyết định kết quả (tin bị khoá kiểm duyệt → pending_review, từ khoá cấm → rejected) → báo theo status trả về.
+  const publish = (id: string) =>
+    setStatus.mutate(
+      { id, status: 'active' },
+      {
+        onSuccess: (saved) => {
+          if (saved.status === 'pending_review') toast.show(t('form.pending_title'), 'info');
+          else if (saved.status === 'rejected') toast.show(t('form.rejected_title'), 'danger');
+          else toast.show(t('manage.reopened'), 'success');
+        },
+        onError: failStatus('active'),
+      },
+    );
 
   return {
     markSold: (id: string) => changeStatus(id, 'sold', 'manage.sold_done'),
     close: (id: string) => changeStatus(id, 'closed', 'manage.closed_done'),
-    reopen: (id: string) => changeStatus(id, 'active', 'manage.reopened'),
-    /** Kết quả luôn là chờ duyệt → toast "Tin đang chờ duyệt". */
-    resubmit: (id: string) => changeStatus(id, 'active', 'form.pending_title'),
+    reopen: publish,
+    resubmit: publish,
     renew: (id: string) =>
       renew.mutate(id, {
         onSuccess: (expires) => toast.show(t('manage.renewed', { date: formatDate(expires) }), 'success'),
@@ -267,5 +293,66 @@ export function useShareListing() {
     // iOS nhận url riêng (xem trước link); Android chỉ có message → gắn link vào cuối.
     const content = Platform.OS === 'ios' ? { message: text, url } : { message: `${text}\n${url}` };
     Share.share(content).catch(() => toast.show(t('errors:unknown'), 'danger'));
+  };
+}
+
+const isLocale = (v: string): v is Locale => (LOCALES as readonly string[]).includes(v);
+
+/**
+ * Nút "Dịch" ở chi tiết: chỉ khi `listing.lang` khác ngôn ngữ đang dùng. Bấm → translate-content (cache theo tin +
+ * ngôn ngữ trong @hp/core) → đổi tiêu đề + mô tả sang bản dịch; "Xem bản gốc" đổi lại. Lỗi (translate_unavailable —
+ * chưa cấu hình API dịch, translate_failed, rate_limited) → toast, giữ bản gốc.
+ */
+export function useListingTranslation(listing: Pick<PublicListing, 'id' | 'lang' | 'title' | 'description'>) {
+  const { i18n } = useTranslation();
+  const errorText = useErrorText();
+  const translate = useTranslateListing(listing.id);
+  const [showing, setShowing] = useState(false);
+  const locale = isLocale(i18n.language) ? i18n.language : null;
+  const available = !!locale && listing.lang !== locale;
+  const data = translate.data && translate.data.lang === locale ? translate.data : null;
+  const translated = showing && !!data;
+
+  return {
+    available,
+    translated,
+    isPending: translate.isPending,
+    title: translated && data ? data.title : listing.title,
+    description: translated && data ? data.description : listing.description,
+    run: () => {
+      if (!locale) return;
+      if (data) return setShowing(true);
+      translate.mutate(locale, {
+        onSuccess: () => setShowing(true),
+        onError: (e) => toast.show(errorText(e.code), 'danger'),
+      });
+    },
+    showOriginal: () => setShowing(false),
+  };
+}
+
+/** "Tin có thể khớp" của tin mất / nhặt — chỉ gọi khi người xem là chủ tin và tin chưa "nhận lại". */
+export function useListingMatches(listing: Pick<PublicListing, 'id'>, enabled: boolean) {
+  return useLostFoundMatches(listing.id, { enabled });
+}
+
+/**
+ * "Đã nhận lại đồ": RPC một giao dịch (useMarkListingReturned của @hp/core — attributes.returned = true + đóng tin;
+ * trigger khớp bỏ qua tin này). Thành công → toast `returned_done`; lỗi (auth_required, not_found) → errors.<code>.
+ */
+export function useMarkReturned(listingId: string) {
+  const { t } = useTranslation('listing');
+  const errorText = useErrorText();
+  const mark = useMarkListingReturned(listingId);
+  return {
+    markReturned: (onDone?: () => void) =>
+      mark.mutate(undefined, {
+        onSuccess: () => {
+          toast.show(t('lost_found.returned_done'), 'success');
+          onDone?.();
+        },
+        onError: (e) => toast.show(errorText(e.code), 'danger'),
+      }),
+    isPending: mark.isPending,
   };
 }

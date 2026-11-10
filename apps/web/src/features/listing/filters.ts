@@ -1,9 +1,11 @@
-// Bộ lọc danh sách trên URL: ?category=<mã>&q=<từ khoá>&site=<mã khu>&<thuộc tính>=<giá trị>. Kiểm bằng ListingFilters
+// Bộ lọc danh sách trên URL: ?category=<mã>&q=<từ khoá>&site=<mã khu>&distance=<km>&<thuộc tính>=<giá trị>. Kiểm bằng ListingFilters
 // (@hp/shared); giá trị sai / không thuộc tính năng → bỏ qua (không báo lỗi, không 404). Không phụ thuộc React — dùng ở
 // server và client.
 // Thuộc tính (chip "Tìm nhanh" của trang chủ — HOME_SHORTCUTS): chỉ trường enum / bool của ATTRIBUTE_FIELDS thuộc các
 // category đang xét mới được nhận (whitelist), tên tham số = khoá thuộc tính (`?vehicle_type=motorbike`, `?has_loft=1`,
 // `?shift=night`). Gửi xuống search_listings dạng jsonb containment (p_attributes).
+// Khoảng cách tới khu làm việc (`?distance=2` = dưới 2 km): chỉ nhận giá trị trong `distanceFilterKm` của config tính năng
+// (trọ: 1 / 2 / 5) → search_listings p_max_distance_m. Tập giá trị hữu hạn → trang đầu vẫn cache được.
 import { ATTRIBUTE_FIELDS, type AttributeField, type ListingCategory, ListingFilters } from '@hp/shared';
 
 /** Thuộc tính đang lọc: enum → mã giá trị, bool → true / false. */
@@ -14,6 +16,8 @@ export type ListFilterState = {
   category: ListingCategory | null;
   query: string;
   site: string | null;
+  /** Cách khu làm việc tối đa (km) — null = mọi khoảng cách. */
+  distanceKm: number | null;
   attributes: AttributeFilter;
 };
 
@@ -21,7 +25,7 @@ type RawParams = Record<string, string | string[] | undefined>;
 type FilterableField = Extract<AttributeField, { kind: 'enum' | 'bool' }>;
 
 /** Tham số đã dùng cho bộ lọc chung — thuộc tính không được trùng tên. */
-const RESERVED = new Set(['category', 'q', 'site', 'tab', 'next']);
+const RESERVED = new Set(['category', 'q', 'site', 'distance', 'tab', 'next']);
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
@@ -60,7 +64,15 @@ export function attributesFor(attributes: AttributeFilter, categories: readonly 
   return out;
 }
 
-export function parseListFilters(raw: RawParams, allowed: readonly ListingCategory[]): ListFilterState {
+/** km → mét cho search_listings (ListingFilters.maxDistanceM). */
+export const distanceMeters = (km: number | null): number | undefined => (km === null ? undefined : km * 1000);
+
+export function parseListFilters(
+  raw: RawParams,
+  allowed: readonly ListingCategory[],
+  /** Lựa chọn km của tính năng (config.distanceFilterKm); rỗng = không có bộ lọc khoảng cách. */
+  distanceOptions: readonly number[] = [],
+): ListFilterState {
   const rawCategory = first(raw.category);
   const category =
     rawCategory && ListingFilters.safeParse({ categories: [rawCategory] }).success && allowed.includes(rawCategory as ListingCategory)
@@ -68,6 +80,9 @@ export function parseListFilters(raw: RawParams, allowed: readonly ListingCatego
       : null;
   const q = ListingFilters.safeParse({ query: first(raw.q) ?? '' });
   const s = ListingFilters.safeParse({ site: first(raw.site) });
+  const rawDistance = Number(first(raw.distance));
+  const distanceKm =
+    distanceOptions.includes(rawDistance) && ListingFilters.safeParse({ maxDistanceM: rawDistance * 1000 }).success ? rawDistance : null;
 
   const attributes: Record<string, string | boolean> = {};
   for (const field of filterableFields(category ? [category] : allowed)) {
@@ -79,13 +94,14 @@ export function parseListFilters(raw: RawParams, allowed: readonly ListingCatego
     category,
     query: q.success ? (q.data.query ?? '') : '',
     site: s.success ? (s.data.site ?? null) : null,
+    distanceKm,
     attributes,
   };
 }
 
 /** Số tham số lọc đang dùng (robots noindex khi > 2 — .claude/rules/web-seo-public.md). */
 export function activeFilterCount(f: ListFilterState): number {
-  return [f.category, f.query, f.site].filter(Boolean).length + Object.keys(f.attributes).length;
+  return [f.category, f.query, f.site, f.distanceKm].filter(Boolean).length + Object.keys(f.attributes).length;
 }
 
 /** Thuộc tính → tham số URL (bool: 1 / 0). Thứ tự khoá cố định để URL / khoá cache ổn định. */
@@ -105,5 +121,6 @@ export function filterQuery(f: Partial<ListFilterState>): Record<string, string>
   if (f.category) out.category = f.category;
   if (f.query) out.q = f.query;
   if (f.site) out.site = f.site;
+  if (f.distanceKm) out.distance = String(f.distanceKm);
   return { ...out, ...attributeQuery(f.attributes) };
 }

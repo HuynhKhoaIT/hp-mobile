@@ -137,11 +137,11 @@ export default function OnboardingScreen() {
           >
             <Text>
               {t('auth:onboarding.consent_before')}{' '}
-              <Text tone="primary" className="underline" onPress={() => void WebBrowser.openBrowserAsync(webPageUrl('/dieu-khoan'))}>
+              <Text accessibilityRole="link" tone="primary" className="underline" onPress={() => void WebBrowser.openBrowserAsync(webPageUrl('/dieu-khoan'))}>
                 {t('auth:onboarding.terms')}
               </Text>{' '}
               {t('auth:onboarding.consent_and')}{' '}
-              <Text tone="primary" className="underline" onPress={() => void WebBrowser.openBrowserAsync(webPageUrl('/chinh-sach-bao-mat'))}>
+              <Text accessibilityRole="link" tone="primary" className="underline" onPress={() => void WebBrowser.openBrowserAsync(webPageUrl('/chinh-sach-bao-mat'))}>
                 {t('auth:onboarding.privacy')}
               </Text>
             </Text>

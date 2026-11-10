@@ -1,6 +1,7 @@
 // Chuẩn bị ảnh tin trong trình duyệt trước khi upload (không thư viện ngoài, cùng cách với profile/avatar-image.ts):
 // thu cạnh dài về 1280 px (LISTING_IMAGES.longEdgePx, không phóng to ảnh nhỏ), mã hoá WebP 0.8 (trình duyệt không hỗ trợ
 // WebP → JPEG), giảm chất lượng tới khi ≤ 2 MB (giới hạn bucket listing-images). Chỉ chạy ở client. Mã lỗi là key errors.*.
+// prepareImage(file, limits) dùng chung cách này cho ảnh khác (giấy tờ huy hiệu: 1600 px, ≤ 5 MB — VERIFICATION_FILE).
 import { LISTING_IMAGES } from '@hp/shared';
 
 const QUALITIES = [LISTING_IMAGES.quality, 0.7, 0.6, 0.5] as const;
@@ -12,8 +13,15 @@ function encode(canvas: HTMLCanvasElement, type: string, quality: number): Promi
   return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
 }
 
-export async function prepareListingImage(
+export type ImageLimits = { longEdgePx: number; maxBytes: number };
+
+export function prepareListingImage(file: File): Promise<{ data: PreparedImage; error: null } | { data: null; error: ImageError }> {
+  return prepareImage(file, LISTING_IMAGES);
+}
+
+export async function prepareImage(
   file: File,
+  limits: ImageLimits,
 ): Promise<{ data: PreparedImage; error: null } | { data: null; error: ImageError }> {
   if (!file.type.startsWith('image/')) return { data: null, error: 'file_type' };
 
@@ -26,7 +34,7 @@ export async function prepareListingImage(
     return { data: null, error: 'file_type' };
   }
 
-  const scale = Math.min(1, LISTING_IMAGES.longEdgePx / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, limits.longEdgePx / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(bitmap.width * scale));
   canvas.height = Math.max(1, Math.round(bitmap.height * scale));
@@ -44,7 +52,7 @@ export async function prepareListingImage(
     // Safari cũ trả PNG khi không mã hoá được WebP → dùng JPEG.
     const blob = webp?.type === 'image/webp' ? webp : await encode(canvas, 'image/jpeg', quality);
     if (!blob) return { data: null, error: 'upload_failed' };
-    if (blob.size <= LISTING_IMAGES.maxBytes) {
+    if (blob.size <= limits.maxBytes) {
       return { data: { blob, contentType: blob.type === 'image/webp' ? 'image/webp' : 'image/jpeg' }, error: null };
     }
   }

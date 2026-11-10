@@ -3,7 +3,7 @@ import type { Tables } from '@hp/db';
 import { type Client, type Result, fail, fromSupabase, requireUserId } from './result';
 
 /** Cột của chính mình mà client được đọc (không lấy push_tokens). */
-const MY_PROFILE_COLUMNS =
+export const MY_PROFILE_COLUMNS =
   'id, phone, full_name, avatar_url, site, department, badges, locale, reputation_score, rating_avg, rating_count, role, is_banned, banned_until, notification_prefs, interests, consent_at, created_at' as const;
 
 export type MyProfile = Pick<

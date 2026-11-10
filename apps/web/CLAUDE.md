@@ -52,12 +52,12 @@ app/
 ├── [locale]/
 │   ├── (marketing)/
 │   │   ├── layout.tsx                    # header/footer marketing
-│   │   ├── page.tsx                      # landing  →  /
 │   │   ├── tinh-nang/[slug]/page.tsx
 │   │   ├── tai-app/page.tsx              # nhận diện iOS/Android → store, desktop → QR
 │   │   ├── cho-chu-tro/page.tsx
 │   │   ├── blog/[slug]/page.tsx          # MDX
-│   │   ├── gioi-thieu | lien-he | chinh-sach-bao-mat | dieu-khoan | xoa-tai-khoan/page.tsx
+│   │   ├── gioi-thieu/page.tsx           # landing (`/` là Hub trong (app))
+│   │   ├── lien-he | chinh-sach-bao-mat | dieu-khoan | xoa-tai-khoan/page.tsx   # MDX
 │   ├── (app)/
 │   │   ├── layout.tsx                    # header người dùng (tìm kiếm, Đăng tin, tin nhắn, thông báo, avatar); bottom nav trên mobile
 │   │   ├── tin/page.tsx                  # tất cả tin
@@ -98,7 +98,7 @@ src/
 ├── components/ui/                        # shadcn
 ├── components/shared/                    # Logo, LocaleSwitcher, ThemeToggle, EmptyState, ErrorState, Skeletons
 └── components/admin/                     # DataTable, PageHeader, StatusBadge, ConfirmDialog
-content/blog/{vi,en,zh}/*.mdx
+content/{legal,blog}/{vi,en,zh}/*.mdx
 proxy.ts                                  # (Next 16, thay middleware.ts) locale + refresh session + chặn (auth) và /admin
 ```
 
@@ -169,14 +169,14 @@ Luật:
 ## 8. Design & motion
 
 - Token từ `@hp/tokens` (giống app): `primary #0B4F9C` (xanh thép), `primaryLight #E6EFFA`, `accent #F2762E`, `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F6F7F9`, `surface #FFFFFF`; gradient thương hiệu `#0B4F9C → #1E6FD9`; màu dịch vụ: pass cam, trọ tím, việc xanh lá, ghép xe xanh ngọc, thể thao đỏ, thất lạc vàng. Dark mode bằng class.
-- Font: Be Vietnam Pro (vi/en), Noto Sans SC (zh) qua `next/font`.
+- Font: Be Vietnam Pro qua `next/font`; chữ Hán dùng font CJK của hệ thống (`--font-zh`).
 - Responsive mobile-first: < 640px giống app (bottom nav 5 mục, nút Đăng nổi giữa), ≥ 1024px header ngang + lưới 3–4 cột, chi tiết tin 2 cột (gallery trái, thông tin + CTA dính phải).
 - Card tin, badge, trạng thái nhìn giống app để người dùng chuyển qua lại không bỡ ngỡ.
 - Chữ thân ≥ 16px, vùng chạm ≥ 44px, tương phản ≥ 4.5:1, hỗ trợ zoom 200%.
 - Motion (`motion`): fade + trượt lên 12–16px khi vào viewport (`once`), stagger 40–60ms; hover card nâng 2px; tim lưu tin nảy; skeleton shimmer; landing có mockup điện thoại nổi nhẹ và số liệu đếm tăng. Tôn trọng `prefers-reduced-motion`. Khu admin chỉ transition 150ms.
 - Mọi trang/khối dữ liệu có loading (skeleton qua `loading.tsx` hoặc Suspense), empty (illustration + CTA), error (`error.tsx` có nút thử lại).
 
-## 9. Marketing (`/`)
+## 9. Marketing (`/gioi-thieu`)
 
 Landing theo thứ tự: Hero (tiêu đề, 1 câu, 2 nút "Dùng ngay trên web" + "Tải app", QR trên desktop, mockup) → 6 dịch vụ → tin mới nhất (lấy thật từ DB, server render) → cách hoạt động 3 bước → an toàn & tin cậy → số liệu cộng đồng (ẩn khi số còn nhỏ) → cảm nhận người dùng (chỉ phản hồi thật đã xin phép; chưa có thì ẩn, **không** viết lời chứng thực giả) → cho chủ trọ/chủ sân/nhà tuyển dụng → FAQ (JSON-LD) → CTA → footer.
 

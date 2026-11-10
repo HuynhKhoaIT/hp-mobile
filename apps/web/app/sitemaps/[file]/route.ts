@@ -3,7 +3,7 @@ import { listingSitemapXml, staticSitemapXml, xmlResponse } from '@/features/seo
 
 export async function GET(_request: Request, ctx: RouteContext<'/sitemaps/[file]'>) {
   const { file } = await ctx.params;
-  if (file === 'static.xml') return xmlResponse(staticSitemapXml());
+  if (file === 'static.xml') return xmlResponse(await staticSitemapXml());
   const match = /^listings-(\d{1,4})\.xml$/.exec(file);
   const xml = match ? await listingSitemapXml(Number(match[1])) : null;
   return xml ? xmlResponse(xml) : new Response(null, { status: 404 });

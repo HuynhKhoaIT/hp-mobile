@@ -20,10 +20,10 @@ const withQuery = (path: string, query: Record<string, string>) => {
 };
 
 export async function listMetadata(scope: ListScope, searchParams: Promise<RawParams>): Promise<Metadata> {
-  const { path, categories, seoKey } = scopeInfo(scope);
+  const { path, categories, seoKey, distanceKm } = scopeInfo(scope);
   const locale = asLocale(await getLocale());
   const t = await getTranslations();
-  const filters = parseListFilters(await searchParams, categories);
+  const filters = parseListFilters(await searchParams, categories, distanceKm);
   const siteName = filters.site ? (await getPublicSites()).find((s) => s.code === filters.site)?.name : undefined;
 
   const title = siteName

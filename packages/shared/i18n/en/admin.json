@@ -1,1 +1,960 @@
-{}
+{
+  "meta": {
+    "title": "Admin",
+    "login": "Admin sign-in",
+    "mfa": "Two-step verification",
+    "moderation": "Listing moderation",
+    "overview": "Overview",
+    "reports": "Reports",
+    "badges": "Badges",
+    "users": "Users",
+    "user": "User profile",
+    "listings": "Listings",
+    "groups": "Groups",
+    "catalog": "Catalog",
+    "marketing": "Marketing",
+    "audit": "Audit log",
+    "leads": "Leads"
+  },
+  "brand": {
+    "area": "Admin",
+    "staff_only": "For moderators and administrators only."
+  },
+  "nav": {
+    "label": "Admin navigation",
+    "overview": "Overview",
+    "moderation": "Moderation",
+    "open_menu": "Open menu",
+    "close_menu": "Close menu",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "back_to_site": "Back to the site",
+    "reports": "Reports",
+    "badges": "Badges",
+    "users": "Users",
+    "listings": "Listings",
+    "groups": "Groups",
+    "catalog": "Catalog",
+    "marketing": "Marketing",
+    "audit": "Audit log",
+    "count": {
+      "pending_one": "{{count}} listing awaiting review",
+      "pending_other": "{{count}} listings awaiting review",
+      "reports_one": "{{count}} report to handle",
+      "reports_other": "{{count}} reports to handle",
+      "badges_one": "{{count}} badge request awaiting review",
+      "badges_other": "{{count}} badge requests awaiting review",
+      "venues_one": "{{count}} venue awaiting review",
+      "venues_other": "{{count}} venues awaiting review",
+      "leads_one": "{{count}} new leads",
+      "leads_other": "{{count}} new leads"
+    },
+    "leads": "Leads"
+  },
+  "role": {
+    "user": "User",
+    "moderator": "Moderator",
+    "admin": "Administrator"
+  },
+  "topbar": {
+    "account": "Account",
+    "sign_out": "Sign out",
+    "theme": "Theme",
+    "language": "Language"
+  },
+  "access": {
+    "denied_title": "Access denied",
+    "denied_body": "This account is not a moderator or administrator.",
+    "sign_in_again": "Sign in with another account",
+    "admin_only_title": "Administrators only",
+    "admin_only_body": "This section is for administrators. Ask an administrator if something needs to change."
+  },
+  "login": {
+    "title": "Admin sign-in",
+    "subtitle": "Use the phone number that was granted moderation rights. You will also need a code from your authenticator app.",
+    "not_staff": "This account has no admin rights. Sign in with a moderator or administrator account.",
+    "signed_in_as": "Signed in with a regular account",
+    "use_other": "Sign in with another account",
+    "back_home": "Back to home",
+    "step_label": "Step {{current}}/{{total}}",
+    "step_phone": "Phone number",
+    "step_mfa": "Authentication code"
+  },
+  "mfa": {
+    "enroll_title": "Turn on two-step verification",
+    "enroll_intro": "Two-step verification is required for the admin area. You only need to set it up once on your phone.",
+    "step_install": "Install an authenticator app: Google Authenticator, Microsoft Authenticator or Authy.",
+    "step_scan": "In the app, add an account and scan the QR code below.",
+    "step_code": "Enter the 6-digit code the app shows to finish.",
+    "qr_alt": "QR code to add the admin account to your authenticator app",
+    "secret_label": "Can't scan? Enter this key in the app",
+    "copy": "Copy key",
+    "copied": "Key copied",
+    "verify_title": "Enter authentication code",
+    "verify_intro": "Open your authenticator app and enter the 6-digit code for the {{app}} account.",
+    "code_label": "6-digit code",
+    "submit": "Verify",
+    "submit_enroll": "Turn on and continue",
+    "lost_device": "Lost your phone or authenticator app? Ask an administrator to reset two-step verification for you.",
+    "sign_out": "Sign out",
+    "load_error": "Could not load two-step verification details."
+  },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "What needs attention and how the community is doing today.",
+    "queues_title": "Needs attention",
+    "queue": {
+      "moderation": "Listings awaiting review",
+      "reports": "Open reports",
+      "badges": "Badge requests",
+      "venues": "Venues awaiting review"
+    },
+    "queue_open": "Open the queue to handle",
+    "queue_clear": "All clear",
+    "community_title": "Community",
+    "users_total": "Users",
+    "users_banned": "Suspended or banned",
+    "listings_active": "Active listings",
+    "groups_upcoming": "Upcoming groups",
+    "messages_24h": "Messages in 24 hours",
+    "new_7d_one": "+{{count}} in 7 days",
+    "new_7d_other": "+{{count}} in 7 days",
+    "by_category_title": "Active listings by category",
+    "by_category_hint": "Only listings currently shown publicly.",
+    "gaps_note": "Not yet available: new users split by web / app, queue handling time, Google visits, app installs, leads. Coming once source data exists."
+  },
+  "moderation": {
+    "title": "Listing moderation",
+    "subtitle": "Highest risk first. Check the content, photos and poster before deciding.",
+    "tabs_label": "Queue status",
+    "tabs": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "filter_label": "Filter by reason",
+    "filter_all": "All reasons",
+    "list_label": "Listings",
+    "select_all": "Select all listings on this page",
+    "select_item": "Select “{{title}}”",
+    "selected_one": "{{count}} listing selected",
+    "selected_other": "{{count}} listings selected",
+    "clear_selection": "Clear selection",
+    "bulk_approve_one": "Approve {{count}} listing",
+    "bulk_approve_other": "Approve {{count}} listings",
+    "risk": "Risk {{score}}",
+    "risk_level": {
+      "low": "Low risk",
+      "medium": "Medium risk",
+      "high": "High risk"
+    },
+    "owner_joined": "Joined {{time}}",
+    "new_account": "New account",
+    "banned": "Suspended",
+    "deleted_owner": "Deleted account",
+    "unknown_owner": "Unknown poster",
+    "posted": "Posted {{time}}",
+    "reviewed_by": "{{name}} reviewed {{time}}",
+    "auto_rejected": "Auto-rejected {{time}}",
+    "no_image": "No photo",
+    "results": "{{from}}–{{to}} of {{total}} listings",
+    "pagination_label": "Pagination",
+    "page": "Page {{page}}/{{total}}",
+    "prev_page": "Previous page",
+    "next_page": "Next page",
+    "empty": {
+      "pending_title": "Queue is clear",
+      "pending_body": "New listings that need review will appear here. You're all caught up.",
+      "approved_title": "Nothing approved yet",
+      "rejected_title": "Nothing rejected yet",
+      "other_body": "Reviewed listings appear here, newest first.",
+      "filtered_title": "No listings with this reason",
+      "filtered_body": "Clear the filter to see the whole queue.",
+      "clear_filter": "Clear filter",
+      "view_approved": "View approved listings"
+    },
+    "detail": {
+      "label": "Listing details",
+      "placeholder_title": "Select a listing to review",
+      "placeholder_body": "Use J / K to move between listings, A to approve, R to reject.",
+      "back": "Back to list",
+      "position": "Listing {{current}}/{{total}}",
+      "prev": "Previous listing",
+      "next": "Next listing",
+      "approve": "Approve",
+      "reject": "Reject",
+      "open_public": "View public page",
+      "images_one": "Photo ({{count}})",
+      "images_other": "Photos ({{count}})",
+      "open_image": "Open photo {{n}} full size in a new tab",
+      "reasons": "Why it is in the queue",
+      "description": "Description",
+      "no_description": "No description.",
+      "attributes": "Details",
+      "location": "Area",
+      "address": "Address given by poster",
+      "owner": "Poster",
+      "phone": "Phone",
+      "joined": "Joined",
+      "listing_count_one": "{{count}} listing posted",
+      "listing_count_other": "{{count}} listings posted",
+      "rejected_count_one": "{{count}} listing rejected",
+      "rejected_count_other": "{{count}} listings rejected",
+      "history": "Moderation history",
+      "history_entered": "Entered queue {{time}}",
+      "history_status": {
+        "pending": "Awaiting review",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "history_by": "by {{name}}",
+      "history_system": "by the system",
+      "note": "Note",
+      "loading_extra": "Loading history…",
+      "extra_error": "Could not load moderation history.",
+      "deleted_listing": "The poster deleted this listing.",
+      "not_pending": "This listing is no longer awaiting review.",
+      "status": "Listing status"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "approve": "Approve",
+      "reject": "Reject",
+      "next": "Next listing",
+      "prev": "Previous listing",
+      "close": "Close details"
+    },
+    "reject": {
+      "title": "Reject “{{title}}” by {{owner}}?",
+      "description": "The listing will not be public. The poster is notified and can edit and resubmit it.",
+      "reason_label": "Reason",
+      "note_label": "Additional note (optional)",
+      "note_hint": "Only moderators and administrators can see this note.",
+      "note_count": "{{count}}/{{max}}",
+      "confirm": "Reject listing"
+    },
+    "bulk": {
+      "title_one": "Approve {{count}} selected listing?",
+      "title_other": "Approve {{count}} selected listings?",
+      "description": "The listings go public immediately and each poster is notified that it was approved.",
+      "confirm_one": "Approve {{count}} listing",
+      "confirm_other": "Approve {{count}} listings"
+    },
+    "toast": {
+      "approved": "Approved “{{title}}”",
+      "rejected": "Rejected “{{title}}”",
+      "bulk_done_one": "Approved {{count}} listing",
+      "bulk_done_other": "Approved {{count}} listings",
+      "bulk_partial": "Approved {{ok}}; {{failed}} could not be approved (already reviewed or no longer pending)",
+      "already_reviewed": "This listing was already reviewed or is no longer pending"
+    }
+  },
+  "reasons": {
+    "scam": "Scam or upfront payment request",
+    "prohibited": "Prohibited item or service",
+    "wrong_category": "Wrong category",
+    "duplicate": "Duplicate listing",
+    "misleading_price": "Misleading price",
+    "contact_in_title": "Phone / contact in title or photos",
+    "other": "Other reason"
+  },
+  "error": {
+    "title": "Could not load the admin page",
+    "body": "Something went wrong while reading data. Try again in a moment."
+  },
+  "table": {
+    "select_all": "Select all rows on this page",
+    "select_col": "Select",
+    "select_row": "Select row",
+    "selected_one": "{{count}} row selected",
+    "selected_other": "{{count}} rows selected",
+    "sort_by": "Sort by this column",
+    "pagination": "Pagination",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page {{page}} of {{total}}",
+    "none": "No results",
+    "range": "{{from}}–{{to}} of {{total}}",
+    "tabs": "Status filter"
+  },
+  "filters": {
+    "label": "Filters",
+    "all": "All",
+    "apply": "Filter",
+    "clear": "Clear filters"
+  },
+  "confirm": {
+    "count": "{{count}}/{{max}}"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Reports from users, oldest first. Target: handle within 2 hours.",
+    "table_label": "Reports",
+    "tabs": {
+      "active": "To handle",
+      "open": "New",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "filter": {
+      "type": "Target",
+      "reason": "Reason"
+    },
+    "status": {
+      "open": "New",
+      "reviewing": "Reviewing",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed"
+    },
+    "col": {
+      "target": "Target",
+      "reason": "Reason",
+      "reporter": "Reporter",
+      "created": "Time",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "message_hidden": "Message (private content, not shown)",
+    "target_missing": "Target not found",
+    "target_deleted": "Deleted",
+    "open_count_one": "{{count}} report",
+    "open_count_other": "{{count}} reports",
+    "unknown_user": "Unknown",
+    "resolved_by": "{{name}} · {{time}}",
+    "actions_for": "Actions for the report about “{{target}}”",
+    "set": {
+      "reviewing": "Mark as reviewing",
+      "resolved": "Mark as resolved",
+      "dismissed": "Dismiss report"
+    },
+    "hide_listing": "Hide listing and close reports",
+    "cancel_group": "Cancel group and close reports",
+    "open_user": "Open profile to suspend",
+    "open_owner": "Open owner profile",
+    "opens_new_tab": "(opens in a new tab)",
+    "select_row": "Select report about “{{target}}”",
+    "clear_selection": "Clear selection",
+    "bulk": {
+      "resolve_one": "Resolve {{count}} report",
+      "resolve_other": "Resolve {{count}} reports",
+      "dismiss_one": "Dismiss {{count}} report",
+      "dismiss_other": "Dismiss {{count}} reports",
+      "title_one": "Move {{count}} report to “{{status}}”?",
+      "title_other": "Move {{count}} reports to “{{status}}”?",
+      "description": "Reporters are not notified. Every change is written to the audit log."
+    },
+    "hide": {
+      "title": "Hide listing “{{title}}”?",
+      "description": "The listing is no longer public and every open report about it is marked resolved.",
+      "confirm": "Hide listing"
+    },
+    "cancel": {
+      "title": "Cancel group “{{title}}”?",
+      "description": "Members are notified that the group was cancelled. Every open report about it is marked resolved.",
+      "confirm": "Cancel group"
+    },
+    "note_label": "Internal note (required)",
+    "note_hint": "Only moderators and administrators can see this.",
+    "toast": {
+      "status_one": "Moved {{count}} report to “{{status}}”",
+      "status_other": "Moved {{count}} reports to “{{status}}”",
+      "hidden": "Listing hidden and reports closed",
+      "cancelled": "Group cancelled and reports closed"
+    },
+    "empty": {
+      "active_title": "No reports to handle",
+      "active_body": "New reports from users will show up here.",
+      "other_title": "No reports yet",
+      "other_body": "Handled reports show up here, newest first."
+    }
+  },
+  "badges": {
+    "title": "Badges",
+    "subtitle": "Compare the document with the full name before approving. Documents are deleted 30 days after review.",
+    "table_label": "Badge requests",
+    "filter": {
+      "badge": "Badge"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "col": {
+      "user": "Requester",
+      "badge": "Badge",
+      "created": "Sent",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "unknown_user": "Unknown requester",
+    "reviewed_by": "{{name}} · {{time}}",
+    "review": "Review",
+    "view": "View",
+    "approve": "Approve",
+    "reject": "Reject",
+    "dialog": {
+      "title": "“{{badge}}” badge for {{name}}",
+      "submitted": "Sent {{time}}",
+      "privacy": "Documents are private data — do not screenshot or share.",
+      "document": "Verification document",
+      "open_new_tab": "Open in new tab",
+      "document_purged": "The document was deleted under the retention policy (30 days after review).",
+      "document_alt": "Document for the “{{badge}}” badge of {{name}}",
+      "url_expiry": "The document link expires after 5 minutes. Close and reopen to keep viewing.",
+      "reject_reason": "Rejection reason"
+    },
+    "approve_confirm": {
+      "title": "Approve the “{{badge}}” badge for {{name}}?",
+      "description": "The badge appears on this person's profile and listings right away. They get a notification.",
+      "confirm": "Approve badge"
+    },
+    "reject_confirm": {
+      "title": "Reject the “{{badge}}” badge for {{name}}?",
+      "description": "The user is notified with the reason and can submit again.",
+      "confirm": "Reject badge",
+      "reason_label": "Reason (shown to the user)",
+      "note_label": "Extra note for the user (optional)",
+      "note_hint": "Keep it short and polite; never include document numbers."
+    },
+    "reject_reasons": {
+      "unreadable": "Blurry, unreadable photo",
+      "name_mismatch": "Name does not match the profile",
+      "wrong_document": "Wrong type of document",
+      "expired": "Document has expired",
+      "other": "Other reason"
+    },
+    "toast": {
+      "approved": "Approved the “{{badge}}” badge for {{name}}",
+      "rejected": "Rejected the “{{badge}}” badge for {{name}}"
+    },
+    "empty": {
+      "pending_title": "No pending requests",
+      "pending_body": "New badge requests show up here, oldest first.",
+      "other_title": "No requests yet",
+      "other_body": "Reviewed requests show up here, newest first."
+    }
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Search by full name or phone number. Phone numbers are always partly masked.",
+    "table_label": "Users",
+    "no_name": "No name set",
+    "no_phone": "No phone",
+    "no_badges": "No badges yet",
+    "open": "Details",
+    "suspended_until": "Until {{date}}",
+    "filter": {
+      "q": "Search",
+      "q_placeholder": "Full name or 0912…",
+      "role": "Role",
+      "state": "Status"
+    },
+    "field": {
+      "name": "Full name",
+      "phone": "Phone",
+      "joined": "Joined",
+      "state": "Status",
+      "badges": "Badges",
+      "site": "Site",
+      "rating": "Rating",
+      "suspended_until": "Suspended until"
+    },
+    "state": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "banned": "Banned",
+      "deleted": "Account deleted"
+    },
+    "badge_status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "col": {
+      "name": "User",
+      "role": "Role",
+      "state": "Status",
+      "badges": "Badges",
+      "joined": "Joined",
+      "reputation": "Reputation",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No users yet",
+      "filtered_title": "No matching users",
+      "filtered_body": "Try another keyword or remove some filters."
+    },
+    "detail": {
+      "public_name": "Public name: {{name}}",
+      "back": "All users",
+      "audit": "View audit log",
+      "rating": "{{avg}} · {{count}} ratings",
+      "listings": "Listings posted",
+      "listings_active_one": "{{count}} active",
+      "listings_active_other": "{{count}} active",
+      "groups": "Groups hosted",
+      "reports_against": "Open reports about this user",
+      "reports_filed_one": "Filed {{count}} report",
+      "reports_filed_other": "Filed {{count}} reports",
+      "badge_requests": "Badge requests",
+      "no_badge_requests": "No requests yet.",
+      "actions": "Actions"
+    },
+    "actions": {
+      "self": "This is your own account. Ask another administrator to change it.",
+      "staff_target": "This person is a moderator / administrator. Only administrators can act on them.",
+      "deleted": "Account deleted — no actions available.",
+      "suspend_title": "Temporary suspension",
+      "suspend_hint": "Cannot post, message or join groups while suspended.",
+      "days_label": "Duration",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "suspend": "Suspend",
+      "unsuspend": "Lift suspension now",
+      "badges_title": "Badges",
+      "badges_hint": "Add or remove verification badges. Usually approve through Badges so a document is on file.",
+      "save_badges": "Save badges",
+      "ban_title": "Permanent ban",
+      "ban_hint": "Blocks the account indefinitely. Only for serious violations.",
+      "ban": "Ban account",
+      "unban": "Lift ban",
+      "role_title": "Role",
+      "role_hint": "Moderators / administrators must sign in again and turn on two-step verification.",
+      "role_label": "New role",
+      "change_role": "Change role",
+      "admin_only_note": "Only administrators can ban permanently or change roles."
+    },
+    "confirm": {
+      "suspend_title_one": "Suspend {{name}} for {{count}} day?",
+      "suspend_title_other": "Suspend {{name}} for {{count}} days?",
+      "suspend_body": "The user can still sign in but cannot post, message or join groups until it expires.",
+      "suspend_cta_one": "Suspend {{count}} day",
+      "suspend_cta_other": "Suspend {{count}} days",
+      "unsuspend_title": "Lift the suspension for {{name}}?",
+      "unsuspend_body": "The user can use every feature again right away.",
+      "unsuspend_cta": "Lift suspension",
+      "ban_title": "Permanently ban {{name}}?",
+      "ban_body": "The account stays blocked until an administrator lifts the ban.",
+      "ban_cta": "Ban account",
+      "unban_title": "Lift the ban for {{name}}?",
+      "unban_body": "The account works normally again (any temporary suspension stays).",
+      "unban_cta": "Lift ban",
+      "role_title": "Change {{name}}'s role to “{{role}}”?",
+      "role_body": "Moderators and administrators can open the admin area. Takes effect immediately.",
+      "role_cta": "Make {{role}}",
+      "badges_title": "Save badges for {{name}}?",
+      "badges_body": "Badges show on this person's profile and listings.",
+      "badges_cta": "Save badges"
+    },
+    "toast": {
+      "suspended_one": "Suspended {{name}} for {{count}} day",
+      "suspended_other": "Suspended {{name}} for {{count}} days",
+      "unsuspended": "Lifted the suspension for {{name}}",
+      "banned": "Banned {{name}}",
+      "unbanned": "Lifted the ban for {{name}}",
+      "role": "Changed {{name}}'s role to {{role}}",
+      "badges": "Saved badges for {{name}}"
+    }
+  },
+  "listings": {
+    "title": "Listings",
+    "subtitle": "Every listing in every status. Listings awaiting review are handled in Moderation.",
+    "table_label": "Listings",
+    "opens_new_tab": "(opens in a new tab)",
+    "owner_filter": "Showing one user's listings.",
+    "filter": {
+      "q": "Search",
+      "q_placeholder": "Title or listing code",
+      "status": "Status",
+      "category": "Category",
+      "site": "Site"
+    },
+    "col": {
+      "title": "Listing",
+      "owner": "Owner",
+      "status": "Status",
+      "views": "Views",
+      "created": "Posted",
+      "actions": "Actions"
+    },
+    "unknown_owner": "Unknown",
+    "actions_for": "Actions for “{{title}}”",
+    "open_queue": "Open the moderation queue",
+    "open_owner": "Open owner profile",
+    "set": {
+      "active": "Restore listing",
+      "closed": "Hide listing",
+      "rejected": "Reject listing"
+    },
+    "select_row": "Select “{{title}}”",
+    "clear_selection": "Clear selection",
+    "bulk_hide_one": "Hide {{count}} listing",
+    "bulk_hide_other": "Hide {{count}} listings",
+    "confirm": {
+      "active_title": "Restore “{{title}}”?",
+      "closed_title": "Hide “{{title}}”?",
+      "rejected_title": "Reject “{{title}}”?",
+      "active_many_one": "Restore {{count}} listing?",
+      "active_many_other": "Restore {{count}} listings?",
+      "closed_many_one": "Hide {{count}} selected listing?",
+      "closed_many_other": "Hide {{count}} selected listings?",
+      "rejected_many_one": "Reject {{count}} listing?",
+      "rejected_many_other": "Reject {{count}} listings?",
+      "active_body": "The listing becomes public again.",
+      "closed_body": "The listing is no longer public. The owner still sees it in “My listings”.",
+      "rejected_body": "The listing is removed from public pages with a rejected status."
+    },
+    "note_label": "Internal note",
+    "note_hint": "Saved to the audit log; staff only.",
+    "toast": {
+      "active": "Listing restored",
+      "closed": "Listing hidden",
+      "rejected": "Listing rejected",
+      "bulk_done_one": "Updated {{count}} listing",
+      "bulk_done_other": "Updated {{count}} listings",
+      "bulk_partial": "Updated {{ok}} listings, {{failed}} could not be changed"
+    },
+    "empty": {
+      "title": "No listings yet",
+      "filtered_title": "No matching listings",
+      "filtered_body": "Try another keyword or remove some filters."
+    }
+  },
+  "groups": {
+    "title": "Groups",
+    "subtitle": "Ride sharing and sports groups. Cancel violating groups — members are notified.",
+    "table_label": "Groups",
+    "opens_new_tab": "(opens in a new tab)",
+    "host_filter": "Showing one user's groups.",
+    "filter": {
+      "q": "Search",
+      "q_placeholder": "Title or group code",
+      "kind": "Type",
+      "status": "Status"
+    },
+    "col": {
+      "title": "Group",
+      "host": "Host",
+      "starts": "Starts",
+      "seats": "Seats",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "unknown_host": "Unknown",
+    "seats": "{{taken}}/{{total}}",
+    "cancel": "Cancel group",
+    "confirm": {
+      "title": "Cancel “{{title}}” hosted by {{host}}?",
+      "body": "The group becomes “Cancelled” and every member is notified. This cannot be undone."
+    },
+    "note_label": "Reason (saved to the audit log)",
+    "note_hint": "Staff only.",
+    "toast": {
+      "cancelled": "Group cancelled"
+    },
+    "empty": {
+      "title": "No groups yet",
+      "filtered_title": "No matching groups",
+      "filtered_body": "Try another keyword or remove some filters."
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "Sports venues, work sites and moderation keywords.",
+    "tabs": {
+      "venues": "Venues",
+      "sites": "Sites",
+      "keywords": "Banned keywords"
+    },
+    "venues": {
+      "table_label": "Venues",
+      "filter": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "hidden": "Hidden"
+      },
+      "search": "Search venues",
+      "search_placeholder": "Venue name",
+      "col": {
+        "name": "Venue",
+        "site": "Site",
+        "price": "Reference price",
+        "phone": "Venue phone",
+        "created_by": "Contributed by",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "per_hour": "{{price}}/hour",
+      "unknown": "Unknown",
+      "hidden": "Hidden",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "approve": "Approve",
+      "reject": "Reject",
+      "edit": "Edit details",
+      "hide": "Hide venue",
+      "unhide": "Show again",
+      "actions_for": "Actions for “{{name}}”",
+      "empty_title": "No venues",
+      "empty_body": "Venues contributed by users appear under Pending.",
+      "confirm": {
+        "approve_title": "Approve “{{name}}”?",
+        "approve_body": "Everyone can pick this venue when creating a sports group.",
+        "reject_title": "Reject “{{name}}”?",
+        "reject_body": "The venue cannot be picked when creating a group.",
+        "hide_title": "Hide “{{name}}”?",
+        "hide_body": "The venue no longer shows when creating groups; existing groups keep its name.",
+        "unhide_title": "Show “{{name}}” again?",
+        "unhide_body": "The venue is usable again according to its review status."
+      },
+      "reject_reason": "Rejection reason",
+      "reject_hint": "Up to 200 characters.",
+      "toast": {
+        "approve": "Venue approved",
+        "reject": "Venue rejected",
+        "hide": "Venue hidden",
+        "unhide": "Venue shown again",
+        "updated": "Venue details saved"
+      },
+      "form": {
+        "title": "Edit “{{name}}”",
+        "description": "Shown to group hosts. The phone is the business number, not a personal one.",
+        "name": "Venue name",
+        "sports": "Sports",
+        "site": "Site",
+        "price": "Reference price (VND/hour)",
+        "address": "Address",
+        "phone": "Venue phone",
+        "save": "Save"
+      }
+    },
+    "sites": {
+      "hint": "Work sites users choose in their profile. Prefer hiding over deleting so existing profiles keep their site.",
+      "add": "Add site",
+      "empty": "No sites yet",
+      "table_label": "Sites",
+      "col": {
+        "name": "Name",
+        "code": "Code",
+        "sort": "Order",
+        "status": "Visibility",
+        "actions": "Actions"
+      },
+      "active": "Visible",
+      "inactive": "Hidden",
+      "edit": "Edit",
+      "hide": "Hide",
+      "show": "Show",
+      "confirm": {
+        "hide_title": "Hide “{{name}}”?",
+        "hide_body": "The site no longer shows in the app / web; people who chose it keep it.",
+        "show_title": "Show “{{name}}” again?",
+        "show_body": "The site is listed again in the app / web pickers."
+      },
+      "toast": {
+        "updated": "Site saved",
+        "created": "Site added"
+      },
+      "form": {
+        "new_title": "Add site",
+        "edit_title": "Edit “{{name}}”",
+        "description": "Coordinates are the site centre, used for distance filters.",
+        "code": "Site code",
+        "code_hint": "Lowercase letters without accents, digits, underscores (e.g. hoa_phat_dung_quat). Cannot change later.",
+        "name": "Display name",
+        "lat": "Latitude",
+        "lng": "Longitude",
+        "sort": "Order",
+        "coords_hint": "Leave latitude / longitude empty to keep the current coordinates.",
+        "save": "Save",
+        "create": "Add site"
+      }
+    },
+    "keywords": {
+      "search": "Search keywords",
+      "search_placeholder": "e.g. vay nóng",
+      "action": "Action",
+      "actions": {
+        "reject": "Reject immediately",
+        "review": "Send to review queue"
+      },
+      "add_title": "Add keyword",
+      "keyword": "Keyword",
+      "add": "Add",
+      "hint": "2–60 characters: letters, digits and spaces only. Matching ignores Vietnamese accents.",
+      "categories_label_one": "Only for categories ({{count}} selected)",
+      "categories_label_other": "Only for categories ({{count}} selected; none = every category)",
+      "categories": "Applies to",
+      "all_categories": "Every category",
+      "col_actions": "Actions",
+      "table_label_one": "{{count}} keyword",
+      "table_label_other": "{{count}} keywords",
+      "empty": "No keywords yet",
+      "empty_filtered": "No matching keywords",
+      "switch_to": {
+        "reject": "Switch to reject immediately",
+        "review": "Switch to review queue"
+      },
+      "remove": "Remove keyword",
+      "confirm_remove": "Remove the keyword “{{keyword}}”?",
+      "confirm_remove_body": "New listings containing it will no longer be blocked. The removal is written to the audit log.",
+      "toast": {
+        "created": "Keyword added",
+        "updated": "Action changed",
+        "removed": "Keyword removed"
+      }
+    }
+  },
+  "audit": {
+    "title": "Audit log",
+    "subtitle": "Every staff and system action, newest first. Append-only.",
+    "table_label": "Audit log",
+    "filter": {
+      "from": "From",
+      "to": "To",
+      "action": "Action"
+    },
+    "prefix": {
+      "listing": "Listings",
+      "report": "Reports",
+      "badge": "Badges",
+      "user": "Users",
+      "group": "Groups",
+      "venue": "Venues",
+      "site": "Sites",
+      "keyword": "Banned keywords",
+      "banner": "Banners",
+      "contact": "Contact reveals",
+      "account": "Accounts",
+      "audit": "Log exports",
+      "lead": "Leads"
+    },
+    "col": {
+      "time": "Time",
+      "actor": "Actor",
+      "action": "Action",
+      "target": "Target",
+      "meta": "Details"
+    },
+    "unknown_actor": "Unknown",
+    "system": "System",
+    "filter_actor": "Filter by this person",
+    "filter_target": "Filter by this target",
+    "clear_actor": "Clear actor filter",
+    "clear_target": "Clear target filter {{id}}",
+    "export": "Export CSV",
+    "export_hint": "Exports the current date range and action filter (up to 10,000 rows). The export itself is logged.",
+    "empty": "No actions yet",
+    "empty_filtered": "No actions match the filters"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "subtitle": "Banners on the app home, web home and listing pages. Leads and blog come later.",
+    "hint": "Text-only banners (banner images are not supported here yet). Turn banners off instead of deleting.",
+    "add": "Add banner",
+    "empty_title": "No banners yet",
+    "empty_body": "Create a banner to promote a feature or event.",
+    "placement": {
+      "all": "All",
+      "app_home": "App home",
+      "web_home": "Web home",
+      "web_listing": "Web listings"
+    },
+    "all_locales": "All languages",
+    "state": {
+      "live": "Live",
+      "scheduled": "Scheduled",
+      "ended": "Ended",
+      "off": "Off"
+    },
+    "window": "{{from}} → {{to}}",
+    "no_start": "Now",
+    "no_end": "No end",
+    "sort": "Order {{sort}}",
+    "edit": "Edit",
+    "disable": "Turn off",
+    "enable": "Turn on",
+    "tone": {
+      "primary": "Brand blue",
+      "accent": "Orange",
+      "pass": "Second-hand",
+      "room": "Rooms",
+      "job": "Jobs",
+      "lost-found": "Lost & found",
+      "ride": "Ride sharing",
+      "sport": "Sports"
+    },
+    "toast": {
+      "enabled": "Turned on “{{title}}”",
+      "disabled": "Turned off “{{title}}”",
+      "saved": "Banner saved",
+      "created": "Banner created"
+    },
+    "form": {
+      "new_title": "Add banner",
+      "edit_title": "Edit “{{title}}”",
+      "description": "Text shows exactly as entered, in the selected language.",
+      "placement": "Placement",
+      "locale": "Language",
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "cta": "Button label",
+      "link": "Link (/… or https://…)",
+      "tone": "Colour",
+      "starts": "Starts",
+      "ends": "Ends",
+      "sort": "Order",
+      "active": "Banner on",
+      "save": "Save",
+      "create": "Create banner"
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "subtitle": "Contacts from the forms on the about and landlord pages.",
+    "table_label": "Lead list",
+    "filter": {
+      "q": "Search contact or name",
+      "status": "Status",
+      "kind": "Type"
+    },
+    "col": {
+      "time": "Time",
+      "contact": "Contact",
+      "kind": "Type",
+      "message": "Message",
+      "source": "Source",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "kind": {
+      "user": "User",
+      "landlord": "Landlord",
+      "venue": "Venue owner",
+      "employer": "Employer"
+    },
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "closed": "Closed"
+    },
+    "to": {
+      "new": "Reopen",
+      "contacted": "Mark contacted",
+      "closed": "Close"
+    },
+    "toast": {
+      "updated": "Lead updated"
+    },
+    "export": "Export CSV",
+    "export_hint": "Exports the current status filter (up to 10,000 rows). The file contains contact details and the export is logged.",
+    "empty": "No leads yet",
+    "empty_filtered": "No leads match the filters"
+  }
+}

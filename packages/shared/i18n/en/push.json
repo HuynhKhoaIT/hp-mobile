@@ -6,5 +6,57 @@
   "listing_rejected": {
     "title": "Listing not approved",
     "body": "Your listing \"{{title}}\" breaks our rules and was not published. You can edit and post it again."
+  },
+  "new_message": {
+    "title": "{{sender_name}}",
+    "body": "{{preview}}",
+    "image": "Sent a photo",
+    "group_title": "{{title}}",
+    "group_body": "{{sender_name}}: {{preview}}",
+    "group_image": "{{sender_name}} sent a photo"
+  },
+  "join_request": {
+    "title": "{{title}}",
+    "body": "{{name}} asked to join your group",
+    "body_joined": "{{name}} joined your group",
+    "body_left": "{{name}} left the group, 1 seat is free again"
+  },
+  "join_accepted": {
+    "title": "You're in",
+    "body": "The host accepted you into \"{{title}}\""
+  },
+  "join_declined": {
+    "title": "Request not accepted",
+    "body": "The host did not accept you into \"{{title}}\". Try another group."
+  },
+  "group_cancelled": {
+    "title": "Group cancelled",
+    "body": "\"{{title}}\" was cancelled by the host."
+  },
+  "group_reminder": {
+    "title": "Starting soon: {{title}}",
+    "body_ride": "Your ride leaves at {{time}}. Please be on time!",
+    "body_sport": "Your game starts at {{time}}. Time to get ready!"
+  },
+  "group_completed": {
+    "title": "How was \"{{title}}\"?",
+    "body": "Rate the host to help others find reliable groups."
+  },
+  "listing_expiring": {
+    "title": "Listing expiring soon",
+    "body": "\"{{title}}\" expires in a few days. Renew it to keep it visible."
+  },
+  "lost_found_match": {
+    "title": "A possible match for your item",
+    "body_found": "Someone found \"{{title}}\", which looks like your lost item. Take a look!",
+    "body_lost": "Someone is looking for \"{{title}}\", which looks like the item you found."
+  },
+  "badge_approved": {
+    "title": "Badge approved",
+    "body": "Your profile now shows the new badge."
+  },
+  "badge_rejected": {
+    "title": "Badge not approved",
+    "body": "The document was not accepted. {{reason}} You can submit again."
   }
 }

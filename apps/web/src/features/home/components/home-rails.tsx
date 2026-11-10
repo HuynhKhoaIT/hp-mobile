@@ -2,10 +2,11 @@
 
 // Ba loại dải tin của trang chủ (docs/design/home.md §4.7, §4.8):
 // - "Gần {khu}": luôn hiện (khu mặc định cho khách), 10 tin mọi tính năng; rỗng → thẻ mời đăng tin.
-// - "Dành cho bạn": chỉ khi đã đăng nhập và có mối quan tâm thuộc tính năng Listing; bỏ tin đã có ở "Gần bạn"; rỗng → ẩn.
+// - "Dành cho bạn": chỉ khi đã đăng nhập — RPC home_feed (getHomeFeed): cùng khu đang chọn → danh mục hay xem → mới nhất,
+//   30 ngày, không gồm tin của mình; bỏ tin đã có ở "Gần bạn"; rỗng → ẩn. Khách không có dải này (đã có "Gần {khu}").
 // - Theo dịch vụ (Pass đồ, Tìm trọ, Tìm việc, Đồ thất lạc): 8 tin mới nhất, server render sẵn; rỗng → ẩn.
-import { searchListings } from '@hp/core';
-import { HOME_RAIL_SIZE, LISTING_FEATURES, type ListingCategory, type ListingFeature } from '@hp/shared';
+import { getHomeFeed, searchListings } from '@hp/core';
+import { HOME_RAIL_SIZE, LISTING_FEATURES, type ListingFeature } from '@hp/shared';
 import { MapPin, Plus, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
@@ -51,23 +52,17 @@ export function NearRail() {
   );
 }
 
-const isListingFeature = (f: string): f is ListingFeature => f in LISTING_FEATURES;
-
 export function ForYouRail() {
-  const t = useTranslations('common.home');
-  const { viewer, near } = useHome();
-  const features = viewer.status === 'user' ? (viewer.profile?.interests ?? []).filter(isListingFeature) : [];
-  const categories: ListingCategory[] = features.flatMap((f) => [...LISTING_FEATURES[f]]);
-  const key = viewer.status === 'user' && categories.length > 0 ? `foryou:${viewer.id}:${categories.join(',')}` : null;
-  const categoriesKey = categories.join(',');
+  const t = useTranslations();
+  const { viewer, near, site } = useHome();
+  const siteCode = site?.code ?? null;
+  const key = viewer.status === 'user' ? `foryou:${viewer.id}:${siteCode ?? '*'}` : null;
 
   const load = useCallback(async () => {
-    const res = await searchListings(createBrowserClient(), {
-      categories: categoriesKey.split(',') as ListingCategory[],
-      limit: HOME_RAIL_SIZE.forYou + HOME_RAIL_SIZE.near,
-    });
-    return res.error ? res : { data: { items: res.data.items, now: Date.now() }, error: null };
-  }, [categoriesKey]);
+    // Lấy dư số tin của "Gần bạn" để sau khi bỏ trùng vẫn đủ một dải.
+    const res = await getHomeFeed(createBrowserClient(), { site: siteCode, limit: HOME_RAIL_SIZE.forYou + HOME_RAIL_SIZE.near });
+    return res.error ? res : { data: { items: res.data, now: Date.now() }, error: null };
+  }, [siteCode]);
   const [state, retry] = useLoadable<RailData>(key, load);
 
   // Bỏ tin đã có ở "Gần bạn" (lọc khi hiển thị — không phải đợi dải kia tải xong).
@@ -80,16 +75,15 @@ export function ForYouRail() {
     };
   }, [state, near]);
 
-  const only = features.length === 1 ? features[0] : undefined;
   return (
     <ListingRail
       id="for-you"
-      title={t('for_you_title')}
-      subtitle={t('for_you_hint')}
+      title={t('common.home.for_you_title')}
+      subtitle={t('web.home.for_you_hint')}
       Icon={Sparkles}
       iconBox="bg-accent/15"
       iconFg="text-accent"
-      seeAll={only ? LISTING_FEATURE_CONFIGS[only].path : '/tin'}
+      seeAll={siteCode ? { pathname: '/tin', query: { site: siteCode } } : '/tin'}
       state={shown}
       onRetry={retry}
     />

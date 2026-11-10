@@ -1,6 +1,7 @@
 // ListingCard — thẻ tin dùng chung 4 tính năng Listing. Khớp web `listing-card.tsx` (cùng thứ tự, cùng prop):
 // (1) ảnh bìa 4:3 (`row`: ảnh vuông bên trái) hoặc ô giữ chỗ màu dịch vụ + icon → (2) badge danh mục (neutral)
-// + badge ngôn ngữ khi tin khác ngôn ngữ đang dùng → (3) tiêu đề tối đa 2 dòng → (4) giá đậm 700
+// + "Đã trả lại" (đồ thất lạc đã nhận lại, success) + badge ngôn ngữ khi tin khác ngôn ngữ đang dùng
+// → (3) tiêu đề tối đa 2 dòng → (4) giá đậm 700
 // → (5) "Cách <khu> <khoảng cách>" (hoặc tên khu) · thời gian đăng.
 // ListingCover dùng lại ở chi tiết (ô giữ chỗ cỡ lớn khi tin chưa có ảnh).
 import { listingCover, type PublicListing } from '@hp/core';
@@ -9,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatRelative } from '@/lib/format';
 import { listingImageUrl } from '@/lib/images';
-import { usePriceText, useSiteText } from '@/lib/listing';
+import { isReturned, usePriceText, useSiteText } from '@/lib/listing';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { Icon } from './Icon';
@@ -80,25 +81,31 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
   const price = priceText(listing);
   const meta = [siteText(listing), formatRelative(listing.created_at)].filter(Boolean).join(' · ');
   const showLang = listing.lang !== i18n.language && i18n.exists(`common:locale.${listing.lang}`);
+  const returned = isReturned(listing);
 
   const body = (
     <View className={layout === 'grid' ? 'gap-1 p-3' : 'flex-1 gap-1'}>
       <View className="flex-row flex-wrap gap-1">
         <Badge label={t(`common:category.${listing.category}`)} numberOfLines={1} />
+        {returned ? <Badge label={t('listing:lost_found.returned_badge')} tone="success" numberOfLines={1} /> : null}
         {showLang ? <Badge label={t(`common:locale.${listing.lang}`)} tone="primary" numberOfLines={1} /> : null}
       </View>
       <Text variant="label" numberOfLines={2}>
         {listing.title}
       </Text>
-      {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web). */}
-      <Text variant="price" numberOfLines={2}>
-        {price.lastIndexOf('/') > 0 ? price.slice(0, price.lastIndexOf('/')) : price}
-        {price.lastIndexOf('/') > 0 ? (
-          <Text variant="caption" tone="muted" weight="semibold">
-            {price.slice(price.lastIndexOf('/'))}
-          </Text>
-        ) : null}
-      </Text>
+      {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web).
+          ​ (giống <wbr /> của web) là chỗ được ngắt trước đơn vị; thiếu nó, bản web ngắt giữa chữ ("thá|ng"). */}
+      {price ? (
+        <Text variant="price" numberOfLines={2}>
+          {price.lastIndexOf('/') > 0 ? price.slice(0, price.lastIndexOf('/')) : price}
+          {price.lastIndexOf('/') > 0 ? (
+            <Text variant="caption" tone="muted" weight="semibold">
+              {'​'}
+              {price.slice(price.lastIndexOf('/'))}
+            </Text>
+          ) : null}
+        </Text>
+      ) : null}
       <Text variant="caption" tone="muted" numberOfLines={1}>
         {meta}
       </Text>
@@ -109,7 +116,7 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
     <Card
       padded={layout === 'row'}
       onPress={onPress}
-      accessibilityLabel={[listing.title, price, meta].join(', ')}
+      accessibilityLabel={[listing.title, returned ? t('listing:lost_found.returned_badge') : null, price, meta].filter(Boolean).join(', ')}
       className={className}
     >
       {layout === 'grid' ? (

@@ -12,6 +12,11 @@ export function listingShareUrl(slug: string): string {
   return shareUrl({ type: 'listing', slug }, env.webUrl);
 }
 
+/** Link chia sẻ nhóm ghép: luôn URL web `https://tenapp.vn/nhom/{slug}`. */
+export function groupShareUrl(slug: string): string {
+  return shareUrl({ type: 'group', slug }, env.webUrl);
+}
+
 export type WebPage = '/dieu-khoan' | '/chinh-sach-bao-mat' | '/xoa-tai-khoan' | '/gioi-thieu' | '/lien-he';
 
 export function webPageUrl(page: WebPage): string {
@@ -26,7 +31,7 @@ const LOCALE_PREFIX = /^\/(en|zh)(?=\/|$)/;
 
 /**
  * Đường dẫn web nội bộ (link banner, link trong nội dung: `/pass-do`, `/dang-tin`, `/tin/{slug}`, `/tim-kiem?q=`…)
- * → route của app. Bỏ tiền tố ngôn ngữ `/en`, `/zh`. Không có màn tương ứng (trang pháp lý, nhóm…) → null
+ * → route của app. Bỏ tiền tố ngôn ngữ `/en`, `/zh`. Không có màn tương ứng (trang pháp lý…) → null
  * (nơi gọi mở trang web). Khớp đường dẫn cố định của web (LISTING_FEATURE_PATHS, apps/web/app/[locale]).
  */
 export function routeForWebPath(input: string): AppRoute | null {
@@ -47,6 +52,8 @@ export function routeForWebPath(input: string): AppRoute | null {
   }
   const slug = /^\/tin\/([^/]+)$/.exec(path)?.[1];
   if (slug) return { href: { pathname: '/tin/[slug]', params: { slug: decodeURIComponent(slug) } }, auth: false };
+  const groupSlug = /^\/nhom\/([^/]+)$/.exec(path)?.[1];
+  if (groupSlug) return { href: { pathname: '/nhom/[slug]', params: { slug: decodeURIComponent(groupSlug) } }, auth: false };
 
   switch (path) {
     case '/ghep-xe':

@@ -25,3 +25,14 @@ export function formatVnPhone(normalized: string): string {
   const national = normalized.startsWith('84') ? `0${normalized.slice(2)}` : normalized;
   return national.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
 }
+
+/**
+ * Che SĐT cho màn quản trị, chỉ giữ 3 số cuối: `84912345678` → `•••• ••• 678`. Số đầy đủ chỉ lộ qua hành động có
+ * audit log (luật web-admin: nút "Xem" → `profile.reveal_phone`), không bao giờ gửi xuống trình duyệt khi chỉ xem danh sách.
+ */
+export function maskVnPhone(normalized: string | null | undefined): string | null {
+  if (!normalized) return null;
+  const digits = normalized.replace(/\D/g, '');
+  if (digits.length < 3) return null;
+  return `•••• ••• ${digits.slice(-3)}`;
+}

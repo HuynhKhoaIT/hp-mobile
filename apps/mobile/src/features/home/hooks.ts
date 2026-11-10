@@ -3,6 +3,7 @@
 import { needsOnboarding } from '@hp/core';
 import {
   useBanners,
+  useHomeFeed,
   useListingList,
   useMyListingStats,
   useMyProfile,
@@ -25,7 +26,8 @@ import { toast } from '@/ui';
 /** Thứ tự dải theo dịch vụ (§4.8) — cùng thứ tự LISTING_FEATURE_ORDER của web. */
 export const HOME_FEATURE_ORDER: readonly ListingFeature[] = ['pass', 'room', 'job', 'lostFound'];
 
-const isListingFeature = (f: string): f is ListingFeature => f in LISTING_FEATURES;
+/** "Dành cho bạn" xin dư để còn đủ thẻ sau khi bỏ tin trùng "Gần bạn" (home_feed ưu tiên cùng khu). */
+const FOR_YOU_FETCH = HOME_RAIL_SIZE.forYou * 2;
 
 /**
  * Khu làm việc của Hub (§4.1): profiles.site → khu chọn lần trước trên máy → khu đầu tiên theo sort_order.
@@ -109,20 +111,23 @@ export function usePersonalCard() {
 }
 
 /**
- * Dải tin của Hub (§4.7, §4.8): "Gần {khu}" (10 tin mọi tính năng), "Dành cho bạn" (10 tin theo profile.interests,
- * bỏ tin đã có ở "Gần bạn"; không có interests Listing → ẩn), 4 dải theo dịch vụ (8 tin mới nhất, rỗng → ẩn).
+ * Dải tin của Hub (§4.7, §4.8): "Gần {khu}" (10 tin mọi tính năng), "Dành cho bạn" (tuần 9: home_feed — cùng khu
+ * trước, loại tin người xem hay xem, mới nhất, bỏ tin của mình; 10 tin, bỏ tin đã có ở "Gần bạn"; chỉ khi đã đăng
+ * nhập — khách nhận đúng thứ tự "Gần bạn" nên ẩn), 4 dải theo dịch vụ (8 tin mới nhất, rỗng → ẩn).
  */
 export function useHomeRails(siteCode: string | undefined) {
-  const me = useMyProfile();
+  const { userId } = useSession();
   const near = useListingList({ site: siteCode, limit: HOME_RAIL_SIZE.near }, { enabled: !!siteCode });
 
-  const interestCategories = useMemo<ListingCategory[]>(
-    () => (me.data?.interests ?? []).filter(isListingFeature).flatMap((f) => [...LISTING_FEATURES[f]]),
-    [me.data?.interests],
-  );
-  const forYou = useListingList({ categories: interestCategories, limit: HOME_RAIL_SIZE.forYou }, { enabled: interestCategories.length > 0 });
+  const forYouEnabled = !!userId;
+  const forYou = useHomeFeed({ site: siteCode ?? null, limit: FOR_YOU_FETCH, enabled: forYouEnabled });
   const nearIds = useMemo(() => new Set(near.items.map((l) => l.id)), [near.items]);
-  const forYouItems = useMemo(() => forYou.items.filter((l) => !nearIds.has(l.id)), [forYou.items, nearIds]);
+  const forYouItems = useMemo(
+    () => (forYou.data ?? []).filter((l) => !nearIds.has(l.id)).slice(0, HOME_RAIL_SIZE.forYou),
+    [forYou.data, nearIds],
+  );
+  // "Xem tất cả" của "Dành cho bạn": danh sách mọi tin lọc theo các loại tin đang gợi ý.
+  const forYouCategories = useMemo<ListingCategory[]>(() => [...new Set(forYouItems.map((l) => l.category))], [forYouItems]);
 
   const pass = useListingList({ categories: [...LISTING_FEATURES.pass], limit: HOME_RAIL_SIZE.feature });
   const room = useListingList({ categories: [...LISTING_FEATURES.room], limit: HOME_RAIL_SIZE.feature });
@@ -138,17 +143,17 @@ export function useHomeRails(siteCode: string | undefined) {
     settled(near) &&
     near.items.length === 0 &&
     features.every(({ query }) => settled(query) && query.items.length === 0) &&
-    (interestCategories.length === 0 || (settled(forYou) && forYouItems.length === 0));
+    (!forYouEnabled || (settled(forYou) && forYouItems.length === 0));
 
   return {
     near,
-    forYou: { ...forYou, items: forYouItems, enabled: interestCategories.length > 0, categories: interestCategories },
+    forYou: { ...forYou, items: forYouItems, enabled: forYouEnabled, categories: forYouCategories },
     features,
     allEmpty,
     refetchAll: () =>
       Promise.all([
         siteCode ? near.refetch() : undefined,
-        interestCategories.length > 0 ? forYou.refetch() : undefined,
+        forYouEnabled ? forYou.refetch() : undefined,
         ...features.map(({ query }) => query.refetch()),
       ]),
   };

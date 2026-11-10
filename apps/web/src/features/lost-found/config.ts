@@ -1,5 +1,6 @@
 // Đồ thất lạc — /that-lac. Chỉ khác biệt so với tính năng Listing khác; logic chung ở features/listing.
 // Không có loại JSON-LD phù hợp (schema.org không có "đồ thất lạc") → không nhúng.
+// returnable: chủ tin xem "Tin có thể khớp" (trigger khớp tự động) + "Đã nhận lại đồ" (attributes.returned + đóng tin).
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { LISTING_FEATURES } from '@hp/shared';
 import { Search } from 'lucide-react';
@@ -13,4 +14,5 @@ export const lostFoundConfig: ListingFeatureConfig = {
   tone: { soft: 'bg-service-lost-found-soft', fg: 'text-service-lost-found' },
   cardLayout: 'row',
   jsonLd: null,
+  returnable: true,
 };

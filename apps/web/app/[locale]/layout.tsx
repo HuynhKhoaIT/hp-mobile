@@ -1,17 +1,22 @@
 // Layout gốc theo ngôn ngữ (root param `locale`: vi không tiền tố, /en, /zh): html, font, providers.
-// Font Be Vietnam Pro (vi / en); Noto Sans SC chỉ gắn khi zh. Dark mode theo class (next-themes).
-// Tạm noindex toàn site cho tới khi ra mắt (bỏ khi có landing + trang pháp lý — tuần 11).
+// Font Be Vietnam Pro; chữ Hán dùng font CJK của hệ thống (lớp lang-zh, xem --font-zh). Không dùng next/font cho Noto Sans SC:
+// CSS của nó (404 @font-face, 372 KB) nằm trong layout gốc nên chặn render ở cả vi / en. Dark mode theo class (next-themes).
+// noindex toàn site trừ khi NEXT_PUBLIC_ALLOW_INDEX=true (chỉ production).
 import '../globals.css';
 import { APP_NAME } from '@hp/shared';
 import type { Metadata, Viewport } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
-import { Be_Vietnam_Pro, Noto_Sans_SC } from 'next/font/google';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { locale as rootLocale } from 'next/root-params';
+import { Suspense } from 'react';
+import { CookieConsent } from '@/components/shared/cookie-consent';
 import { ThemeProvider } from '@/components/shared/theme-provider';
 import { ToastProvider } from '@/components/shared/toast';
+import { clientWebMessages } from '@/i18n/client-messages';
 import { routing } from '@/i18n/routing';
+import { publicEnv } from '@/lib/env';
 import { cn } from '@/lib/utils';
 
 const beVietnamPro = Be_Vietnam_Pro({
@@ -19,14 +24,6 @@ const beVietnamPro = Be_Vietnam_Pro({
   weight: ['400', '500', '600', '700'],
   variable: '--font-be-vietnam-pro',
   display: 'swap',
-});
-
-// Không preload: chỉ trang zh dùng tới; trình duyệt tải theo unicode-range khi gặp chữ Hán.
-const notoSansSc = Noto_Sans_SC({
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-noto-sans-sc',
-  display: 'swap',
-  preload: false,
 });
 
 // viewport-fit=cover để thanh điều hướng dưới chừa được vùng an toàn của iPhone (pb-safe).
@@ -41,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
     description: t('description'),
-    robots: { index: false, follow: false },
+    robots: publicEnv.allowIndex ? undefined : { index: false, follow: false },
   };
 }
 
@@ -56,14 +53,14 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
     <html
       lang={locale}
       suppressHydrationWarning
-      className={cn('h-full', beVietnamPro.variable, isZh && [notoSansSc.variable, 'lang-zh'])}
+      className={cn('h-full', beVietnamPro.variable, isZh && 'lang-zh')}
     >
       <body className="flex min-h-full flex-col">
         {/* Client chỉ nhận namespace cần cho component tương tác. Header / footer ở layout của (marketing) và (app).
             `listing`: thẻ tin của "Xem thêm", chia sẻ, liên hệ (features/listing/components). */}
         <NextIntlClientProvider
           messages={{
-            web: messages.web,
+            web: clientWebMessages(messages.web),
             common: messages.common,
             errors: messages.errors,
             auth: messages.auth,
@@ -71,7 +68,13 @@ export default async function LocaleLayout({ children }: LayoutProps<'/[locale]'
           }}
         >
           <ThemeProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              {children}
+              {/* Đọc URL ở client: Suspense để không chặn prerender của route động (Cache Components). */}
+              <Suspense fallback={null}>
+                <CookieConsent />
+              </Suspense>
+            </ToastProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

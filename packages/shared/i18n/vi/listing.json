@@ -213,7 +213,8 @@
       "km": "km",
       "months": "tháng",
       "people": "người"
-    }
+    },
+    "photos_min": "Cần ít nhất {{min}} ảnh cho loại tin này."
   },
   "manage": {
     "title": "Tin của tôi",
@@ -240,6 +241,8 @@
     "sold_body": "Tin sẽ hiện nhãn \"Đã bán\" và không còn trong danh sách.",
     "sold_confirm": "Đã bán",
     "sold_done": "Đã đánh dấu đã bán",
+    "sold_forbidden": "Chỉ đánh dấu đã bán được với tin đã đăng công khai.",
+    "status_forbidden": "Trạng thái tin vừa thay đổi. Hãy tải lại danh sách rồi thử lại.",
     "closed_done": "Đã đóng tin",
     "reopened": "Đã mở lại tin",
     "deleted": "Đã xoá tin",
@@ -263,7 +266,7 @@
     "empty_body": "Bấm trái tim ở tin bạn quan tâm để xem lại sau."
   },
   "contact": {
-    "reveal": "Hiện số điện thoại",
+    "reveal": "Hiện số",
     "call": "Gọi {{phone}}",
     "no_phone": "Người đăng chưa có số điện thoại — hãy nhắn tin.",
     "hint": "Chỉ gọi khi thật sự quan tâm. Không chuyển tiền trước khi xem hàng."
@@ -279,5 +282,27 @@
     "unsave": "Bỏ lưu",
     "saved": "Đã lưu tin",
     "removed": "Đã bỏ lưu"
+  },
+  "translate": {
+    "action": "Dịch sang tiếng Việt",
+    "show_original": "Xem bản gốc",
+    "translated_note": "Bản dịch tự động",
+    "translating": "Đang dịch…"
+  },
+  "distance": {
+    "label": "Cách khu làm việc",
+    "any": "Mọi khoảng cách",
+    "within": "Dưới {{km}} km",
+    "to_site": "Cách {{site}} {{distance}}"
+  },
+  "lost_found": {
+    "matches_title": "Tin có thể khớp",
+    "matches_hint": "Cùng loại đồ, gần thời điểm và gần vị trí bạn đăng.",
+    "matches_empty": "Chưa có tin khớp. Bạn sẽ được báo ngay khi có.",
+    "mark_returned": "Đã nhận lại đồ",
+    "mark_returned_confirm_title": "Đánh dấu đã nhận lại?",
+    "mark_returned_confirm_body": "Tin sẽ đóng lại và không còn hiện công khai.",
+    "returned_done": "Tuyệt vời! Đồ đã về với chủ.",
+    "returned_badge": "Đã trả lại"
   }
 }

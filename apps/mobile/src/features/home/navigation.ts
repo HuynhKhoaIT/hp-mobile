@@ -4,12 +4,13 @@ import type { HomeShortcut, HomeTile } from '@hp/shared';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { requireAuth } from '@/core/auth';
+import { openGroupList } from '@/features/group/navigation';
 import { LISTING_ROUTE_SLUG, openListingList, openMyListings } from '@/features/listing/navigation';
 import { routeForWebPath, webUrlForPath } from '@/lib/urls';
 
 const isListingTile = (id: HomeTile['id']): id is keyof typeof LISTING_ROUTE_SLUG => id in LISTING_ROUTE_SLUG;
 
-/** Ô lưới dịch vụ: tính năng Listing → danh sách; ride / sport (chưa có) → màn "Sắp có"; Tin của tôi → cần đăng nhập. */
+/** Ô lưới dịch vụ: tính năng Listing → danh sách tin; ride / sport → danh sách nhóm (tuần 7); Tin của tôi → cần đăng nhập. */
 export function openTile(tile: HomeTile) {
   if (tile.kind === 'utility') {
     if (tile.id === 'my_listings') requireAuth(() => openMyListings());
@@ -17,7 +18,7 @@ export function openTile(tile: HomeTile) {
     return;
   }
   if (isListingTile(tile.id)) openListingList(LISTING_ROUTE_SLUG[tile.id]);
-  else router.push({ pathname: '/groups/[kind]', params: { kind: tile.id } });
+  else openGroupList(tile.id);
 }
 
 /** Chip "Tìm nhanh" → danh sách của tính năng với bộ lọc đặt sẵn. */

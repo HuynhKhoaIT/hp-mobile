@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 import { create } from 'zustand';
 import { queryClient } from '../query';
 import { supabase } from '../supabase';
+import { unregisterPushOnSignOut } from '../notifications';
 
 /** Route của luồng đăng nhập — không lưu làm returnTo. */
 const AUTH_ROUTES = new Set(['/phone', '/otp', '/onboarding']);
@@ -84,6 +85,8 @@ export function finishAuthFlow() {
 
 /** Đăng xuất: (tuần 6: xoá push token của máy trước) → Supabase → xoá cache dữ liệu theo người dùng. */
 export async function signOutApp() {
+  // Bỏ push token khi còn phiên (sau signOut không còn quyền gọi RPC); lỗi mạng không chặn đăng xuất.
+  await unregisterPushOnSignOut().catch(() => undefined);
   const result = await signOut(supabase);
   queryClient.clear();
   return result;

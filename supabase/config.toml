@@ -409,6 +409,14 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# send-push: DB webhook (trg_notifications_push) — không có JWT người dùng; handler tự kiểm x-webhook-secret.
+[functions.send-push]
+verify_jwt = false
+
+# purge-files: pg_cron (public.call_purge_files) — không có JWT; handler tự kiểm x-cron-secret.
+[functions.purge-files]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

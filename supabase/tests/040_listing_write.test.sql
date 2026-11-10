@@ -2,7 +2,7 @@
 -- Vai trò: anon, user (tài khoản cũ / mới), người khác, bị cấm, moderator, admin.
 begin;
 \ir _helpers.psql
-select plan(47);
+select plan(49);
 
 select tests.create_user('old_user');
 select tests.create_user('new_user');
@@ -92,6 +92,10 @@ select throws_ok($$ select public.review_listing('b0000000-0000-4000-8000-000000
   'review_listing: tin không chờ duyệt → conflict');
 reset role;
 select is((select status::text from public.listings where id = 'b0000000-0000-4000-8000-000000000002'), 'active', 'duyệt → active');
+select is((select count(*)::int from public.moderation_queue where listing_id = 'b0000000-0000-4000-8000-000000000005'), 1,
+  'từ chối tay: chỉ 1 dòng hàng chờ (không thêm dòng "tự từ chối")');
+select is((select params->>'reason' from public.notifications where type = 'listing_rejected' and data->'params'->>'id' = 'b0000000-0000-4000-8000-000000000005'),
+  'thiếu ảnh', 'thông báo từ chối có lý do (mã trước dấu :)');
 select is((select status from public.moderation_queue where listing_id = 'b0000000-0000-4000-8000-000000000002'), 'approved',
   'duyệt → hàng chờ approved, có người duyệt');
 select is((select array_agg(action order by id) from public.audit_log where target_id::text like 'b0000000%'),

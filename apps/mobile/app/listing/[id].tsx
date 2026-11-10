@@ -4,6 +4,7 @@
 import { useListing } from '@hp/core/react';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { configOfCategory } from '@/features/configs';
 import { ListingDetailState } from '@/features/listing/components/ListingDetail';
 import { ListingHeaderActions } from '@/features/listing/components/ListingHeaderActions';
 import { backOrHome } from '@/features/listing/navigation';
@@ -23,7 +24,7 @@ export default function ListingDetailScreen() {
         onBack={backOrHome}
         right={listing ? <ListingHeaderActions listing={listing} /> : undefined}
       />
-      <ListingDetailState query={query} />
+      <ListingDetailState query={query} configOf={configOfCategory} />
     </Screen>
   );
 }

@@ -1,14 +1,16 @@
 // Người đăng: ảnh đại diện, tên hiển thị (view đã che họ tên đầy đủ), tham gia từ, đánh giá, huy hiệu xác minh.
+// Chạm → hồ sơ công khai (tin khác của người này, báo cáo / chặn).
 import type { PublicListing } from '@hp/core';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatDate, formatNumber } from '@/lib/format';
+import { openProfile } from '@/features/profile/navigation';
 import { profileAvatarUrl } from '@/lib/images';
 import { Avatar, Badge, Card, SectionHeader, Text } from '@/ui';
 
 type Owner = Pick<
   PublicListing,
-  'owner_name' | 'owner_avatar_url' | 'owner_since' | 'owner_rating_avg' | 'owner_rating_count' | 'owner_badges'
+  'owner_id' | 'owner_name' | 'owner_avatar_url' | 'owner_since' | 'owner_rating_avg' | 'owner_rating_count' | 'owner_badges'
 >;
 
 export function OwnerCard({ listing }: { listing: Owner }) {
@@ -23,7 +25,7 @@ export function OwnerCard({ listing }: { listing: Owner }) {
   return (
     <View className="gap-2">
       <SectionHeader title={t('detail.posted_by')} />
-      <Card>
+      <Card onPress={() => openProfile(listing.owner_id)} accessibilityLabel={`${name}, ${t('common:profile.view')}`}>
         <View className="flex-row items-start gap-3">
           <Avatar uri={profileAvatarUrl(listing.owner_avatar_url)} name={name || '?'} />
           <View className="flex-1 gap-1">

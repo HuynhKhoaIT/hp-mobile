@@ -5,6 +5,7 @@ import type { ListingCategory, ListingFeature } from './enums';
 
 export type PricePer = 'month' | 'hour' | 'day';
 export type PriceLabel =
+  | { type: 'none' }
   | { type: 'free' }
   | { type: 'negotiable' }
   | { type: 'money'; amount: number; per?: PricePer }
@@ -21,7 +22,7 @@ const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFi
 
 /**
  * Giá hiển thị: việc làm lấy khoảng lương trong attributes (salary_min / max theo pay_type); trọ tính theo tháng;
- * đồ thất lạc không có giá; miễn phí / thoả thuận hiện chữ.
+ * đồ thất lạc không có giá (`none`: client không hiện dòng giá); miễn phí / thoả thuận hiện chữ.
  */
 export function priceLabel(l: PriceSource): PriceLabel {
   const attrs = (l.attributes && typeof l.attributes === 'object' ? l.attributes : {}) as Record<string, unknown>;
@@ -35,7 +36,7 @@ export function priceLabel(l: PriceSource): PriceLabel {
     if (l.price !== null && l.price > 0) return { type: 'money', amount: l.price, per };
     return { type: 'negotiable' };
   }
-  if (feature === 'lostFound') return { type: 'free' };
+  if (feature === 'lostFound') return { type: 'none' };
   if (l.price_type === 'free') return { type: 'free' };
   if (l.price === null || l.price_type === 'negotiable') return { type: 'negotiable' };
   return { type: 'money', amount: l.price, per: feature === 'room' ? 'month' : undefined };

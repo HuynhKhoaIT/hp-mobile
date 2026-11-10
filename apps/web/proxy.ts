@@ -37,11 +37,19 @@ export async function proxy(request: NextRequest) {
   if (isUnder(path, '/admin')) {
     response.headers.set('X-Robots-Tag', NOINDEX);
     if (isUnder(path, '/admin/login')) return response;
-    if (!session.userId) return redirectKeepingCookies(new URL(`${prefix}/admin/login`, request.url), response);
+    // `next` = trang admin đang mở (quay lại đúng chỗ sau đăng nhập / MFA; trang đích tự kiểm safeAdminNext).
+    const adminRedirect = (to: string) => {
+      const url = new URL(`${prefix}${to}`, request.url);
+      url.searchParams.set('next', `${pathname}${search}`);
+      const res = redirectKeepingCookies(url, response);
+      res.headers.set('X-Robots-Tag', NOINDEX);
+      return res;
+    };
+    if (!session.userId) return adminRedirect('/admin/login');
     if (!session.role || !STAFF.has(session.role)) {
       return new NextResponse(null, { status: 403, headers: { 'X-Robots-Tag': NOINDEX } });
     }
-    if (session.aal !== 'aal2') return redirectKeepingCookies(new URL(`${prefix}/admin/login/mfa`, request.url), response);
+    if (session.aal !== 'aal2') return adminRedirect('/admin/login/mfa');
     return response;
   }
 

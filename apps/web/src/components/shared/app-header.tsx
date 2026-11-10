@@ -1,12 +1,13 @@
-// Header khu người dùng: logo · ô tìm kiếm · Đăng tin (cam) · tin nhắn · thông báo (kèm số chưa đọc) · tài khoản.
+// Header khu người dùng: logo · ô tìm kiếm · Đăng tin (cam) · tin nhắn · thông báo (cả hai kèm số chưa đọc) · tài khoản.
 // Điện thoại (< 640px): chỉ logo + tìm + tài khoản; các mục còn lại ở BottomNav. Trang chủ "/" trên điện thoại dùng
 // header riêng của Hub (AppHeaderShell ẩn header này ở đó).
-import { MessageCircle, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { locale as rootLocale } from 'next/root-params';
 import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { MessagesLink } from '@/features/chat/components/messages-link';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { getPathname, Link } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
@@ -43,11 +44,7 @@ export async function AppHeader() {
               {t('common.actions.post')}
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex">
-            <Link href="/tin-nhan" aria-label={t('common.nav.messages')}>
-              <MessageCircle strokeWidth={1.75} />
-            </Link>
-          </Button>
+          <MessagesLink className="hidden sm:inline-flex" />
           <NotificationBell className="hidden sm:inline-flex" />
           <Suspense fallback={<UserMenuSkeleton />}>
             <UserMenu />

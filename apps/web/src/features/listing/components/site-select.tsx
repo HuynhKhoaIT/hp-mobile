@@ -1,21 +1,26 @@
 'use client';
 
-// Chọn khu trong form lọc (GET). Có JS: đổi là gửi form ngay; tắt JS: người dùng bấm nút Tìm — vẫn lọc được.
-// Dùng <select> gốc của trình duyệt (form GET, bàn phím, trình đọc màn hình sẵn có); chưa có Select của shadcn trong dự án.
+// Ô chọn trong form lọc (GET): khu làm việc, khoảng cách tới khu. Có JS: đổi là gửi form ngay; tắt JS: người dùng bấm nút
+// Tìm — vẫn lọc được. Dùng <select> gốc của trình duyệt (form GET, bàn phím, trình đọc màn hình sẵn có); chưa có Select
+// của shadcn trong dự án.
 import { ChevronDown } from 'lucide-react';
 import { useId } from 'react';
 import { cn } from '@/lib/utils';
 
-export function SiteSelect({
-  sites,
+export function FilterSelect({
+  name,
+  options,
   value,
   label,
   anyLabel,
   className,
 }: {
-  sites: { code: string; name: string }[];
+  /** Tên tham số URL. */
+  name: string;
+  options: { value: string; label: string }[];
   value: string | null;
   label: string;
+  /** Lựa chọn "tất cả" (giá trị rỗng → bỏ tham số). */
   anyLabel: string;
   className?: string;
 }) {
@@ -27,15 +32,15 @@ export function SiteSelect({
       </label>
       <select
         id={id}
-        name="site"
+        name={name}
         defaultValue={value ?? ''}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
         className="min-h-12 w-full appearance-none rounded-sm border border-border bg-surface pr-10 pl-3 text-md text-fg outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/30"
       >
         <option value="">{anyLabel}</option>
-        {sites.map((s) => (
-          <option key={s.code} value={s.code}>
-            {s.name}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
           </option>
         ))}
       </select>
@@ -46,4 +51,17 @@ export function SiteSelect({
       />
     </div>
   );
+}
+
+export function SiteSelect({
+  sites,
+  ...rest
+}: {
+  sites: { code: string; name: string }[];
+  value: string | null;
+  label: string;
+  anyLabel: string;
+  className?: string;
+}) {
+  return <FilterSelect name="site" options={sites.map((s) => ({ value: s.code, label: s.name }))} {...rest} />;
 }

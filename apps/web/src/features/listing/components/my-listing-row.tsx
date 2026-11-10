@@ -21,6 +21,7 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
   const cover = listing.images[0];
   const reasons = listing.moderation_reasons.filter((r) => t.has(`listing.manage.reason.${r}`));
   const titleHref = hasPublicPage(status) ? `/tin/${listing.slug}` : `/toi/tin-cua-toi/${listing.id}/sua`;
+  const price = priceText(priceLabel(listing), t, locale);
 
   return (
     <article className="flex gap-3 rounded-md bg-surface p-3 shadow-card">
@@ -46,7 +47,7 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone={STATUS_TONE[status]}>{t(`common.status.${status}`)}</Badge>
-          <span className="text-md font-bold text-fg">{priceText(priceLabel(listing), t, locale)}</span>
+          {price ? <span className="text-md font-bold text-fg">{price}</span> : null}
         </div>
         <p className="flex flex-wrap items-center gap-x-3 text-sm text-muted">
           {listing.expires_at && (status === 'active' || status === 'expired') ? (

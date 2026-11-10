@@ -58,3 +58,9 @@ test('keys.me tách theo người dùng', () => {
   assert.deepEqual(keys.me(), ['hp', 'me']);
   assert.deepEqual(keys.me('u1'), ['hp', 'me', 'u1']);
 });
+
+test('toAuthError map lỗi MFA TOTP', () => {
+  assert.equal(toAuthError({ code: 'mfa_verification_failed', status: 422 }).code, 'mfa_code_invalid');
+  assert.equal(toAuthError({ code: 'mfa_challenge_expired', status: 422 }).code, 'mfa_code_invalid');
+  assert.equal(toAuthError({ code: 'mfa_totp_enroll_not_enabled', status: 422 }).code, 'mfa_disabled');
+});

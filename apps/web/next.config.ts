@@ -1,12 +1,18 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 // next-intl đọc cấu hình theo request từ src/i18n/request.ts.
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+// content/{legal,blog}/**/*.mdx biên dịch lúc build (src/features/marketing/content.ts). Thành phần: mdx-components.tsx.
+const withMDX = createMDX();
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  // Luôn đặt metadata trong <head>. Mặc định Next stream metadata xuống <body> ở trang đọc searchParams (kể cả với Googlebot),
+  // mà Google bỏ qua rel=canonical ngoài <head>.
+  htmlLimitedBots: /.*/,
   // Chỉ có tác dụng với `next dev`: cho phép mở dev server qua IP LAN (điện thoại cùng wifi). Thiếu dòng này
   // Next chặn websocket HMR từ origin khác localhost → client kết nối lại thất bại rồi tự tải lại trang liên tục.
   allowedDevOrigins: ["10.*.*.*", "192.168.*.*", "172.*.*.*"],
@@ -22,4 +28,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(withMDX(nextConfig));
