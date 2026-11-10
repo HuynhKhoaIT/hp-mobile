@@ -1,6 +1,6 @@
 'use client';
 
-// Dải tin cuộn ngang của trang chủ (docs/design/home.md §4.7, §4.8, §10): tiêu đề cao 44 (ô icon 32 + tiêu đề + phụ đề,
+// Dải tin cuộn ngang của trang chủ (docs/design/home.md §4.7, §4.8, §10; style Stitch): tiêu đề cao 44 (ô icon 32 + tiêu đề md/lg + phụ đề,
 // "Xem tất cả ›" bên phải), danh sách cuộn ngang có snap đầu thẻ, mép / scroll-padding 16. Thẻ ListingCard layout grid
 // rộng 208 (điện thoại) / 232 (≥ 640) / 5 thẻ một màn (≥ 1024, có nút cuộn trái / phải vì chuột không vuốt ngang được).
 // Trạng thái: đang tải → 3 thẻ skeleton (desktop 5); lỗi → khối lỗi + Thử lại; rỗng → `empty` hoặc ẩn cả dải.
@@ -77,15 +77,15 @@ export function ListingRail({ id, title, subtitle, Icon, iconBox, iconFg, seeAll
   const headingId = `rail-${id}`;
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
-      <div className="flex min-h-11 items-center gap-3">
-        <span aria-hidden className={cn('flex size-8 shrink-0 items-center justify-center rounded-md', iconBox)}>
+      <div className="flex min-h-11 items-center gap-2.5">
+        <span aria-hidden className={cn('flex size-8 shrink-0 items-center justify-center rounded-sm', iconBox)}>
           <Icon strokeWidth={1.75} className={cn('size-5', iconFg)} />
         </span>
         <div className="flex min-w-0 flex-1 flex-col">
-          <h2 id={headingId} className="line-clamp-2 text-lg leading-snug font-semibold text-fg">
+          <h2 id={headingId} className="line-clamp-2 text-md leading-snug font-semibold text-fg sm:text-lg">
             {title}
           </h2>
-          {subtitle ? <p className="text-sm leading-snug text-muted">{subtitle}</p> : null}
+          {subtitle ? <p className="line-clamp-1 text-sm leading-snug text-muted">{subtitle}</p> : null}
         </div>
         {ready && !(edges.start && edges.end) ? (
           <div className="hidden shrink-0 gap-1 lg:flex">
@@ -96,10 +96,10 @@ export function ListingRail({ id, title, subtitle, Icon, iconBox, iconFg, seeAll
         <Link
           href={seeAll}
           aria-label={t('web.home.see_all_label', { title })}
-          className="-mr-2 inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md pl-2 text-md font-medium whitespace-nowrap text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="-mr-2 inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-md pr-1 pl-2 text-sm font-semibold whitespace-nowrap text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 sm:text-md"
         >
           {t('common.home.see_all')}
-          <ChevronRight aria-hidden strokeWidth={1.75} className="size-5" />
+          <ChevronRight aria-hidden strokeWidth={2} className="size-4 sm:size-5" />
         </Link>
       </div>
 

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 export function SectionError({ onRetry, className }: { onRetry: () => void; className?: string }) {
   const t = useTranslations('common');
   return (
-    <div role="alert" className={cn('flex items-center gap-3 rounded-lg bg-surface p-4 shadow-card', className)}>
+    <div role="alert" className={cn('flex items-center gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className)}>
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-2 text-muted">
         <CloudOff aria-hidden strokeWidth={1.75} className="size-5" />
       </span>

@@ -69,7 +69,7 @@ export function BannerCarousel({ initial, className }: { initial: Banner[] | nul
 export function BannerSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn('flex flex-col', className)}>
-      <Skeleton className="aspect-banner w-full rounded-xl" />
+      <Skeleton className="aspect-banner w-full rounded-lg" />
       <div className="flex h-8 items-center justify-center gap-1.5" aria-hidden>
         <span className="h-1.5 w-5 rounded-full bg-surface-2" />
         <span className="size-1.5 rounded-full bg-surface-2" />
@@ -169,7 +169,7 @@ function Carousel({ banners, className }: { banners: Banner[]; className?: strin
           onWheel={(e) => {
             if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) setTouched(true);
           }}
-          className="no-scrollbar relative flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain rounded-xl"
+          className="no-scrollbar relative flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain rounded-lg"
         >
           {banners.map((banner, i) => (
             <div
@@ -267,7 +267,7 @@ function SlideLink({ href, className, children }: { href: string | null; classNa
 
 function Slide({ banner, priority }: { banner: Banner; priority: boolean }) {
   const linkClass =
-    'group/slide relative flex w-full flex-col outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring/60 rounded-xl';
+    'group/slide relative flex w-full flex-col outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring/60 rounded-lg';
 
   if (banner.image_path) {
     return (
@@ -290,7 +290,7 @@ function Slide({ banner, priority }: { banner: Banner; priority: boolean }) {
   return (
     <SlideLink href={banner.link_url} className={cn(linkClass, 'aspect-banner justify-between gap-3 p-5 sm:p-8', tone.box)}>
       {/* Trang trí: không chặn bấm, không đọc. */}
-      <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl">
+      <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg">
         {service ? (
           <service.Icon strokeWidth={1.5} className={cn('absolute right-5 bottom-5 size-16 opacity-90 sm:right-8 sm:bottom-8 sm:size-24', service.fg)} />
         ) : (
@@ -302,7 +302,7 @@ function Slide({ banner, priority }: { banner: Banner; priority: boolean }) {
       </span>
       <span className={cn('relative flex max-w-xl flex-col gap-1 sm:gap-2', service ? 'pr-20 sm:pr-28' : 'pr-8')}>
         <span className="line-clamp-2 text-xl font-bold sm:text-3xl">{banner.title}</span>
-        {banner.subtitle ? <span className="line-clamp-2 text-sm opacity-90 sm:text-lg">{banner.subtitle}</span> : null}
+        {banner.subtitle ? <span className="line-clamp-2 text-sm font-semibold sm:text-lg">{banner.subtitle}</span> : null}
       </span>
       {banner.cta_label && banner.link_url ? (
         <span

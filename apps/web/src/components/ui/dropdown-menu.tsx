@@ -1,7 +1,7 @@
 'use client';
 
 // DropdownMenu (shadcn CLI, Radix) chỉnh theo token (.claude/rules/web-ui-design.md): `cn` từ @/lib/utils, nền focus
-// `bg-surface-2` (không `bg-accent` — accent là màu cam Đăng tin), mục cao ≥ 44px, chữ 16px. Chỉ giữ phần dự án dùng.
+// `bg-surface-2` (không `bg-accent` — accent là màu vàng Đăng tin), mục cao ≥ 44px, chữ 16px. Chỉ giữ phần dự án dùng.
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 import type * as React from 'react';
 import { cn } from '@/lib/utils';

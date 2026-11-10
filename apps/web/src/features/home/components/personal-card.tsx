@@ -20,7 +20,8 @@ import { useLoadable } from '../use-loadable';
 import { useHome } from './home-context';
 import { SectionError } from './section-error';
 
-const CARD = 'flex h-full flex-col gap-4 rounded-xl bg-surface p-4 shadow-card';
+/** Card chuẩn (style Stitch): viền hairline + bóng nhạt, bo lg (16). */
+const CARD = 'relative flex h-full flex-col gap-4 overflow-hidden rounded-lg border border-border bg-surface p-4 shadow-card';
 /** Nút của thẻ: cao 44, chữ được xuống dòng thay vì tràn (tiếng Anh dài hơn ~30%). */
 const CARD_BUTTON = 'min-h-11 whitespace-normal px-3 text-center leading-tight';
 
@@ -37,14 +38,14 @@ function PersonalCardSkeleton({ className }: { className?: string }) {
   return (
     <div className={cn(CARD, className)} aria-hidden>
       <div className="flex items-start gap-3">
-        <Skeleton className="size-12 shrink-0 rounded-lg" />
+        <Skeleton className="size-10 shrink-0 rounded-md" />
         <div className="flex flex-1 flex-col gap-2 pt-0.5">
           <Skeleton className="h-5 w-2/3" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-1/2" />
         </div>
       </div>
-      <Skeleton className="mt-auto h-11 w-full sm:w-40" />
+      <Skeleton className="mt-auto h-12 w-full sm:w-40 lg:w-full" />
     </div>
   );
 }
@@ -64,17 +65,23 @@ function IntroCard({
 }) {
   return (
     <section className={cn(CARD, className)}>
+      {/* Hoạ tiết góc phải trên (trang trí, mờ, không đọc / không nhận chạm). */}
+      <span aria-hidden className="pointer-events-none absolute -top-8 -right-8 size-24 rounded-full border-2 border-dashed border-primary/15" />
+      <span aria-hidden className="pointer-events-none absolute -top-3 -right-3 size-12 rounded-full bg-primary-light/60" />
       {/* Desktop: thẻ cao bằng banner bên cạnh → nội dung đứng giữa, nút ở đáy. */}
-      <div className="flex items-start gap-3 lg:flex-1 lg:items-center">
-        <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary-light text-primary">
-          <Icon strokeWidth={1.75} className="size-7" />
+      <div className="relative flex items-start gap-3 pr-6 lg:flex-1 lg:items-center">
+        <span
+          aria-hidden
+          className="flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/15 bg-primary-light text-primary"
+        >
+          <Icon strokeWidth={1.75} className="size-5" />
         </span>
         <div className="flex min-w-0 flex-col gap-1">
           <h2 className="text-md font-semibold text-fg">{title}</h2>
           <p className="text-sm text-muted">{body}</p>
         </div>
       </div>
-      <div className="mt-auto flex">{action}</div>
+      <div className="relative mt-auto flex">{action}</div>
     </section>
   );
 }
@@ -90,7 +97,7 @@ function GuestCard({ className }: { className?: string }) {
       action={
         <LoginDialog
           trigger={
-            <Button type="button" className={cn(CARD_BUTTON, 'w-full sm:w-auto sm:px-6')}>
+            <Button type="button" size="lg" className={cn(CARD_BUTTON, 'w-full font-semibold sm:w-auto sm:px-6 lg:w-full')}>
               {t('auth.sign_in')}
             </Button>
           }
@@ -111,7 +118,7 @@ function OnboardingCard({ className }: { className?: string }) {
       action={
         <LoginDialog
           trigger={
-            <Button type="button" className={cn(CARD_BUTTON, 'w-full sm:w-auto sm:px-6')}>
+            <Button type="button" size="lg" className={cn(CARD_BUTTON, 'w-full font-semibold sm:w-auto sm:px-6 lg:w-full')}>
               {t('onboarding_cta')}
             </Button>
           }
@@ -149,7 +156,7 @@ function StatsCard({ userId, className }: { userId: string; className?: string }
         Icon={PackagePlus}
         title={t('first_post_title')}
         body={t('first_post_body')}
-        action={<PostButton className="w-full sm:w-auto sm:px-6" />}
+        action={<PostButton className="w-full font-semibold sm:w-auto sm:px-6 lg:w-full" />}
       />
     );
   }
@@ -220,7 +227,7 @@ function AlertRow({
     <Link
       href={href}
       className={cn(
-        'flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm text-fg outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
+        'flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-sm text-fg outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
         tone === 'warning' ? 'bg-warning/10 hover:bg-warning/15' : 'bg-danger/10 hover:bg-danger/15',
       )}
     >
