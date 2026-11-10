@@ -1,21 +1,21 @@
 /* SINH TỰ ĐỘNG từ packages/tokens/src/index.ts — không sửa tay. Chạy: pnpm --filter @hp/tokens build */
 
 @theme {
-  --color-primary: #0B4F9C;
+  --color-primary: #0B4A9C;
   --color-primary-light: #E6EFFA;
-  --color-accent: #F2762E;
+  --color-accent: #EA580C;
   --color-success: #1E9E5A;
   --color-warning: #E0A100;
   --color-danger: #D93025;
-  --color-bg: #F6F7F9;
+  --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
-  --color-surface-2: #EEF0F3;
-  --color-border: #E2E5EA;
+  --color-surface-2: #F1F5F9;
+  --color-border: #E2E8F0;
   --color-fg: #111827;
-  --color-muted: #6B7280;
-  --color-disabled: #9CA3AF;
+  --color-muted: #5B6B82;
+  --color-disabled: #94A3B8;
   --color-on-primary: #FFFFFF;
-  --color-on-accent: #111827;
+  --color-on-accent: #FFFFFF;
   --color-service-pass: #D9692E;
   --color-service-pass-soft: #FDF0E6;
   --color-service-room: #7C5CC4;
@@ -29,10 +29,10 @@
   --color-service-lost-found: #A87A00;
   --color-service-lost-found-soft: #FBF3D9;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
   --text-xs: 12px;
@@ -50,7 +50,9 @@
   --text-3xl: 28px;
   --text-3xl--line-height: 1.4;
 
-  --shadow-card: 0px 1px 3px rgba(0,0,0,0.06);
+  --shadow-card: 0px 2px 8px rgba(15,23,42,0.06);
+  --shadow-bar: 0px -2px 10px rgba(15,23,42,0.06);
+  --shadow-fab: 0px 6px 16px rgba(234,88,12,0.35);
   --aspect-card: 4 / 3;
   --aspect-avatar: 1 / 1;
   --aspect-banner: 16 / 7;
@@ -62,19 +64,19 @@
 .dark {
   --color-primary: #5B9BE6;
   --color-primary-light: #15283F;
-  --color-accent: #F58A4C;
+  --color-accent: #EA580C;
   --color-success: #3CBF78;
   --color-warning: #F0B429;
   --color-danger: #F05252;
-  --color-bg: #0F1115;
-  --color-surface: #171A20;
-  --color-surface-2: #1F232B;
-  --color-border: #2A2F38;
-  --color-fg: #F3F4F6;
-  --color-muted: #9CA3AF;
-  --color-disabled: #6B7280;
-  --color-on-primary: #0F1115;
-  --color-on-accent: #0F1115;
+  --color-bg: #0B1120;
+  --color-surface: #131B2B;
+  --color-surface-2: #1C2537;
+  --color-border: #273247;
+  --color-fg: #F1F5F9;
+  --color-muted: #94A3B8;
+  --color-disabled: #64748B;
+  --color-on-primary: #0B1120;
+  --color-on-accent: #FFFFFF;
   --color-service-pass: #F0A070;
   --color-service-pass-soft: #3A2A20;
   --color-service-room: #B39DEB;
