@@ -313,6 +313,12 @@ export default function UiGalleryScreen() {
           <Badge label={t('status.draft')} />
           <Badge label={t('price.free')} tone="primary" />
         </Row>
+        {/* overlay: nhãn nổi trên ảnh (góc trái trên ảnh ListingCard grid). */}
+        <Row gap={2} wrap className="rounded-md bg-primary p-3">
+          <Badge overlay label={t('category.pass_electronics')} />
+          <Badge overlay label={t('locale.en')} tone="primary" />
+          <Badge overlay label={t('status.active')} tone="success" />
+        </Row>
         <Row gap={3}>
           <Avatar name="Nguyễn Văn An" size="sm" />
           <Avatar name="Trần Thị Bình" />
@@ -384,9 +390,10 @@ export default function UiGalleryScreen() {
           <NotificationBell count={12} onPress={() => undefined} accessibilityLabel={t('home.notifications_unread', { count: 12 })} />
           <SiteChip label={siteLabel} onPress={() => setSiteSheet(true)} accessibilityLabel={t('home.site_label')} />
         </Row>
-        <View className="rounded-md bg-primary p-3">
+        <Row gap={3} className="rounded-md bg-primary p-3">
           <Button size="sm" variant="inverse" shape="pill" label={t('auth:sign_in')} />
-        </View>
+          <Button size="sm" variant="glass" shape="pill" label={t('auth:sign_in')} />
+        </Row>
         <OptionSheet
           open={siteSheet}
           onClose={() => setSiteSheet(false)}
@@ -399,7 +406,7 @@ export default function UiGalleryScreen() {
       </Section>
 
       <Section title="ServiceTile grid · ServiceGrid">
-        <View className="rounded-xl bg-surface p-4 shadow-card">
+        <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
           <ServiceGrid>
             {FEATURE_KEYS.map((f, i) => (
               <View key={f} className="flex-1">
@@ -439,7 +446,7 @@ export default function UiGalleryScreen() {
           body={t('home.card.guest_body')}
           action={{ label: t('auth:sign_in'), onPress: () => toast.show(t('auth:sign_in')) }}
         />
-        <View className="gap-3 rounded-xl bg-surface p-4 shadow-card">
+        <View className="gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
           <Text variant="label" weight="semibold">
             {t('home.card.mine_title')}
           </Text>
@@ -452,6 +459,17 @@ export default function UiGalleryScreen() {
           />
           <AlertRow tone="warning" label={t('home.card.expiring', { count: 2 })} onPress={() => toast.show(t('home.card.manage'))} />
           <AlertRow tone="danger" label={t('home.card.rejected', { count: 1 })} onPress={() => toast.show(t('home.card.manage'))} />
+        </View>
+        {/* size md + tone primary: thẻ Cộng đồng ở Hub. */}
+        <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <StatColumns
+            size="md"
+            items={[
+              { value: '1.234', label: t('home.stats.users'), tone: 'primary' },
+              { value: '460', label: t('home.stats.listings'), tone: 'primary' },
+              { value: '4', label: t('home.stats.sites'), tone: 'primary' },
+            ]}
+          />
         </View>
         <Row gap={3}>
           <StatTile className="flex-1" value="1.234" label={t('home.stats.users')} />
@@ -475,6 +493,18 @@ export default function UiGalleryScreen() {
           action={{ label: t('home.see_all'), onPress: () => toast.show(t('home.see_all')) }}
         />
         <SectionHeader title={t('feature.job')} icon={{ service: 'job' }} chevron action={{ label: t('home.see_all'), onPress: () => undefined }} />
+        <SectionHeader
+          size="md"
+          title={t('home.near_title', { site: 'Dung Quất' })}
+          icon={{ icon: MapPin, tone: 'primary' }}
+          chevron
+          action={{ label: t('home.see_all'), onPress: () => undefined }}
+        />
+        <SectionHeader size="md" title={t('home.shortcuts_title')} />
+        <Row gap={2} wrap>
+          <Chip size="sm" dot="accent" label={t('home.shortcut.motorbike')} />
+          <Chip size="sm" dot="accent" label={t('home.shortcut.room_loft')} />
+        </Row>
         <Row gap={2} wrap>
           <Chip size="sm" dot="pass" label={t('home.shortcut.motorbike')} />
           <Chip size="sm" dot="room" label={t('home.shortcut.room_loft')} />

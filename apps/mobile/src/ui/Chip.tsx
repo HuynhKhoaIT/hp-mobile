@@ -1,7 +1,8 @@
 // Chip — lựa chọn dạng viên thuốc (filter, ngôn ngữ, giao diện). Vùng chạm tối thiểu 44 (nút phụ).
 // selected đổi viền + nền + màu chữ, kèm accessibilityState để không truyền tải chỉ bằng màu.
-// size 'sm' (chip "Tìm nhanh" ở Hub, docs/design/home.md §10): cao 40, px-3, chữ text-sm 500, hitSlop 4 → vùng chạm 48;
-// `dot` thêm chấm màu dịch vụ size-2 bên trái chữ. Nhấn: nền surface-2.
+// size 'sm' (chip "Tìm nhanh" ở Hub, docs/design/home.md §10): cao 40, px-3.5, chữ text-sm 500, hitSlop 4 → vùng chạm 48;
+// `dot` thêm chấm size-2 bên trái chữ: màu dịch vụ (ServiceKey) hoặc 'accent' (cam — chip "Tìm nhanh" ở Hub, style
+// Stitch). Nhấn: nền surface-2.
 import type { LucideIcon } from 'lucide-react-native';
 import { Pressable, type PressableProps, View } from 'react-native';
 import { Icon } from './Icon';
@@ -12,8 +13,8 @@ export type ChipProps = Omit<PressableProps, 'children'> & {
   label: string;
   selected?: boolean;
   size?: 'md' | 'sm';
-  /** Chấm màu dịch vụ trước chữ. */
-  dot?: ServiceKey;
+  /** Chấm màu trước chữ: màu dịch vụ hoặc 'accent'. */
+  dot?: ServiceKey | 'accent';
   /** Icon sau chữ (vd ChevronDown khi chip mở danh sách chọn, X khi bỏ lọc). */
   trailingIcon?: LucideIcon;
   className?: string;
@@ -22,7 +23,7 @@ export type ChipProps = Omit<PressableProps, 'children'> & {
 export function Chip({ label, selected = false, size = 'md', dot, trailingIcon, disabled, className, ...rest }: ChipProps) {
   const tone = disabled ? 'disabled' : selected ? 'primary' : 'default';
   const box = selected ? 'border-primary bg-primary-light' : 'border-border bg-surface';
-  const sizing = size === 'sm' ? 'min-h-10 gap-2 px-3 active:bg-surface-2' : 'min-h-11 gap-1 px-4 active:opacity-80';
+  const sizing = size === 'sm' ? 'min-h-10 gap-2 px-3.5 active:bg-surface-2' : 'min-h-11 gap-1 px-4 active:opacity-80';
   return (
     <Pressable
       accessibilityRole="button"
@@ -32,7 +33,7 @@ export function Chip({ label, selected = false, size = 'md', dot, trailingIcon, 
       className={['flex-row items-center justify-center rounded-full border', sizing, box, className].filter(Boolean).join(' ')}
       {...rest}
     >
-      {dot ? <View className={`size-2 rounded-full ${SERVICE[dot].dot}`} /> : null}
+      {dot ? <View className={`size-2 rounded-full ${dot === 'accent' ? 'bg-accent' : SERVICE[dot].dot}`} /> : null}
       {size === 'sm' ? (
         <Text variant="caption" weight="medium" tone={tone}>
           {label}

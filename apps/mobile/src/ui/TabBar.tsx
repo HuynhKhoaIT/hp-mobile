@@ -1,6 +1,10 @@
-// TabBar — thanh tab dưới (Expo Router js-tabs, prop `tabBar`). Mỗi tab: icon Lucide 24 + chữ (luôn kèm chữ),
-// tab đang mở tô primary + icon nảy nhẹ; tab `accent` (Đăng) là nút tròn cam, xoay 45° khi đang mở.
-// Reduce Motion → không nảy / xoay. Vùng chạm ≥ 48, chừa vùng an toàn đáy.
+// TabBar — thanh tab dưới (Expo Router js-tabs, prop `tabBar`), style Stitch: nền surface đặc (Android elevation + nền
+// trong mờ vẽ lỗi bóng, không có BlurView) + viền trên border + shadow-bar; cao 64 + vùng an toàn đáy.
+// Mỗi tab: icon Lucide 24 + chữ (luôn kèm chữ); đang mở: icon + chữ primary, nét icon đậm hơn (Icon strong), chữ 600,
+// icon nảy nhẹ; chưa mở: muted. Tab `accent` (Đăng): nút tròn size-14 nổi lên trên thanh (-mt-6) — vòng ngoài 4 màu
+// surface tách khỏi nội dung phía sau, lõi cam 48 — nền accent, icon Plus on-accent (trắng) + shadow-fab;
+// vẫn kèm chữ "Đăng" dưới nút; xoay 45° khi đang mở. Vùng chạm cả cột tab ≥ 56 (phần nút nhô lên trên thanh không nhận
+// chạm — ngoài khung cha). Reduce Motion → không nảy / xoay.
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import type { LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
@@ -24,7 +28,7 @@ export function TabBar({ state, descriptors, emitter, navigateToTab, insets, ico
   return (
     <View
       accessibilityRole="tablist"
-      className="flex-row border-t border-border bg-surface px-1 pt-1"
+      className="flex-row border-t border-border bg-surface px-1 pt-1 shadow-bar"
       style={{ paddingBottom: Math.max(insets.bottom, 4) }}
     >
       {state.routes.map((route, index) => {
@@ -92,15 +96,15 @@ function TabItem({
       accessibilityState={{ selected: focused }}
       accessibilityLabel={badge ? `${label}, ${badge}` : label}
       onPress={onPress}
-      className="min-h-12 flex-1 items-center justify-center gap-0.5 py-1"
+      className="min-h-14 flex-1 items-center justify-end gap-0.5 py-1"
     >
       {accent ? (
-        <AnimatedView style={style} className="h-9 w-9 items-center justify-center rounded-full bg-accent">
-          <Icon icon={icon} tone="onAccent" size="tab" />
+        <AnimatedView style={style} className="-mt-6 size-14 items-center justify-center rounded-full border-4 border-surface bg-accent shadow-fab">
+          <Icon icon={icon} tone="onAccent" size="tab" strong />
         </AnimatedView>
       ) : (
         <AnimatedView style={style}>
-          <Icon icon={icon} tone={focused ? 'primary' : 'muted'} size="tab" />
+          <Icon icon={icon} tone={focused ? 'primary' : 'muted'} size="tab" strong={focused} />
           {badge ? (
             <View
               accessibilityElementsHidden
@@ -121,7 +125,7 @@ function TabItem({
         // 5 tab ở 360px, cỡ chữ 150%: thu nhỏ cho vừa ô thay vì cắt "Mess…".
         adjustsFontSizeToFit
         minimumFontScale={0.7}
-        className={focused ? 'font-sans-medium' : undefined}
+        weight={focused ? 'semibold' : 'medium'}
       >
         {label}
       </Text>

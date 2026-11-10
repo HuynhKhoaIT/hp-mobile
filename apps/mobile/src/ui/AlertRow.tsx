@@ -1,5 +1,5 @@
 // AlertRow — một hàng cảnh báo bấm được trong thẻ (vd "2 tin sắp hết hạn" ở thẻ "Tin của bạn", docs/design/home.md §10):
-// hàng rounded-lg px-3 py-2 chữ text-sm; warning: nền warning/10 + Clock 16 màu warning; danger: nền danger/10 +
+// hàng rounded-md px-3 py-2 chữ text-sm; warning: nền warning/10 + Clock 16 màu warning; danger: nền danger/10 +
 // CircleAlert 16 màu danger; ChevronRight cuối hàng. Có chữ (không chỉ màu). Cao ≥ 44 (vùng chạm phụ).
 import { ChevronRight, CircleAlert, Clock, type LucideIcon } from 'lucide-react-native';
 import { Pressable } from 'react-native';
@@ -25,7 +25,7 @@ export function AlertRow({ label, tone = 'warning', icon, onPress, className }: 
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      className={['min-h-11 flex-row items-center gap-2 rounded-lg px-3 py-2 active:opacity-80', BOX[tone], className].filter(Boolean).join(' ')}
+      className={['min-h-11 flex-row items-center gap-2 rounded-md px-3 py-2 active:opacity-80', BOX[tone], className].filter(Boolean).join(' ')}
     >
       <Icon icon={icon ?? ICON[tone]} tone={tone} size={16} />
       <Text variant="caption" className="flex-1">

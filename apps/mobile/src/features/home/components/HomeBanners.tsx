@@ -47,7 +47,7 @@ export function HomeBanners({ active }: { active: boolean }) {
   if (banners.isLoading) {
     return (
       <View className="gap-3 px-4">
-        <Skeleton className="aspect-banner w-full rounded-xl" />
+        <Skeleton className="aspect-banner w-full rounded-lg" />
         <View className="min-h-8 flex-row items-center justify-center gap-1.5">
           <Skeleton className="h-1.5 w-5 rounded-full" />
           <Skeleton className="h-1.5 w-1.5 rounded-full" />

@@ -1,4 +1,4 @@
-// Một dải tin ở Hub (§4.7, §4.8, §10): tiêu đề hàng cao 44 (ô icon size-8 + tiêu đề text-lg 600 + phụ đề, phải:
+// Một dải tin ở Hub (§4.7, §4.8, §10): tiêu đề hàng cao 44 (ô icon size-8 + tiêu đề text-md 600 + phụ đề, phải:
 // "Xem tất cả" + ChevronRight) → thẻ ListingCard grid rộng 208 cuộn ngang có snap. Đang tải → 3 thẻ chờ; lỗi →
 // ErrorState gọn ở dải này; rỗng → ẩn (hoặc `empty` hiện thay, vd dải "Gần {khu}" luôn hiện).
 import type { PublicListing } from '@hp/core';
@@ -54,6 +54,7 @@ export function HomeRail({
     ) : (
       <SectionHeader
         className="px-4"
+        size="md"
         title={title}
         subtitle={subtitle}
         icon={icon}

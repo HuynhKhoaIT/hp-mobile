@@ -121,7 +121,7 @@ function ListingContext({ conversation: c }: { conversation: ConversationSummary
         </Text>
         <View className="flex-row flex-wrap items-center gap-x-2">
           {priceText ? (
-            <Text variant="caption" weight="bold" tone="accent">
+            <Text variant="caption" weight="bold">
               {priceText}
             </Text>
           ) : null}

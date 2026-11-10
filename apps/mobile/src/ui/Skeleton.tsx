@@ -30,10 +30,11 @@ export function Skeleton({ className }: { className?: string }) {
   );
 }
 
-function CardBones() {
+/** `badge`: hàng badge trong thân thẻ (row); grid đặt badge nổi trên ảnh. */
+function CardBones({ badge = true }: { badge?: boolean }) {
   return (
     <View className="gap-2">
-      <Skeleton className="h-6 w-1/2 rounded-full" />
+      {badge ? <Skeleton className="h-6 w-1/2 rounded-full" /> : null}
       <Skeleton className="h-5 w-11/12" />
       <Skeleton className="h-5 w-2/3" />
       <Skeleton className="h-6 w-1/3" />
@@ -46,8 +47,8 @@ function CardBones() {
 function OneCard({ layout, className }: { layout: 'grid' | 'row'; className?: string }) {
   if (layout === 'row') {
     return (
-      <View className={['flex-row items-start gap-3 rounded-md bg-surface p-3 shadow-card', className].filter(Boolean).join(' ')}>
-        <Skeleton className="aspect-avatar w-24 rounded-sm" />
+      <View className={['flex-row items-start gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
+        <Skeleton className="aspect-avatar w-24 rounded-md" />
         <View className="flex-1">
           <CardBones />
         </View>
@@ -55,10 +56,10 @@ function OneCard({ layout, className }: { layout: 'grid' | 'row'; className?: st
     );
   }
   return (
-    <View className={['rounded-md bg-surface shadow-card', className].filter(Boolean).join(' ')}>
-      <Skeleton className="aspect-card w-full rounded-t-md" />
+    <View className={['rounded-lg border border-border bg-surface shadow-card', className].filter(Boolean).join(' ')}>
+      <Skeleton className="aspect-card w-full rounded-t-lg" />
       <View className="p-3">
-        <CardBones />
+        <CardBones badge={false} />
       </View>
     </View>
   );

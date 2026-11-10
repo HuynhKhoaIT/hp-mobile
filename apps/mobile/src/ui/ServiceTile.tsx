@@ -1,10 +1,12 @@
 // ServiceTile — ô dịch vụ. Icon ở Hub luôn kèm chữ; chữ dùng text-fg (không dùng màu dịch vụ cho chữ).
-// variant 'card' (mặc định): thẻ nền surface, icon tròn 48 — bước chọn loại tin (PostPicker), có `selected`.
-// variant 'grid': ô trong lưới 8 ô của Hub (docs/design/home.md §10) — khung icon size-14 rounded-lg nền
-//   bg-service-<x>-soft (ô tiện ích có `icon`: bg-primary-light + icon primary), icon 28; nhãn text-sm 500 tối đa
-//   2 dòng trong khung min-h-10 (không numberOfLines: phóng chữ 150% thì khung giãn theo minHeight, không cắt chữ); nhãn góc "Sắp có" /
-//   "Mới" lệch -6/-6 góc trên phải khung icon; ô sắp có mờ 60% (nhãn góc giữ rõ) + accessibilityState.disabled
-//   nhưng vẫn bấm được (mở màn "Sắp có"). Nhấn: scale 0.97 (motion.fast) + nền surface-2.
+// variant 'card' (mặc định): thẻ Card (bo lg, viền hairline), icon tròn 48 — bước chọn loại tin (PostPicker), có `selected`
+//   (viền 2 primary do Card vẽ).
+// variant 'grid': ô trong lưới 8 ô của Hub (style Stitch) — ô icon 48×48 rounded-md nền nhạt bg-service-<x>-soft + viền
+//   nhạt cùng tông (border-service-<x>/20), icon 24 màu dịch vụ (ô tiện ích có `icon`: bg-primary-light, viền primary/15,
+//   icon primary); nhãn text-sm 500 tối đa 2 dòng trong khung min-h-10 (không numberOfLines: phóng chữ 150% thì khung giãn
+//   theo minHeight, không cắt chữ). Nhãn góc "Mới" (bg-accent + chữ on-accent trắng đậm, in hoa) / "Sắp có" lệch -8/-8 góc trên
+//   phải ô icon; ô sắp có mờ 60% (nhãn góc giữ rõ) + accessibilityState.disabled nhưng vẫn bấm được (mở màn "Sắp có").
+//   Nhấn: scale 0.97 (motion.fast) + nền surface-2. Vùng chạm cả ô (icon + nhãn) ≥ 48.
 // ServiceGrid xếp các ô 'grid' thành hàng 4 cột (gap-x-2, gap-y-4) — RN không có CSS grid nên chia hàng tường minh.
 import type { LucideIcon } from 'lucide-react-native';
 import { Children, type ReactNode } from 'react';
@@ -33,9 +35,9 @@ export type ServiceTileProps = Glyph & {
   className?: string;
 };
 
-const BADGE: Record<ServiceTileBadge['tone'], { box: string; tone: 'muted' | 'onAccent' }> = {
-  soon: { box: 'bg-surface-2', tone: 'muted' },
-  new: { box: 'bg-accent', tone: 'onAccent' },
+const BADGE: Record<ServiceTileBadge['tone'], { box: string; tone: 'muted' | 'onAccent'; text: string }> = {
+  soon: { box: 'border border-border bg-surface-2', tone: 'muted', text: '' },
+  new: { box: 'bg-accent', tone: 'onAccent', text: 'uppercase' },
 };
 
 /** Icon dịch vụ (màu nhận diện) hoặc icon tiện ích (primary). */
@@ -45,6 +47,8 @@ function TileIcon({ glyph, size }: { glyph: Glyph; size: 'tab' | number }) {
 }
 
 const softOf = (glyph: Glyph) => (glyph.service !== undefined ? SERVICE[glyph.service].soft : 'bg-primary-light');
+/** Viền nhạt cùng tông của ô icon ở lưới Hub. */
+const ringOf = (glyph: Glyph) => (glyph.service !== undefined ? SERVICE[glyph.service].ring : 'border-primary/15');
 
 export function ServiceTile(props: ServiceTileProps) {
   if (props.variant === 'grid') return <GridTile {...props} />;
@@ -54,7 +58,7 @@ export function ServiceTile(props: ServiceTileProps) {
       onPress={onPress}
       accessibilityLabel={label}
       selected={selected}
-      className={['min-h-24 items-center gap-2 border-2', selected ? 'border-primary' : 'border-transparent', className].filter(Boolean).join(' ')}
+      className={['min-h-24 items-center gap-2', className].filter(Boolean).join(' ')}
     >
       <View className={`h-12 w-12 items-center justify-center rounded-full ${softOf(props)}`}>
         <TileIcon glyph={props} size="tab" />
@@ -85,16 +89,23 @@ function GridTile(props: ServiceTileProps) {
         className="min-h-12 items-center gap-2 rounded-lg py-1 active:bg-surface-2"
       >
         <View className="relative">
-          <View className={['size-14 items-center justify-center rounded-lg', softOf(props), dim].join(' ')}>
-            <TileIcon glyph={props} size={28} />
+          <View className={['size-12 items-center justify-center rounded-md border', softOf(props), ringOf(props), dim].join(' ')}>
+            <TileIcon glyph={props} size="tab" />
           </View>
           {badge ? (
             <View
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
-              className={`absolute -right-1.5 -top-1.5 rounded-full px-1.5 py-0.5 ${BADGE[badge.tone].box}`}
+              className={`absolute -right-2 -top-2 rounded-full px-1.5 py-0.5 ${BADGE[badge.tone].box}`}
             >
-              <Text variant="micro" weight="semibold" tone={BADGE[badge.tone].tone} numberOfLines={1}>
+              <Text
+                variant="micro"
+                weight="bold"
+                tone={BADGE[badge.tone].tone}
+                numberOfLines={1}
+                maxFontSizeMultiplier={1.2}
+                className={BADGE[badge.tone].text || undefined}
+              >
                 {badge.label}
               </Text>
             </View>
