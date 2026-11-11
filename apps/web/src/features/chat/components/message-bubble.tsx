@@ -2,16 +2,18 @@
 
 // MessageBubble — một tin nhắn trong khung chat (giống apps/mobile/src/ui/MessageBubble.tsx). Của mình: nền primary, bên
 // phải, góc dưới phải nhọn; người kia: nền surface có viền, bên trái. Ảnh (signed URL hoặc object URL khi đang gửi) bo theo
-// bong bóng, bấm mở ảnh lớn ở tab mới. Dòng phụ: giờ + trạng thái (đang gửi / đã gửi / đã xem); lỗi → nút chữ đỏ
-// "Chưa gửi được…" để gửi lại (không truyền tin chỉ bằng màu).
-// Chat nhóm: tin của người khác có tên người gửi ở tin đầu chuỗi và avatar ở tin cuối chuỗi (cột avatar giữ chỗ để các
-// bong bóng cùng người thẳng hàng).
-import { CircleAlert, LoaderCircle } from 'lucide-react';
+// bong bóng, bấm mở ảnh lớn ở tab mới. Dòng phụ: giờ + trạng thái chữ (đang gửi / đã gửi / đã xem) kèm icon đồng hồ / ✓ /
+// ✓✓ (đã xem: màu primary); lỗi → nút chữ đỏ "Chưa gửi được…" để gửi lại (không truyền tin chỉ bằng màu / icon).
+// `sender` (tin của người khác): chat nhóm có tên người gửi ở tin đầu chuỗi + avatar ở tin cuối chuỗi; chat 1-1 chỉ avatar
+// (cột avatar giữ chỗ để các bong bóng cùng người thẳng hàng).
+import { Check, CheckCheck, CircleAlert, Clock, LoaderCircle, type LucideIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { cn } from '@/lib/utils';
 import type { MessageStatus } from '../use-chat';
+
+const STATUS_ICON: Record<Exclude<MessageStatus, 'failed'>, LucideIcon> = { sending: Clock, sent: Check, seen: CheckCheck };
 
 export type MessageBubbleProps = {
   mine: boolean;
@@ -91,7 +93,10 @@ export function MessageBubble({
           {t('chat.thread.failed')}
         </button>
       ) : showMeta ? (
-        <p className="px-1 text-xs text-muted">{statusText && mine ? `${time} · ${statusText}` : time}</p>
+        <p className="flex items-center gap-1 px-1 text-xs text-muted">
+          {statusText && mine ? `${time} · ${statusText}` : time}
+          {mine && status ? <StatusIcon status={status} /> : null}
+        </p>
       ) : null}
     </div>
   );
@@ -107,4 +112,9 @@ export function MessageBubble({
       {bubble}
     </div>
   );
+}
+
+function StatusIcon({ status }: { status: Exclude<MessageStatus, 'failed'> }) {
+  const Glyph = STATUS_ICON[status];
+  return <Glyph aria-hidden strokeWidth={1.75} className={cn('size-4', status === 'seen' && 'text-primary')} />;
 }
