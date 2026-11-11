@@ -6,7 +6,11 @@ import { listSavedListings, type PublicListing } from '../listings';
 import {
   createListing,
   deleteListing,
+  type FeatureListingsSummary,
+  type FeatureListingsTab,
+  getFeatureListingsSummary,
   getMyListing,
+  listFeatureListings,
   listMyListings,
   type MyListing,
   type MyListingsTab,
@@ -19,7 +23,7 @@ import {
 } from '../listings-write';
 import type { AppError } from '../result';
 import { listBookmarks, type Page, setBookmark } from '../social';
-import type { OwnerListingStatus } from '@hp/shared';
+import type { ListingCategory, OwnerListingStatus } from '@hp/shared';
 import { unwrap } from './hooks';
 import { useSupabase } from './provider';
 
@@ -48,6 +52,35 @@ export function useMyListings(tab: MyListingsTab, opts: { enabled?: boolean } = 
     enabled: opts.enabled ?? true,
   });
   return { ...result, items: result.data?.pages.flatMap((p) => p.items) ?? [] };
+}
+
+/** Mini-app "Quản lý tin": tin của tôi trong danh mục của tính năng, theo tab vòng đời bán. */
+export function useFeatureListings(
+  categories: readonly ListingCategory[],
+  tab: FeatureListingsTab,
+  opts: { enabled?: boolean } = {},
+) {
+  const client = useSupabase();
+  const result = useInfiniteQuery<Page<MyListing>, AppError, MyPages, readonly unknown[], string | null>({
+    queryKey: keys.featureListings(categories, tab),
+    queryFn: ({ pageParam }) => unwrap(listFeatureListings(client, { tab, categories, cursor: pageParam })),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
+    staleTime: 30_000,
+    enabled: opts.enabled ?? true,
+  });
+  return { ...result, items: result.data?.pages.flatMap((p) => p.items) ?? [] };
+}
+
+/** Số tin mỗi tab + lượt xem cho thẻ số liệu "Quản lý tin" của mini-app. */
+export function useFeatureListingsSummary(categories: readonly ListingCategory[], opts: { enabled?: boolean } = {}) {
+  const client = useSupabase();
+  return useQuery<FeatureListingsSummary, AppError>({
+    queryKey: keys.featureListingsSummary(categories),
+    queryFn: () => unwrap(getFeatureListingsSummary(client, { categories })),
+    staleTime: 30_000,
+    enabled: opts.enabled ?? true,
+  });
 }
 
 export function useMyListing(id: string | undefined) {
@@ -102,8 +135,9 @@ function restoreMine(qc: QueryClient, snapshot: ReturnType<typeof snapshotMine>)
   for (const [key, data] of snapshot) qc.setQueryData(key, data);
 }
 function patchMine(qc: QueryClient, id: string, patch: (l: MyListing) => MyListing | null) {
+  // Dưới keys.myListings() còn query không phân trang (myListingStats, featureListingsSummary) → chỉ sửa dữ liệu dạng trang.
   qc.setQueriesData<MyPages>({ queryKey: keys.myListings() }, (data) =>
-    data
+    data && Array.isArray(data.pages)
       ? {
           ...data,
           pages: data.pages.map((p) => ({

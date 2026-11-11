@@ -2,7 +2,9 @@
 // (config.home.bannerPlacement, vd 'app_pass'). Đang tải → khung 16:7 chờ + chấm; lỗi → ErrorState gọn có Thử lại, hoặc
 // ẩn (`hideOnError` — banner chỉ là khuyến mãi, không chặn trang); không có banner → ẩn cả khối. Bấm → `onBannerPress`
 // (analytics) rồi mở link (đường dẫn web nội bộ → màn app tương ứng; https → trình duyệt). Lề 16 nằm trong khối.
+// `fallback` (trang chủ mini-app: khối "An tâm trao tay"): hiện thay khi không có banner nào hoặc lỗi bị ẩn.
 import type { Banner } from '@hp/core';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { bannerImageUrl } from '@/lib/images';
@@ -47,9 +49,11 @@ export type PlacementBannersProps = {
   hideOnError?: boolean;
   /** Gọi trước khi mở link của banner (analytics). */
   onBannerPress?: (banner: Banner) => void;
+  /** Khối thay thế khi không có banner (hoặc lỗi với `hideOnError`). */
+  fallback?: ReactNode;
 };
 
-export function PlacementBanners({ placement, active, hideOnError = false, onBannerPress }: PlacementBannersProps) {
+export function PlacementBanners({ placement, active, hideOnError = false, onBannerPress, fallback = null }: PlacementBannersProps) {
   const { t } = useTranslation();
   // Banner theo ngôn ngữ đang dùng (đổi ngôn ngữ → tải bộ banner của ngôn ngữ đó).
   const banners = usePlacementBanners(placement);
@@ -68,12 +72,12 @@ export function PlacementBanners({ placement, active, hideOnError = false, onBan
     );
   }
   if (banners.isError) {
-    if (hideOnError) return null;
+    if (hideOnError) return fallback;
     return (
       <ErrorState compact className="mx-4" title={t('home.section_error')} code={banners.error.code} onRetry={() => void banners.refetch()} />
     );
   }
-  if (list.length === 0) return null;
+  if (list.length === 0) return fallback;
 
   return (
     <BannerCarousel

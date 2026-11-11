@@ -1,4 +1,5 @@
-// /pass-do — Pass đồ: danh sách dùng chung features/listing (khác biệt ở features/*/config.ts).
+// /pass-do — Pass đồ: danh sách dùng chung features/listing (khác biệt ở features/*/config.ts). config.miniApp → trang chủ
+// mini-app "Chợ Pass Đồ" (header + điều hướng riêng; trang con /bo-loc, /da-luu, /tin-nhan, /quan-ly).
 import type { Metadata } from 'next';
 import { ListingListPage } from '@/features/listing/components/listing-list-page';
 import { listMetadata } from '@/features/listing/metadata';

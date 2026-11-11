@@ -6,6 +6,7 @@
 // Cả hai dùng chung useManage: gọi Server Action (actions.ts) → toast manage.*_done → làm mới query "Tin của tôi" của
 // TanStack (khối xem trước ở /toi + số trên chip) và router.refresh() (trang /toi/tin-cua-toi đọc theo request).
 // Thao tác nào hiện do manage.ts quyết định (chỉ UI); DB mới là nơi chặn.
+// useManage export cho thẻ "Quản lý tin" của mini-app (cùng action / toast / làm mới, hàng nút riêng theo Stitch).
 // Đồ thất lạc: "Đã nhận lại đồ" / "Đã trả cho chủ" → ReturnedDialog (xác nhận → "Bàn giao thành công" → đánh giá, style
 // Stitch; RPC mark_listing_returned trong hộp, đóng hộp mới làm mới danh sách để thẻ không biến mất giữa chừng). Đã trả lại →
 // "Cảm ơn người trả đồ" / "Đánh giá người nhận" → RateListingDialog (rate_listing). Cần `returnable` (tiêu đề, loại, ảnh,
@@ -61,7 +62,7 @@ const ICON: Record<QuickAction['action'], LucideIcon> = {
   renew: CalendarClock,
 };
 
-function useManage(id: string, returnable?: ReturnedListing) {
+export function useManage(id: string, returnable?: ReturnedListing) {
   const t = useTranslations('listing.manage');
   const tForm = useTranslations('listing.form');
   const locale = asLocale(useLocale());

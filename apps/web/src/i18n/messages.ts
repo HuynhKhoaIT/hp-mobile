@@ -42,6 +42,15 @@ export function toIcuString(value: string): string {
   return value.replace(/\{\{\s*([\w.]+)\s*\}\}/g, '{$1}');
 }
 
+/**
+ * `x_other` là dạng số nhiều khi có anh em cùng gốc (`x_one`…) hoặc chữ chứa `{{count}}` (zh chỉ có `_other`). Không thì
+ * là key thường có hậu tố trùng tên dạng số nhiều — vd mã danh mục `pass_other` ("Đồ khác"), `login.use_other`.
+ */
+function isPluralKey(tree: Tree, key: string, base: string, value: string): boolean {
+  if (value.includes('{{count}}')) return true;
+  return Object.keys(tree).some((k) => k !== key && PLURAL.exec(k)?.[1] === base);
+}
+
 /** Đổi một cây i18next sang ICU: placeholder + gộp các key số nhiều `x_one`, `x_other` thành `x`. */
 export function toIcu(tree: Tree): Tree {
   const out: Tree = {};
@@ -52,7 +61,7 @@ export function toIcu(tree: Tree): Tree {
       continue;
     }
     const match = PLURAL.exec(key);
-    if (match?.[1] && match[2]) {
+    if (match?.[1] && match[2] && isPluralKey(tree, key, match[1], value)) {
       (plurals[match[1]] ??= {})[match[2]] = toIcuString(value).replace(/\{count\}/g, '#');
       continue;
     }

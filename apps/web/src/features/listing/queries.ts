@@ -51,12 +51,17 @@ export type ListQuery = {
   freeOnly?: boolean;
   /** Thứ tự (?sort=) — thiếu = mới nhất. */
   sort?: ListingSort;
+  /**
+   * Đọc theo request, không cache: bộ lọc ngoài tập hữu hạn (giá nhập tay ở trang bộ lọc mini-app — hasCustomPrice).
+   * Chỉ gọi sau khi đã đọc searchParams (trong <Suspense>).
+   */
+  fresh?: boolean;
 };
 
 const hasAttributes = (a: AttributeFilter | undefined): a is AttributeFilter => !!a && Object.keys(a).length > 0;
 
 /** Tham số trang đầu được cache: thứ tự khoá cố định, bỏ trường rỗng → khoá cache ổn định. */
-type CachedListKey = Omit<ListQuery, 'query'>;
+type CachedListKey = Omit<ListQuery, 'query' | 'fresh'>;
 
 /** Lỗi đọc dữ liệu: message = mã errors.* (error.tsx không hiện message ở production, chỉ để log). */
 function unwrap<T>(result: Result<T>): T {
@@ -93,9 +98,12 @@ async function getCachedListPage(key: CachedListKey) {
   return { page, now: Date.now() };
 }
 
-/** Trang đầu của danh sách. Có từ khoá → đọc theo request (không cache); chỉ gọi sau khi đã đọc searchParams. */
+/**
+ * Trang đầu của danh sách. Có từ khoá hoặc `fresh` (giá nhập tay) → đọc theo request (không cache); chỉ gọi sau khi đã đọc
+ * searchParams.
+ */
 export async function getListPage(q: ListQuery): Promise<Timed<{ page: Page<PublicListing> }>> {
-  if (!q.query) {
+  if (!q.query && !q.fresh) {
     const key: CachedListKey = { categories: q.categories, site: q.site };
     if (hasAttributes(q.attributes)) key.attributes = q.attributes;
     if (q.maxDistanceM !== undefined) key.maxDistanceM = q.maxDistanceM;

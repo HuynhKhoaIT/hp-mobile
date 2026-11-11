@@ -4,7 +4,7 @@
 // Luồng có ảnh: createListing(status 'draft') → uploadListingImage từng ảnh (cần listing id cho path)
 //   → updateListing({ id, images, status: 'active' }). Thoát giữa chừng thì tin còn ở Nháp.
 import type { Database, Json } from '@hp/db';
-import { CreateListingInput, type OwnerListingStatus, UpdateListingInput } from '@hp/shared';
+import { CreateListingInput, type ListingCategory, type OwnerListingStatus, UpdateListingInput } from '@hp/shared';
 import { flattenIssues } from './profile';
 import { type Client, type Result, fail, fromSupabase, ok, requireUserId } from './result';
 import type { Page } from './social';
@@ -131,6 +131,71 @@ export async function listMyListings(
   if (res.error) return res;
   const items = res.data ?? [];
   return ok({ items, nextCursor: items.length === limit ? (items.at(-1)?.updated_at ?? null) : null });
+}
+
+// ── Quản lý tin trong mini-app (vd Chợ Pass): chỉ tin thuộc danh mục của tính năng, tab theo vòng đời bán ──────
+/** Tab "Quản lý tin" của mini-app: Đang bán · Đã bán · Chờ duyệt (gồm bị từ chối) · Đã ẩn (rút tin, hết hạn, nháp). */
+export type FeatureListingsTab = 'active' | 'sold' | 'pending' | 'hidden';
+export const FEATURE_LISTINGS_TABS: readonly FeatureListingsTab[] = ['active', 'sold', 'pending', 'hidden'];
+const FEATURE_TAB_STATUSES: Record<FeatureListingsTab, ListingRow['status'][]> = {
+  active: ['active'],
+  sold: ['sold'],
+  pending: ['pending_review', 'rejected'],
+  hidden: ['closed', 'expired', 'draft'],
+};
+
+/** Tin của tôi trong các danh mục của một tính năng, theo tab, mới cập nhật trước. Cursor = updated_at của dòng cuối. */
+export async function listFeatureListings(
+  client: Client,
+  opts: { tab: FeatureListingsTab; categories: readonly ListingCategory[]; cursor?: string | null; limit?: number },
+): Promise<Result<Page<MyListing>>> {
+  const uid = await requireUserId(client);
+  if (uid.error) return uid;
+  const limit = Math.min(Math.max(opts.limit ?? 20, 1), 50);
+  let q = client
+    .from('listings')
+    .select(MY_LISTING_COLUMNS)
+    .eq('owner_id', uid.data)
+    .is('deleted_at', null)
+    .in('category', [...opts.categories])
+    .in('status', FEATURE_TAB_STATUSES[opts.tab])
+    .order('updated_at', { ascending: false })
+    .limit(limit);
+  if (opts.cursor) q = q.lt('updated_at', opts.cursor);
+  const res = fromSupabase<MyListing[]>(await q);
+  if (res.error) return res;
+  const items = res.data ?? [];
+  return ok({ items, nextCursor: items.length === limit ? (items.at(-1)?.updated_at ?? null) : null });
+}
+
+/** Số tin mỗi tab + tổng lượt xem của tin đang bán / đã bán (thẻ số liệu "Quản lý tin" của mini-app). */
+export type FeatureListingsSummary = Record<FeatureListingsTab, number> & { views: number };
+
+/** Đếm trên tin của chính người gọi (RLS), tối đa 1000 tin gần nhất — đủ cho một người đăng. */
+export async function getFeatureListingsSummary(
+  client: Client,
+  opts: { categories: readonly ListingCategory[] },
+): Promise<Result<FeatureListingsSummary>> {
+  const uid = await requireUserId(client);
+  if (uid.error) return uid;
+  const res = fromSupabase<Pick<ListingRow, 'status' | 'view_count'>[]>(
+    await client
+      .from('listings')
+      .select('status,view_count')
+      .eq('owner_id', uid.data)
+      .is('deleted_at', null)
+      .in('category', [...opts.categories])
+      .order('updated_at', { ascending: false })
+      .limit(1000),
+  );
+  if (res.error) return res;
+  const out: FeatureListingsSummary = { active: 0, sold: 0, pending: 0, hidden: 0, views: 0 };
+  for (const row of res.data ?? []) {
+    const tab = FEATURE_LISTINGS_TABS.find((t) => FEATURE_TAB_STATUSES[t].includes(row.status));
+    if (tab) out[tab] += 1;
+    if (row.status === 'active' || row.status === 'sold') out.views += row.view_count;
+  }
+  return ok(out);
 }
 
 /** Một tin của tôi (màn sửa) — kèm lat / lng gần đúng không có: form dùng lại site / address_text. */

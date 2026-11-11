@@ -10,6 +10,7 @@
 // bước Thông tin chính), `form.hiddenAttributes`, `form.photosTipKey` / `form.privacyNotice` (bước Ảnh), gợi ý chữ riêng.
 // Trang chủ riêng của tính năng (Pass đồ kiểu "chợ đồ cũ"): `home` (lưới danh mục + banner + dải tin trước danh sách đầy đủ),
 // filter 'price' (khoảng giá đặt sẵn `priceRanges`) + 'sort', chip lọc nhanh "Cho tặng" (`freeOnly`).
+// Mini-app (Chợ Pass Đồ, Stitch "Sub-App Chợ Pass"): `miniApp` — route mini/[feature] có thanh tab riêng.
 import type { ListingCategory, ListingFeature, ListingPriceRange, PriceType } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react-native';
 import type { ListingCardDisplay, ListingCardLayout, ServiceKey } from '@/ui';
@@ -78,6 +79,26 @@ export type ListingFeatureHomeConfig = {
 };
 
 /**
+ * Mini-app riêng của tính năng (Pass đồ → "Chợ Pass Đồ"): bấm tính năng ở super app mở `mini/[feature]` có thanh tab
+ * riêng (Trang chủ chợ · Đã lưu · [Đăng tin] · Chat · Quản lý tin) thay cho danh sách `listings/[feature]`. Engine:
+ * features/listing/miniApp.ts + components/mini. Không khai báo → tính năng vẫn mở danh sách như cũ.
+ */
+export type ListingMiniAppConfig = {
+  /** Key i18n tên mini-app (vd 'listing:mini_app.title.pass' — "Chợ Pass Đồ"). */
+  titleKey: string;
+  /** Key i18n dòng phụ dưới tên ở header trang chủ mini-app. */
+  subtitleKey: string;
+  /** Key i18n nhãn tab trang chủ + nút quay về trang chủ ở các tab khác (vd "Chợ Pass"). */
+  homeTabKey: string;
+  /** Icon ô vuông trước tên mini-app ở header (nền accent). */
+  icon: LucideIcon;
+  /** banners.placement của trang chủ mini-app (vd 'app_pass'); placement chưa có banner nào → khối "An tâm trao tay". */
+  bannerPlacement: string;
+  /** Số ô danh mục hiện trước ô "Cho tặng" + "Tất cả mục" ở lưới trang chủ (lưới 4 cột → 6 = 2 hàng). */
+  homeCategoryCount: number;
+};
+
+/**
  * Khối mời đăng tin đầu danh sách (khi chưa lọc), mỗi nút mở thẳng form đúng danh mục (bắt đăng nhập trước).
  * 'actions': thẻ có dòng chữ + các nút chia đều (đồ thất lạc: "Báo nhặt được" / "Đăng tin tìm đồ") · 'strip': dải mỏng
  * chữ + một nút (trọ: "Bạn là chủ trọ? Đăng tin"). Khớp web `ListingListBanner`.
@@ -139,6 +160,8 @@ export type ListingFeatureConfig = {
   priceRanges?: readonly ListingPriceRange[];
   /** Trang chủ riêng của tính năng (lưới danh mục, banner, dải tin) trên danh sách khi chưa lọc. */
   home?: ListingFeatureHomeConfig;
+  /** Mini-app riêng có thanh tab (thay danh sách `listings/[feature]`). */
+  miniApp?: ListingMiniAppConfig;
   /** Khối riêng ở chi tiết (chủ tin). */
   detail?: ListingDetailConfig;
   /** Form đăng tin; không có ở danh sách tổng hợp 'all'. */

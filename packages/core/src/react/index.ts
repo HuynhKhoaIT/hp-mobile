@@ -26,6 +26,8 @@ export {
   useBookmarkedListingIds,
   useCreateListing,
   useDeleteListing,
+  useFeatureListings,
+  useFeatureListingsSummary,
   useMyListing,
   useMyListings,
   useRenewListing,

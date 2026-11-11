@@ -11,23 +11,22 @@
 //   1024px nằm trong cột phải dính + dòng gợi ý contact.hint.
 // - Tin đã bán / đóng / hết hạn: ẩn liên hệ, chỉ còn Chia sẻ (banner trạng thái ở trang).
 // - Người xem không phải chủ tin: "Báo cáo tin" (ReportButton; khách → LoginDialog).
-// - Chia sẻ: Web Share API (điện thoại); không có → sao chép link web (shareUrl của @hp/core) + toast "Đã sao chép".
-import { recordListingView, shareUrl } from '@hp/core';
-import { APP_NAME, featureOfCategory, formatVnPhone, type ListingCategory } from '@hp/shared';
+// - Chia sẻ: useShareListing (Web Share API trên điện thoại; không có → sao chép link web + toast "Đã sao chép").
+import { recordListingView } from '@hp/core';
+import { featureOfCategory, formatVnPhone, type ListingCategory } from '@hp/shared';
 import { MessageCircle, Pencil, Share2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import { LoginDialog } from '@/components/shared/login-dialog';
 import { takeLoginIntent } from '@/components/shared/login-intent';
-import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
 import { useErrorText } from '@/features/auth/components/use-error-text';
 import { useSessionUser } from '@/features/auth/components/use-session-user';
 import { useOpenConversation } from '@/features/chat/use-chat';
 import { ReportButton } from '@/features/report/components/report-button';
 import { Link } from '@/i18n/navigation';
-import { publicEnv } from '@/lib/env';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { useShareListing } from '../use-share-listing';
 import { PhoneAction, useContactReveal } from './contact-reveal';
 
 export function ListingActions({
@@ -51,7 +50,6 @@ export function ListingActions({
   primaryCta?: 'chat' | 'call';
 }) {
   const t = useTranslations();
-  const toast = useToast();
   const userId = useSessionUser();
   const isOwner = !!userId && userId === ownerId;
 
@@ -61,25 +59,8 @@ export function ListingActions({
     void recordListingView(createBrowserClient(), listingId);
   }, [userId, listingId]);
 
-  const share = async () => {
-    const url = shareUrl({ type: 'listing', slug }, publicEnv.siteUrl);
-    const text = t('listing.detail.share_text', { title, app: APP_NAME });
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ title, text, url });
-        return;
-      } catch (e) {
-        // Người dùng huỷ chia sẻ: không làm gì.
-        if (e instanceof DOMException && e.name === 'AbortError') return;
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.show(t('listing.detail.link_copied'));
-    } catch {
-      toast.show(t('errors.unknown'), 'error');
-    }
-  };
+  const shareListing = useShareListing();
+  const share = () => shareListing({ slug, title });
 
   const shareButton = (
     <Button type="button" variant="outline" size="lg" onClick={() => void share()}>

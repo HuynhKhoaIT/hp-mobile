@@ -12,6 +12,9 @@
 // Pass đồ (config.priceRanges / sortable / chip freeOnly): `?price=500k_2m` (khoá khoảng giá → p_price_min / p_price_max),
 // `?sort=price_asc|price_desc` (mặc định newest — không ghi lên URL), `?free=1` (chỉ tin cho tặng → p_free_only). Đều là tập
 // hữu hạn → cache được; tính năng không khai báo thì tham số bị bỏ qua.
+// Mini-app (config.customPrice — trang bộ lọc Chợ Pass): ô giá tối thiểu / tối đa tuỳ ý `?price_min=300000&price_max=2500000`
+// (số nguyên VND ≥ 0, tối thiểu > tối đa → bỏ tối thiểu). Không phải tập hữu hạn → trang đầu KHÔNG cache (hasCustomPrice →
+// getListPage `fresh`) và noindex (metadata.ts). Tính năng không bật customPrice: price_max vẫn chỉ nhận mốc chip giá.
 import {
   ATTRIBUTE_FIELDS,
   type AttributeField,
@@ -32,7 +35,9 @@ export type ListFilterState = {
   site: string | null;
   /** Cách khu làm việc tối đa (km) — null = mọi khoảng cách. */
   distanceKm: number | null;
-  /** Giá tối đa (VND) — null = mọi mức giá. */
+  /** Giá tối thiểu (VND, ô nhập — config.customPrice) — null = không giới hạn. */
+  priceMin: number | null;
+  /** Giá tối đa (VND): mốc chip giá, hoặc ô nhập tuỳ ý khi config.customPrice — null = mọi mức giá. */
   priceMax: number | null;
   /** Khoá khoảng giá đặt sẵn (config.priceRanges) — null = mọi mức giá. */
   priceRange: string | null;
@@ -58,6 +63,8 @@ export type ListFilterOptions = {
   sortable?: boolean;
   /** Có chip "Cho tặng" (chip freeOnly trong config.quickFilters). */
   freeOnly?: boolean;
+  /** Ô giá tối thiểu / tối đa tuỳ ý (config.customPrice). */
+  customPrice?: boolean;
 };
 
 export const NO_FILTERS: ListFilterState = {
@@ -65,6 +72,7 @@ export const NO_FILTERS: ListFilterState = {
   query: '',
   site: null,
   distanceKm: null,
+  priceMin: null,
   priceMax: null,
   priceRange: null,
   freeOnly: false,
@@ -76,7 +84,10 @@ type RawParams = Record<string, string | string[] | undefined>;
 type FilterableField = Extract<AttributeField, { kind: 'enum' | 'bool' }>;
 
 /** Tham số đã dùng cho bộ lọc chung — thuộc tính không được trùng tên. */
-const RESERVED = new Set(['category', 'q', 'site', 'distance', 'price_max', 'price', 'free', 'sort', 'tab', 'next']);
+const RESERVED = new Set(['category', 'q', 'site', 'distance', 'price_min', 'price_max', 'price', 'free', 'sort', 'tab', 'next']);
+
+/** Trần ô giá tuỳ ý (VND) — chặn số vô lý trên URL. */
+const PRICE_INPUT_MAX = 100_000_000_000;
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
@@ -101,7 +112,31 @@ export function filterOptionsOf(cfg: ListingFeatureConfig | null): ListFilterOpt
     priceRanges: cfg.priceRanges ?? [],
     sortable: cfg.sortable ?? false,
     freeOnly: (cfg.quickFilters ?? []).some(isFreeQuickFilter),
+    customPrice: cfg.customPrice ?? false,
   };
+}
+
+/** Số VND nguyên ≥ 0 từ ô nhập (bỏ dấu chấm / phẩy / khoảng trắng phân tách nghìn). */
+export function parsePriceInput(raw: string | undefined): number | null {
+  if (!raw) return null;
+  const digits = raw.replace(/[\s.,]/g, '');
+  if (!/^\d{1,12}$/.test(digits)) return null;
+  const n = Number(digits);
+  return Number.isSafeInteger(n) && n <= PRICE_INPUT_MAX && ListingFilters.safeParse({ priceMin: n }).success ? n : null;
+}
+
+/**
+ * "Loại đồ" của một danh mục = trường enum ĐẦU TIÊN của ATTRIBUTE_FIELDS (pass: device_type, vehicle_type…; trừ `condition`)
+ * — chip "Loại đồ cụ thể" ở trang bộ lọc (`?device_type=phone`). null = danh mục không có (pass_other).
+ */
+export function categoryTypeField(category: ListingCategory): Extract<AttributeField, { kind: 'enum' }> | null {
+  const field = ATTRIBUTE_FIELDS[category][0];
+  return field?.kind === 'enum' && field.key !== 'condition' && !RESERVED.has(field.key) ? field : null;
+}
+
+/** Giá tuỳ ý (ô nhập) — tập vô hạn → không cache trang đầu, noindex. */
+export function hasCustomPrice(f: ListFilterState, options: ListFilterOptions): boolean {
+  return f.priceMin !== null || (f.priceMax !== null && !(options.priceMax ?? []).includes(f.priceMax));
 }
 
 /** Trường lọc được (enum / bool) của các category. Cùng khoá ở nhiều category (item_type) → gộp các lựa chọn. */
@@ -161,8 +196,13 @@ export function parseListFilters(
       ? rawDistance
       : null;
   const rawPrice = Number(first(raw.price_max));
-  const priceMax =
+  const quickPriceMax =
     (options.priceMax ?? []).includes(rawPrice) && ListingFilters.safeParse({ priceMax: rawPrice }).success ? rawPrice : null;
+  const inputMax = options.customPrice ? parsePriceInput(first(raw.price_max)) : null;
+  const priceMax = quickPriceMax ?? inputMax;
+  const inputMin = options.customPrice ? parsePriceInput(first(raw.price_min)) : null;
+  // Tối thiểu > tối đa: bỏ tối thiểu (trang bộ lọc đã báo lỗi trước khi gửi; URL gõ tay thì giữ phần còn hợp lệ).
+  const priceMin = inputMin !== null && inputMin > 0 && (priceMax === null || inputMin <= priceMax) ? inputMin : null;
   const rawRange = first(raw.price);
   const priceRange = (options.priceRanges ?? []).find((r) => r.key === rawRange)?.key ?? null;
   const rawSort = first(raw.sort);
@@ -182,6 +222,7 @@ export function parseListFilters(
     query: q.success ? (q.data.query ?? '') : '',
     site: s.success ? (s.data.site ?? null) : null,
     distanceKm,
+    priceMin,
     priceMax,
     priceRange,
     freeOnly,
@@ -193,7 +234,7 @@ export function parseListFilters(
 /** Số tham số lọc đang dùng (robots noindex khi > 2 — .claude/rules/web-seo-public.md). Sắp xếp không tính (xem isFiltered). */
 export function activeFilterCount(f: ListFilterState): number {
   return (
-    [f.category, f.query, f.site, f.distanceKm, f.priceMax, f.priceRange, f.freeOnly].filter(Boolean).length +
+    [f.category, f.query, f.site, f.distanceKm, f.priceMin, f.priceMax, f.priceRange, f.freeOnly].filter(Boolean).length +
     Object.keys(f.attributes).length
   );
 }
@@ -211,9 +252,10 @@ export function searchFiltersOf(
 ): { maxDistanceM?: number; priceMin?: number; priceMax?: number; freeOnly?: boolean; sort?: ListingSort } {
   const range = (options.priceRanges ?? []).find((r) => r.key === f.priceRange);
   const maxes = [range?.max, f.priceMax ?? undefined].filter((v): v is number => v !== undefined);
+  const mins = [range?.min, f.priceMin ?? undefined].filter((v): v is number => v !== undefined);
   return {
     maxDistanceM: distanceMeters(f.distanceKm),
-    priceMin: range?.min,
+    priceMin: mins.length > 0 ? Math.max(...mins) : undefined,
     priceMax: maxes.length > 0 ? Math.min(...maxes) : undefined,
     freeOnly: f.freeOnly || undefined,
     sort: f.sort === 'newest' ? undefined : f.sort,
@@ -238,6 +280,7 @@ export function filterQuery(f: Partial<ListFilterState>): Record<string, string>
   if (f.query) out.q = f.query;
   if (f.site) out.site = f.site;
   if (f.distanceKm) out.distance = String(f.distanceKm);
+  if (f.priceMin) out.price_min = String(f.priceMin);
   if (f.priceMax) out.price_max = String(f.priceMax);
   if (f.priceRange) out.price = f.priceRange;
   if (f.freeOnly) out.free = '1';

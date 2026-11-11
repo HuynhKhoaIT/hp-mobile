@@ -4,7 +4,8 @@ import { LISTING_FEATURE_PATHS, shareUrl } from '@hp/core';
 import type { ListingFeature } from '@hp/shared';
 import { type Href, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { LISTING_ROUTE_SLUG } from '@/features/listing/navigation';
+import { hasMiniApp } from '@/features/configs';
+import { LISTING_ROUTE_SLUG, miniAppHref } from '@/features/listing/navigation';
 import { requireAuth } from '@/core/auth';
 import { getLocale } from '@/core/i18n';
 import { env } from '@/core/env';
@@ -50,7 +51,10 @@ export function routeForWebPath(input: string): AppRoute | null {
   if (path === '/tin') return { href: { pathname: '/listings/[feature]', params: { feature: 'all', ...listParams } }, auth: false };
   const feature = (Object.keys(LISTING_FEATURE_PATHS) as ListingFeature[]).find((f) => LISTING_FEATURE_PATHS[f] === path);
   if (feature) {
-    return { href: { pathname: '/listings/[feature]', params: { feature: LISTING_ROUTE_SLUG[feature], ...listParams } }, auth: false };
+    const slug = LISTING_ROUTE_SLUG[feature];
+    // Tính năng có mini-app (Pass đồ → Chợ Pass Đồ): mở trang chủ mini-app với cùng bộ lọc đặt sẵn.
+    if (hasMiniApp(slug)) return { href: miniAppHref(slug, listParams), auth: false };
+    return { href: { pathname: '/listings/[feature]', params: { feature: slug, ...listParams } }, auth: false };
   }
   const slug = /^\/tin\/([^/]+)$/.exec(path)?.[1];
   if (slug) return { href: { pathname: '/tin/[slug]', params: { slug: decodeURIComponent(slug) } }, auth: false };

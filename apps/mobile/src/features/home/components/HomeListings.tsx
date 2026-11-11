@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { usePostListing } from '@/features/listing/hooks';
 import { LISTING_ROUTE_SLUG, openListingList } from '@/features/listing/navigation';
+import { openFeature } from '../navigation';
 import { EmptyState } from '@/ui';
 import type { HomeSite, useHomeRails } from '../hooks';
 import { HomeRail } from './HomeRail';
@@ -73,7 +74,7 @@ export function HomeListings({ site, rails }: { site: HomeSite; rails: ReturnTyp
           isError={query.isError}
           errorCode={query.error?.code}
           onRetry={() => void query.refetch()}
-          onSeeAll={() => openListingList(LISTING_ROUTE_SLUG[feature], {})}
+          onSeeAll={() => openFeature(LISTING_ROUTE_SLUG[feature])}
         />
       ))}
     </View>

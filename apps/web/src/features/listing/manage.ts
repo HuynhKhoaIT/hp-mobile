@@ -5,7 +5,7 @@
 // Đồ thất lạc (Stitch L2 "Đồ thất lạc của tôi", khớp app MyListingRow): đang đăng, chưa trả → "Đã nhận lại đồ" / "Đã trả cho
 // chủ" (mark_listing_returned) là nút nhanh chính; đã trả lại → không còn Mở lại, nút nhanh chính "Cảm ơn người trả đồ" /
 // "Đánh giá người nhận" (rate_listing — RateListingDialog).
-import type { MyListing, MyListingsTab } from '@hp/core';
+import { FEATURE_LISTINGS_TABS, type FeatureListingsTab, type MyListing, type MyListingsTab } from '@hp/core';
 import { featureOfCategory, type ListingStatus } from '@hp/shared';
 import type { BadgeTone } from '@/components/shared/badge';
 import { isReturned } from './display';
@@ -15,6 +15,12 @@ export const RENEW_WINDOW_DAYS = 3;
 
 /** Tab "Tin của tôi" (listMyListings): Chờ duyệt gồm cả bị từ chối; Đã đóng gồm đã bán / đã đóng / hết hạn. */
 export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
+
+/** Tab "Quản lý tin" của mini-app (?tab=active|sold|pending|hidden — listFeatureListings); sai / thiếu → Đang bán. */
+export function parseFeatureTab(raw: string | string[] | undefined): FeatureListingsTab {
+  const v = Array.isArray(raw) ? raw[0] : raw;
+  return (FEATURE_LISTINGS_TABS as readonly string[]).includes(v ?? '') ? (v as FeatureListingsTab) : 'active';
+}
 
 export type ManageAction = 'edit' | 'sold' | 'returned' | 'rate' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
 

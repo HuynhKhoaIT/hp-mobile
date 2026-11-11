@@ -1,11 +1,11 @@
 // Hook chat riêng mobile (ghép @hp/core với điều hướng, chọn ảnh, MMKV). Dữ liệu + optimistic ở @hp/core/react.
 // Hộp thư: dịch vụ của hội thoại (conversationFeature) và lọc tại chỗ (useInboxFilter) ở @hp/core — dùng chung web;
 // chữ giá tin ngữ cảnh (useConversationPrice) dịch + định dạng ở đây.
-import { type ChatMessage, type ConversationSummary, conversationPriceSource } from '@hp/core';
+import { type ChatMessage, type ConversationSummary, conversationFeature, conversationPriceSource } from '@hp/core';
 import { useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
-import { type ChatContentError, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
+import { type ChatContentError, type Feature, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
 import { router } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -157,6 +157,27 @@ export const isGroupConversation = (c: Pick<ConversationSummary, 'kind'>) => c.k
 
 export { conversationFeature } from '@hp/core';
 export { type InboxFilter, useInboxFilter } from '@hp/core/react';
+
+/** Hộp thư khoá theo một dịch vụ (tab Chat của mini-app) tự tải thêm trang tới khi đủ số dòng này (giống useInboxFilter). */
+const LOCKED_MIN_VISIBLE = 8;
+
+/**
+ * Hộp thư chỉ một dịch vụ (tab Chat của mini-app — vd Chợ Pass chỉ hội thoại về tin pass đồ): lọc tại chỗ theo
+ * conversationFeature; ít dòng mà còn trang → tự tải thêm. Không có chip lọc (useInboxFilter chỉ bật chip khi hộp thư có
+ * từ hai dịch vụ trở lên nên không khoá được). `feature` undefined → trả nguyên hộp thư, không tự tải thêm.
+ */
+export function useFeatureInbox(
+  list: { items: ConversationSummary[]; hasNextPage: boolean; isFetchingNextPage: boolean; fetchNextPage: () => unknown },
+  feature: Feature | undefined,
+) {
+  const { items, hasNextPage, isFetchingNextPage, fetchNextPage } = list;
+  const visible = useMemo(() => (feature ? items.filter((c) => conversationFeature(c) === feature) : items), [items, feature]);
+  const short = !!feature && visible.length < LOCKED_MIN_VISIBLE;
+  useEffect(() => {
+    if (short && hasNextPage && !isFetchingNextPage) void fetchNextPage();
+  }, [short, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  return visible;
+}
 
 /** Chữ giá của tin ngữ cảnh ("1.500.000 ₫", "Thoả thuận"…); việc làm / hội thoại nhóm / không giá → null. */
 export function useConversationPrice() {
