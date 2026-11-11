@@ -6,6 +6,8 @@
 // Stitch L2 (form): chọn "Tôi làm mất / Tôi nhặt được" bằng 2 thẻ lớn ở bước chọn danh mục; bước Ảnh có hộp nhắc che số
 // giấy tờ; loại đồ + nơi + thời điểm lên bước Thông tin chính; không có giá; `returned` không hiện trong form (chỉ đặt qua
 // "Đã nhận lại đồ"). Gợi ý tiêu đề / mô tả riêng (giữ một chi tiết để hỏi người đến nhận).
+// Stitch L3 ("Tìm kiếm đồ thất lạc & Nhặt được"): khối 2 nút "Báo nhặt được" / "Đăng tin tìm đồ" đầu danh sách mở thẳng form
+// đúng danh mục; thẻ có mô tả 2 dòng + dòng người đăng; tin đã trả lại: ảnh mờ + tiêu đề gạch ngang (ListingCard).
 import { LISTING_FEATURES } from '@hp/shared';
 import { HandHeart, Megaphone } from 'lucide-react-native';
 import type { ListingFeatureConfig } from '@/features/listing/types';
@@ -24,11 +26,21 @@ export const lostFoundConfig: ListingFeatureConfig = {
     { key: 'item_type', value: 'phone' },
     { key: 'item_type', value: 'keys' },
   ],
+  banner: {
+    variant: 'actions',
+    textKey: 'listing:list.banner.lost_found_text',
+    actions: [
+      { labelKey: 'listing:list.banner.found_cta', category: 'found', icon: HandHeart },
+      { labelKey: 'listing:list.banner.lost_cta', category: 'lost', icon: Megaphone },
+    ],
+  },
   card: {
     variant: 'row',
-    estimatedHeight: 150,
+    estimatedHeight: 200,
     display: {
       facts: ['item_type'],
+      description: true,
+      owner: true,
       categoryBadge: {
         lost: { tone: 'danger', labelKey: 'listing:lost_found.kind_lost' },
         found: { tone: 'success', labelKey: 'listing:lost_found.kind_found' },

@@ -48,5 +48,9 @@
   "translate_failed": "翻译失败，请稍后再试。",
   "images_min": "房屋信息至少需要 3 张照片。",
   "contact_invalid": "请输入有效的电话号码（例如 0912 345 678）或电子邮箱。",
-  "consent_required": "请同意后我们才能联系您。"
+  "consent_required": "请同意后我们才能联系您。",
+  "listing_not_returned": "物品交还后才能评价。",
+  "listing_already_rated": "你已经为这条信息评价过了。",
+  "cannot_rate_self": "不能评价自己。",
+  "rating_no_chat": "只能评价就这条信息与你聊过天的人。"
 }

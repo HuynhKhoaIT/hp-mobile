@@ -8,7 +8,8 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { absoluteUrl, localeAlternates } from '@/i18n/alternates';
 import { listingImageUrl } from '@/lib/images';
 import { asLocale, priceText } from './display';
-import { activeFilterCount, filterQuery, parseListFilters } from './filters';
+import { LISTING_FEATURE_CONFIGS } from './features';
+import { activeFilterCount, filterQuery, parseListFilters, priceMaxOptions } from './filters';
 import { getPublicSites } from './queries';
 import { type ListScope, scopeInfo } from './scope';
 
@@ -20,10 +21,12 @@ const withQuery = (path: string, query: Record<string, string>) => {
 };
 
 export async function listMetadata(scope: ListScope, searchParams: Promise<RawParams>): Promise<Metadata> {
-  const { path, categories, seoKey, distanceKm } = scopeInfo(scope);
+  const { feature, path, categories, seoKey, distanceKm } = scopeInfo(scope);
   const locale = asLocale(await getLocale());
   const t = await getTranslations();
-  const filters = parseListFilters(await searchParams, categories, distanceKm);
+  // Cùng mốc giá với trang (chip lọc nhanh giá) để ?price_max= được tính vào số tham số lọc (noindex khi lọc sâu).
+  const prices = priceMaxOptions(feature ? LISTING_FEATURE_CONFIGS[feature].quickFilters : undefined);
+  const filters = parseListFilters(await searchParams, categories, distanceKm, prices);
   const siteName = filters.site ? (await getPublicSites()).find((s) => s.code === filters.site)?.name : undefined;
 
   const title = siteName

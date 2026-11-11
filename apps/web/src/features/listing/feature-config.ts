@@ -5,6 +5,8 @@
 // (chip lọc nhanh theo thông số — tham số URL `?has_loft=1`), `tipKey` (mẹo an toàn riêng), `primaryCta` (nút liên hệ chính).
 // Stitch L2 (form đăng tin, khớp app `config.form` + `categoryIcons`): `categoryIcons` (thẻ danh mục ở bước chọn), `form`
 // (thông số lên bước Thông tin chính, trường ẩn, mẹo / hộp nhắc ở bước Ảnh, gợi ý chữ riêng).
+// Stitch L3 (danh sách việc ca kíp / trọ / đồ thất lạc, khớp app): `card.owner | bookmark | description`, chip lọc nhanh giá
+// tối đa (`?price_max=1000000`), `banner` (khối mời đăng tin đầu danh sách).
 import type { ListingFeaturePath } from '@hp/core';
 import type { ListingCategory, ListingFeature } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react';
@@ -20,6 +22,12 @@ export type ListingCardDisplay = {
   placeKey?: string;
   /** Khoá attributes datetime thay thời gian đăng ở dòng cuối thẻ (vd `lost_at`). */
   timeKey?: string;
+  /** Đoạn mô tả tối đa 2 dòng dưới thông số (đồ thất lạc: đặc điểm đồ). */
+  description?: boolean;
+  /** Dòng người đăng cuối thẻ: avatar + tên rút gọn + dấu xác minh (owner_badges). */
+  owner?: boolean;
+  /** Nút tim lưu tin góc phải trên của thẻ (ẩn với tin của chính mình). */
+  bookmark?: boolean;
 };
 
 /** Khác biệt của form "Đăng nhanh" theo tính năng — giống `ListingFormConfig` của app (apps/mobile/src/features/listing/types.ts). */
@@ -37,8 +45,22 @@ export type ListingFormDisplay = {
   descriptionHintKey?: string;
 };
 
-/** Chip lọc nhanh theo thông số (chỉ trường enum / bool — filterableFields của filters.ts). */
-export type ListingQuickFilter = { key: string; value: string | boolean };
+/**
+ * Chip lọc nhanh: theo thông số (chỉ trường enum / bool — filterableFields của filters.ts) hoặc giá tối đa (VND,
+ * `?price_max=` → search_listings p_price_max; nhãn riêng qua `labelKey`). Giống `ListingQuickFilter` của app.
+ */
+export type ListingQuickFilter = { key: string; value: string | boolean } | { priceMax: number; labelKey: string };
+
+/**
+ * Khối mời đăng tin đầu danh sách (khi chưa lọc) — mỗi nút tới /dang-tin chọn sẵn tính năng + danh mục. Giống
+ * `ListingListBanner` của app: 'actions' (thẻ chữ + các nút chia đều — đồ thất lạc) · 'strip' (dải mỏng chữ + một nút — trọ).
+ */
+export type ListingListBanner = {
+  variant: 'actions' | 'strip';
+  /** Key i18n dòng chữ của khối. */
+  textKey: string;
+  actions: readonly { labelKey: string; category: ListingCategory; Icon?: LucideIcon }[];
+};
 
 export type ListingFeatureConfig = {
   feature: ListingFeature;
@@ -61,6 +83,8 @@ export type ListingFeatureConfig = {
   card?: ListingCardDisplay;
   /** Chip lọc nhanh dưới chip danh mục (bật / tắt; cùng khoá thì thay giá trị). */
   quickFilters?: readonly ListingQuickFilter[];
+  /** Khối mời đăng tin đầu danh sách (trước mẹo an toàn). */
+  banner?: ListingListBanner;
   /** Key i18n mẹo an toàn riêng (đầu danh sách + chi tiết); thiếu → `listing.detail.safety_tip`. */
   tipKey?: string;
   /** Nút liên hệ chính ở chi tiết: 'chat' (mặc định) hoặc 'call' (Hiện số → Gọi — trọ, đồ thất lạc). */

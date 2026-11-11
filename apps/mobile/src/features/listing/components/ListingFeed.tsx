@@ -1,6 +1,7 @@
 // Danh sách tin cuộn vô hạn (FlashList v2, cursor) dùng chung 4 tính năng: skeleton đúng hình thẻ → rỗng có CTA
 // → lỗi có Thử lại → lưới / hàng theo config.card.variant; kéo để làm mới; chân danh sách: đang tải / hết tin / thử lại.
-// Điểm nhấn thẻ (config.card.display): config tính năng của từng tin khi có `configOf` (danh sách trộn), không thì `config`.
+// Điểm nhấn thẻ (config.card.display): config tính năng của từng tin khi có `configOf` (danh sách trộn), không thì `config`;
+// `display.bookmark` → thẻ có nút tim lưu tin (ListingCardItem).
 import type { PublicListing } from '@hp/core';
 import type { ListingCategory } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
@@ -12,7 +13,6 @@ import {
   EmptyState,
   type EmptyStateProps,
   ErrorState,
-  ListingCard,
   SERVICE,
   SkeletonListingCard,
   StaggerItem,
@@ -21,6 +21,7 @@ import {
 } from '@/ui';
 import { openListing } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
+import { ListingCardItem } from './ListingCardItem';
 
 export type ListingFeedProps = {
   config: ListingFeatureConfig;
@@ -97,7 +98,7 @@ export function ListingFeed(p: ListingFeedProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item, index }) => (
         <StaggerItem index={index} className={grid ? (index % 2 === 0 ? 'pb-3 pr-1.5' : 'pb-3 pl-1.5') : 'pb-3'}>
-          <ListingCard
+          <ListingCardItem
             listing={item}
             layout={p.config.card.variant}
             display={(p.configOf?.(item.category) ?? p.config).card.display}

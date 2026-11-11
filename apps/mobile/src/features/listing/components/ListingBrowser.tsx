@@ -3,9 +3,11 @@
 //     kiếm nổi (SearchBar elevated). Tìm có từ khoá → log_search + event `search` (useListingBrowser).
 //   2 hàng chip tràn mép: [Xoá lọc ×] (khi đang lọc) · [bộ lọc đặt sẵn ×] · [Khu ▾] · [Khoảng cách ▾] (trọ) · chip danh mục
 //     con (nhãn theo config.card.display.categoryBadge nếu có — đồ thất lạc: "Mất đồ / Nhặt được").
-//   3 hàng chip lọc nhanh theo thông số (config.quickFilters — bật / tắt, vd trọ "Có gác", "Chỗ để xe").
-//   4 danh sách cuộn vô hạn; khi chưa tìm / lọc, đầu danh sách: `header` (vd dải nhóm ở Khám phá) → mẹo an toàn riêng tính
-//     năng (config.tipKey, Notice bordered) → tiêu đề "Tin mới đăng" có vạch cam.
+//   3 hàng chip lọc nhanh theo thông số (config.quickFilters — bật / tắt, vd trọ "Có gác", "Chỗ để xe") hoặc giá tối đa
+//     (trọ "Dưới 1 triệu/tháng" → p_price_max).
+//   4 danh sách cuộn vô hạn; khi chưa tìm / lọc, đầu danh sách: `header` (vd dải nhóm ở Khám phá) → khối mời đăng tin
+//     (config.banner — mở thẳng form đúng danh mục) → mẹo an toàn riêng tính năng (config.tipKey, Notice bordered) → tiêu
+//     đề "Tin mới đăng" có vạch cam.
 // Khác Stitch (cố ý): không đếm "Tìm thấy N tin" (RPC phân trang cursor, không trả tổng), không "Sắp xếp" (RPC chỉ mới nhất),
 // không bản đồ, không mic (bàn phím hệ thống đã có nhập giọng nói), không chip khu đặt tên tay — khu lấy từ bảng sites.
 import { useSites } from '@hp/core/react';
@@ -16,8 +18,9 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { formatNumber } from '@/lib/format';
 import { Chip, Col, FilterBar, Notice, PageHero, SearchBar, SectionHeader, Select } from '@/ui';
-import { ALL, DISTANCE_OPTIONS_KM, type ListingPreset, useListingBrowser, usePostListing } from '../hooks';
+import { ALL, DISTANCE_OPTIONS_KM, isPriceQuickFilter, type ListingPreset, useListingBrowser, usePostListing } from '../hooks';
 import type { ListingFeatureConfig } from '../types';
+import { ListingBanner } from './ListingBanner';
 import { ListingFeed } from './ListingFeed';
 
 export type ListingBrowserProps = {
@@ -113,22 +116,34 @@ export function ListingBrowser({
         className="-mx-4 grow-0"
         contentContainerClassName="gap-2 px-4 py-1"
       >
-        {quick.map((f) => (
-          <Chip
-            key={`${f.key}:${String(f.value)}`}
-            size="sm"
-            dot={config.color ?? 'accent'}
-            label={typeof f.value === 'boolean' ? t(`attr.${f.key}`) : t(`attr_value.${f.key}.${f.value}`)}
-            selected={browser.attributes[f.key] === f.value}
-            onPress={() => browser.toggleAttribute(f.key, f.value)}
-          />
-        ))}
+        {quick.map((f) =>
+          isPriceQuickFilter(f) ? (
+            <Chip
+              key={`price_max:${f.priceMax}`}
+              size="sm"
+              dot={config.color ?? 'accent'}
+              label={t(f.labelKey)}
+              selected={browser.priceMax === f.priceMax}
+              onPress={() => browser.togglePriceMax(f.priceMax)}
+            />
+          ) : (
+            <Chip
+              key={`${f.key}:${String(f.value)}`}
+              size="sm"
+              dot={config.color ?? 'accent'}
+              label={typeof f.value === 'boolean' ? t(`attr.${f.key}`) : t(`attr_value.${f.key}.${f.value}`)}
+              selected={browser.attributes[f.key] === f.value}
+              onPress={() => browser.toggleAttribute(f.key, f.value)}
+            />
+          ),
+        )}
       </ScrollView>
     ) : null;
 
   const feedHeader = (
     <Col gap={4}>
       {header}
+      {config.banner ? <ListingBanner banner={config.banner} /> : null}
       {config.tipKey ? <Notice variant="bordered" tone="warning" title={t('tip.title')} text={t(config.tipKey)} /> : null}
       <SectionHeader title={t('hub.latest_title')} bar="accent" size="md" />
     </Col>

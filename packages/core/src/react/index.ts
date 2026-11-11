@@ -87,6 +87,7 @@ export {
   useUpdateGroup,
 } from './group-hooks';
 export { useContributeVenue, useVenues } from './venue-hooks';
+export { useListingCounterparts, useRateListing } from './rating-hooks';
 export {
   type RequestBadgeVars,
   useDeleteAccount,

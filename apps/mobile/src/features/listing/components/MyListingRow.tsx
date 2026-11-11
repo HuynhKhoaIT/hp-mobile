@@ -9,7 +9,8 @@
 // Vùng mở tin (ảnh + chữ) là một nút riêng, ⋮ và các nút nhanh là nút anh em → trình đọc màn hình tới được từng nút.
 // Đồ thất lạc (style Stitch L2 "Đồ thất lạc của tôi"): nhãn Mất đồ / Nhặt được dưới tiêu đề; đang đăng → nút chính
 // "Đã nhận lại đồ" / "Đã trả cho chủ" (ReturnedSheet → mark_listing_returned) + Sửa, Đóng tin vào menu ⋮; đã trả lại →
-// badge "Đã trả lại" thay "Đã đóng", không còn Mở lại.
+// badge "Đã trả lại" thay "Đã đóng", không còn Mở lại; nút chính "Cảm ơn người trả đồ" / "Đánh giá người nhận"
+// (ListingRateSheet → RPC rate_listing; đã chấm → sheet hiện "Bạn đã đánh giá …").
 import type { MyListing } from '@hp/core';
 import { featureOfCategory } from '@hp/shared';
 import {
@@ -25,6 +26,7 @@ import {
   Pencil,
   RotateCcw,
   Send,
+  Star,
   Trash2,
 } from 'lucide-react-native';
 import { useState } from 'react';
@@ -35,9 +37,10 @@ import { isReturned, LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
 import { Badge, BottomSheet, Button, type ButtonVariant, Card, Col, Icon, IconButton, ListingCover, Skeleton, Text } from '@/ui';
 import { ownerActions, useOwnerListingActions } from '../hooks';
 import { openEditListing, openListing } from '../navigation';
+import { ListingRateSheet } from './ListingRateSheet';
 import { ReturnedSheet, returnedLabelKeys } from './ReturnedSheet';
 
-export type MyListingQuickAction = 'edit' | 'resubmit' | 'renew' | 'sold' | 'close' | 'reopen' | 'returned';
+export type MyListingQuickAction = 'edit' | 'resubmit' | 'renew' | 'sold' | 'close' | 'reopen' | 'returned' | 'rate';
 
 const QUICK: Record<MyListingQuickAction, { label: string; icon: LucideIcon; a11y?: string }> = {
   edit: { label: 'manage.edit', icon: Pencil },
@@ -49,7 +52,14 @@ const QUICK: Record<MyListingQuickAction, { label: string; icon: LucideIcon; a11
   reopen: { label: 'manage.reopen', icon: RotateCcw },
   // Chữ theo loại tin (mất / nhặt) — MyListingRow truyền labelKey của returnedLabelKeys.
   returned: { label: 'lost_found.mark_returned', icon: PackageCheck },
+  // Chữ theo loại tin — rateLabelKey.
+  rate: { label: 'lost_found.rate_cta_lost', icon: Star },
 };
+
+/** Đánh giá sau khi trả đồ: tin mất đồ → "Cảm ơn người trả đồ", tin nhặt được → "Đánh giá người nhận". */
+function rateLabelKey(category: MyListing['category']) {
+  return category === 'found' ? 'lost_found.rate_cta_found' : 'lost_found.rate_cta_lost';
+}
 
 type QuickRow = { primary?: { action: MyListingQuickAction; variant: Extract<ButtonVariant, 'primary' | 'accent'> }; secondary: MyListingQuickAction[] };
 
@@ -75,7 +85,7 @@ function quickRowOf(listing: MyListing): QuickRow {
   if (listing.status === 'draft' || listing.status === 'pending_review') return { primary: { action: 'edit', variant: 'primary' }, secondary: [] };
   if (a.expired) return { primary: a.renew ? { action: 'renew', variant: 'accent' } : undefined, secondary: ['edit'] };
   if (canMarkReturnedOf(listing, a.expired)) return { primary: { action: 'returned', variant: 'primary' }, secondary: ['edit'] };
-  if (isReturned(listing)) return { secondary: ['edit'] };
+  if (isReturned(listing)) return { primary: { action: 'rate', variant: 'primary' }, secondary: ['edit'] };
   if (listing.status === 'active') {
     const end: MyListingQuickAction[] = canSellOf(listing, a.markSold) ? ['sold'] : a.close ? ['close'] : [];
     return { primary: a.renew ? { action: 'renew', variant: 'accent' } : undefined, secondary: ['edit', ...end] };
@@ -182,7 +192,13 @@ export function MyListingRow({ listing, onMore, onAction }: MyListingRowProps) {
               <QuickButton
                 action={quick.primary.action}
                 variant={quick.primary.variant}
-                labelKey={quick.primary.action === 'returned' ? returnedLabelKeys(listing.category).action : undefined}
+                labelKey={
+                  quick.primary.action === 'returned'
+                    ? returnedLabelKeys(listing.category).action
+                    : quick.primary.action === 'rate'
+                      ? rateLabelKey(listing.category)
+                      : undefined
+                }
                 fill
                 onPress={onAction}
               />
@@ -258,7 +274,7 @@ export function MyListingRowSkeleton() {
 
 // ── Menu ⋮ + xác nhận ────────────────────────────────────────────────────────────
 
-type SheetView = 'menu' | 'sold' | 'delete' | 'returned';
+type SheetView = 'menu' | 'sold' | 'delete' | 'returned' | 'rate';
 type SheetState = { listing: MyListing; view: SheetView } | null;
 
 /**
@@ -276,6 +292,8 @@ export function useMyListingActions() {
         return setState({ listing, view: 'sold' });
       case 'returned':
         return setState({ listing, view: 'returned' });
+      case 'rate':
+        return setState({ listing, view: 'rate' });
       case 'resubmit':
         return run.resubmit(listing.id);
       case 'renew':
@@ -302,10 +320,12 @@ export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyL
   const { listing, view } = state;
   // Sheet riêng (thẻ món đồ + nhắc đối chiếu) — style Stitch "Popup xác minh nhận lại đồ".
   if (view === 'returned') return <ReturnedSheet listing={listing} open onClose={onClose} />;
+  if (view === 'rate') return <ListingRateSheet listingId={listing.id} open onClose={onClose} />;
   const a = ownerActions(listing);
   const canSell = canSellOf(listing, a.markSold);
   const canReturn = canMarkReturnedOf(listing, a.expired);
   const canReopen = a.reopen && !isReturned(listing);
+  const canRate = featureOfCategory(listing.category) === 'lostFound' && isReturned(listing);
   const act = (fn: (id: string) => void) => () => {
     fn(listing.id);
     onClose();
@@ -342,6 +362,9 @@ export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyL
               fullWidth
               onPress={() => onView('returned')}
             />
+          ) : null}
+          {canRate ? (
+            <Button label={t(rateLabelKey(listing.category))} icon={Star} variant="outline" fullWidth onPress={() => onView('rate')} />
           ) : null}
           {a.close ? <Button label={t('manage.mark_closed')} icon={Archive} variant="outline" fullWidth onPress={act(run.close)} /> : null}
           {canReopen ? <Button label={t('manage.reopen')} icon={RotateCcw} variant="outline" fullWidth onPress={act(run.reopen)} /> : null}

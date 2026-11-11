@@ -4,6 +4,8 @@
 // Tuần 3: phần đọc (danh sách + chi tiết); tuần 4: `form` cho "Đăng nhanh" (engine form trong features/listing/form).
 // Giao diện Stitch (L1): `subtitleKey` (dòng phụ header xanh), `quickFilters` (hàng chip lọc nhanh theo thông số),
 // `tipKey` (mẹo an toàn riêng tính năng ở danh sách + chi tiết), `card.display` (điểm nhấn thẻ), `detail.primaryCta`.
+// Stitch L3 (danh sách việc ca kíp / trọ / đồ thất lạc): `quickFilters` có thêm chip giá tối đa, `banner` (khối mời đăng tin
+// mở thẳng form đúng danh mục), `card.display.owner | bookmark | description`.
 // Giao diện Stitch (L2 — form đăng tin): `categoryIcons` (thẻ danh mục ở bước chọn), `form.primaryAttributes` (thông số lên
 // bước Thông tin chính), `form.hiddenAttributes`, `form.photosTipKey` / `form.privacyNotice` (bước Ảnh), gợi ý chữ riêng.
 import type { ListingCategory, ListingFeature, PriceType } from '@hp/shared';
@@ -42,8 +44,23 @@ export type ListingFormConfig = {
   descriptionHintKey?: string;
 };
 
-/** Chip lọc nhanh theo thông số (search_listings p_attributes — chỉ trường enum / bool của ATTRIBUTE_FIELDS). */
-export type ListingQuickFilter = { key: string; value: string | boolean };
+/**
+ * Chip lọc nhanh: theo thông số (search_listings p_attributes — chỉ trường enum / bool của ATTRIBUTE_FIELDS) hoặc giá tối
+ * đa (p_price_max, VND — vd trọ "Dưới 1 triệu/tháng"; nhãn riêng qua `labelKey`). Khớp web `ListingQuickFilter`.
+ */
+export type ListingQuickFilter = { key: string; value: string | boolean } | { priceMax: number; labelKey: string };
+
+/**
+ * Khối mời đăng tin đầu danh sách (khi chưa lọc), mỗi nút mở thẳng form đúng danh mục (bắt đăng nhập trước).
+ * 'actions': thẻ có dòng chữ + các nút chia đều (đồ thất lạc: "Báo nhặt được" / "Đăng tin tìm đồ") · 'strip': dải mỏng
+ * chữ + một nút (trọ: "Bạn là chủ trọ? Đăng tin"). Khớp web `ListingListBanner`.
+ */
+export type ListingListBanner = {
+  variant: 'actions' | 'strip';
+  /** Key i18n dòng chữ của khối. */
+  textKey: string;
+  actions: readonly { labelKey: string; category: ListingCategory; icon?: LucideIcon }[];
+};
 
 /** Khối thêm ở màn chi tiết. */
 export type ListingDetailConfig = {
@@ -77,6 +94,8 @@ export type ListingFeatureConfig = {
   categoryIcons?: Partial<Record<ListingCategory, LucideIcon>>;
   /** Chip lọc nhanh theo thông số (bật / tắt từng chip, ghép AND) — hàng thứ hai dưới chip danh mục. */
   quickFilters?: readonly ListingQuickFilter[];
+  /** Khối mời đăng tin đầu danh sách (sau `header`, trước mẹo an toàn). */
+  banner?: ListingListBanner;
   card: {
     /** Prop `layout` của ListingCard: 'grid' = lưới 2 cột, 'row' = một cột ảnh vuông bên trái. */
     variant: ListingCardLayout;

@@ -3,7 +3,8 @@
 //   │ giá 18 px đậm primary │ lượt xem · hết hạn
 //   hộp ghi chú chờ duyệt / bị từ chối + lý do (manage.reason.*) │ hàng thao tác nhanh (quickActions) ngăn bởi đường kẻ.
 // Đồ thất lạc (Stitch L2 "Đồ thất lạc của tôi", khớp app): nhãn Mất đồ / Nhặt được dưới tiêu đề; đang đăng → nút nhanh chính
-// "Đã nhận lại đồ" / "Đã trả cho chủ" (ReturnedDialog); đã trả lại → badge "Đã trả lại" thay "Đã đóng".
+// "Đã nhận lại đồ" / "Đã trả cho chủ" (ReturnedDialog); đã trả lại → badge "Đã trả lại" thay "Đã đóng" + nút nhanh chính
+// "Cảm ơn người trả đồ" / "Đánh giá người nhận" (RateListingDialog).
 // Tin đã bán / đã đóng / hết hạn: viền đứt, ảnh nhạt, tiêu đề + giá màu muted (vẫn ≥ 4,5:1). Không async, không 'use client':
 // dùng được cho trang đầu (server) và các trang "Xem thêm" / khối xem trước (client).
 import type { MyListing } from '@hp/core';

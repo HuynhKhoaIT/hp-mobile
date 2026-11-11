@@ -1,9 +1,11 @@
 // ImageGallery — ảnh chi tiết tin: vuốt ngang từng ảnh (4:3), đếm "Ảnh 2/5" (icon máy ảnh). expo-image cache memory-disk.
 // `bleed` (chi tiết tin, style Stitch): tràn mép màn (-mx-4, bù padding 16 của Screen), không bo góc.
 // `thumbnails`: hàng ảnh nhỏ size-16 dưới ảnh chính (≥ 2 ảnh) — chạm để nhảy tới ảnh đó; ảnh đang xem viền primary.
-// Không có ảnh → màn chi tiết hiện ListingCover (ô giữ chỗ màu dịch vụ) thay vì component này.
+// `placeholder`: nội dung khung 4:3 khi chưa có ảnh (chi tiết tin: ListingCover — ô giữ chỗ màu dịch vụ) để nhãn phủ vẫn
+// cùng chỗ. `overlayTop` (góc trái trên: nhãn trạng thái / xác minh — Badge overlay) và `overlayBottom` (góc trái dưới,
+// chừa chỗ bộ đếm ảnh: vd giá trọ trên nền surface/90) — style Stitch "Chi tiết phòng trọ"; nội dung phủ không nhận chạm (không chặn vuốt).
 import { Camera } from 'lucide-react-native';
-import { useRef, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, type ScrollViewInstance, View } from 'react-native';
 import { Icon } from './Icon';
@@ -19,9 +21,23 @@ export type ImageGalleryProps = {
   bleed?: boolean;
   /** Hàng ảnh nhỏ chọn ảnh (chỉ hiện khi ≥ 2 ảnh); `uris` của ảnh nhỏ, mặc định dùng lại `uris`. */
   thumbnails?: boolean | string[];
+  /** Nội dung khung khi `uris` rỗng (vd ô giữ chỗ). */
+  placeholder?: ReactNode;
+  /** Nhãn phủ góc trái trên ảnh (Badge overlay). */
+  overlayTop?: ReactNode;
+  /** Khối phủ góc trái dưới ảnh (giá…); chừa chỗ bộ đếm ảnh bên phải. */
+  overlayBottom?: ReactNode;
 };
 
-export function ImageGallery({ uris, accessibilityLabel, bleed = false, thumbnails = false }: ImageGalleryProps) {
+export function ImageGallery({
+  uris,
+  accessibilityLabel,
+  bleed = false,
+  thumbnails = false,
+  placeholder,
+  overlayTop,
+  overlayBottom,
+}: ImageGalleryProps) {
   const { t } = useTranslation();
   const { motion } = useTheme();
   const scroller = useRef<ScrollViewInstance>(null);
@@ -43,7 +59,8 @@ export function ImageGallery({ uris, accessibilityLabel, bleed = false, thumbnai
         accessibilityLabel={accessibilityLabel}
         className={['aspect-card w-full overflow-hidden bg-surface-2', bleed ? '' : 'rounded-md'].filter(Boolean).join(' ')}
       >
-        {width > 0 ? (
+        {total === 0 ? placeholder : null}
+        {total > 0 && width > 0 ? (
           <ScrollView
             ref={scroller}
             horizontal
@@ -71,6 +88,16 @@ export function ImageGallery({ uris, accessibilityLabel, bleed = false, thumbnai
             <Text variant="caption" weight="medium" accessibilityLiveRegion="polite">
               {t('listing:detail.image_count', { current: index + 1, total })}
             </Text>
+          </View>
+        ) : null}
+        {overlayTop ? (
+          <View pointerEvents="none" className="absolute left-3 right-3 top-3 flex-row flex-wrap gap-1.5">
+            {overlayTop}
+          </View>
+        ) : null}
+        {overlayBottom ? (
+          <View pointerEvents="none" className={['absolute bottom-3 left-3', total > 1 ? 'right-28' : 'right-3'].join(' ')}>
+            {overlayBottom}
           </View>
         ) : null}
       </View>

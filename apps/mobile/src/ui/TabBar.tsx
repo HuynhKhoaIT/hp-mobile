@@ -4,7 +4,9 @@
 // icon nảy nhẹ; chưa mở: muted. Tab `accent` (Đăng): nút tròn size-14 nổi lên trên thanh (-mt-6) — vòng ngoài 4 màu
 // surface tách khỏi nội dung phía sau, lõi cam 48 — nền accent, icon Plus on-accent (trắng) + shadow-fab;
 // vẫn kèm chữ "Đăng" dưới nút; xoay 45° khi đang mở. Vùng chạm cả cột tab ≥ 56 (phần nút nhô lên trên thanh không nhận
-// chạm — ngoài khung cha). Reduce Motion → không nảy / xoay.
+// chạm — ngoài khung cha). Nút Đăng "thở" chậm khi chưa mở (useAmbientLoop 'glow', t.motion.ambient.glow 2,8s/chu kỳ):
+// quầng cam shadow-fab phía sau sáng dần + phóng ≤ 1.04 rồi tắt; đang mở (xoay 45°) → tắt quầng.
+// Reduce Motion → không nảy / xoay / thở (tắt hẳn).
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import type { LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
@@ -14,6 +16,7 @@ import { Icon } from './Icon';
 import { AnimatedView } from './interop';
 import { Text } from './Text';
 import { useReducedMotion, useTheme } from './theme';
+import { useAmbientLoop } from './useAmbientLoop';
 
 export type TabBarProps = BottomTabBarProps & {
   /** Tên route → icon. Route không có icon thì không hiện trên thanh. */
@@ -42,7 +45,7 @@ export function TabBar({ state, descriptors, emitter, navigateToTab, insets, ico
           if (!focused && !event.defaultPrevented) navigateToTab(route.key);
         };
         return (
-          <TabItem
+          <TabBarItem
             key={route.key}
             label={label}
             icon={icon}
@@ -57,26 +60,30 @@ export function TabBar({ state, descriptors, emitter, navigateToTab, insets, ico
   );
 }
 
-function TabItem({
-  label,
-  icon,
-  focused,
-  accent,
-  badge,
-  onPress,
-}: {
+export type TabBarItemProps = {
   label: string;
   icon: LucideIcon;
   focused: boolean;
-  accent: boolean;
-  badge: string | null;
+  /** Nút Đăng (nền accent, nổi trên thanh, thở chậm khi chưa mở). */
+  accent?: boolean;
+  badge?: string | null;
   onPress: () => void;
-}) {
+};
+
+/** Một ô của TabBar (xuất riêng để trưng bày ở ui-gallery). */
+export function TabBarItem({ label, icon, focused, accent = false, badge = null, onPress }: TabBarItemProps) {
   const { motion } = useTheme();
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
   const rotate = useSharedValue(0);
   const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }, { rotate: `${rotate.get()}deg` }] }));
+  // Quầng nút Đăng: chỉ khi là nút Đăng và chưa mở; Reduce Motion → hook tự tắt.
+  const glow = useAmbientLoop('glow', accent && !focused);
+  const glowPeak = motion.ambient.glow.scale;
+  const glowStyle = useAnimatedStyle(() => ({
+    opacity: glow.progress.get(),
+    transform: [{ scale: 1 + (glowPeak - 1) * glow.progress.get() }],
+  }));
 
   useEffect(() => {
     if (reduced) {
@@ -99,9 +106,15 @@ function TabItem({
       className="min-h-14 flex-1 items-center justify-end gap-0.5 py-1"
     >
       {accent ? (
-        <AnimatedView style={style} className="-mt-6 size-14 items-center justify-center rounded-full border-4 border-surface bg-accent shadow-fab">
-          <Icon icon={icon} tone="onAccent" size="tab" strong />
-        </AnimatedView>
+        <View className="-mt-6 size-14">
+          {/* Quầng thở: lớp accent + shadow-fab nằm sau nút (cộng thêm một lớp bóng cam khi sáng), không nhận chạm. */}
+          {!reduced ? (
+            <AnimatedView pointerEvents="none" style={glowStyle} className="absolute inset-0 rounded-full bg-accent shadow-fab" />
+          ) : null}
+          <AnimatedView style={style} className="size-14 items-center justify-center rounded-full border-4 border-surface bg-accent shadow-fab">
+            <Icon icon={icon} tone="onAccent" size="tab" strong />
+          </AnimatedView>
+        </View>
       ) : (
         <AnimatedView style={style}>
           <Icon icon={icon} tone={focused ? 'primary' : 'muted'} size="tab" strong={focused} />

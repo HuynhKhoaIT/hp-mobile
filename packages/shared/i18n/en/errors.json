@@ -48,5 +48,9 @@
   "translate_failed": "Could not translate. Please try again later.",
   "images_min": "Room listings need at least 3 photos.",
   "contact_invalid": "Enter a valid phone number (e.g. 0912 345 678) or email.",
-  "consent_required": "Please agree so we can contact you."
+  "consent_required": "Please agree so we can contact you.",
+  "listing_not_returned": "You can rate only after the item has been handed back.",
+  "listing_already_rated": "You have already rated for this post.",
+  "cannot_rate_self": "You cannot rate yourself.",
+  "rating_no_chat": "You can only rate someone who messaged you about this post."
 }

@@ -29,7 +29,15 @@
     "subtitle_lostFound": "Report lost items, return found ones",
     "subtitle_all": "New posts around your work area",
     "clear_filters": "Clear filters",
-    "quick_filters": "Quick filters"
+    "quick_filters": "Quick filters",
+    "quick_price_under_1m": "Under 1M ₫/month",
+    "banner": {
+      "landlord_text": "Are you a landlord?",
+      "landlord_cta": "Post a room",
+      "lost_found_text": "Found or lost something?",
+      "found_cta": "Report a found item",
+      "lost_cta": "Post a lost item"
+    }
   },
   "card": {
     "no_image": "No photo",
@@ -70,7 +78,8 @@
     "stat_rating": "Rating",
     "stat_joined": "Joined",
     "no_rating_short": "None yet",
-    "image_thumb": "View photo {{current}} of {{total}}"
+    "image_thumb": "View photo {{current}} of {{total}}",
+    "code": "Listing #{{code}}"
   },
   "attr": {
     "brand": "Brand",
@@ -307,7 +316,19 @@
     "reveal": "Show number",
     "call": "Call {{phone}}",
     "no_phone": "The poster hasn't added a phone number — send a message.",
-    "hint": "Only call if you're really interested. Never pay before seeing the item."
+    "hint": "Only call if you're really interested. Never pay before seeing the item.",
+    "reveal_call": "Show number to call",
+    "phone_line": "Phone: {{phone}}",
+    "primary": {
+      "chat_pass": "Message seller",
+      "chat_room": "Ask about the room",
+      "chat_job": "Apply via chat",
+      "chat_lostFound": "Message poster",
+      "call_pass": "Call seller",
+      "call_room": "Call about the room",
+      "call_job": "Call employer",
+      "call_lostFound": "Call poster"
+    }
   },
   "state": {
     "sold": "This item has been sold",
@@ -346,7 +367,40 @@
     "kind_found": "Found",
     "mark_returned_found": "Returned to owner",
     "mark_returned_found_confirm_title": "Mark as returned to owner?",
-    "returned_check": "Before handing it over, ask the claimant for a private detail (colour, scratches, contents) to be sure it's theirs."
+    "returned_check": "Before handing it over, ask the claimant for a private detail (colour, scratches, contents) to be sure it's theirs.",
+    "done_badge": "Handed back",
+    "done_title": "The item is back with its owner!",
+    "done_body_lost": "The post is closed. Send a thank-you or rate the person who returned your item.",
+    "done_body_found": "The post is closed. You can rate the person who got the item back.",
+    "done_rate": "Send thanks / Rate",
+    "done_message": "Message",
+    "done_later": "Later",
+    "rate_cta_lost": "Thank the finder",
+    "rate_cta_found": "Rate the receiver",
+    "rate_cta_owner": "Rate the poster",
+    "safe_flow": "Safe handover",
+    "rate": {
+      "title": "Rating & thank-you",
+      "pick_label": "Who do you want to thank?",
+      "pick_hint": "People who messaged you about this post.",
+      "owner_tag": "Poster",
+      "question": "How was the handover?",
+      "hint": "Ratings help the community know who to trust.",
+      "compliments_label": "What stood out (quick pick)",
+      "compliment_honest": "Honest and helpful",
+      "compliment_careful": "Kept it safe",
+      "compliment_on_time": "On time",
+      "compliment_clear": "Clear check",
+      "compliment_helpful": "Looks out for coworkers",
+      "comment_label": "Thank-you note (optional)",
+      "comment_placeholder": "Write a few words of thanks…",
+      "submit": "Send rating",
+      "done": "Rating sent. Thank you!",
+      "rated": "You rated {{name}} {{score}}/5.",
+      "empty": "Nobody has messaged you about this post yet, so there is no one to rate.",
+      "pick_required": "Choose who you want to rate.",
+      "score_required": "Choose a star rating."
+    }
   },
   "tip": {
     "title": "Safety tip",
@@ -354,5 +408,18 @@
     "room": "Visit the room in person and check power and water. Don't pay a deposit online before seeing it.",
     "job": "Never pay a fee or deposit, or hand over original documents, to get a job.",
     "lostFound": "Ask about unique details to make sure it goes to the real owner. Cover ID and staff card numbers in photos."
+  },
+  "attr_group": {
+    "costs": "Costs",
+    "rules": "House rules",
+    "contact": "Contact person",
+    "requirements": "Requirements"
+  },
+  "availability": {
+    "pass": "Available",
+    "room": "Vacant",
+    "job": "Hiring",
+    "lost": "Still looking",
+    "found": "Waiting for owner"
   }
 }

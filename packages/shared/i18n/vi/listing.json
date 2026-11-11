@@ -29,7 +29,15 @@
     "subtitle_lostFound": "Báo mất đồ, tìm chủ cho đồ nhặt được",
     "subtitle_all": "Tin mới quanh khu làm việc của bạn",
     "clear_filters": "Xoá lọc",
-    "quick_filters": "Lọc nhanh"
+    "quick_filters": "Lọc nhanh",
+    "quick_price_under_1m": "Dưới 1 triệu/tháng",
+    "banner": {
+      "landlord_text": "Bạn là chủ trọ?",
+      "landlord_cta": "Đăng tin",
+      "lost_found_text": "Bạn vừa nhặt được hay làm mất đồ?",
+      "found_cta": "Báo nhặt được",
+      "lost_cta": "Đăng tin tìm đồ"
+    }
   },
   "card": {
     "no_image": "Chưa có ảnh",
@@ -70,7 +78,8 @@
     "stat_rating": "Đánh giá",
     "stat_joined": "Tham gia",
     "no_rating_short": "Chưa có",
-    "image_thumb": "Xem ảnh {{current}}/{{total}}"
+    "image_thumb": "Xem ảnh {{current}}/{{total}}",
+    "code": "Mã tin #{{code}}"
   },
   "attr": {
     "brand": "Hãng",
@@ -307,7 +316,19 @@
     "reveal": "Hiện số",
     "call": "Gọi {{phone}}",
     "no_phone": "Người đăng chưa có số điện thoại — hãy nhắn tin.",
-    "hint": "Chỉ gọi khi thật sự quan tâm. Không chuyển tiền trước khi xem hàng."
+    "hint": "Chỉ gọi khi thật sự quan tâm. Không chuyển tiền trước khi xem hàng.",
+    "reveal_call": "Hiện số để gọi",
+    "phone_line": "Số điện thoại: {{phone}}",
+    "primary": {
+      "chat_pass": "Nhắn người bán",
+      "chat_room": "Nhắn hỏi phòng",
+      "chat_job": "Nhắn tin ứng tuyển",
+      "chat_lostFound": "Nhắn người đăng",
+      "call_pass": "Gọi người bán",
+      "call_room": "Gọi hỏi phòng",
+      "call_job": "Gọi nhà tuyển dụng",
+      "call_lostFound": "Gọi người đăng"
+    }
   },
   "state": {
     "sold": "Tin này đã bán",
@@ -346,7 +367,40 @@
     "kind_found": "Nhặt được",
     "mark_returned_found": "Đã trả cho chủ",
     "mark_returned_found_confirm_title": "Đánh dấu đã trả cho chủ?",
-    "returned_check": "Trước khi trao đồ, hỏi người nhận một đặc điểm riêng (màu, vết xước, đồ bên trong) để chắc đúng chủ."
+    "returned_check": "Trước khi trao đồ, hỏi người nhận một đặc điểm riêng (màu, vết xước, đồ bên trong) để chắc đúng chủ.",
+    "done_badge": "Bàn giao thành công",
+    "done_title": "Đồ đã về với chủ!",
+    "done_body_lost": "Tin đã đóng. Hãy gửi lời cảm ơn hoặc đánh giá người đã trả đồ cho bạn.",
+    "done_body_found": "Tin đã đóng. Bạn có thể đánh giá người đã nhận lại đồ.",
+    "done_rate": "Gửi lời cảm ơn / Đánh giá",
+    "done_message": "Nhắn tin",
+    "done_later": "Để sau",
+    "rate_cta_lost": "Cảm ơn người trả đồ",
+    "rate_cta_found": "Đánh giá người nhận",
+    "rate_cta_owner": "Đánh giá chủ tin",
+    "safe_flow": "Bàn giao an toàn",
+    "rate": {
+      "title": "Đánh giá & lời cảm ơn",
+      "pick_label": "Bạn muốn cảm ơn ai?",
+      "pick_hint": "Người đã nhắn tin với bạn về tin này.",
+      "owner_tag": "Chủ tin",
+      "question": "Trải nghiệm trao trả đồ thế nào?",
+      "hint": "Đánh giá giúp cộng đồng biết ai đáng tin cậy.",
+      "compliments_label": "Điểm bạn ấn tượng (chọn nhanh)",
+      "compliment_honest": "Trung thực, nhiệt tình",
+      "compliment_careful": "Giữ đồ cẩn thận",
+      "compliment_on_time": "Đúng hẹn",
+      "compliment_clear": "Đối chiếu rõ ràng",
+      "compliment_helpful": "Tương trợ anh em",
+      "comment_label": "Lời cảm ơn (không bắt buộc)",
+      "comment_placeholder": "Viết vài lời cảm ơn…",
+      "submit": "Gửi đánh giá",
+      "done": "Đã gửi đánh giá. Cảm ơn bạn!",
+      "rated": "Bạn đã đánh giá {{name}} {{score}}/5.",
+      "empty": "Chưa có ai nhắn tin với bạn về tin này nên chưa có ai để đánh giá.",
+      "pick_required": "Hãy chọn người bạn muốn đánh giá.",
+      "score_required": "Hãy chọn số sao."
+    }
   },
   "tip": {
     "title": "Mẹo an toàn",
@@ -354,5 +408,18 @@
     "room": "Đến xem phòng tận nơi, kiểm tra điện nước. Không đặt cọc qua mạng khi chưa xem phòng.",
     "job": "Không nộp phí, đặt cọc hay giao giấy tờ gốc để được nhận việc.",
     "lostFound": "Hỏi đặc điểm riêng của món đồ để trả đúng chủ. Che bớt số CCCD, thẻ nhân viên khi chụp ảnh giấy tờ."
+  },
+  "attr_group": {
+    "costs": "Chi phí",
+    "rules": "Nội quy",
+    "contact": "Người phụ trách",
+    "requirements": "Yêu cầu"
+  },
+  "availability": {
+    "pass": "Còn hàng",
+    "room": "Còn trống",
+    "job": "Đang tuyển",
+    "lost": "Đang tìm",
+    "found": "Chờ chủ nhận"
   }
 }

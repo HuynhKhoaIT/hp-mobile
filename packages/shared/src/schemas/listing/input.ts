@@ -110,3 +110,20 @@ export type UpdateListingInput = z.input<typeof UpdateListingInput>;
 /** Trạng thái chủ tin tự đặt được (khớp trg_listings_guard). */
 export const OWNER_LISTING_STATUSES = ['draft', 'active', 'sold', 'closed'] as const;
 export type OwnerListingStatus = (typeof OWNER_LISTING_STATUSES)[number];
+
+/** Nhận xét khi đánh giá sau giao dịch (khớp ratings.comment ≤ 500). */
+export const LISTING_RATING_COMMENT_MAX = 500;
+
+/**
+ * Đánh giá + lời cảm ơn sau khi trao trả đồ thất lạc (RPC rate_listing): chủ tin ↔ người đã nhắn tin về tin, một lần / tin.
+ * DB mới quyết định (tin đã trả lại, có hội thoại, chưa chấm, không tự chấm, lọc SĐT / từ cấm).
+ */
+export const RateListingInput = z
+  .object({
+    listingId: z.uuid('invalid_input'),
+    rateeId: z.uuid('invalid_input'),
+    score: z.number().int('invalid_input').min(1, 'invalid_input').max(5, 'invalid_input'),
+    comment: z.string().trim().max(LISTING_RATING_COMMENT_MAX, 'too_long').nullable().default(null),
+  })
+  .strict();
+export type RateListingInput = z.input<typeof RateListingInput>;

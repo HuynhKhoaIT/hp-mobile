@@ -21,12 +21,14 @@ type Props = {
   attributes: AttributeFilter;
   /** Lọc khoảng cách tới khu làm việc (m), giống trang đầu. */
   maxDistanceM?: number;
+  /** Giá tối đa (VND), giống trang đầu. */
+  priceMax?: number;
   pageSize: number;
   initialCursor: string | null;
   layout: 'grid' | 'row';
 };
 
-export function LoadMore({ categories, query, site, attributes, maxDistanceM, pageSize, initialCursor, layout }: Props) {
+export function LoadMore({ categories, query, site, attributes, maxDistanceM, priceMax, pageSize, initialCursor, layout }: Props) {
   const t = useTranslations('listing.list');
   const [items, setItems] = useState<PublicListing[]>([]);
   const [fetchedAt, setFetchedAt] = useState(0);
@@ -43,6 +45,7 @@ export function LoadMore({ categories, query, site, attributes, maxDistanceM, pa
       site: site ?? undefined,
       attributes: Object.keys(attributes).length > 0 ? { ...attributes } : undefined,
       maxDistanceM,
+      priceMax,
       cursor,
       limit: pageSize,
     });

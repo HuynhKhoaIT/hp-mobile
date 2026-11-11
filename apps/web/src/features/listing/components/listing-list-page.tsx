@@ -3,7 +3,8 @@
 //   1 header xanh (HeaderDecor như trang chủ / "Tôi"; tràn mép + bo đáy trên điện thoại, khối bo xl từ 640px): ô icon dịch vụ,
 //     H1 (theo khu khi lọc) + mô tả SEO của trang, nút Đăng tin; form tìm (ô nổi + khu + khoảng cách) bên trong.
 //   2 chip danh mục / tính năng + chip lọc nhanh theo thông số (config.quickFilters) + "Xoá lọc" (ListChips).
-//   3 mẹo an toàn riêng tính năng (config.tipKey) khi chưa lọc → tiêu đề có vạch cam ("Tin mới đăng" / "Kết quả cho …") → lưới.
+//   3 khi chưa lọc: khối mời đăng tin (config.banner — đồ thất lạc "Báo nhặt được / Đăng tin tìm đồ", trọ "Bạn là chủ trọ?")
+//     → mẹo an toàn riêng tính năng (config.tipKey) → tiêu đề có vạch cam ("Tin mới đăng" / "Kết quả cho …") → lưới.
 // Render (Cache Components):
 // - Fallback của <Suspense> = trang đầu KHÔNG lọc (dữ liệu cache 300s) → nằm trong static shell: HTML có tin thật ngay cả khi
 //   tắt JS hoặc với bot chỉ đọc HTML (không phải skeleton).
@@ -19,11 +20,12 @@ import { HeaderDecor } from '@/components/shared/header-decor';
 import { Button } from '@/components/ui/button';
 import { getPathname, Link } from '@/i18n/navigation';
 import { asLocale } from '../display';
-import { activeFilterCount, distanceMeters, type ListFilterState, parseListFilters } from '../filters';
+import { activeFilterCount, distanceMeters, type ListFilterState, parseListFilters, priceMaxOptions } from '../filters';
 import { getListPage, getPublicSites, LIST_PAGE_SIZE, logSearchTerm } from '../queries';
 import { LISTING_FEATURE_CONFIGS } from '../features';
 import { type ListScope, scopeInfo } from '../scope';
 import { ListChips, ListSearchForm } from './list-filters';
+import { ListingBanner } from './listing-banner';
 import { ListingGrid } from './listing-grid';
 import { LoadMore } from './load-more';
 import { PostListingButton } from './post-listing-button';
@@ -31,7 +33,7 @@ import { BarHeading, SafetyTip } from './safety-tip';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
-const NO_FILTERS: ListFilterState = { category: null, query: '', site: null, distanceKm: null, attributes: {} };
+const NO_FILTERS: ListFilterState = { category: null, query: '', site: null, distanceKm: null, priceMax: null, attributes: {} };
 
 export function ListingListPage({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
   return (
@@ -44,8 +46,9 @@ export function ListingListPage({ scope, searchParams }: { scope: ListScope; sea
 }
 
 async function ListContent({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
-  const { categories, distanceKm } = scopeInfo(scope);
-  const filters = parseListFilters(await searchParams, categories, distanceKm);
+  const { feature, categories, distanceKm } = scopeInfo(scope);
+  const prices = priceMaxOptions(feature ? LISTING_FEATURE_CONFIGS[feature].quickFilters : undefined);
+  const filters = parseListFilters(await searchParams, categories, distanceKm, prices);
   return <ListBody scope={scope} filters={filters} />;
 }
 
@@ -61,6 +64,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
       query: filters.query,
       attributes: filters.attributes,
       maxDistanceM: distanceMeters(filters.distanceKm),
+      priceMax: filters.priceMax ?? undefined,
     }),
     getPublicSites(),
   ]);
@@ -109,6 +113,8 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
       <div className="flex flex-col gap-4 px-4 sm:px-0">
         <ListChips path={path} feature={feature} categories={categories} filters={filters} />
 
+        {cfg?.banner && !filtered ? <ListingBanner banner={cfg.banner} feature={cfg.feature} /> : null}
+
         {cfg?.tipKey && !filtered ? <SafetyTip title={t('listing.tip.title')} text={t(cfg.tipKey)} /> : null}
 
         <div className="flex items-center justify-between gap-3">
@@ -147,6 +153,7 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
               site={filters.site}
               attributes={filters.attributes}
               maxDistanceM={distanceMeters(filters.distanceKm)}
+              priceMax={filters.priceMax ?? undefined}
               pageSize={LIST_PAGE_SIZE}
               initialCursor={page.nextCursor}
               layout={cardLayout}

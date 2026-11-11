@@ -5,17 +5,20 @@
 //   nhạt cùng tông (border-service-<x>/20), icon 24 màu dịch vụ (ô tiện ích có `icon`: bg-primary-light, viền primary/15,
 //   icon primary); nhãn text-sm 500 tối đa 2 dòng trong khung min-h-10 (không numberOfLines: phóng chữ 150% thì khung giãn
 //   theo minHeight, không cắt chữ). Nhãn góc "Mới" (bg-accent + chữ on-accent trắng đậm, in hoa) / "Sắp có" lệch -8/-8 góc trên
-//   phải ô icon; ô sắp có mờ 60% (nhãn góc giữ rõ) + accessibilityState.disabled nhưng vẫn bấm được (mở màn "Sắp có").
+//   phải ô icon; nhãn "Mới" nổi lên xuống nhẹ (useAmbientLoop 'float': −3px, 2,4s/chu kỳ; Reduce Motion → đứng yên); ô sắp có mờ 60% (nhãn góc giữ rõ) + accessibilityState.disabled nhưng vẫn bấm được (mở màn "Sắp có").
 //   Nhấn: scale 0.97 (motion.fast) + nền surface-2. Vùng chạm cả ô (icon + nhãn) ≥ 48.
 // ServiceGrid xếp các ô 'grid' thành hàng 4 cột (gap-x-2, gap-y-4) — RN không có CSS grid nên chia hàng tường minh.
 import type { LucideIcon } from 'lucide-react-native';
 import { Children, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
+import { useAnimatedStyle } from 'react-native-reanimated';
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { AnimatedView } from './interop';
 import { SERVICE, type ServiceKey } from './service';
 import { Text } from './Text';
+import { useTheme } from './theme';
+import { useAmbientLoop } from './useAmbientLoop';
 import { usePressScale } from './usePressScale';
 
 export type ServiceTileBadge = { label: string; tone: 'soon' | 'new' };
@@ -73,6 +76,11 @@ export function ServiceTile(props: ServiceTileProps) {
 function GridTile(props: ServiceTileProps) {
   const { label, onPress, badge, soon = false, className } = props;
   const press = usePressScale('fast');
+  const { motion } = useTheme();
+  // Chỉ nhãn "Mới" nổi (lặp chậm); nhãn "Sắp có" đứng yên.
+  const float = useAmbientLoop('float', badge?.tone === 'new');
+  const floatY = motion.ambient.float.translateY;
+  const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: floatY * float.progress.get() }] }));
   const dim = soon ? 'opacity-60' : '';
   const a11yLabel = badge ? `${label}, ${badge.label}` : label;
   return (
@@ -93,9 +101,11 @@ function GridTile(props: ServiceTileProps) {
             <TileIcon glyph={props} size="tab" />
           </View>
           {badge ? (
-            <View
+            <AnimatedView
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
+              pointerEvents="none"
+              style={floatStyle}
               className={`absolute -right-2 -top-2 rounded-full px-1.5 py-0.5 ${BADGE[badge.tone].box}`}
             >
               <Text
@@ -108,7 +118,7 @@ function GridTile(props: ServiceTileProps) {
               >
                 {badge.label}
               </Text>
-            </View>
+            </AnimatedView>
           ) : null}
         </View>
         <View className={['min-h-10 w-full justify-start', dim].join(' ')}>

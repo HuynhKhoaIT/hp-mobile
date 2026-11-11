@@ -1,32 +1,57 @@
-// Skeleton — khối chờ đúng hình nội dung; nhấp nháy 1.2s/lượt (t.motion.skeletonShimmerMs), tắt khi Reduce Motion.
+// Skeleton — khối chờ đúng hình nội dung; dải sáng chéo (t.motion.shimmer: rộng 40% khối, nghiêng −20°, màu t.shimmer mờ
+// dần hai mép) quét trái → phải 1.2s/lượt (t.motion.skeletonShimmerMs) — cùng cảm giác với web (animate-skeleton-shimmer).
+// Reduce Motion → khối đứng yên, không dải. Trang trí: trình đọc màn hình bỏ qua, không nhận chạm.
 // SkeletonListingCard theo bố cục ListingCard (ảnh → badge → tiêu đề 2 dòng → giá → khu vực) — khớp web ListingCardSkeleton.
 // SkeletonListingDetail theo bố cục màn chi tiết tin (ảnh tràn mép).
-import { useEffect } from 'react';
-import { View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { type LayoutChangeEvent, View } from 'react-native';
 import { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { AnimatedView } from './interop';
-import { useReducedMotion, useTheme } from './theme';
+import { easingOf, useReducedMotion, useTheme } from './theme';
 
 export function Skeleton({ className }: { className?: string }) {
-  const { motion } = useTheme();
+  const { motion, shimmer } = useTheme();
   const reduced = useReducedMotion();
-  const opacity = useSharedValue(1);
+  const [width, setWidth] = useState(0);
+  const progress = useSharedValue(0);
+  const { duration, easing, band: bandRatio, skewDeg } = motion.shimmer;
+  const band = width * bandRatio;
+  // Hai mép dùng cùng màu với alpha 0 (không 'transparent' = đen trong suốt → viền xám khi nội suy trên Android / iOS).
+  const clear = shimmer.replace(/[\d.]+\)$/, '0)');
 
   useEffect(() => {
-    if (reduced) return;
-    opacity.set(withRepeat(withTiming(0.5, { duration: motion.skeletonShimmerMs / 2 }), -1, true));
-    return () => cancelAnimation(opacity);
-  }, [reduced, motion.skeletonShimmerMs, opacity]);
+    if (reduced || width === 0) return;
+    progress.set(0);
+    progress.set(withRepeat(withTiming(1, { duration, easing: easingOf(easing) }), -1, false));
+    return () => cancelAnimation(progress);
+  }, [reduced, width, duration, easing, progress]);
 
-  const style = useAnimatedStyle(() => ({ opacity: opacity.get() }));
+  // Bắt đầu ngoài mép trái (−1,5 dải, chừa phần nghiêng), kết thúc ngoài mép phải — khớp keyframes skeleton-shimmer của web.
+  const bandStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: -1.5 * band + progress.get() * (width + 2 * band) }, { skewX: `${skewDeg}deg` }],
+  }));
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const w = Math.round(e.nativeEvent.layout.width);
+    if (w !== width) setWidth(w);
+  };
+
   return (
-    <AnimatedView
+    <View
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={style}
+      pointerEvents="none"
+      onLayout={reduced ? undefined : onLayout}
       // Bo góc mặc định md; className có rounded-* riêng thì dùng của nó (tránh hai class cùng thuộc tính).
-      className={['bg-surface-2', /rounded/.test(className ?? '') ? null : 'rounded-md', className].filter(Boolean).join(' ')}
-    />
+      className={['overflow-hidden bg-surface-2', /rounded/.test(className ?? '') ? null : 'rounded-md', className].filter(Boolean).join(' ')}
+    >
+      {!reduced && width > 0 ? (
+        <AnimatedView
+          className="absolute inset-y-0 left-0"
+          style={[{ width: band, backgroundImage: `linear-gradient(90deg, ${clear}, ${shimmer}, ${clear})` }, bandStyle]}
+        />
+      ) : null}
+    </View>
   );
 }
 

@@ -63,7 +63,7 @@ export { StatColumns, type StatItem, StatTile } from './Stat';
 export { Stepper, type StepperProps } from './Stepper';
 export { StickyCta } from './StickyCta';
 export { SuccessScreen, type SuccessScreenProps, type SuccessTone } from './SuccessScreen';
-export { TabBar, type TabBarProps } from './TabBar';
+export { TabBar, TabBarItem, type TabBarItemProps, type TabBarProps } from './TabBar';
 export { Ticker, type TickerProps } from './Ticker';
 export { Text, type TextProps, type TextTone, type TextVariant, type TextWeight } from './Text';
 export { toast, ToastHost, type ToastTone } from './Toast';

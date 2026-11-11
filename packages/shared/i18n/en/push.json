@@ -58,5 +58,9 @@
   "badge_rejected": {
     "title": "Badge not approved",
     "body": "The document was not accepted. {{reason}} You can submit again."
+  },
+  "rating_received": {
+    "title": "You received a thank-you",
+    "body": "{{name}} rated you {{score}}/5 stars for \"{{title}}\"."
   }
 }

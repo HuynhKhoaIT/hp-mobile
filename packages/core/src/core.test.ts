@@ -42,6 +42,8 @@ test('keys: key con nằm dưới key cha để invalidate cả nhánh', () => {
   assert.deepEqual(keys.listings({ category: 'pass_home' }).slice(0, 2), keys.listings());
   assert.deepEqual(keys.unreadCount().slice(0, 2), keys.notifications());
   assert.deepEqual(keys.bookmarks('listing').slice(0, 2), keys.bookmarks());
+  // Người đã chat về tin (đánh giá sau khi trả đồ) làm mới cùng chi tiết tin.
+  assert.deepEqual(keys.listingCounterparts('l1').slice(0, 3), keys.listing('l1'));
 });
 
 test('toAuthError map lỗi Supabase Auth sang key i18n', () => {

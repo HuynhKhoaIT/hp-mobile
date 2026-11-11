@@ -1,5 +1,5 @@
 // /dang-tin — form "Đăng nhanh" (khu đăng nhập: proxy.ts chuyển khách sang /dang-nhap?next=/dang-tin).
-// ?feature=pass|room|job|lostFound chọn sẵn tính năng. Đọc theo request (cookie) → nội dung trong <Suspense>.
+// ?feature=pass|room|job|lostFound chọn sẵn tính năng, ?category=<code> chọn sẵn danh mục. Đọc theo request (cookie) → nội dung trong <Suspense>.
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';

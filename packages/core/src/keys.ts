@@ -23,6 +23,8 @@ export const keys = {
   savedListings: () => ['hp', 'bookmarks', 'listing', 'items'] as const,
   homeFeed: (site?: string | null) => ['hp', 'listings', 'home-feed', site ?? ''] as const,
   lostFoundMatches: (listingId: string) => ['hp', 'listing', listingId, 'lost-found-matches'] as const,
+  /** Người đã nhắn tin về tin (chọn người để cảm ơn / đánh giá) — con của keys.listing(id). */
+  listingCounterparts: (listingId: string) => ['hp', 'listing', listingId, 'counterparts'] as const,
   translation: (listingId: string, lang: string) => ['hp', 'listing', listingId, 'translation', lang] as const,
   myBadgeRequests: () => ['hp', 'badge-requests', 'mine'] as const,
 

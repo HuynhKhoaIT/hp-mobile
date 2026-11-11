@@ -9,16 +9,23 @@
 // (trọ: diện tích · có gác · ở tối đa; pass: tình trạng; việc: ca), badge danh mục đổi nhãn + tone theo category (đồ thất
 // lạc: "Mất đồ" đỏ / "Nhặt được" xanh), dòng (5) lấy nơi + thời điểm từ attributes (đồ thất lạc: place · lost_at) thay
 // cho khu · thời gian đăng. Không truyền → thẻ chung (dải tin ở Hub, Tin đã lưu…).
+// Stitch L3 (việc ca kíp, trọ, đồ thất lạc): `display.description` (4c) mô tả 2 dòng; `display.owner` (6) dòng người đăng
+// (avatar + tên rút gọn của view + dấu xác minh khi có huy hiệu); prop `bookmark` → nút tim lưu tin góc phải trên (grid: nổi
+// trên ảnh, nền surface-2; row: góc thẻ) — feature quyết định có truyền hay không theo `display.bookmark` (hook lưu tin nằm
+// ở features/listing). Nút tim là anh em của Card (không lồng trong Pressable của thẻ) để trình đọc màn hình bấm riêng được.
+// Đồ thất lạc đã trả lại: ảnh mờ + tiêu đề gạch ngang chữ muted (kèm badge "Đã trả lại" — không chỉ bằng màu).
 // ListingCover dùng lại ở chi tiết (ô giữ chỗ cỡ lớn khi tin chưa có ảnh).
 import { listingCover, type PublicListing } from '@hp/core';
 import { featureOfCategory, type ListingCategory } from '@hp/shared';
-import { MapPin } from 'lucide-react-native';
+import { BadgeCheck, MapPin } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatRelative } from '@/lib/format';
-import { listingImageUrl } from '@/lib/images';
+import { listingImageUrl, profileAvatarUrl } from '@/lib/images';
 import { attributeString, isReturned, useCardFacts, usePriceText, useSiteText } from '@/lib/listing';
+import { Avatar } from './Avatar';
 import { Badge, type BadgeTone } from './Badge';
+import { BookmarkButton, type BookmarkButtonProps } from './BookmarkButton';
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { Image } from './interop';
@@ -38,7 +45,16 @@ export type ListingCardDisplay = {
   placeKey?: string;
   /** Khoá attributes datetime thay thời gian đăng ở dòng cuối (vd `lost_at`). */
   timeKey?: string;
+  /** Đoạn mô tả tối đa 2 dòng dưới thông số (đồ thất lạc: đặc điểm đồ). */
+  description?: boolean;
+  /** Dòng người đăng cuối thẻ: avatar + tên rút gọn + dấu xác minh (owner_badges). */
+  owner?: boolean;
+  /** Nút lưu tin trên thẻ — feature truyền prop `bookmark` khi bật (thẻ chỉ hiển thị). */
+  bookmark?: boolean;
 };
+
+/** Trạng thái + thao tác của nút tim trên thẻ (useListingBookmark của features/listing). */
+export type ListingCardBookmark = Pick<BookmarkButtonProps, 'saved' | 'onToggle' | 'labels'>;
 
 export type ListingCardProps = {
   listing: PublicListing;
@@ -50,6 +66,8 @@ export type ListingCardProps = {
   imagePriority?: 'low' | 'normal' | 'high';
   /** Điểm nhấn theo tính năng (config.card.display). */
   display?: ListingCardDisplay;
+  /** Có → nút tim lưu tin ở góc phải trên (không truyền cho tin của chính mình). */
+  bookmark?: ListingCardBookmark;
 };
 
 const join = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -95,7 +113,7 @@ export function ListingCover({
   );
 }
 
-export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority, display }: ListingCardProps) {
+export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority, display, bookmark }: ListingCardProps) {
   const { t, i18n } = useTranslation();
   const priceText = usePriceText();
   const siteText = useSiteText();
@@ -110,9 +128,16 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
   const grid = layout === 'grid';
   const categoryBadge = display?.categoryBadge?.[listing.category];
   const category = categoryBadge?.labelKey ? t(categoryBadge.labelKey) : t(`common:category.${listing.category}`);
+  const description = display?.description ? listing.description?.trim() : null;
+  const ownerName = display?.owner ? listing.owner_name?.trim() : null;
+  const verified = !!ownerName && listing.owner_badges.some((b) => i18n.exists(`listing:owner_badge.${b}`));
+  const ownerLabel = ownerName ? (verified ? `${ownerName}, ${t('common:profile.verified')}` : ownerName) : null;
 
   const badges = (
-    <View pointerEvents="none" className={grid ? 'absolute left-2 right-2 top-2 flex-row flex-wrap gap-1' : 'flex-row flex-wrap gap-1'}>
+    <View
+      pointerEvents="none"
+      className={grid ? join('absolute left-2 top-2 flex-row flex-wrap gap-1', bookmark ? 'right-12' : 'right-2') : 'flex-row flex-wrap gap-1'}
+    >
       <Badge overlay={grid} label={category} tone={categoryBadge?.tone} numberOfLines={1} />
       {returned ? <Badge overlay={grid} label={t('listing:lost_found.returned_badge')} tone="success" numberOfLines={1} /> : null}
       {showLang ? <Badge overlay={grid} label={t(`common:locale.${listing.lang}`)} tone="primary" numberOfLines={1} /> : null}
@@ -120,9 +145,15 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
   );
 
   const body = (
-    <View className={grid ? 'gap-1 p-3' : 'flex-1 gap-1'}>
+    <View className={grid ? 'gap-1 p-3' : join('flex-1 gap-1', bookmark && 'pr-8')}>
       {grid ? null : badges}
-      <Text variant="label" weight="semibold" numberOfLines={2}>
+      <Text
+        variant="label"
+        weight="semibold"
+        tone={returned ? 'muted' : undefined}
+        numberOfLines={2}
+        className={returned ? 'line-through' : undefined}
+      >
         {listing.title}
       </Text>
       {/* Đơn vị sau "/" cuối (vd /tháng) chữ nhỏ, cho xuống dòng: số + ₫ nối bằng dấu cách không ngắt nên dễ bị cắt (giống web).
@@ -149,38 +180,70 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
           ))}
         </View>
       ) : null}
+      {description ? (
+        <Text variant="body" tone="muted" numberOfLines={2}>
+          {description}
+        </Text>
+      ) : null}
       <View className="flex-row items-center gap-1">
         {site ? <Icon icon={MapPin} tone="muted" size={14} /> : null}
         <Text variant="caption" tone="muted" numberOfLines={1} className="flex-1">
           {meta}
         </Text>
       </View>
+      {ownerName ? (
+        <View className="mt-1 flex-row items-center gap-2 border-t border-border pt-2">
+          <Avatar uri={profileAvatarUrl(listing.owner_avatar_url)} name={ownerName} size="sm" />
+          <Text variant="caption" weight="medium" numberOfLines={1} className="shrink">
+            {ownerName}
+          </Text>
+          {verified ? <Icon icon={BadgeCheck} tone="success" size={16} /> : null}
+        </View>
+      ) : null}
     </View>
   );
 
-  return (
+  // Đồ thất lạc đã trả lại: ảnh mờ (chữ giữ tương phản ≥ 4,5:1; trạng thái đọc bằng badge + tiêu đề gạch ngang).
+  const coverDim = returned ? 'opacity-50' : undefined;
+  const card = (
     <Card
       padded={!grid}
       onPress={onPress}
-      accessibilityLabel={[category, listing.title, returned ? t('listing:lost_found.returned_badge') : null, price, ...facts, meta]
+      accessibilityLabel={[category, listing.title, returned ? t('listing:lost_found.returned_badge') : null, price, ...facts, meta, ownerLabel]
         .filter(Boolean)
         .join(', ')}
-      className={className}
+      className={bookmark ? undefined : className}
     >
       {grid ? (
         <>
           <View>
-            <ListingCover listing={listing} priority={imagePriority} className="aspect-card w-full rounded-t-lg" />
+            <ListingCover listing={listing} priority={imagePriority} className={join('aspect-card w-full rounded-t-lg', coverDim)} />
             {badges}
           </View>
           {body}
         </>
       ) : (
         <View className="flex-row items-start gap-3">
-          <ListingCover listing={listing} priority={imagePriority} className="aspect-avatar w-24 rounded-md" />
+          <ListingCover listing={listing} priority={imagePriority} className={join('aspect-avatar w-24 rounded-md', coverDim)} />
           {body}
         </View>
       )}
     </Card>
+  );
+  if (!bookmark) return card;
+  // Nút tim nằm ngoài Pressable của thẻ (anh em, đặt tuyệt đối) → VoiceOver / TalkBack bấm riêng được; vùng chạm 44.
+  return (
+    <View className={join('relative', className)}>
+      {card}
+      <View className="absolute right-1 top-1">
+        <BookmarkButton
+          saved={bookmark.saved}
+          onToggle={bookmark.onToggle}
+          labels={bookmark.labels}
+          variant={grid ? 'filled' : 'ghost'}
+          size="button"
+        />
+      </View>
+    </View>
   );
 }

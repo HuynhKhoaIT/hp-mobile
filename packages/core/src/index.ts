@@ -20,6 +20,7 @@ export * from './moderation';
 export * from './notifications';
 export * from './result';
 export * from './profile';
+export * from './ratings';
 export * from './reports';
 export * from './social';
 export * from './urls';

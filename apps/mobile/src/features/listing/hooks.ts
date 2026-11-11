@@ -6,7 +6,6 @@ import {
   useDeleteListing,
   useListingList,
   useLostFoundMatches,
-  useMarkListingReturned,
   useMyListingStats,
   useRenewListing,
   useRevealContact,
@@ -39,8 +38,8 @@ import { formatDate } from '@/lib/format';
 import { listingShareUrl } from '@/lib/urls';
 import { toast } from '@/ui';
 import { useOpenConversation } from '@/features/chat/hooks';
-import { openPostPicker } from './navigation';
-import type { ListingFeatureConfig } from './types';
+import { openPostForm, openPostPicker } from './navigation';
+import type { ListingFeatureConfig, ListingQuickFilter } from './types';
 
 /** Giá trị chip "Tất cả" / "Mọi khu" / "Mọi khoảng cách" (không lọc). Mã category / site không bao giờ rỗng. */
 export const ALL = '' as const;
@@ -57,6 +56,9 @@ export type ListingPreset = {
   categories?: readonly ListingCategory[];
   attributes?: Readonly<Record<string, string | number | boolean>>;
 };
+
+/** Chip lọc nhanh theo giá tối đa (p_price_max) — còn lại là chip theo thông số (p_attributes). */
+export const isPriceQuickFilter = (f: ListingQuickFilter): f is Extract<ListingQuickFilter, { priceMax: number }> => 'priceMax' in f;
 
 const isCategory = (v: string): v is ListingCategory => (LISTING_CATEGORIES as readonly string[]).includes(v);
 
@@ -78,7 +80,8 @@ export function useListingPreset(params: { shortcut?: string; categories?: strin
 
 /**
  * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, khoảng cách, chip lọc nhanh theo thông số
- * (config.quickFilters — bật / tắt; cùng khoá thì chip sau thay chip trước), bộ lọc đặt sẵn → useListingList (cursor,
+ * (config.quickFilters — bật / tắt; cùng khoá thì chip sau thay chip trước), chip giá tối đa (priceMax — VND, bật / tắt),
+ * bộ lọc đặt sẵn → useListingList (cursor,
  * staleTime 60s). `clearAll` bỏ mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event
  * `search` một lần cho mỗi bộ lọc.
  */
@@ -99,6 +102,8 @@ export function useListingBrowser(
   const [preset, setPreset] = useState<ListingPreset | null>(asChip ? null : (initial.preset ?? null));
   /** Chip lọc nhanh đang bật: khoá thông số → giá trị (search_listings p_attributes, ghép với thuộc tính đặt sẵn). */
   const [attributes, setAttributes] = useState<Readonly<Record<string, string | boolean>>>({});
+  /** Chip giá tối đa đang bật (VND, search_listings p_price_max); null = không lọc giá. */
+  const [priceMax, setPriceMax] = useState<number | null>(null);
 
   const filters = useMemo(
     () => ({
@@ -114,8 +119,9 @@ export function useListingBrowser(
       ...(query ? { query } : {}),
       ...(site !== ALL ? { site } : {}),
       ...(distance !== ALL ? { maxDistanceM: Number(distance) } : {}),
+      ...(priceMax !== null ? { priceMax } : {}),
     }),
-    [category, config.categories, config.key, preset, query, site, distance, attributes],
+    [category, config.categories, config.key, preset, query, site, distance, attributes, priceMax],
   );
   const list = useListingList(filters);
 
@@ -156,6 +162,9 @@ export function useListingBrowser(
         else next[key] = value;
         return next;
       }),
+    priceMax,
+    /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá). */
+    togglePriceMax: (value: number) => setPriceMax((prev) => (prev === value ? null : value)),
     /** Bỏ mọi bộ lọc + từ khoá (chip "Xoá lọc"). */
     clearAll: () => {
       setInput('');
@@ -165,9 +174,17 @@ export function useListingBrowser(
       setDistance(ALL);
       setPreset(null);
       setAttributes({});
+      setPriceMax(null);
     },
-    /** Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
-    isFiltered: !!query || category !== ALL || site !== ALL || distance !== ALL || !!preset || Object.keys(attributes).length > 0,
+    /** Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / giá / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
+    isFiltered:
+      !!query ||
+      category !== ALL ||
+      site !== ALL ||
+      distance !== ALL ||
+      !!preset ||
+      Object.keys(attributes).length > 0 ||
+      priceMax !== null,
   };
 }
 
@@ -175,6 +192,11 @@ export function useListingBrowser(
 export function usePostListing(feature?: ListingFeatureConfig['key']) {
   const preset: ListingFeature | undefined = feature === 'all' ? undefined : feature;
   return () => requireAuth(() => openPostPicker(preset));
+}
+
+/** Đăng tin vào thẳng một danh mục (khối mời đăng tin — config.banner): bắt đăng nhập trước → form bước 1. */
+export function usePostListingIn() {
+  return (category: ListingCategory) => requireAuth(() => openPostForm(category));
 }
 
 /** Nhắn tin với người đăng: khách → đăng nhập; mở (hoặc lấy lại) hội thoại rồi vào màn chat (features/chat). */
@@ -382,23 +404,3 @@ export function useListingMatches(listing: Pick<PublicListing, 'id'>, enabled: b
   return useLostFoundMatches(listing.id, { enabled });
 }
 
-/**
- * "Đã nhận lại đồ": RPC một giao dịch (useMarkListingReturned của @hp/core — attributes.returned = true + đóng tin;
- * trigger khớp bỏ qua tin này). Thành công → toast `returned_done`; lỗi (auth_required, not_found) → errors.<code>.
- */
-export function useMarkReturned(listingId: string) {
-  const { t } = useTranslation('listing');
-  const errorText = useErrorText();
-  const mark = useMarkListingReturned(listingId);
-  return {
-    markReturned: (onDone?: () => void) =>
-      mark.mutate(undefined, {
-        onSuccess: () => {
-          toast.show(t('lost_found.returned_done'), 'success');
-          onDone?.();
-        },
-        onError: (e) => toast.show(errorText(e.code), 'danger'),
-      }),
-    isPending: mark.isPending,
-  };
-}

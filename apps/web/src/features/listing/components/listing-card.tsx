@@ -9,20 +9,26 @@
 // `display` (config.card của tính năng — ListingGrid tự lấy theo category, khớp app): tối đa 3 nhãn thông số dưới giá (trọ:
 // diện tích · có gác · ở tối đa), badge danh mục đổi nhãn + tone (đồ thất lạc: "Mất đồ" đỏ / "Nhặt được" xanh), dòng 5 lấy
 // nơi + thời điểm từ attributes (đồ thất lạc: place · lost_at).
-// Cả thẻ là một link tới /tin/{slug}. Không 'use client', không async: render được ở Server Component (SSR danh sách)
-// lẫn Client Component (trang tiếp theo của "Xem thêm").
+// Stitch L3 (việc ca kíp, trọ, đồ thất lạc — khớp app): `display.description` (4c) mô tả 2 dòng; `display.owner` (6) dòng
+// người đăng (avatar + tên rút gọn của view + dấu xác minh khi có huy hiệu); `display.bookmark` → nút tim lưu tin góc phải
+// trên (grid: nổi trên ảnh; row: góc thẻ — ListingCardBookmark, client). Đồ thất lạc đã trả lại: ảnh mờ + tiêu đề gạch
+// ngang chữ muted (kèm chip "Đã trả lại" — không chỉ bằng màu).
+// Cả thẻ bấm được: link ở tiêu đề phủ toàn thẻ bằng ::after (stretched link) — nút tim là anh em của link (không lồng
+// <button> trong <a>), nằm trên lớp phủ (z-10) nên Tab tới riêng được. Vòng focus của link vẽ trong thẻ (ring-inset).
+// Không 'use client', không async: render được ở Server Component (SSR danh sách) lẫn Client Component ("Xem thêm").
 import { listingCover, type PublicListing } from '@hp/core';
 import { formatDistance, formatRelative, priceLabel } from '@hp/shared';
-import { CircleCheck, MapPin } from 'lucide-react';
+import { BadgeCheck, CircleCheck, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/shared/badge';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { listingImageUrl } from '@/lib/images';
+import { listingImageUrl, profileAvatarUrl } from '@/lib/images';
 import { asLocale, attributeString, cardFacts, isReturned, priceText } from '../display';
 import type { ListingCardDisplay } from '../feature-config';
+import { ListingCardBookmark } from './listing-card-bookmark';
 import { ListingPlaceholder } from './listing-placeholder';
 
 export type ListingCardProps = {
@@ -62,13 +68,17 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
   const category = badge?.labelKey ? t(badge.labelKey) : t(`common.category.${listing.category}`);
   const returned = isReturned(listing) ? t('listing.lost_found.returned_badge') : null;
   const foreign = listing.lang !== locale ? t(`common.locale.${listing.lang}`) : null;
+  const description = display?.description ? listing.description?.trim() : null;
+  const ownerName = display?.owner ? listing.owner_name?.trim() : null;
+  const verified = !!ownerName && listing.owner_badges.some((b) => t.has(`listing.owner_badge.${b}`));
+  const avatar = ownerName ? profileAvatarUrl(listing.owner_avatar_url) : null;
+  const bookmark = !!display?.bookmark;
 
   return (
-    <Link
-      href={`/tin/${listing.slug}`}
+    <article
       className={cn(
-        'group flex overflow-hidden rounded-lg border border-border bg-surface shadow-card outline-none transition duration-150',
-        'hover:-translate-y-0.5 hover:border-primary/20 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        'group relative flex overflow-hidden rounded-lg border border-border bg-surface shadow-card transition duration-150',
+        'hover:-translate-y-0.5 hover:border-primary/20 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
         isRow ? 'flex-row items-start gap-3 p-3' : 'flex-col',
       )}
     >
@@ -86,13 +96,15 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
             unoptimized
             priority={priority}
             sizes={isRow ? '112px' : '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'}
-            className="object-cover"
+            className={cn('object-cover', returned && 'opacity-50')}
           />
         ) : (
-          <ListingPlaceholder category={listing.category} size={isRow ? 'sm' : 'md'} />
+          <div className={cn('size-full', returned && 'opacity-50')}>
+            <ListingPlaceholder category={listing.category} size={isRow ? 'sm' : 'md'} />
+          </div>
         )}
         {isRow ? null : (
-          <div className="absolute inset-x-2 top-2 flex flex-wrap items-start gap-1">
+          <div className={cn('absolute top-2 left-2 flex flex-wrap items-start gap-1', bookmark ? 'right-12' : 'right-2')}>
             <ImageChip className={badge?.tone === 'danger' ? 'text-danger' : undefined}>{category}</ImageChip>
             {returned ? (
               <ImageChip icon={<CircleCheck aria-hidden strokeWidth={2} className="size-3.5 shrink-0 text-success" />}>
@@ -107,7 +119,7 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
           </div>
         )}
       </div>
-      <div className={cn('flex min-w-0 flex-1 flex-col gap-1', !isRow && 'p-3.5 pt-3')}>
+      <div className={cn('flex min-w-0 flex-1 flex-col gap-1', !isRow && 'p-3.5 pt-3', isRow && bookmark && 'pr-9')}>
         {isRow ? (
           <div className="flex flex-wrap gap-1">
             <Badge tone={badge?.tone}>{category}</Badge>
@@ -119,8 +131,17 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
             ) : null}
           </div>
         ) : null}
-        <h3 lang={listing.lang} className="line-clamp-2 text-md leading-snug font-semibold text-fg">
-          {listing.title}
+        <h3
+          lang={listing.lang}
+          className={cn('line-clamp-2 text-md leading-snug font-semibold', returned ? 'text-muted line-through' : 'text-fg')}
+        >
+          {/* Link phủ cả thẻ (::after inset-0 theo <article>): bấm đâu trên thẻ cũng mở tin, trừ nút tim nằm trên lớp phủ. */}
+          <Link
+            href={`/tin/${listing.slug}`}
+            className="outline-none after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-3 focus-visible:after:ring-ring/50 focus-visible:after:ring-inset"
+          >
+            {listing.title}
+          </Link>
         </h3>
         <ListingPrice text={priceText(priceLabel(listing), t, locale)} />
         {facts.length > 0 ? (
@@ -132,6 +153,11 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
             ))}
           </ul>
         ) : null}
+        {description ? (
+          <p lang={listing.lang} className="line-clamp-2 text-md text-muted">
+            {description}
+          </p>
+        ) : null}
         <p className="mt-auto flex min-w-0 items-center gap-1 pt-0.5 text-sm text-muted">
           {where ? <MapPin aria-hidden strokeWidth={1.75} className="size-4 shrink-0" /> : null}
           <span className="line-clamp-1 min-w-0">
@@ -139,8 +165,33 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false, d
             <time dateTime={time}>{when}</time>
           </span>
         </p>
+        {ownerName ? (
+          <p className="mt-1 flex min-w-0 items-center gap-2 border-t border-border pt-2 text-sm font-medium text-fg">
+            <span aria-hidden className="relative size-8 shrink-0 overflow-hidden rounded-full bg-primary-light">
+              {avatar ? (
+                <Image src={avatar} alt="" fill unoptimized sizes="32px" className="object-cover" />
+              ) : (
+                <span className="flex size-full items-center justify-center text-sm font-semibold text-primary">
+                  {ownerName.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </span>
+            <span className="truncate">{ownerName}</span>
+            {verified ? (
+              <>
+                <BadgeCheck aria-hidden strokeWidth={1.75} className="size-4 shrink-0 text-success" />
+                <span className="sr-only">{t('common.profile.verified')}</span>
+              </>
+            ) : null}
+          </p>
+        ) : null}
       </div>
-    </Link>
+      {bookmark ? (
+        <div className="absolute top-1 right-1 z-10">
+          <ListingCardBookmark listingId={listing.id} ownerId={listing.owner_id} overlay={!isRow} />
+        </div>
+      ) : null}
+    </article>
   );
 }
 

@@ -5,6 +5,7 @@ import { LISTING_CATEGORIES } from '../../enums';
 import { SiteCode } from '../profile';
 
 export * from './fields';
+export * from './attribute-groups';
 export * from './attributes';
 export * from './input';
 /** Bộ lọc danh sách / tìm kiếm (search params web, state bộ lọc app). Khớp tham số RPC search_listings. */

@@ -4,22 +4,21 @@
 // này chỉ hiện ở trình duyệt khi người xem là chủ tin (chỉ là UI: RPC list_lost_found_matches + RLS mới quyết định).
 // - "Tin có thể khớp": useLostFoundMatches (trigger khớp tự động: cùng loại đồ, gần thời điểm, gần vị trí). Skeleton /
 //   lỗi + thử lại / rỗng (sẽ được báo khi có tin khớp).
-// - "Đã nhận lại đồ" / "Đã trả cho chủ" (tin đang đăng, chưa trả): ReturnedDialog (thẻ món đồ + nhắc đối chiếu — style Stitch
-//   L2) → markListingReturnedAction (returned = true + đóng tin) → toast → router.refresh() (trang đọc lại bản cache đã làm
-//   mới bằng updateTag).
+// - "Đã nhận lại đồ" / "Đã trả cho chủ" (tin đang đăng, chưa trả): ReturnedDialog (xác nhận → "Bàn giao thành công" →
+//   đánh giá / lời cảm ơn — style Stitch) gọi RPC mark_listing_returned; đóng hộp sau khi trả → router.refresh(). Khối được
+//   giữ lại khi đang mở hộp sau khi trả (`handover`), dù trang đã có returned = true, để hộp không biến mất giữa chừng.
+// Người xem KHÁC chủ tin, tin đã trả lại: nút cảm ơn / đánh giá chủ tin (RateListingEntry — tự ẩn khi chưa từng chat về tin).
 import { useLostFoundMatches } from '@hp/core/react';
 import { PackageCheck, SearchCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { ErrorState } from '@/components/shared/error-state';
 import { ListingGridSkeleton } from '@/components/shared/skeletons';
-import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
-import { useErrorText } from '@/features/auth/components/use-error-text';
 import { useSessionUser } from '@/features/auth/components/use-session-user';
 import { useRouter } from '@/i18n/navigation';
-import { markListingReturnedAction } from '../actions';
 import { ListingGrid } from './listing-grid';
+import { RateListingEntry } from './rate-listing-dialog';
 import { ReturnedDialog, type ReturnedListing, returnedLabelKeys } from './returned-dialog';
 
 export function LostFoundOwnerPanel({
@@ -38,31 +37,39 @@ export function LostFoundOwnerPanel({
   returned: boolean;
 }) {
   const userId = useSessionUser();
+  // Hộp trả đồ đang mở (kể cả bước "Bàn giao thành công" / đánh giá sau khi trả) → giữ khối để hộp không bị gỡ.
+  const [confirming, setConfirming] = useState(false);
+  if (!userId) return null;
+  if (userId !== ownerId) return returned ? <RateListingEntry listingId={listingId} /> : null;
   // Đã trả lại → không còn gì để khớp / đánh dấu (nhãn "Đã trả lại" ở phần server của trang).
-  if (!userId || userId !== ownerId || returned) return null;
-  return <OwnerPanel listingId={listingId} item={item} canMarkReturned={active} />;
+  if (returned && !confirming) return null;
+  return (
+    <OwnerPanel
+      listingId={listingId}
+      item={item}
+      canMarkReturned={active && !returned}
+      confirming={confirming}
+      setConfirming={setConfirming}
+    />
+  );
 }
 
-function OwnerPanel({ listingId, item, canMarkReturned }: { listingId: string; item: ReturnedListing; canMarkReturned: boolean }) {
+function OwnerPanel({
+  listingId,
+  item,
+  canMarkReturned,
+  confirming,
+  setConfirming,
+}: {
+  listingId: string;
+  item: ReturnedListing;
+  canMarkReturned: boolean;
+  confirming: boolean;
+  setConfirming: (open: boolean) => void;
+}) {
   const t = useTranslations('listing.lost_found');
-  const toast = useToast();
-  const errorText = useErrorText();
   const router = useRouter();
-  const [confirming, setConfirming] = useState(false);
-  const [pending, startTransition] = useTransition();
   const matches = useLostFoundMatches(listingId);
-
-  const markReturned = () =>
-    startTransition(async () => {
-      const res = await markListingReturnedAction(listingId);
-      if (!res.ok) {
-        toast.show(errorText(res.code), 'error');
-        return;
-      }
-      setConfirming(false);
-      toast.show(t('returned_done'));
-      router.refresh();
-    });
 
   return (
     <section aria-labelledby="lost-found-owner" className="flex flex-col gap-3 rounded-lg bg-surface p-4 shadow-card">
@@ -94,7 +101,13 @@ function OwnerPanel({ listingId, item, canMarkReturned }: { listingId: string; i
         <ListingGrid items={matches.data} now={matches.dataUpdatedAt} layout="row" />
       )}
 
-      <ReturnedDialog open={confirming} onOpenChange={setConfirming} listing={item} pending={pending} onConfirm={markReturned} />
+      <ReturnedDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        listingId={listingId}
+        listing={item}
+        onFinished={() => router.refresh()}
+      />
     </section>
   );
 }

@@ -12,7 +12,6 @@ import {
   createListing,
   deleteListing,
   flattenIssues,
-  markListingReturned,
   renewListing,
   revealContact,
   type SavedListingResult,
@@ -75,19 +74,6 @@ export async function setListingStatusAction(raw: { id: string; status: OwnerLis
   if (!supabase) return err('auth_required');
   const result = await setListingStatus(supabase, { id: raw.id, status: raw.status });
   if (!result.error) invalidate(raw.id);
-  return fromResult(result);
-}
-
-/**
- * Đồ thất lạc "Đã nhận lại đồ": RPC mark_listing_returned (một lệnh: attributes.returned = true — trigger khớp bỏ qua
- * tin này — và đóng tin; trang chi tiết vẫn 200 với nhãn "Đã trả lại"). Không phải chủ / không phải tin mất, nhặt → not_found.
- */
-export async function markListingReturnedAction(id: string): Promise<ActionResult<null>> {
-  if (!isUuid(id)) return err('invalid_input');
-  const supabase = await signedInClient();
-  if (!supabase) return err('auth_required');
-  const result = await markListingReturned(supabase, id);
-  if (!result.error) invalidate(id);
   return fromResult(result);
 }
 

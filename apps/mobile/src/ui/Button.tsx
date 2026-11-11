@@ -3,6 +3,8 @@
 // đăng tin / tham gia nhóm / lưu tin (prop `haptic`). `inverse`: nút trên nền primary (header Hub) — nền surface, chữ
 // primary. `glass`: nút trong mờ trên nền primary (Đăng nhập ở header Hub, style Stitch) — nền on-primary/15, viền
 // on-primary/30, chữ on-primary. `shape="pill"` bo tròn hẳn (nút trong header / banner).
+// `iconOnly` (thanh liên hệ chi tiết tin, style Stitch): nút vuông chỉ icon — 48×48 (md) / 44×44 (sm), `label` thành
+// accessibilityLabel; nền secondary / outline thì icon màu primary.
 import * as Haptics from 'expo-haptics';
 import type { LucideIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
@@ -36,6 +38,7 @@ const TONE: Record<ButtonVariant, TextTone> = {
   glass: 'onPrimary',
 };
 const SIZE: Record<ButtonSize, string> = { md: 'min-h-12 px-5', sm: 'min-h-11 px-4' };
+const SQUARE: Record<ButtonSize, string> = { md: 'size-12', sm: 'size-11' };
 
 export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   label: string;
@@ -46,6 +49,8 @@ export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   fullWidth?: boolean;
   haptic?: boolean;
   shape?: 'rounded' | 'pill';
+  /** Nút vuông chỉ icon (bắt buộc `icon`); `label` dùng làm accessibilityLabel. */
+  iconOnly?: boolean;
   className?: string;
 };
 
@@ -58,6 +63,7 @@ export function Button({
   fullWidth = false,
   haptic = false,
   shape = 'rounded',
+  iconOnly = false,
   disabled,
   onPress,
   className,
@@ -65,14 +71,16 @@ export function Button({
 }: ButtonProps) {
   const t = useTheme();
   const press = usePressScale();
-  const tone = TONE[variant];
+  const square = iconOnly && !!icon;
+  const tone: TextTone = square && (variant === 'secondary' || variant === 'outline') ? 'primary' : TONE[variant];
   const isDisabled = disabled || loading;
   const spinnerColor = tone === 'onPrimary' ? t.colors.onPrimary : tone === 'onAccent' ? t.colors.onAccent : t.colors.primary;
 
   return (
-    <AnimatedView style={press.style} className={fullWidth ? 'self-stretch' : 'self-start'}>
+    <AnimatedView style={press.style} className={fullWidth && !square ? 'self-stretch' : 'self-start'}>
       <Pressable
         accessibilityRole="button"
+        accessibilityLabel={square ? label : undefined}
         accessibilityState={{ disabled: !!isDisabled, busy: loading }}
         disabled={isDisabled}
         onPressIn={press.onPressIn}
@@ -85,7 +93,7 @@ export function Button({
           'flex-row items-center justify-center gap-2 border',
           shape === 'pill' ? 'rounded-full' : 'rounded-md',
           BOX[variant],
-          SIZE[size],
+          square ? SQUARE[size] : SIZE[size],
           isDisabled && 'opacity-50',
           className,
         ]
@@ -94,9 +102,11 @@ export function Button({
         {...rest}
       >
         {loading ? <ActivityIndicator size="small" color={spinnerColor} /> : icon ? <Icon icon={icon} tone={tone} /> : null}
-        <Text variant="label" tone={tone} className="shrink text-center">
-          {label}
-        </Text>
+        {square ? null : (
+          <Text variant="label" tone={tone} className="shrink text-center">
+            {label}
+          </Text>
+        )}
       </Pressable>
     </AnimatedView>
   );
