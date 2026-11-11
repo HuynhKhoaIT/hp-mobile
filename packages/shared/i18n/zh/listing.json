@@ -37,7 +37,8 @@
       "lost_found_text": "捡到或丢失了物品？",
       "found_cta": "发布拾到物品",
       "lost_cta": "发布寻物启事"
-    }
+    },
+    "quick_free": "免费赠送"
   },
   "card": {
     "no_image": "暂无图片",
@@ -108,7 +109,17 @@
     "lost_at": "时间",
     "place": "地点",
     "identifying_marks": "识别特征",
-    "returned": "已归还"
+    "returned": "已归还",
+    "device_type": "设备类型",
+    "storage": "存储容量",
+    "home_type": "物品类型",
+    "appliance_type": "电器类型",
+    "capacity": "容量/功率",
+    "fashion_type": "物品类型",
+    "sport_type": "运动项目",
+    "tool_type": "工具类型",
+    "baby_type": "物品类型",
+    "age_range": "适用年龄"
   },
   "attr_value": {
     "condition": {
@@ -146,6 +157,63 @@
     "bool": {
       "yes": "有",
       "no": "无"
+    },
+    "device_type": {
+      "phone": "手机",
+      "laptop": "笔记本电脑",
+      "tablet": "平板",
+      "audio": "音响/耳机",
+      "screen": "显示器",
+      "other": "其他"
+    },
+    "home_type": {
+      "furniture": "桌椅",
+      "bedding": "床上用品",
+      "kitchen": "厨具",
+      "shelf": "柜架",
+      "decor": "装饰",
+      "other": "其他"
+    },
+    "appliance_type": {
+      "fridge": "冰箱",
+      "washer": "洗衣机",
+      "air_conditioner": "空调",
+      "fan": "风扇",
+      "water_heater": "热水器",
+      "tv": "电视",
+      "other": "其他"
+    },
+    "fashion_type": {
+      "clothes": "衣服",
+      "shoes": "鞋子",
+      "bag": "包",
+      "watch": "手表",
+      "accessory": "配饰",
+      "other": "其他"
+    },
+    "sport_type": {
+      "football": "足球",
+      "badminton": "羽毛球",
+      "pickleball": "匹克球",
+      "gym": "健身",
+      "cycling": "自行车",
+      "other": "其他"
+    },
+    "tool_type": {
+      "power_tool": "电动工具",
+      "hand_tool": "手动工具",
+      "vehicle_repair": "修车工具",
+      "electrical": "电工工具",
+      "construction": "建筑工具",
+      "other": "其他"
+    },
+    "baby_type": {
+      "stroller": "婴儿车",
+      "clothes": "衣服",
+      "toys": "玩具",
+      "feeding": "喂养用品",
+      "bed": "婴儿床",
+      "other": "其他"
     }
   },
   "unit": {
@@ -241,13 +309,19 @@
       "pass_electronics": "手机、笔记本、耳机…",
       "pass_vehicle": "摩托车、自行车、电动车…",
       "pass_ppe": "劳保鞋、安全帽、反光衣…",
-      "pass_home": "风扇、电饭煲、床垫…",
+      "pass_home": "桌椅、床垫、锅具、柜架…",
       "room_rent": "单间、整套房屋",
       "room_share": "找室友合租",
       "job_main": "全职工作",
       "job_parttime": "下班后兼职",
       "lost": "请大家帮忙寻找",
-      "found": "帮物品找到失主"
+      "found": "帮物品找到失主",
+      "pass_appliance": "冰箱、洗衣机、空调、风扇…",
+      "pass_fashion": "衣服、鞋子、包、手表…",
+      "pass_sport": "足球鞋、球拍、健身器材…",
+      "pass_tools": "电钻、修车工具、电工工具…",
+      "pass_baby": "婴儿车、婴儿衣服、玩具…",
+      "pass_other": "书籍、乐器、盆栽…"
     },
     "photos_tip": {
       "pass": "照片清晰、多角度，更容易卖出。",
@@ -421,5 +495,47 @@
     "job": "招聘中",
     "lost": "寻找中",
     "found": "等待失主"
+  },
+  "category_short": {
+    "pass_electronics": "电子产品",
+    "pass_vehicle": "车辆",
+    "pass_appliance": "家电",
+    "pass_home": "家居",
+    "pass_fashion": "服饰",
+    "pass_sport": "运动",
+    "pass_tools": "工具",
+    "pass_baby": "母婴",
+    "pass_ppe": "劳保",
+    "pass_other": "其他",
+    "room_rent": "出租房",
+    "room_share": "合租",
+    "job_main": "全职",
+    "job_parttime": "兼职",
+    "lost": "丢失",
+    "found": "拾到"
+  },
+  "sort": {
+    "label": "排序",
+    "newest": "最新",
+    "price_asc": "价格从低到高",
+    "price_desc": "价格从高到低"
+  },
+  "price_range": {
+    "label": "价格",
+    "any": "不限价格",
+    "under_500k": "50万以下",
+    "500k_2m": "50万–200万",
+    "2m_5m": "200万–500万",
+    "over_5m": "500万以上"
+  },
+  "feature_home": {
+    "categories_title": "分类",
+    "category_a11y": "浏览{{category}}",
+    "near_title": "{{site}}附近",
+    "near_title_any": "园区附近新发布",
+    "free_title": "免费赠送",
+    "free_subtitle": "工友免费送出，自取即可",
+    "rail_category": "{{category}}新发布",
+    "latest_title": "全部{{feature}}信息"
   }
 }

@@ -9,6 +9,14 @@ export const PPE_ITEM_TYPES = ['boots', 'helmet', 'uniform', 'gloves'] as const;
 export const SHIFTS = ['day', 'night', 'rotating'] as const;
 export const PAY_TYPES = ['hour', 'day', 'month'] as const;
 export const LOST_ITEM_TYPES = ['wallet', 'phone', 'keys', 'card', 'bag', 'other'] as const;
+// Loại đồ trong từng danh mục Pass đồ — mỗi danh mục một khoá riêng (giá trị dịch `listing.attr_value.<khoá>.<giá trị>`).
+export const DEVICE_TYPES = ['phone', 'laptop', 'tablet', 'audio', 'screen', 'other'] as const;
+export const HOME_ITEM_TYPES = ['furniture', 'bedding', 'kitchen', 'shelf', 'decor', 'other'] as const;
+export const APPLIANCE_TYPES = ['fridge', 'washer', 'air_conditioner', 'fan', 'water_heater', 'tv', 'other'] as const;
+export const FASHION_TYPES = ['clothes', 'shoes', 'bag', 'watch', 'accessory', 'other'] as const;
+export const SPORT_ITEM_TYPES = ['football', 'badminton', 'pickleball', 'gym', 'cycling', 'other'] as const;
+export const TOOL_TYPES = ['power_tool', 'hand_tool', 'vehicle_repair', 'electrical', 'construction', 'other'] as const;
+export const BABY_ITEM_TYPES = ['stroller', 'clothes', 'toys', 'feeding', 'bed', 'other'] as const;
 
 export type AttributeField =
   | { key: string; kind: 'enum'; options: readonly string[] }
@@ -19,8 +27,10 @@ export type AttributeField =
   | { key: string; kind: 'datetime' };
 
 const PASS_ELECTRONICS: AttributeField[] = [
+  { key: 'device_type', kind: 'enum', options: DEVICE_TYPES },
   { key: 'brand', kind: 'text' },
   { key: 'model', kind: 'text' },
+  { key: 'storage', kind: 'text' },
   { key: 'condition', kind: 'enum', options: CONDITIONS },
   { key: 'warranty_months', kind: 'int', unit: 'months' },
 ];
@@ -36,7 +46,40 @@ const PASS_PPE: AttributeField[] = [
   { key: 'size', kind: 'text' },
   { key: 'condition', kind: 'enum', options: CONDITIONS },
 ];
-const PASS_HOME: AttributeField[] = [{ key: 'condition', kind: 'enum', options: CONDITIONS }];
+const PASS_HOME: AttributeField[] = [
+  { key: 'home_type', kind: 'enum', options: HOME_ITEM_TYPES },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+];
+const PASS_APPLIANCE: AttributeField[] = [
+  { key: 'appliance_type', kind: 'enum', options: APPLIANCE_TYPES },
+  { key: 'brand', kind: 'text' },
+  { key: 'capacity', kind: 'text' },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+  { key: 'warranty_months', kind: 'int', unit: 'months' },
+];
+const PASS_FASHION: AttributeField[] = [
+  { key: 'fashion_type', kind: 'enum', options: FASHION_TYPES },
+  { key: 'brand', kind: 'text' },
+  { key: 'size', kind: 'text' },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+];
+const PASS_SPORT: AttributeField[] = [
+  { key: 'sport_type', kind: 'enum', options: SPORT_ITEM_TYPES },
+  { key: 'brand', kind: 'text' },
+  { key: 'size', kind: 'text' },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+];
+const PASS_TOOLS: AttributeField[] = [
+  { key: 'tool_type', kind: 'enum', options: TOOL_TYPES },
+  { key: 'brand', kind: 'text' },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+];
+const PASS_BABY: AttributeField[] = [
+  { key: 'baby_type', kind: 'enum', options: BABY_ITEM_TYPES },
+  { key: 'age_range', kind: 'text' },
+  { key: 'condition', kind: 'enum', options: CONDITIONS },
+];
+const PASS_OTHER: AttributeField[] = [{ key: 'condition', kind: 'enum', options: CONDITIONS }];
 const ROOM: AttributeField[] = [
   { key: 'area_m2', kind: 'int', unit: 'm2' },
   { key: 'electricity_price', kind: 'money', per: 'kwh' },
@@ -73,6 +116,12 @@ export const ATTRIBUTE_FIELDS: Record<ListingCategory, readonly AttributeField[]
   job_parttime: JOB,
   lost: LOST_FOUND,
   found: LOST_FOUND,
+  pass_appliance: PASS_APPLIANCE,
+  pass_fashion: PASS_FASHION,
+  pass_sport: PASS_SPORT,
+  pass_tools: PASS_TOOLS,
+  pass_baby: PASS_BABY,
+  pass_other: PASS_OTHER,
 };
 
 // ── Form đăng tin: chia thông số theo bước (app + web) ───────────────────────────────────────────────────────────

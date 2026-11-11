@@ -1,9 +1,11 @@
 // Link trang web (pháp lý, chia sẻ) theo ngôn ngữ đang dùng: vi không tiền tố, /en, /zh — khớp routing của web.
-// routeForWebPath: đường dẫn web nội bộ (link banner…) → route của app.
+// routeForWebPath: đường dẫn web nội bộ (link banner…) → route của app; openWebLink mở link đó (màn app hoặc trình duyệt).
 import { LISTING_FEATURE_PATHS, shareUrl } from '@hp/core';
 import type { ListingFeature } from '@hp/shared';
-import type { Href } from 'expo-router';
+import { type Href, router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { LISTING_ROUTE_SLUG } from '@/features/listing/navigation';
+import { requireAuth } from '@/core/auth';
 import { getLocale } from '@/core/i18n';
 import { env } from '@/core/env';
 
@@ -82,4 +84,22 @@ export function routeForWebPath(input: string): AppRoute | null {
 /** URL đầy đủ của một đường dẫn web (mở bằng trình duyệt khi app không có màn tương ứng). */
 export function webUrlForPath(path: string): string {
   return `${env.webUrl.replace(/\/+$/, '')}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+/**
+ * Link banner (banners.link_url): `https://…` → trình duyệt trong app; đường dẫn web có màn tương ứng → điều hướng
+ * nội bộ (cần đăng nhập thì requireAuth trước); đường dẫn web khác → mở trang web.
+ */
+export function openWebLink(link: string) {
+  if (/^https:\/\//.test(link)) {
+    void WebBrowser.openBrowserAsync(link);
+    return;
+  }
+  const route = routeForWebPath(link);
+  if (!route) {
+    void WebBrowser.openBrowserAsync(webUrlForPath(link));
+    return;
+  }
+  if (route.auth) requireAuth(() => router.push(route.href));
+  else router.push(route.href);
 }

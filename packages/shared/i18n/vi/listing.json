@@ -37,7 +37,8 @@
       "lost_found_text": "Bạn vừa nhặt được hay làm mất đồ?",
       "found_cta": "Báo nhặt được",
       "lost_cta": "Đăng tin tìm đồ"
-    }
+    },
+    "quick_free": "Cho tặng"
   },
   "card": {
     "no_image": "Chưa có ảnh",
@@ -108,7 +109,17 @@
     "lost_at": "Thời điểm",
     "place": "Nơi mất / nhặt",
     "identifying_marks": "Đặc điểm nhận dạng",
-    "returned": "Đã trả lại"
+    "returned": "Đã trả lại",
+    "device_type": "Loại thiết bị",
+    "storage": "Dung lượng",
+    "home_type": "Loại đồ",
+    "appliance_type": "Loại máy",
+    "capacity": "Công suất / dung tích",
+    "fashion_type": "Loại đồ",
+    "sport_type": "Môn",
+    "tool_type": "Loại dụng cụ",
+    "baby_type": "Loại đồ",
+    "age_range": "Độ tuổi"
   },
   "attr_value": {
     "condition": {
@@ -146,6 +157,63 @@
     "bool": {
       "yes": "Có",
       "no": "Không"
+    },
+    "device_type": {
+      "phone": "Điện thoại",
+      "laptop": "Laptop",
+      "tablet": "Máy tính bảng",
+      "audio": "Loa / tai nghe",
+      "screen": "Màn hình",
+      "other": "Khác"
+    },
+    "home_type": {
+      "furniture": "Bàn ghế",
+      "bedding": "Chăn ga gối nệm",
+      "kitchen": "Đồ bếp",
+      "shelf": "Kệ / tủ",
+      "decor": "Trang trí",
+      "other": "Khác"
+    },
+    "appliance_type": {
+      "fridge": "Tủ lạnh",
+      "washer": "Máy giặt",
+      "air_conditioner": "Điều hoà",
+      "fan": "Quạt",
+      "water_heater": "Bình nóng lạnh",
+      "tv": "Tivi",
+      "other": "Khác"
+    },
+    "fashion_type": {
+      "clothes": "Quần áo",
+      "shoes": "Giày dép",
+      "bag": "Túi / balo",
+      "watch": "Đồng hồ",
+      "accessory": "Phụ kiện",
+      "other": "Khác"
+    },
+    "sport_type": {
+      "football": "Bóng đá",
+      "badminton": "Cầu lông",
+      "pickleball": "Pickleball",
+      "gym": "Gym / thể hình",
+      "cycling": "Xe đạp",
+      "other": "Khác"
+    },
+    "tool_type": {
+      "power_tool": "Máy cầm tay",
+      "hand_tool": "Dụng cụ cầm tay",
+      "vehicle_repair": "Đồ nghề sửa xe",
+      "electrical": "Đồ điện",
+      "construction": "Xây dựng",
+      "other": "Khác"
+    },
+    "baby_type": {
+      "stroller": "Xe đẩy",
+      "clothes": "Quần áo",
+      "toys": "Đồ chơi",
+      "feeding": "Bình sữa / ăn dặm",
+      "bed": "Nôi / cũi",
+      "other": "Khác"
     }
   },
   "unit": {
@@ -241,13 +309,19 @@
       "pass_electronics": "Điện thoại, laptop, tai nghe…",
       "pass_vehicle": "Xe máy, xe đạp, xe điện…",
       "pass_ppe": "Giày, mũ, áo phản quang…",
-      "pass_home": "Quạt, nồi cơm, đệm, tủ…",
+      "pass_home": "Bàn ghế, nệm, nồi, kệ tủ…",
       "room_rent": "Phòng trọ, nhà nguyên căn",
       "room_share": "Tìm người ở cùng",
       "job_main": "Việc toàn thời gian",
       "job_parttime": "Làm thêm sau giờ ca",
       "lost": "Nhờ mọi người cùng tìm",
-      "found": "Tìm lại chủ cho món đồ"
+      "found": "Tìm lại chủ cho món đồ",
+      "pass_appliance": "Tủ lạnh, máy giặt, điều hoà, quạt…",
+      "pass_fashion": "Quần áo, giày dép, túi, đồng hồ…",
+      "pass_sport": "Giày đá bóng, vợt, dụng cụ tập…",
+      "pass_tools": "Máy khoan, đồ nghề sửa xe, đồ điện…",
+      "pass_baby": "Xe đẩy, đồ sơ sinh, đồ chơi…",
+      "pass_other": "Sách, nhạc cụ, cây cảnh…"
     },
     "photos_tip": {
       "pass": "Ảnh rõ nét, đủ các mặt giúp đồ bán nhanh hơn.",
@@ -421,5 +495,47 @@
     "job": "Đang tuyển",
     "lost": "Đang tìm",
     "found": "Chờ chủ nhận"
+  },
+  "category_short": {
+    "pass_electronics": "Điện tử",
+    "pass_vehicle": "Xe cộ",
+    "pass_appliance": "Điện lạnh",
+    "pass_home": "Gia dụng",
+    "pass_fashion": "Thời trang",
+    "pass_sport": "Thể thao",
+    "pass_tools": "Dụng cụ",
+    "pass_baby": "Mẹ & bé",
+    "pass_ppe": "Bảo hộ",
+    "pass_other": "Khác",
+    "room_rent": "Phòng trọ",
+    "room_share": "Ở ghép",
+    "job_main": "Việc chính",
+    "job_parttime": "Làm thêm",
+    "lost": "Làm mất",
+    "found": "Nhặt được"
+  },
+  "sort": {
+    "label": "Sắp xếp",
+    "newest": "Mới nhất",
+    "price_asc": "Giá thấp → cao",
+    "price_desc": "Giá cao → thấp"
+  },
+  "price_range": {
+    "label": "Giá",
+    "any": "Mọi mức giá",
+    "under_500k": "Dưới 500 nghìn",
+    "500k_2m": "500 nghìn – 2 triệu",
+    "2m_5m": "2 – 5 triệu",
+    "over_5m": "Trên 5 triệu"
+  },
+  "feature_home": {
+    "categories_title": "Danh mục",
+    "category_a11y": "Xem {{category}}",
+    "near_title": "Gần {{site}}",
+    "near_title_any": "Tin mới quanh khu",
+    "free_title": "Cho tặng miễn phí",
+    "free_subtitle": "Đồ anh em cho lại, đến lấy là được",
+    "rail_category": "{{category}} mới đăng",
+    "latest_title": "Tất cả tin {{feature}}"
   }
 }

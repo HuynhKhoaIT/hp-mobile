@@ -1,7 +1,7 @@
 // Tin đăng — phần đọc công khai (migration 20261031120000_public_listings). Ghi (đăng / sửa / đánh dấu đã bán) ở tuần 4.
 // Người khác và khách chỉ đọc view public_listings / RPC công khai (đã che PII), không from('listings').
 import type { Database } from '@hp/db';
-import { ListingFilters, type ListingCategory } from '@hp/shared';
+import { ListingFilters, type ListingCategory, type ListingSort } from '@hp/shared';
 import { type Client, type Result, fail, fromSupabase, ok } from './result';
 import type { Page } from './social';
 
@@ -16,18 +16,50 @@ export const LISTING_COLUMNS = 'id,slug,short_id,category,status,title,descripti
 
 export type ListingQuery = ListingFilters & { cursor?: string | null; limit?: number };
 
-const toPage = (items: PublicListing[], limit: number): Page<PublicListing> => ({
-  items,
-  nextCursor: items.length === limit ? (items.at(-1)?.created_at ?? null) : null,
-});
+/**
+ * Khoá giá khi sắp theo giá — cùng quy tắc với RPC search_listings (migration 20261112100000): cho tặng = 0, tin thoả thuận
+ * không giá luôn cuối (giá trị chặn 1e15 khi tăng dần, -1 khi giảm dần).
+ */
+function priceSortKey(item: PublicListing, sort: Exclude<ListingSort, 'newest'>): number {
+  if (item.price_type === 'free') return 0;
+  if (item.price !== null) return item.price;
+  return sort === 'price_asc' ? 1e15 : -1;
+}
 
-/** List / tìm kiếm / lọc. Phân trang cursor (created_at của tin cuối), tối đa 50 / trang. */
+/**
+ * Cursor là chuỗi mờ: `newest` → created_at của tin cuối (như cũ); sắp theo giá → `giá|created_at|id` (thứ tự toàn phần,
+ * không trùng / sót khi nhiều tin cùng giá). Đổi `sort` thì bỏ cursor cũ (query key khác → trang đầu).
+ */
+const toPage = (items: PublicListing[], limit: number, sort: ListingSort = 'newest'): Page<PublicListing> => {
+  const last = items.at(-1);
+  if (items.length < limit || !last) return { items, nextCursor: null };
+  return {
+    items,
+    nextCursor: sort === 'newest' ? last.created_at : `${priceSortKey(last, sort)}|${last.created_at}|${last.id}`,
+  };
+};
+
+type CursorParams = { p_cursor?: string; p_cursor_price?: number; p_cursor_id?: string };
+
+function decodeCursor(cursor: string | null | undefined, sort: ListingSort): CursorParams | null {
+  if (!cursor) return {};
+  if (sort === 'newest') return { p_cursor: cursor };
+  const [price, createdAt, id] = cursor.split('|');
+  const p = Number(price);
+  if (!createdAt || !id || !Number.isFinite(p)) return null;
+  return { p_cursor_price: p, p_cursor: createdAt, p_cursor_id: id };
+}
+
+/** List / tìm kiếm / lọc / sắp xếp. Phân trang cursor (xem toPage), tối đa 50 / trang. */
 export async function searchListings(client: Client, query: ListingQuery = {}): Promise<Result<Page<PublicListing>>> {
   const { cursor, limit: rawLimit, ...rest } = query;
   const parsed = ListingFilters.safeParse(rest);
   if (!parsed.success) return fail('invalid_input');
   const f = parsed.data;
   const limit = Math.min(Math.max(rawLimit ?? 20, 1), 50);
+  const sort = f.sort ?? 'newest';
+  const cursorParams = decodeCursor(cursor, sort);
+  if (!cursorParams) return fail('invalid_input');
 
   const res = await client
     .rpc('search_listings', {
@@ -41,13 +73,16 @@ export async function searchListings(client: Client, query: ListingQuery = {}): 
       p_price_max: f.priceMax,
       p_attributes: f.attributes,
       p_limit: limit,
-      p_cursor: cursor ?? undefined,
       p_max_distance_m: f.maxDistanceM,
+      // Chỉ gửi khi dùng tới: lời gọi mặc định vẫn khớp chữ ký RPC cũ (DB chưa chạy migration 20261112100000).
+      p_sort: sort === 'newest' ? undefined : sort,
+      p_free_only: f.freeOnly || undefined,
+      ...cursorParams,
     })
     .select(LISTING_COLUMNS);
   const result = fromSupabase<PublicListing[]>(res);
   if (result.error) return result;
-  return ok(toPage(result.data ?? [], limit));
+  return ok(toPage(result.data ?? [], limit, sort));
 }
 
 /** Chi tiết theo slug `{tieu-de}-{short_id}` (link chia sẻ). Không thấy / không còn active → not_found. */

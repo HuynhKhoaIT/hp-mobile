@@ -2,7 +2,6 @@
 // (khu đã chọn lưu MMKV, toast, analytics, kéo để làm mới). Không gọi supabase, không khai báo query key.
 import { needsOnboarding } from '@hp/core';
 import {
-  useBanners,
   useHomeFeed,
   useListingList,
   useMyListingStats,
@@ -13,13 +12,13 @@ import {
   useUnreadNotificationCount,
   useUpdateProfile,
 } from '@hp/core/react';
-import { HOME_RAIL_SIZE, LISTING_FEATURES, type ListingCategory, type ListingFeature, type Locale } from '@hp/shared';
+import { HOME_RAIL_SIZE, LISTING_FEATURES, type ListingCategory, type ListingFeature } from '@hp/shared';
 import { useFocusEffect } from 'expo-router';
 import { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { track } from '@/core/analytics';
 import { useSettings } from '@/core/settings';
+import { usePlacementBanners } from '@/features/listing/hooks';
 import { useErrorText } from '@/lib/errors';
 import { toast } from '@/ui';
 
@@ -159,10 +158,9 @@ export function useHomeRails(siteCode: string | undefined) {
   };
 }
 
-/** Banner theo ngôn ngữ đang dùng (đổi ngôn ngữ → tải bộ banner của ngôn ngữ đó). */
+/** Banner theo ngôn ngữ đang dùng (đổi ngôn ngữ → tải bộ banner của ngôn ngữ đó) — cùng key với khối PlacementBanners. */
 export function useHomeBanners() {
-  const { i18n } = useTranslation();
-  return useBanners('app_home', i18n.language as Locale);
+  return usePlacementBanners('app_home');
 }
 
 /** Số chưa đọc cho chuông (khách: 0, không gọi server). */

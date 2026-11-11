@@ -5,28 +5,38 @@
 // @hp/shared — trọ "Chi phí" / "Nội quy", việc "Người phụ trách" (tên; SĐT chỉ qua Gọi) / "Yêu cầu" (đoạn chữ).
 import { type AttributeField, type AttributeValue, groupAttributeRows, type ListingCategory } from '@hp/shared';
 import {
+  Baby,
   Bike,
   BriefcaseBusiness,
   Calendar,
+  CalendarRange,
   CircleDollarSign,
   Clock,
   Droplet,
+  Dumbbell,
   Gauge,
+  HardDrive,
   Hash,
   Layers,
   ListChecks,
   type LucideIcon,
   MapPin,
+  MonitorSmartphone,
   Package,
+  Refrigerator,
   Ruler,
+  Scale,
   ScanSearch,
+  Shirt,
   ShieldCheck,
   Smartphone,
+  Sofa,
   Sparkles,
   Tag,
   User,
   Users,
   Wallet,
+  Wrench,
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -60,6 +70,17 @@ const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   lost_at: Clock,
   place: MapPin,
   identifying_marks: ScanSearch,
+  // Loại đồ theo danh mục Pass đồ (cùng icon với thẻ danh mục — features/pass/config.ts).
+  device_type: MonitorSmartphone,
+  storage: HardDrive,
+  home_type: Sofa,
+  appliance_type: Refrigerator,
+  capacity: Scale,
+  fashion_type: Shirt,
+  sport_type: Dumbbell,
+  tool_type: Wrench,
+  baby_type: Baby,
+  age_range: CalendarRange,
 };
 
 const WIDE = new Set(['requirements', 'identifying_marks', 'place', 'curfew']);

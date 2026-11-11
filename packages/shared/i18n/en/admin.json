@@ -864,7 +864,9 @@
       "all": "All",
       "app_home": "App home",
       "web_home": "Web home",
-      "web_listing": "Web listings"
+      "web_listing": "Web listings",
+      "app_pass": "Pass home (app)",
+      "web_pass": "Pass home (web)"
     },
     "all_locales": "All languages",
     "state": {

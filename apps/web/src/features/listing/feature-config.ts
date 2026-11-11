@@ -7,8 +7,10 @@
 // (thông số lên bước Thông tin chính, trường ẩn, mẹo / hộp nhắc ở bước Ảnh, gợi ý chữ riêng).
 // Stitch L3 (danh sách việc ca kíp / trọ / đồ thất lạc, khớp app): `card.owner | bookmark | description`, chip lọc nhanh giá
 // tối đa (`?price_max=1000000`), `banner` (khối mời đăng tin đầu danh sách).
+// Chợ Pass đồ ("Trang chủ riêng", khớp app): `priceRanges` (?price=<khoá>), `sortable` (?sort=), chip "Cho tặng" (?free=1),
+// `home` (trang chủ mini khi chưa lọc: lưới danh mục → banner → các dải → "Tất cả tin").
 import type { ListingFeaturePath } from '@hp/core';
-import type { ListingCategory, ListingFeature } from '@hp/shared';
+import type { ListingCategory, ListingFeature, ListingPriceRange } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { BadgeTone } from '@/components/shared/badge';
 
@@ -46,10 +48,30 @@ export type ListingFormDisplay = {
 };
 
 /**
- * Chip lọc nhanh: theo thông số (chỉ trường enum / bool — filterableFields của filters.ts) hoặc giá tối đa (VND,
- * `?price_max=` → search_listings p_price_max; nhãn riêng qua `labelKey`). Giống `ListingQuickFilter` của app.
+ * Chip lọc nhanh: theo thông số (chỉ trường enum / bool — filterableFields của filters.ts), giá tối đa (VND,
+ * `?price_max=` → search_listings p_price_max; nhãn riêng qua `labelKey`) hoặc chỉ tin cho tặng (`?free=1` → p_free_only).
+ * Giống `ListingQuickFilter` của app.
  */
-export type ListingQuickFilter = { key: string; value: string | boolean } | { priceMax: number; labelKey: string };
+export type ListingQuickFilter =
+  | { key: string; value: string | boolean }
+  | { priceMax: number; labelKey: string }
+  | { freeOnly: true; labelKey: string };
+
+/** Một dải tin của trang chủ mini: gần khu mặc định · cho tặng · tin mới của một danh mục. Giống `ListingHomeRail` của app. */
+export type ListingHomeRail =
+  | { key: string; kind: 'near' }
+  | { key: string; kind: 'free' }
+  | { key: string; kind: 'category'; category: ListingCategory };
+
+/**
+ * Trang chủ mini của tính năng (khi chưa lọc / sắp xếp): lưới danh mục (icon config.categoryIcons) → banner (`bannerPlacement`,
+ * bảng `banners`) → các dải `rails` theo thứ tự → "Tất cả tin {tính năng}". Giống `ListingFeatureHome` của app.
+ */
+export type ListingFeatureHome = {
+  /** Vị trí banner (bảng banners, vd `web_pass`); thiếu = không có khối banner. */
+  bannerPlacement?: string;
+  rails: readonly ListingHomeRail[];
+};
 
 /**
  * Khối mời đăng tin đầu danh sách (khi chưa lọc) — mỗi nút tới /dang-tin chọn sẵn tính năng + danh mục. Giống
@@ -92,4 +114,10 @@ export type ListingFeatureConfig = {
   /** Icon từng danh mục ở bước chọn danh mục (thiếu → Icon của tính năng). Gợi ý: listing.form.category_hint.<code>. */
   categoryIcons?: Partial<Record<ListingCategory, LucideIcon>>;
   form?: ListingFormDisplay;
+  /** Khoảng giá đặt sẵn của bộ lọc "Giá" (?price=<khoá> → priceMin / priceMax). Thiếu = không có ô giá. */
+  priceRanges?: readonly ListingPriceRange[];
+  /** Có ô "Sắp xếp" (?sort=price_asc | price_desc; mặc định mới nhất — không ghi lên URL). */
+  sortable?: boolean;
+  /** Trang chủ mini khi chưa lọc (thiếu = danh sách thường). */
+  home?: ListingFeatureHome;
 };

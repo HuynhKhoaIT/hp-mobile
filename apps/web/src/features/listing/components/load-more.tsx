@@ -4,7 +4,7 @@
 // searchListings (@hp/core) với con trỏ nextCursor, gọi hàm thuần với createBrowserClient() (giống onboarding-form) —
 // danh sách công khai không cần cache client; khu đăng nhập (chat, thông báo) dùng hook TanStack của @hp/core/react. Hết trang → dòng "Bạn đã xem hết tin".
 import { type PublicListing, searchListings } from '@hp/core';
-import type { ListingCategory } from '@hp/shared';
+import type { ListingCategory, ListingSort } from '@hp/shared';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { ErrorState } from '@/components/shared/error-state';
@@ -21,14 +21,30 @@ type Props = {
   attributes: AttributeFilter;
   /** Lọc khoảng cách tới khu làm việc (m), giống trang đầu. */
   maxDistanceM?: number;
-  /** Giá tối đa (VND), giống trang đầu. */
+  /** Giá tối thiểu / tối đa (VND), cho tặng, thứ tự — giống trang đầu (cursor mờ chỉ đúng với cùng bộ lọc + thứ tự). */
+  priceMin?: number;
   priceMax?: number;
+  freeOnly?: boolean;
+  sort?: ListingSort;
   pageSize: number;
   initialCursor: string | null;
   layout: 'grid' | 'row';
 };
 
-export function LoadMore({ categories, query, site, attributes, maxDistanceM, priceMax, pageSize, initialCursor, layout }: Props) {
+export function LoadMore({
+  categories,
+  query,
+  site,
+  attributes,
+  maxDistanceM,
+  priceMin,
+  priceMax,
+  freeOnly,
+  sort,
+  pageSize,
+  initialCursor,
+  layout,
+}: Props) {
   const t = useTranslations('listing.list');
   const [items, setItems] = useState<PublicListing[]>([]);
   const [fetchedAt, setFetchedAt] = useState(0);
@@ -45,7 +61,10 @@ export function LoadMore({ categories, query, site, attributes, maxDistanceM, pr
       site: site ?? undefined,
       attributes: Object.keys(attributes).length > 0 ? { ...attributes } : undefined,
       maxDistanceM,
+      priceMin,
       priceMax,
+      freeOnly,
+      sort,
       cursor,
       limit: pageSize,
     });

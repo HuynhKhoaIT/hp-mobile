@@ -69,7 +69,7 @@
     },
     "pass": {
       "title": "Dung Quat 周边二手物品",
-      "description": "Dung Quat 周边工人之间买卖二手物品：手机、摩托车、劳保用品、家居用品。",
+      "description": "Dung Quat 周边工人的二手市场：手机、摩托车、家电、家具、服饰、运动用品、工具、母婴用品、劳保用品。",
       "heading_site": "{{site}}附近的二手物品"
     },
     "room": {

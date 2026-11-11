@@ -2,11 +2,14 @@
 // DB lưu mã; giao diện dịch qua i18n `category.<code>`, `status.<code>` (ns common).
 // Khi migration tạo enum Postgres, so lại với @hp/db `Enums<...>` — hai nơi phải trùng.
 
+// Thứ tự = thứ tự enum Postgres. Danh mục Pass đồ mở rộng (migration 20261112090000) nằm ở cuối enum; thứ tự hiển thị
+// trong Pass đồ lấy từ LISTING_FEATURES.pass.
 export const LISTING_CATEGORIES = [
   'pass_electronics', 'pass_vehicle', 'pass_ppe', 'pass_home',
   'room_rent', 'room_share',
   'job_main', 'job_parttime',
   'lost', 'found',
+  'pass_appliance', 'pass_fashion', 'pass_sport', 'pass_tools', 'pass_baby', 'pass_other',
 ] as const;
 export type ListingCategory = (typeof LISTING_CATEGORIES)[number];
 
@@ -43,9 +46,12 @@ export type ReportReason = (typeof REPORT_REASONS)[number];
 export const REPORT_TARGETS = ['listing', 'group', 'profile', 'message'] as const;
 export type ReportTarget = (typeof REPORT_TARGETS)[number];
 
-/** Nhóm tính năng Listing → các category của nó (khớp features/<x>/config.ts ở app và web). */
+/** Nhóm tính năng Listing → các category của nó (khớp features/<x>/config.ts ở app và web). Thứ tự = thứ tự hiển thị. */
 export const LISTING_FEATURES = {
-  pass: ['pass_electronics', 'pass_vehicle', 'pass_ppe', 'pass_home'],
+  pass: [
+    'pass_electronics', 'pass_vehicle', 'pass_appliance', 'pass_home', 'pass_fashion',
+    'pass_sport', 'pass_tools', 'pass_baby', 'pass_ppe', 'pass_other',
+  ],
   room: ['room_rent', 'room_share'],
   job: ['job_main', 'job_parttime'],
   lostFound: ['lost', 'found'],

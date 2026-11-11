@@ -969,7 +969,7 @@ export async function deleteBannedKeyword(client: Client, id: unknown): Promise<
 }
 
 // ── Banner (marketing) ───────────────────────────────────────────────────────────
-export const BANNER_PLACEMENTS = ['app_home', 'web_home', 'web_listing'] as const;
+export const BANNER_PLACEMENTS = ['app_home', 'web_home', 'web_listing', 'app_pass', 'web_pass'] as const;
 export type AdminBannerPlacement = (typeof BANNER_PLACEMENTS)[number];
 export const BANNER_TONES = ['primary', 'accent', 'pass', 'room', 'job', 'lost-found', 'ride', 'sport'] as const;
 export type BannerTone = (typeof BANNER_TONES)[number];
