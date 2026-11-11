@@ -19,6 +19,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/shared/badge';
 import { JsonLd } from '@/components/shared/json-ld';
+import { Button } from '@/components/ui/button';
 import { BarHeading, SafetyTip } from '@/features/listing/components/safety-tip';
 import { asLocale, type Translate } from '@/features/listing/display';
 import { absoluteUrl } from '@/i18n/alternates';
@@ -261,7 +262,7 @@ export async function GroupDetail({ group, now }: { group: PublicGroup; now: num
                     </span>
                   )}
                 </div>
-                <div className="flex min-w-0 flex-col">
+                <div className="flex min-w-0 flex-1 flex-col">
                   <p className="truncate text-md font-semibold text-fg">{hostName}</p>
                   <p className="text-sm text-muted">
                     {t('listing.detail.member_since', { date: formatDate(group.host_since, locale) })}
@@ -275,6 +276,10 @@ export async function GroupDetail({ group, now }: { group: PublicGroup; now: num
                       : t('listing.detail.no_rating')}
                   </p>
                 </div>
+                {/* Hồ sơ công khai của người tạo (giống HostCard của app: chạm → hồ sơ). */}
+                <Button asChild variant="outline" size="sm" className="shrink-0">
+                  <Link href={`/u/${group.host_id}`}>{t('common.profile.view')}</Link>
+                </Button>
               </div>
               {group.host_badges.some((b) => t.has(`listing.owner_badge.${b}`)) ? (
                 <ul className="flex flex-wrap gap-1">

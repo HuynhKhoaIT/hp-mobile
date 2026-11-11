@@ -6,10 +6,10 @@
 //   2 dải số liệu (MeStats)   3 thẻ Huy hiệu xác minh (thay "điểm uy tín" của Stitch — không có dữ liệu đó)
 //   4 lối tắt 3 ô: Đăng tin · Tin của tôi · Nhóm của tôi   5 khối "Tin của tôi" (MyListingsPreview: chip + 3 thẻ quản lý)
 // Khách: header gọn (tiêu đề + lời mời + nút Đăng nhập). Phần "Cài đặt & hỗ trợ" + miễn trừ ở MeSettings (page).
-// Web chưa có trang hồ sơ công khai (/u/[id]) → không có nút "Xem hồ sơ" như app.
+// Nút "Xem hồ sơ" (trong mờ, như app ProfileHero) → hồ sơ công khai /u/[id] — người khác thấy gì.
 import { needsOnboarding } from '@hp/core';
 import { formatDate } from '@hp/shared';
-import { Check, ChevronRight, FileText, LogIn, MapPin, Plus, Settings, ShieldCheck, UserRoundPen, Users } from 'lucide-react';
+import { Check, ChevronRight, Eye, FileText, LogIn, MapPin, Plus, Settings, ShieldCheck, UserRoundPen, Users } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -137,7 +137,19 @@ export async function MyAccount() {
             <UserRoundPen aria-hidden strokeWidth={1.75} className="size-5" />
             {t('common.home.card.onboarding_cta')}
           </Link>
-        ) : null}
+        ) : (
+          <Link
+            href={`/u/${me.id}`}
+            className={cn(
+              'inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-4 text-md font-semibold transition-colors hover:bg-on-primary/25',
+              GLASS,
+              ON_PRIMARY_FOCUS,
+            )}
+          >
+            <Eye aria-hidden strokeWidth={1.75} className="size-5" />
+            {t('common.profile.view')}
+          </Link>
+        )}
       </Hero>
 
       <div className="flex flex-col gap-6 px-4 sm:px-0">

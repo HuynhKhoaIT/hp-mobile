@@ -1,6 +1,6 @@
 'use client';
 
-// Báo cáo / chặn — dùng ở chi tiết tin, chat (và hồ sơ khi có trang /u/[id]). Giống apps/mobile/src/core/report.ts:
+// Báo cáo / chặn — dùng ở chi tiết tin, chat và hồ sơ công khai /u/[id]. Giống apps/mobile/src/core/report.ts:
 // dữ liệu qua @hp/core/react (useReport, useBlockedIds, useToggleBlock); kết quả báo bằng toast; lỗi → errors.<code>.
 // Khách: nơi gọi bọc nút bằng LoginDialog (web không mở dialog đăng nhập bằng hàm như app).
 import { useBlockedIds, useReport, useToggleBlock } from '@hp/core/react';
