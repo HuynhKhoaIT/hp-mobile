@@ -9,13 +9,16 @@
 //   dialog đánh giá chủ nhóm) · khớp đồ thất lạc (lost_found_match) → tin của người kia /tin/[slug] · kết quả xin huy hiệu
 //   (system, title_key badge_approved / badge_rejected, data {}) → /toi/huy-hieu · không rõ → ở lại trang.
 // "Đánh dấu đã đọc" → tất cả. Loading skeleton / lỗi + thử lại / trống. Web không có push (capabilities.appOnly).
+// Style Stitch (khớp màn Thông báo của app): header xanh (HeaderDecor; tràn mép + bo đáy trên điện thoại, khối bo xl từ
+// 640px) có H1 + nút "Đánh dấu đã đọc" trong mờ → các thẻ thông báo cách nhau 12 (NotificationRow).
 import { getGroup, getListing, type Notification } from '@hp/core';
 import { useMarkNotificationsRead, useNotifications, useSession, useSupabase, useUnreadNotificationCount } from '@hp/core/react';
 import { notificationTarget } from '@hp/shared';
 import { Bell, CheckCheck, LogIn } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { ClientOnly } from '@/components/shared/client-only';
+import { HeaderDecor } from '@/components/shared/header-decor';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
 import { LoginDialog } from '@/components/shared/login-dialog';
@@ -25,6 +28,19 @@ import { groupRateHref } from '@/features/group/rate-link';
 import { useRouter } from '@/i18n/navigation';
 import { isBadgeNotification, NotificationRow, NotificationRowSkeleton } from './notification-row';
 
+/** Header xanh của trang: H1 + vùng phải (nút Đánh dấu đã đọc). */
+function NotificationsHero({ title, action }: { title: string; action?: ReactNode }) {
+  return (
+    <div className="relative overflow-hidden rounded-b-xl bg-primary text-on-primary sm:mx-4 sm:rounded-xl">
+      <HeaderDecor />
+      <div className="relative flex min-h-16 flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+        <h1 className="text-xl font-bold sm:text-2xl">{title}</h1>
+        {action}
+      </div>
+    </div>
+  );
+}
+
 /** Dữ liệu chỉ có ở trình duyệt → server render tiêu đề + skeleton (ClientOnly). */
 export function NotificationsView() {
   const t = useTranslations('common.notifications');
@@ -32,8 +48,8 @@ export function NotificationsView() {
     <ClientOnly
       fallback={
         <div className="flex flex-col gap-4">
-          <h1 className="px-4 text-2xl font-semibold text-fg">{t('title')}</h1>
-          <div className="sm:px-4">
+          <NotificationsHero title={t('title')} />
+          <div className="px-4">
             <NotificationsSkeleton />
           </div>
         </div>
@@ -46,7 +62,7 @@ export function NotificationsView() {
 
 function NotificationsSkeleton() {
   return (
-    <div className="flex flex-col divide-y divide-border">
+    <div className="flex flex-col gap-3">
       {Array.from({ length: 6 }, (_, i) => (
         <NotificationRowSkeleton key={i} />
       ))}
@@ -112,15 +128,23 @@ function NotificationsContent() {
   };
 
   const header = (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-4">
-      <h1 className="text-2xl font-semibold text-fg">{t('common.notifications.title')}</h1>
-      {session.userId && hasUnread ? (
-        <Button type="button" variant="ghost" disabled={markRead.isPending} onClick={() => markRead.mutate({})}>
-          <CheckCheck strokeWidth={1.75} aria-hidden />
-          {t('common.notifications.mark_all_read')}
-        </Button>
-      ) : null}
-    </div>
+    <NotificationsHero
+      title={t('common.notifications.title')}
+      action={
+        session.userId && hasUnread ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="border-on-primary/25 bg-on-primary/15 text-on-primary hover:bg-on-primary/25 hover:text-on-primary"
+            disabled={markRead.isPending}
+            onClick={() => markRead.mutate({})}
+          >
+            <CheckCheck strokeWidth={1.75} aria-hidden />
+            {t('common.notifications.mark_all_read')}
+          </Button>
+        ) : undefined
+      }
+    />
   );
 
   let body;
@@ -153,7 +177,7 @@ function NotificationsContent() {
   } else {
     body = (
       <>
-        <ul className="flex flex-col divide-y divide-border overflow-hidden bg-surface sm:rounded-lg sm:border sm:border-border">
+        <ul className="flex flex-col gap-3">
           {notifications.items.map((n) => (
             <li key={n.id}>
               <NotificationRow notification={n} onOpen={() => void open(n)} />
@@ -177,7 +201,7 @@ function NotificationsContent() {
   return (
     <div className="flex flex-col gap-4">
       {header}
-      <div className="sm:px-4">{body}</div>
+      <div className="px-4">{body}</div>
     </div>
   );
 }
