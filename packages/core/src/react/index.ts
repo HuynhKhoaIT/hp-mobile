@@ -77,6 +77,7 @@ export {
   useGroupList,
   useGroupMembers,
   useGroupRealtime,
+  useHostGroups,
   useJoinGroup,
   useLeaveGroup,
   useMyGroupRating,

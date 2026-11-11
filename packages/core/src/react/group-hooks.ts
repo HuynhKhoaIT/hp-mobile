@@ -29,6 +29,7 @@ import {
   type GroupPage,
   type GroupQuery,
   leaveGroup,
+  listGroupsByHost,
   listMyGroups,
   type MyGroupPage,
   type MyGroupsTab,
@@ -121,6 +122,20 @@ export function useGroupList(query: Omit<GroupQuery, 'cursor'>, opts: { enabled?
     getNextPageParam: (last) => last.nextCursor,
     staleTime: 60_000,
     enabled: opts.enabled ?? true,
+  });
+  return { ...result, items: result.data?.pages.flatMap((p) => p.items) ?? [] };
+}
+
+/** Nhóm sắp diễn ra do một người tạo (hồ sơ công khai), cursor; cùng dạng trang với useGroupList (cache nhóm dùng chung). */
+export function useHostGroups(hostId: string | undefined) {
+  const client = useSupabase();
+  const result = useInfiniteQuery<GroupPage, AppError, GroupPages, readonly unknown[], string | null>({
+    queryKey: keys.hostGroups(hostId ?? ''),
+    queryFn: ({ pageParam }) => unwrap(listGroupsByHost(client, { hostId: hostId ?? '', cursor: pageParam })),
+    initialPageParam: null,
+    getNextPageParam: (last) => last.nextCursor,
+    enabled: !!hostId,
+    staleTime: 60_000,
   });
   return { ...result, items: result.data?.pages.flatMap((p) => p.items) ?? [] };
 }
