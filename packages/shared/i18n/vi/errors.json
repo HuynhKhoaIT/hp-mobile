@@ -48,5 +48,9 @@
   "translate_failed": "Chưa dịch được, vui lòng thử lại sau.",
   "images_min": "Tin phòng trọ cần ít nhất 3 ảnh.",
   "contact_invalid": "Hãy nhập số điện thoại (ví dụ 0912 345 678) hoặc email đúng.",
-  "consent_required": "Bạn cần đồng ý để chúng tôi liên hệ lại."
+  "consent_required": "Bạn cần đồng ý để chúng tôi liên hệ lại.",
+  "listing_not_returned": "Chỉ đánh giá được sau khi đồ đã được trao trả.",
+  "listing_already_rated": "Bạn đã đánh giá cho tin này rồi.",
+  "cannot_rate_self": "Bạn không thể tự đánh giá mình.",
+  "rating_no_chat": "Chỉ đánh giá được người đã nhắn tin với bạn về tin này."
 }

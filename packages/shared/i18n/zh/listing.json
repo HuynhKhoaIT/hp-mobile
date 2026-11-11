@@ -29,7 +29,15 @@
     "subtitle_lostFound": "发布失物，帮拾到的物品找主人",
     "subtitle_all": "你工作区附近的新信息",
     "clear_filters": "清除筛选",
-    "quick_filters": "快速筛选"
+    "quick_filters": "快速筛选",
+    "quick_price_under_1m": "每月100万₫以下",
+    "banner": {
+      "landlord_text": "您是房东吗？",
+      "landlord_cta": "发布房源",
+      "lost_found_text": "捡到或丢失了物品？",
+      "found_cta": "发布拾到物品",
+      "lost_cta": "发布寻物启事"
+    }
   },
   "card": {
     "no_image": "暂无图片",
@@ -70,7 +78,8 @@
     "stat_rating": "评价",
     "stat_joined": "加入",
     "no_rating_short": "暂无",
-    "image_thumb": "查看第 {{current}}/{{total}} 张图片"
+    "image_thumb": "查看第 {{current}}/{{total}} 张图片",
+    "code": "信息编号 #{{code}}"
   },
   "attr": {
     "brand": "品牌",
@@ -307,7 +316,19 @@
     "reveal": "显示号码",
     "call": "拨打 {{phone}}",
     "no_phone": "发布者没有填写电话号码——请发消息联系。",
-    "hint": "确实有意向再拨打。看货前不要先付款。"
+    "hint": "确实有意向再拨打。看货前不要先付款。",
+    "reveal_call": "显示号码拨打",
+    "phone_line": "电话：{{phone}}",
+    "primary": {
+      "chat_pass": "私信卖家",
+      "chat_room": "咨询房间",
+      "chat_job": "私信应聘",
+      "chat_lostFound": "私信发布者",
+      "call_pass": "致电卖家",
+      "call_room": "致电咨询房间",
+      "call_job": "致电招聘方",
+      "call_lostFound": "致电发布者"
+    }
   },
   "state": {
     "sold": "该物品已售出",
@@ -346,7 +367,40 @@
     "kind_found": "拾到",
     "mark_returned_found": "已归还失主",
     "mark_returned_found_confirm_title": "标记为已归还失主？",
-    "returned_check": "交还前，请认领人说出一个独有特征（颜色、划痕、里面的物品），确认是失主。"
+    "returned_check": "交还前，请认领人说出一个独有特征（颜色、划痕、里面的物品），确认是失主。",
+    "done_badge": "交接成功",
+    "done_title": "物品已物归原主！",
+    "done_body_lost": "信息已关闭。给归还物品的人发一句感谢或评价吧。",
+    "done_body_found": "信息已关闭。你可以评价领回物品的人。",
+    "done_rate": "致谢 / 评价",
+    "done_message": "发消息",
+    "done_later": "稍后",
+    "rate_cta_lost": "感谢拾获者",
+    "rate_cta_found": "评价领取人",
+    "rate_cta_owner": "评价发布者",
+    "safe_flow": "安全交接",
+    "rate": {
+      "title": "评价与感谢",
+      "pick_label": "你想感谢谁？",
+      "pick_hint": "就这条信息与你聊过天的人。",
+      "owner_tag": "发布者",
+      "question": "这次交还体验如何？",
+      "hint": "评价能帮助大家知道谁值得信任。",
+      "compliments_label": "印象深刻的地方（快速选择）",
+      "compliment_honest": "诚实热心",
+      "compliment_careful": "物品保管仔细",
+      "compliment_on_time": "准时",
+      "compliment_clear": "核对清楚",
+      "compliment_helpful": "乐于助人",
+      "comment_label": "感谢的话（可选）",
+      "comment_placeholder": "写几句感谢的话…",
+      "submit": "提交评价",
+      "done": "评价已提交，谢谢你！",
+      "rated": "你给 {{name}} 打了 {{score}}/5 分。",
+      "empty": "还没有人就这条信息联系你，暂时没有可评价的人。",
+      "pick_required": "请选择要评价的人。",
+      "score_required": "请选择星级。"
+    }
   },
   "tip": {
     "title": "安全提示",
@@ -354,5 +408,18 @@
     "room": "亲自上门看房，检查水电。没看房之前不要在网上付定金。",
     "job": "不要为求职缴纳任何费用或押金，也不要交出证件原件。",
     "lostFound": "询问物品的特征，确认是真正的失主。拍证件照片时请遮住身份证号、工卡号。"
+  },
+  "attr_group": {
+    "costs": "费用",
+    "rules": "房屋守则",
+    "contact": "负责人",
+    "requirements": "要求"
+  },
+  "availability": {
+    "pass": "有货",
+    "room": "空房",
+    "job": "招聘中",
+    "lost": "寻找中",
+    "found": "等待失主"
   }
 }

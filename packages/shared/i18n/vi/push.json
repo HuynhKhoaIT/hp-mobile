@@ -58,5 +58,9 @@
   "badge_rejected": {
     "title": "Huy hiệu chưa được duyệt",
     "body": "Giấy tờ chưa hợp lệ. {{reason}} Bạn có thể gửi lại."
+  },
+  "rating_received": {
+    "title": "Bạn nhận được lời cảm ơn",
+    "body": "{{name}} đã đánh giá bạn {{score}}/5 sao cho \"{{title}}\"."
   }
 }

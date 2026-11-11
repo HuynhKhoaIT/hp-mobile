@@ -58,5 +58,9 @@
   "badge_rejected": {
     "title": "徽章未通过审核",
     "body": "证件未通过。{{reason}} 你可以重新提交。"
+  },
+  "rating_received": {
+    "title": "你收到了一份感谢",
+    "body": "{{name}} 就“{{title}}”给了你 {{score}}/5 星评价。"
   }
 }
