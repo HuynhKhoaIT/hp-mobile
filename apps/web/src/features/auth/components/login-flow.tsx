@@ -2,6 +2,7 @@
 
 // Điều phối đăng nhập (trang /dang-nhap và LoginDialog): đã có phiên? → onboarding nếu cần → xong.
 // Chưa có phiên: số điện thoại → OTP → (onboarding) → xong. Google quay về /auth/callback rồi lại vào đây.
+// Bước số điện thoại có biểu tượng + tên app (brand) và chân Điều khoản · Chính sách (+ miễn trừ trong dialog).
 // `next` là đường dẫn đầy đủ đã có tiền tố ngôn ngữ (do proxy.ts tạo) → điều hướng bằng location, không qua router next-intl.
 import { getMyProfile, type MyProfile, needsOnboarding } from '@hp/core';
 import type { Locale } from '@hp/shared';
@@ -9,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { TextLinesSkeleton } from '@/components/shared/skeletons';
 import { safeNext, splitLocale, withLocale } from '@/i18n/paths';
 import { createBrowserClient } from '@/lib/supabase/client';
+import { AuthLegal } from './auth-legal';
 import { OnboardingForm } from './onboarding-form';
 import { OtpStep } from './otp-step';
 import { PhoneStep } from './phone-step';
@@ -62,7 +64,12 @@ export function LoginFlow({
     case 'checking':
       return <TextLinesSkeleton lines={4} />;
     case 'phone':
-      return <PhoneStep next={next} initialError={initialError} onSent={(phone) => setStep({ kind: 'otp', phone })} />;
+      return (
+        <div className="flex flex-col gap-6">
+          <PhoneStep brand next={next} initialError={initialError} onSent={(phone) => setStep({ kind: 'otp', phone })} />
+          <AuthLegal disclaimer={!!onDone} />
+        </div>
+      );
     case 'otp':
       return <OtpStep phone={step.phone} onVerified={() => void afterSignIn()} onChangePhone={() => setStep({ kind: 'phone' })} />;
     case 'onboarding':
