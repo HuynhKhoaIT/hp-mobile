@@ -5,7 +5,9 @@ import type { PublicGroup, PublicListing } from '@hp/core';
 import { LOCALES, type ListingCategory, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
 import {
+  Baby,
   Bell,
+  Bike,
   ClipboardList,
   Compass,
   Heart,
@@ -16,13 +18,18 @@ import {
   LogOut,
   MapPin,
   MessageCircle,
+  Package,
   Plus,
+  Refrigerator,
   Search,
   Share2,
   ShieldCheck,
+  Smartphone,
+  Sofa,
   Sparkles,
   SquarePlus,
   Star,
+  type LucideIcon,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -140,6 +147,15 @@ function sampleListing(over: Partial<PublicListing>): PublicListing {
   };
 }
 const SAMPLE_CATEGORIES: ListingCategory[] = ['pass_vehicle', 'room_rent', 'job_parttime', 'lost'];
+/** Ô danh mục trang chủ Pass đồ (6 ô → hàng thứ hai thiếu, ServiceGrid bù chỗ trống). */
+const GALLERY_CATEGORY_TILES: readonly { category: ListingCategory; icon: LucideIcon }[] = [
+  { category: 'pass_electronics', icon: Smartphone },
+  { category: 'pass_vehicle', icon: Bike },
+  { category: 'pass_appliance', icon: Refrigerator },
+  { category: 'pass_home', icon: Sofa },
+  { category: 'pass_other', icon: Package },
+  { category: 'pass_baby', icon: Baby },
+];
 
 // Nhóm mẫu cho GroupCard (dữ liệu giả, chỉ ở gallery): giờ hẹn 1 ngày tới, tính một lần khi nạp module.
 const TOMORROW = new Date(Date.now() + 86_400_000).toISOString();
@@ -453,6 +469,24 @@ export default function UiGalleryScreen() {
             <View className="flex-1">
               <ServiceTile variant="grid" icon={LayoutGrid} label={t('home.tiles.all')} onPress={() => toast.show(t('home.tiles.all'))} />
             </View>
+          </ServiceGrid>
+        </View>
+      </Section>
+
+      <Section title="ServiceTile grid · service + icon · ServiceGrid columns 5 (feature home categories)">
+        <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <ServiceGrid columns={5}>
+            {GALLERY_CATEGORY_TILES.map(({ category, icon }) => (
+              <View key={category} className="flex-1">
+                <ServiceTile
+                  variant="grid"
+                  service="pass"
+                  icon={icon}
+                  label={t(`listing:category_short.${category}`)}
+                  onPress={() => toast.show(t(`category.${category}`))}
+                />
+              </View>
+            ))}
           </ServiceGrid>
         </View>
       </Section>

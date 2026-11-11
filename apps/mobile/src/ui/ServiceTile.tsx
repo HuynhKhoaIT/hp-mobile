@@ -7,7 +7,10 @@
 //   theo minHeight, không cắt chữ). Nhãn góc "Mới" (bg-accent + chữ on-accent trắng đậm, in hoa) / "Sắp có" lệch -8/-8 góc trên
 //   phải ô icon; nhãn "Mới" nổi lên xuống nhẹ (useAmbientLoop 'float': −3px, 2,4s/chu kỳ; Reduce Motion → đứng yên); ô sắp có mờ 60% (nhãn góc giữ rõ) + accessibilityState.disabled nhưng vẫn bấm được (mở màn "Sắp có").
 //   Nhấn: scale 0.97 (motion.fast) + nền surface-2. Vùng chạm cả ô (icon + nhãn) ≥ 48.
-// ServiceGrid xếp các ô 'grid' thành hàng 4 cột (gap-x-2, gap-y-4) — RN không có CSS grid nên chia hàng tường minh.
+// Glyph: `service` (icon + màu dịch vụ) · `service` + `icon` (icon riêng tô màu dịch vụ trên nền dịch vụ nhạt — ô danh mục
+//   ở trang chủ riêng của tính năng) · `icon` (tiện ích, primary).
+// ServiceGrid xếp các ô 'grid' thành hàng `columns` cột (mặc định 4; gap-x-2, gap-y-4) — RN không có CSS grid nên chia
+// hàng tường minh.
 import type { LucideIcon } from 'lucide-react-native';
 import { Children, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
@@ -23,7 +26,7 @@ import { usePressScale } from './usePressScale';
 
 export type ServiceTileBadge = { label: string; tone: 'soon' | 'new' };
 
-type Glyph = { service: ServiceKey; icon?: undefined } | { icon: LucideIcon; service?: undefined };
+type Glyph = { service: ServiceKey; icon?: LucideIcon } | { icon: LucideIcon; service?: undefined };
 
 export type ServiceTileProps = Glyph & {
   label: string;
@@ -35,6 +38,8 @@ export type ServiceTileProps = Glyph & {
   badge?: ServiceTileBadge;
   /** Tính năng chưa có: mờ 60% + đọc "đã tắt" (vẫn bấm được để mở màn "Sắp có"). */
   soon?: boolean;
+  /** Nhãn đọc màn hình thay cho `label` (vd "Xem Xe cộ" ở ô danh mục); nhãn góc vẫn được đọc kèm. */
+  accessibilityLabel?: string;
   className?: string;
 };
 
@@ -43,9 +48,9 @@ const BADGE: Record<ServiceTileBadge['tone'], { box: string; tone: 'muted' | 'on
   new: { box: 'bg-accent', tone: 'onAccent', text: 'uppercase' },
 };
 
-/** Icon dịch vụ (màu nhận diện) hoặc icon tiện ích (primary). */
+/** Icon dịch vụ / icon riêng tô màu dịch vụ (màu nhận diện) hoặc icon tiện ích (primary). */
 function TileIcon({ glyph, size }: { glyph: Glyph; size: 'tab' | number }) {
-  if (glyph.service !== undefined) return <Icon icon={SERVICE[glyph.service].icon} service={glyph.service} size={size} />;
+  if (glyph.service !== undefined) return <Icon icon={glyph.icon ?? SERVICE[glyph.service].icon} service={glyph.service} size={size} />;
   return <Icon icon={glyph.icon} tone="primary" size={size} />;
 }
 
@@ -55,11 +60,11 @@ const ringOf = (glyph: Glyph) => (glyph.service !== undefined ? SERVICE[glyph.se
 
 export function ServiceTile(props: ServiceTileProps) {
   if (props.variant === 'grid') return <GridTile {...props} />;
-  const { label, onPress, selected, className } = props;
+  const { label, onPress, selected, className, accessibilityLabel } = props;
   return (
     <Card
       onPress={onPress}
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       selected={selected}
       className={['min-h-24 items-center gap-2', className].filter(Boolean).join(' ')}
     >
@@ -74,7 +79,7 @@ export function ServiceTile(props: ServiceTileProps) {
 }
 
 function GridTile(props: ServiceTileProps) {
-  const { label, onPress, badge, soon = false, className } = props;
+  const { label, onPress, badge, soon = false, className, accessibilityLabel = label } = props;
   const press = usePressScale('fast');
   const { motion } = useTheme();
   // Chỉ nhãn "Mới" nổi (lặp chậm); nhãn "Sắp có" đứng yên.
@@ -82,7 +87,7 @@ function GridTile(props: ServiceTileProps) {
   const floatY = motion.ambient.float.translateY;
   const floatStyle = useAnimatedStyle(() => ({ transform: [{ translateY: floatY * float.progress.get() }] }));
   const dim = soon ? 'opacity-60' : '';
-  const a11yLabel = badge ? `${label}, ${badge.label}` : label;
+  const a11yLabel = badge ? `${accessibilityLabel}, ${badge.label}` : accessibilityLabel;
   return (
     // Bề rộng do nơi đặt quyết định (ô trong ServiceGrid: bọc View / StaggerItem `flex-1`) — không flex-1 ở đây vì
     // trong khung cao tự do, flex-1 theo chiều dọc làm ô co về 0.

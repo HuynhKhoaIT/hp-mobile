@@ -1,25 +1,38 @@
 // Màn danh sách tin dùng chung 4 tính năng, tab Khám phá và màn Tìm kiếm (config 'all') — style Stitch "Khám phá & Bộ lọc":
 //   1 header xanh (PageHero: nút quay lại trong mờ, ô icon dịch vụ, tiêu đề + dòng phụ theo config.subtitleKey) chứa ô tìm
 //     kiếm nổi (SearchBar elevated). Tìm có từ khoá → log_search + event `search` (useListingBrowser).
-//   2 hàng chip tràn mép: [Xoá lọc ×] (khi đang lọc) · [bộ lọc đặt sẵn ×] · [Khu ▾] · [Khoảng cách ▾] (trọ) · chip danh mục
-//     con (nhãn theo config.card.display.categoryBadge nếu có — đồ thất lạc: "Mất đồ / Nhặt được").
-//   3 hàng chip lọc nhanh theo thông số (config.quickFilters — bật / tắt, vd trọ "Có gác", "Chỗ để xe") hoặc giá tối đa
-//     (trọ "Dưới 1 triệu/tháng" → p_price_max).
-//   4 danh sách cuộn vô hạn; khi chưa tìm / lọc, đầu danh sách: `header` (vd dải nhóm ở Khám phá) → khối mời đăng tin
-//     (config.banner — mở thẳng form đúng danh mục) → mẹo an toàn riêng tính năng (config.tipKey, Notice bordered) → tiêu
-//     đề "Tin mới đăng" có vạch cam.
-// Khác Stitch (cố ý): không đếm "Tìm thấy N tin" (RPC phân trang cursor, không trả tổng), không "Sắp xếp" (RPC chỉ mới nhất),
-// không bản đồ, không mic (bàn phím hệ thống đã có nhập giọng nói), không chip khu đặt tên tay — khu lấy từ bảng sites.
+//   2 hàng chip tràn mép: [Xoá lọc ×] (khi đang lọc) · [bộ lọc đặt sẵn ×] · chip chọn theo thứ tự config.filters ([Khu ▾],
+//     [Khoảng cách ▾] (trọ), [Giá ▾] (khoảng giá config.priceRanges), [Sắp xếp ▾]) · chip danh mục con (nhãn theo
+//     config.card.display.categoryBadge nếu có — đồ thất lạc: "Mất đồ / Nhặt được").
+//   3 hàng chip lọc nhanh theo thông số (config.quickFilters — bật / tắt, vd trọ "Có gác", "Chỗ để xe"), giá tối đa
+//     (trọ "Dưới 1 triệu/tháng" → p_price_max) hoặc "Cho tặng" (Pass đồ → p_free_only).
+//   4 danh sách cuộn vô hạn (đổi bộ lọc → cuộn về đầu); khi chưa tìm / lọc, đầu danh sách: `header` (vd dải nhóm ở Khám
+//     phá; trang chủ riêng của tính năng — FeatureHome, nhận thao tác của danh sách qua `header` dạng hàm) → khối mời đăng
+//     tin (config.banner — mở thẳng form đúng danh mục) → mẹo an toàn riêng tính năng (config.tipKey, Notice bordered) →
+//     tiêu đề có vạch cam: "Tin mới đăng", hoặc "Tất cả tin {tính năng}" khi có config.home.
+// Khác Stitch (cố ý): không đếm "Tìm thấy N tin" (RPC phân trang cursor, không trả tổng), không bản đồ, không mic (bàn phím
+// hệ thống đã có nhập giọng nói), không chip khu đặt tên tay — khu lấy từ bảng sites.
 import { useSites } from '@hp/core/react';
-import type { ListingCategory } from '@hp/shared';
+import { type ListingCategory, LISTING_SORTS } from '@hp/shared';
+import { useFocusEffect } from 'expo-router';
 import { X } from 'lucide-react-native';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View } from 'react-native';
+import { BackHandler, ScrollView, View } from 'react-native';
 import { formatNumber } from '@/lib/format';
 import { Chip, Col, FilterBar, Notice, PageHero, SearchBar, SectionHeader, Select } from '@/ui';
-import { ALL, DISTANCE_OPTIONS_KM, isPriceQuickFilter, type ListingPreset, useListingBrowser, usePostListing } from '../hooks';
-import type { ListingFeatureConfig } from '../types';
+import {
+  ALL,
+  DEFAULT_SORT,
+  DISTANCE_OPTIONS_KM,
+  isFreeQuickFilter,
+  isPriceQuickFilter,
+  type ListingBrowserApi,
+  type ListingPreset,
+  useListingBrowser,
+  usePostListing,
+} from '../hooks';
+import type { ListingFeatureConfig, ListingFilterKey } from '../types';
 import { ListingBanner } from './ListingBanner';
 import { ListingFeed } from './ListingFeed';
 
@@ -37,8 +50,11 @@ export type ListingBrowserProps = {
   initialQuery?: string;
   initialPreset?: ListingPreset;
   autoFocus?: boolean;
-  /** Khối trên danh sách khi chưa tìm / lọc (trước mẹo an toàn + "Tin mới đăng"). */
-  header?: ReactNode;
+  /**
+   * Khối trên danh sách khi chưa tìm / lọc (trước mẹo an toàn + "Tin mới đăng"). Dạng hàm: nhận thao tác của danh sách
+   * (chọn danh mục, bật "Cho tặng", lọc khu) — trang chủ riêng của tính năng (FeatureHome).
+   */
+  header?: ReactNode | ((api: ListingBrowserApi) => ReactNode);
 };
 
 export function ListingBrowser({
@@ -58,6 +74,21 @@ export function ListingBrowser({
   const browser = useListingBrowser(config, { site: initialSite, query: initialQuery, preset: initialPreset });
   const post = usePostListing(config.key);
   const featureName = t(config.titleKey);
+
+  // Trang chủ riêng (config.home): đang lọc do bấm ngay trên màn (danh mục, "Xem tất cả"…) → nút quay lại ở header và
+  // Back Android về trang chủ của tính năng thay vì rời màn. Vào màn với bộ lọc sẵn (shortcut / link) → quay lại như thường.
+  const backToHome = !!config.home && browser.isFiltered && !initialPreset && !initialQuery && !initialSite;
+  const { clearAll } = browser;
+  useFocusEffect(
+    useCallback(() => {
+      if (!backToHome) return undefined;
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+        clearAll();
+        return true;
+      });
+      return () => sub.remove();
+    }, [backToHome, clearAll]),
+  );
 
   const categoryLabel = (c: ListingCategory) => {
     const key = (configOf?.(c) ?? config).card.display?.categoryBadge?.[c]?.labelKey;
@@ -92,6 +123,38 @@ export function ListingBrowser({
     />
   ) : null;
 
+  const priceRanges = config.priceRanges ?? [];
+  const priceFilter =
+    config.filters.includes('price') && priceRanges.length > 0 ? (
+      <Select
+        trigger="chip"
+        label={t('price_range.label')}
+        value={browser.priceRange}
+        neutralValue={ALL}
+        options={[{ value: ALL, label: t('price_range.any') }, ...priceRanges.map((r) => ({ value: r.key, label: t(`price_range.${r.key}`) }))]}
+        onChange={browser.setPriceRange}
+      />
+    ) : null;
+
+  const sortFilter = config.filters.includes('sort') ? (
+    <Select
+      trigger="chip"
+      label={t('sort.label')}
+      value={browser.sort}
+      neutralValue={DEFAULT_SORT}
+      options={LISTING_SORTS.map((s) => ({ value: s, label: t(`sort.${s}`) }))}
+      onChange={browser.setSort}
+    />
+  ) : null;
+
+  /** Chip chọn đặt đầu hàng theo thứ tự config.filters ('subcategory' là các chip danh mục phía sau). */
+  const selectChips: Record<Exclude<ListingFilterKey, 'subcategory'>, ReactNode> = {
+    site: siteFilter,
+    distance: distanceFilter,
+    price: priceFilter,
+    sort: sortFilter,
+  };
+
   const clearChip = browser.isFiltered ? (
     <Chip label={t('list.clear_filters')} trailingIcon={X} onPress={browser.clearAll} />
   ) : null;
@@ -117,7 +180,16 @@ export function ListingBrowser({
         contentContainerClassName="gap-2 px-4 py-1"
       >
         {quick.map((f) =>
-          isPriceQuickFilter(f) ? (
+          isFreeQuickFilter(f) ? (
+            <Chip
+              key="free_only"
+              size="sm"
+              dot={config.color ?? 'accent'}
+              label={t(f.labelKey)}
+              selected={browser.freeOnly}
+              onPress={browser.toggleFreeOnly}
+            />
+          ) : isPriceQuickFilter(f) ? (
             <Chip
               key={`price_max:${f.priceMax}`}
               size="sm"
@@ -142,10 +214,14 @@ export function ListingBrowser({
 
   const feedHeader = (
     <Col gap={4}>
-      {header}
+      {typeof header === 'function' ? header(browser.api) : header}
       {config.banner ? <ListingBanner banner={config.banner} /> : null}
       {config.tipKey ? <Notice variant="bordered" tone="warning" title={t('tip.title')} text={t(config.tipKey)} /> : null}
-      <SectionHeader title={t('hub.latest_title')} bar="accent" size="md" />
+      <SectionHeader
+        title={config.home ? t('feature_home.latest_title', { feature: featureName }) : t('hub.latest_title')}
+        bar="accent"
+        size="md"
+      />
     </Col>
   );
 
@@ -155,7 +231,7 @@ export function ListingBrowser({
         title={title ?? featureName}
         subtitle={config.subtitleKey ? t(config.subtitleKey) : undefined}
         service={config.color}
-        onBack={onBack}
+        onBack={backToHome ? browser.clearAll : onBack}
         right={heroRight}
       >
         <SearchBar
@@ -177,8 +253,7 @@ export function ListingBrowser({
             <>
               {clearChip}
               {presetChip}
-              {siteFilter}
-              {distanceFilter}
+              {config.filters.map((k) => (k === 'subcategory' ? null : <Fragment key={k}>{selectChips[k]}</Fragment>))}
             </>
           }
         />
@@ -201,6 +276,7 @@ export function ListingBrowser({
           refetch={() => void browser.refetch()}
           onPost={post}
           header={browser.isFiltered ? undefined : feedHeader}
+          listKey={JSON.stringify(browser.filters)}
         />
       </View>
     </>

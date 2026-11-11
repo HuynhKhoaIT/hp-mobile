@@ -8,28 +8,35 @@
 import type { PublicListing } from '@hp/core';
 import { type AttributeField, type AttributeValue, groupAttributeRows, readAttributes } from '@hp/shared';
 import {
+  Baby,
   Bike,
   BriefcaseBusiness,
   Calendar,
   CircleDollarSign,
   Clock,
   Droplet,
+  Dumbbell,
   Gauge,
+  HardDrive,
   Hash,
   Layers,
   ListChecks,
   type LucideIcon,
   MapPin,
   Package,
+  Refrigerator,
   Ruler,
   ScanSearch,
+  Shirt,
   ShieldCheck,
   Smartphone,
+  Sofa,
   Sparkles,
   Tag,
   User,
   Users,
   Wallet,
+  Wrench,
   Zap,
 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -65,6 +72,16 @@ const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   lost_at: Clock,
   place: MapPin,
   identifying_marks: ScanSearch,
+  device_type: Smartphone,
+  storage: HardDrive,
+  home_type: Sofa,
+  appliance_type: Refrigerator,
+  capacity: Gauge,
+  fashion_type: Shirt,
+  sport_type: Dumbbell,
+  tool_type: Wrench,
+  baby_type: Baby,
+  age_range: Baby,
 };
 
 /** Thông số chữ dài → ô chiếm cả hàng. */

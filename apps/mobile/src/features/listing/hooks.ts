@@ -1,7 +1,8 @@
 // Hook riêng mobile của engine Listing — chỉ gọi lại @hp/core và thêm phần của app (state bộ lọc, toast, haptic,
 // Share sheet, gọi điện, requireAuth, analytics). Không gọi supabase trực tiếp, không khai báo query key.
-import { logSearch, type MyListing, type MyListingsTab, type PublicListing } from '@hp/core';
+import { type Banner, logSearch, type MyListing, type MyListingsTab, type PublicListing } from '@hp/core';
 import {
+  useBanners,
   useBookmarkedListingIds,
   useDeleteListing,
   useListingList,
@@ -22,6 +23,7 @@ import {
   LISTING_CATEGORIES,
   type ListingCategory,
   type ListingFeature,
+  type ListingSort,
   type Locale,
   LOCALES,
   type OwnerListingStatus,
@@ -57,8 +59,31 @@ export type ListingPreset = {
   attributes?: Readonly<Record<string, string | number | boolean>>;
 };
 
-/** Chip lọc nhanh theo giá tối đa (p_price_max) — còn lại là chip theo thông số (p_attributes). */
+/** Chip lọc nhanh theo giá tối đa (p_price_max) — còn lại là chip theo thông số (p_attributes) hoặc "Cho tặng". */
 export const isPriceQuickFilter = (f: ListingQuickFilter): f is Extract<ListingQuickFilter, { priceMax: number }> => 'priceMax' in f;
+
+/** Chip lọc nhanh "Cho tặng" (p_free_only). */
+export const isFreeQuickFilter = (f: ListingQuickFilter): f is Extract<ListingQuickFilter, { freeOnly: true }> => 'freeOnly' in f;
+
+/** Thứ tự mặc định của danh sách (không tính là đang lọc). */
+export const DEFAULT_SORT: ListingSort = 'newest';
+
+/** Khoảng giá (config.priceRanges) theo key → priceMin / priceMax; key lạ / ALL → không lọc giá. */
+function priceBounds(config: ListingFeatureConfig, key: string): { priceMin?: number; priceMax?: number } {
+  const range = config.priceRanges?.find((r) => r.key === key);
+  if (!range) return {};
+  return { ...('min' in range ? { priceMin: range.min } : {}), ...('max' in range ? { priceMax: range.max } : {}) };
+}
+
+/**
+ * Thao tác của danh sách mà khối `header` (trang chủ riêng của tính năng — FeatureHome) gọi được: chọn danh mục, bật
+ * "Cho tặng", lọc theo khu. Gọi xong danh sách thành "đang lọc" → khối header ẩn, chip "Xoá lọc" đưa về trang chủ.
+ */
+export type ListingBrowserApi = {
+  selectCategory: (category: ListingCategory) => void;
+  showFree: () => void;
+  selectSite: (site: string) => void;
+};
 
 const isCategory = (v: string): v is ListingCategory => (LISTING_CATEGORIES as readonly string[]).includes(v);
 
@@ -81,8 +106,8 @@ export function useListingPreset(params: { shortcut?: string; categories?: strin
 /**
  * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, khoảng cách, chip lọc nhanh theo thông số
  * (config.quickFilters — bật / tắt; cùng khoá thì chip sau thay chip trước), chip giá tối đa (priceMax — VND, bật / tắt),
- * bộ lọc đặt sẵn → useListingList (cursor,
- * staleTime 60s). `clearAll` bỏ mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event
+ * khoảng giá (config.priceRanges — loại trừ với chip giá tối đa), "Cho tặng" (freeOnly), sắp xếp (mặc định mới nhất),
+ * bộ lọc đặt sẵn → useListingList (cursor — đổi sắp xếp là đổi key, phân trang lại từ đầu; staleTime 60s). `clearAll` bỏ mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event
  * `search` một lần cho mỗi bộ lọc.
  */
 export function useListingBrowser(
@@ -104,6 +129,11 @@ export function useListingBrowser(
   const [attributes, setAttributes] = useState<Readonly<Record<string, string | boolean>>>({});
   /** Chip giá tối đa đang bật (VND, search_listings p_price_max); null = không lọc giá. */
   const [priceMax, setPriceMax] = useState<number | null>(null);
+  /** Khoảng giá đang chọn (key trong config.priceRanges); ALL = mọi mức giá. */
+  const [priceRange, setPriceRange] = useState<string>(ALL);
+  /** Chỉ đồ cho tặng (search_listings p_free_only). */
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [sort, setSort] = useState<ListingSort>(DEFAULT_SORT);
 
   const filters = useMemo(
     () => ({
@@ -119,9 +149,12 @@ export function useListingBrowser(
       ...(query ? { query } : {}),
       ...(site !== ALL ? { site } : {}),
       ...(distance !== ALL ? { maxDistanceM: Number(distance) } : {}),
-      ...(priceMax !== null ? { priceMax } : {}),
+      ...(priceMax !== null ? { priceMax } : priceBounds(config, priceRange)),
+      ...(freeOnly ? { freeOnly: true } : {}),
+      // Mặc định không gửi → key danh sách mặc định giữ nguyên (cache dùng chung với Hub / web).
+      ...(sort !== DEFAULT_SORT ? { sort } : {}),
     }),
-    [category, config.categories, config.key, preset, query, site, distance, attributes, priceMax],
+    [category, config, preset, query, site, distance, attributes, priceMax, priceRange, freeOnly, sort],
   );
   const list = useListingList(filters);
 
@@ -163,8 +196,29 @@ export function useListingBrowser(
         return next;
       }),
     priceMax,
-    /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá). */
-    togglePriceMax: (value: number) => setPriceMax((prev) => (prev === value ? null : value)),
+    /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá); bỏ khoảng giá đang chọn. */
+    togglePriceMax: (value: number) => {
+      setPriceRange(ALL);
+      setPriceMax((prev) => (prev === value ? null : value));
+    },
+    priceRange,
+    /** Chọn khoảng giá (ALL = mọi mức giá); bỏ chip giá tối đa đang bật. */
+    setPriceRange: (key: string) => {
+      setPriceMax(null);
+      setPriceRange(key);
+    },
+    freeOnly,
+    toggleFreeOnly: () => setFreeOnly((prev) => !prev),
+    sort,
+    setSort,
+    /** Thao tác cho khối `header` (FeatureHome). */
+    api: {
+      selectCategory: setCategory,
+      showFree: () => setFreeOnly(true),
+      selectSite: setSite,
+    } satisfies ListingBrowserApi,
+    /** Bộ lọc gửi useListingList — đổi → danh sách cuộn về đầu. */
+    filters,
     /** Bỏ mọi bộ lọc + từ khoá (chip "Xoá lọc"). */
     clearAll: () => {
       setInput('');
@@ -175,8 +229,14 @@ export function useListingBrowser(
       setPreset(null);
       setAttributes({});
       setPriceMax(null);
+      setPriceRange(ALL);
+      setFreeOnly(false);
+      setSort(DEFAULT_SORT);
     },
-    /** Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / giá / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
+    /**
+     * Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / giá / cho tặng / sắp xếp khác mặc định / đặt sẵn) →
+     * rỗng là "không tìm thấy", không phải "chưa có tin"; khối header (trang chủ riêng) ẩn.
+     */
     isFiltered:
       !!query ||
       category !== ALL ||
@@ -184,7 +244,10 @@ export function useListingBrowser(
       distance !== ALL ||
       !!preset ||
       Object.keys(attributes).length > 0 ||
-      priceMax !== null,
+      priceMax !== null ||
+      priceRange !== ALL ||
+      freeOnly ||
+      sort !== DEFAULT_SORT,
   };
 }
 
@@ -365,6 +428,12 @@ export function useShareListing() {
 }
 
 const isLocale = (v: string): v is Locale => (LOCALES as readonly string[]).includes(v);
+
+/** Banner của một placement theo ngôn ngữ đang dùng (Hub 'app_home', trang chủ riêng của tính năng — config.home). */
+export function usePlacementBanners(placement: Banner['placement']) {
+  const { i18n } = useTranslation();
+  return useBanners(placement, isLocale(i18n.language) ? i18n.language : 'vi');
+}
 
 /**
  * Nút "Dịch" ở chi tiết: chỉ khi `listing.lang` khác ngôn ngữ đang dùng. Bấm → translate-content (cache theo tin +

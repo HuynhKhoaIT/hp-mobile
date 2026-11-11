@@ -8,15 +8,18 @@
 // mở thẳng form đúng danh mục), `card.display.owner | bookmark | description`.
 // Giao diện Stitch (L2 — form đăng tin): `categoryIcons` (thẻ danh mục ở bước chọn), `form.primaryAttributes` (thông số lên
 // bước Thông tin chính), `form.hiddenAttributes`, `form.photosTipKey` / `form.privacyNotice` (bước Ảnh), gợi ý chữ riêng.
-import type { ListingCategory, ListingFeature, PriceType } from '@hp/shared';
+// Trang chủ riêng của tính năng (Pass đồ kiểu "chợ đồ cũ"): `home` (lưới danh mục + banner + dải tin trước danh sách đầy đủ),
+// filter 'price' (khoảng giá đặt sẵn `priceRanges`) + 'sort', chip lọc nhanh "Cho tặng" (`freeOnly`).
+import type { ListingCategory, ListingFeature, ListingPriceRange, PriceType } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react-native';
 import type { ListingCardDisplay, ListingCardLayout, ServiceKey } from '@/ui';
 
 /**
  * subcategory: chip category con · site: chip chọn khu (sites) · distance: hàng chip "cách khu làm việc ≤ x km"
- * (maxDistanceM của search_listings — tin không có vị trí bị loại). Phải nằm trong tập RPC search_listings hỗ trợ.
+ * (maxDistanceM của search_listings — tin không có vị trí bị loại) · price: chip khoảng giá (`priceRanges` → priceMin /
+ * priceMax) · sort: chip sắp xếp (LISTING_SORTS → p_sort). Phải nằm trong tập RPC search_listings hỗ trợ.
  */
-export type ListingFilterKey = 'subcategory' | 'site' | 'distance';
+export type ListingFilterKey = 'subcategory' | 'site' | 'distance' | 'price' | 'sort';
 
 /** Cấu hình form "Đăng nhanh" — trường chi tiết lấy từ ATTRIBUTE_FIELDS[category] của @hp/shared (không khai báo lại). */
 export type ListingFormConfig = {
@@ -45,10 +48,34 @@ export type ListingFormConfig = {
 };
 
 /**
- * Chip lọc nhanh: theo thông số (search_listings p_attributes — chỉ trường enum / bool của ATTRIBUTE_FIELDS) hoặc giá tối
- * đa (p_price_max, VND — vd trọ "Dưới 1 triệu/tháng"; nhãn riêng qua `labelKey`). Khớp web `ListingQuickFilter`.
+ * Chip lọc nhanh: theo thông số (search_listings p_attributes — chỉ trường enum / bool của ATTRIBUTE_FIELDS), giá tối
+ * đa (p_price_max, VND — vd trọ "Dưới 1 triệu/tháng"; nhãn riêng qua `labelKey`) hoặc chỉ đồ cho tặng (p_free_only —
+ * Pass đồ "Cho tặng"). Khớp web `ListingQuickFilter`.
  */
-export type ListingQuickFilter = { key: string; value: string | boolean } | { priceMax: number; labelKey: string };
+export type ListingQuickFilter =
+  | { key: string; value: string | boolean }
+  | { priceMax: number; labelKey: string }
+  | { freeOnly: true; labelKey: string };
+
+/**
+ * Một dải tin ở trang chủ riêng của tính năng: 'near' = tin của tính năng ở khu đang chọn của Hub ("Gần {khu}") ·
+ * 'free' = đồ cho tặng (Xem tất cả → bật "Cho tặng") · 'category' = tin mới của một danh mục (Xem tất cả → chọn danh mục).
+ */
+export type ListingFeatureHomeRail =
+  | { key: string; kind: 'near' }
+  | { key: string; kind: 'free' }
+  | { key: string; kind: 'category'; category: ListingCategory };
+
+/**
+ * Trang chủ riêng của tính năng (mini-app trong super app — Pass đồ kiểu chợ đồ cũ), hiện trên danh sách khi chưa tìm /
+ * lọc: lưới danh mục (`categories` + `categoryIcons`, luôn có khi khai báo `home`) → banner theo placement → các dải tin →
+ * "Tất cả tin {tính năng}". Bấm ô danh mục / "Xem tất cả" → áp bộ lọc ngay trên màn (khối trang chủ ẩn khi đang lọc).
+ */
+export type ListingFeatureHomeConfig = {
+  /** banners.placement của tính năng (vd 'app_pass'); không có → không có khối banner. */
+  bannerPlacement?: string;
+  rails: readonly ListingFeatureHomeRail[];
+};
 
 /**
  * Khối mời đăng tin đầu danh sách (khi chưa lọc), mỗi nút mở thẳng form đúng danh mục (bắt đăng nhập trước).
@@ -108,6 +135,10 @@ export type ListingFeatureConfig = {
   filters: readonly ListingFilterKey[];
   /** Mốc của filter 'distance' (km, tăng dần) — mặc định DISTANCE_OPTIONS_KM của engine. */
   distanceOptionsKm?: readonly number[];
+  /** Khoảng giá của filter 'price' (VND, nhãn `listing:price_range.<key>`) — vd PASS_PRICE_RANGES của @hp/shared. */
+  priceRanges?: readonly ListingPriceRange[];
+  /** Trang chủ riêng của tính năng (lưới danh mục, banner, dải tin) trên danh sách khi chưa lọc. */
+  home?: ListingFeatureHomeConfig;
   /** Khối riêng ở chi tiết (chủ tin). */
   detail?: ListingDetailConfig;
   /** Form đăng tin; không có ở danh sách tổng hợp 'all'. */

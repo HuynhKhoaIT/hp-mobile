@@ -43,6 +43,8 @@ export type ListingFeedProps = {
   empty?: EmptyStateProps;
   /** Khối cuộn cùng danh sách, trên thẻ đầu tiên (vd dải nhóm ở tab Khám phá). */
   header?: ReactNode;
+  /** Đổi giá trị (vd chữ ký bộ lọc) → dựng lại danh sách, cuộn về đầu (dữ liệu đã có trong cache không còn giữ vị trí cũ). */
+  listKey?: string;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -93,6 +95,7 @@ export function ListingFeed(p: ListingFeedProps) {
 
   return (
     <FlashList
+      key={p.listKey}
       data={p.items}
       numColumns={columns}
       keyExtractor={(item) => item.id}
