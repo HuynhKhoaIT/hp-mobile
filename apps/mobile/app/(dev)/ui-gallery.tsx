@@ -667,6 +667,7 @@ export default function UiGalleryScreen() {
         <GroupCard
           group={sampleGroup({ id: 'g6', status: 'completed', kind: 'sport', sub_kind: 'badminton', destination_text: null })}
           roleLabel={t('group:mine.role_accepted')}
+          roleTone="success"
         />
         <SkeletonGroupCard />
         <SkeletonGroupDetail />

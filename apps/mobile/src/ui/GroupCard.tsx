@@ -7,8 +7,9 @@
 // → (2) tiêu đề tối đa 2 dòng → (3) tuyến dạng timeline "điểm đi • | • điểm đến" (kèo: ghim sân) → (4) giờ hẹn (ngày giờ ·
 // còn bao lâu) | chi phí / người (đậm 700, primary) hoặc Miễn phí → (5) hàng avatar thành viên (+N) + "Tạo bởi <tên>".
 // Không có ảnh bìa (nhóm không có ảnh), không giá vé / chọn ghế / gọi điện trên thẻ (Stitch có — app không có tính năng đó).
-// `roleLabel` (Nhóm của tôi: Bạn tạo / Đã tham gia / Chờ duyệt): nút phụ như Đánh giá đặt ngoài thẻ — thẻ bấm được đọc thành
-// một nút, nút lồng bên trong không tới được bằng trình đọc màn hình.
+// `roleLabel` (Nhóm của tôi: Bạn tạo / Đã tham gia / Chờ duyệt) + `roleTone` (khớp ROLE_TONE của web my-group-item: chủ
+// nhóm primary, đã tham gia success, chờ duyệt warning): nút phụ như Đánh giá đặt ngoài thẻ — thẻ bấm được đọc thành một nút,
+// nút lồng bên trong không tới được bằng trình đọc màn hình.
 // SkeletonGroupCard theo đúng bố cục trên.
 import type { PublicGroup } from '@hp/core';
 import { type GroupDisplayStatus, groupDisplayStatus, groupLineup, groupMembersPreview } from '@hp/shared';
@@ -40,8 +41,10 @@ export type GroupCardProps = {
   onPress?: () => void;
   /** Bề rộng / vị trí trong danh sách hoặc hàng ngang (vd `w-72`). */
   className?: string;
-  /** Vai trò của mình (Nhóm của tôi) — badge primary đầu hàng. */
+  /** Vai trò của mình (Nhóm của tôi) — badge sau badge loại. */
   roleLabel?: string;
+  /** Tone badge vai trò (mặc định primary). */
+  roleTone?: BadgeTone;
 };
 
 /** Chữ dùng chung card + chi tiết: chỗ còn lại, chi phí, giờ hẹn. */
@@ -84,7 +87,7 @@ const PILL_DOT: Record<BadgeTone, string> = {
   danger: 'bg-danger',
 };
 
-export function GroupCard({ group, onPress, className, roleLabel }: GroupCardProps) {
+export function GroupCard({ group, onPress, className, roleLabel, roleTone = 'primary' }: GroupCardProps) {
   const { t } = useTranslation('group');
   const texts = useGroupTexts();
   const status = groupDisplayStatus(group);
@@ -113,7 +116,7 @@ export function GroupCard({ group, onPress, className, roleLabel }: GroupCardPro
             <Icon icon={SERVICE[group.kind].icon} service={group.kind} size={16} />
           </View>
           <Badge label={t(`sub_kind.${group.sub_kind}`)} tone="primary" numberOfLines={1} />
-          {roleLabel ? <Badge label={roleLabel} tone="primary" numberOfLines={1} /> : null}
+          {roleLabel ? <Badge label={roleLabel} tone={roleTone} numberOfLines={1} /> : null}
         </View>
         <View className={`max-w-full flex-row items-center gap-1.5 self-start rounded-full px-3 py-1 ${PILL_BOX[tone]}`}>
           <View className={`size-2 rounded-full ${PILL_DOT[tone]}`} />
