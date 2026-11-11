@@ -25,6 +25,16 @@ const LISTING_DOT: Record<ListingFeature, string> = {
   lostFound: 'bg-service-lost-found',
 };
 
+/** Viền nhạt cùng tông của ô icon (class đầy đủ để Tailwind quét được). */
+const SERVICE_EDGE: Record<Feature, string> = {
+  pass: 'border-service-pass/15',
+  room: 'border-service-room/15',
+  job: 'border-service-job/15',
+  lostFound: 'border-service-lost-found/15',
+  ride: 'border-service-ride/15',
+  sport: 'border-service-sport/15',
+};
+
 const listingVisual = (feature: ListingFeature): ServiceVisual => {
   const c = LISTING_FEATURE_CONFIGS[feature];
   return { Icon: c.Icon, soft: c.tone.soft, fg: c.tone.fg, dot: LISTING_DOT[feature] };
@@ -57,6 +67,10 @@ export type TileView = {
   Icon: LucideIcon;
   soft: string;
   fg: string;
+  /** Nền đặc cùng tông (chấm màu, nhãn đặc). */
+  solid: string;
+  /** Viền nhạt cùng tông của ô icon ở lưới Hub (style Stitch: nền soft + viền /15 + icon màu dịch vụ). */
+  edge: string;
   soon: boolean;
   isNew: boolean;
 };
@@ -67,7 +81,7 @@ const UTILITY: Record<Extract<HomeTile, { kind: 'utility' }>['id'], { Icon: Luci
   all: { Icon: LayoutGrid, href: '/tin' },
 };
 
-/** 8 ô lưới dịch vụ theo HOME_TILES (thứ tự cố định). Ô tiện ích: nền primary-light, icon primary. */
+/** 8 ô lưới dịch vụ theo HOME_TILES (thứ tự cố định). Ô tiện ích: nền primary-light + viền primary/15, icon primary. */
 export const HOME_TILE_VIEWS: readonly TileView[] = HOME_TILES.map((tile) => {
   if (tile.kind === 'service') {
     const v = SERVICE_VISUALS[tile.id];
@@ -78,6 +92,8 @@ export const HOME_TILE_VIEWS: readonly TileView[] = HOME_TILES.map((tile) => {
       Icon: v.Icon,
       soft: v.soft,
       fg: v.fg,
+      solid: v.dot,
+      edge: SERVICE_EDGE[tile.id],
       soon: tile.soon ?? false,
       isNew: tile.isNew ?? false,
     };
@@ -90,6 +106,8 @@ export const HOME_TILE_VIEWS: readonly TileView[] = HOME_TILES.map((tile) => {
     Icon: u.Icon,
     soft: 'bg-primary-light',
     fg: 'text-primary',
+    solid: 'bg-primary',
+    edge: 'border-primary/15',
     soon: false,
     isNew: tile.isNew ?? false,
   };

@@ -1,6 +1,6 @@
 'use client';
 
-// Header trang chủ (docs/design/home.md §4.1, §10) — dải xanh primary, chữ on-primary.
+// Header trang chủ (docs/design/home.md §4.1, §10; style Stitch) — dải xanh primary, chữ on-primary, hoạ tiết mờ.
 // Cùng tồn tại với AppHeader (header chung của khu (app)):
 // - Điện thoại (< 640px): AppHeader ẩn ở "/" (AppHeaderShell) → đây là header DUY NHẤT: hàng 1 cao 48 gồm ảnh đại diện |
 //   lời chào + dòng phụ | chuông (khách: tên app | nút Đăng nhập), chip khu, rồi ô tìm kiếm dính trên cùng (HubSearch).
@@ -69,14 +69,15 @@ function PhoneRow() {
     return (
       <div className="flex min-h-12 items-center gap-3">
         <div className="flex min-w-0 flex-1 flex-col">
-          <p className="truncate text-lg font-bold">{APP_NAME}</p>
-          <p className="truncate text-md opacity-90">{t('common.home.subtitle')}</p>
+          <p className="truncate text-xl font-bold">{APP_NAME}</p>
+          <p className="truncate text-sm opacity-90">{t('common.home.subtitle')}</p>
         </div>
+        {/* Pill trong mờ trên nền primary (Stitch): chữ on-primary trên primary pha 15% — vẫn ≥ 4,5:1. */}
         <LoginDialog
           trigger={
             <button
               type="button"
-              className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-surface px-4 text-md font-semibold text-primary shadow-card outline-none transition-colors hover:bg-primary-light focus-visible:ring-3 focus-visible:ring-on-primary/60 active:scale-97 motion-reduce:active:scale-100"
+              className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-on-primary/30 bg-on-primary/15 px-4 text-md font-semibold text-on-primary outline-none transition-colors hover:bg-on-primary/25 focus-visible:ring-3 focus-visible:ring-on-primary/60 active:scale-97 motion-reduce:active:scale-100"
             >
               <LogIn aria-hidden strokeWidth={1.75} className="size-5" />
               {t('auth.sign_in')}
@@ -91,8 +92,8 @@ function PhoneRow() {
     <div className="flex min-h-12 items-center gap-3">
       <Avatar viewer={viewer} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate text-lg font-semibold">{greeting}</p>
-        <p className="truncate text-md opacity-90">{t('common.home.subtitle')}</p>
+        <p className="truncate text-xl font-bold">{greeting}</p>
+        <p className="truncate text-sm opacity-90">{t('common.home.subtitle')}</p>
       </div>
       <NotificationBell variant="onPrimary" />
     </div>
@@ -115,10 +116,25 @@ function WideGreeting() {
   );
 }
 
+/**
+ * Hoạ tiết nền (style Stitch, nhẹ): vòng tròn on-primary mờ + vòng nét đứt lồng ngoài ở góc phải, một đốm nhỏ
+ * (trang trí, ẩn với trình đọc màn hình, không nhận chạm). Giống app (HomeHeader).
+ */
+function HeaderDecor() {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <span className="absolute -top-16 -right-12 size-40 rounded-full bg-on-primary/10 sm:-top-32 sm:right-16 sm:size-64" />
+      <span className="absolute -top-24 -right-20 size-56 rounded-full border-2 border-dashed border-on-primary/15 sm:-top-44 sm:right-6 sm:size-88" />
+      <span className="absolute top-12 right-28 size-12 rounded-full bg-on-primary/10 sm:top-14 sm:right-1/4 sm:size-16" />
+    </div>
+  );
+}
+
 export function HubHeader() {
   return (
-    <div className="bg-primary text-on-primary">
-      <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 pt-3 sm:gap-4 sm:pt-8">
+    <div className="relative bg-primary text-on-primary">
+      <HeaderDecor />
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-2 px-4 pt-3 sm:gap-4 sm:pt-8">
         <div className="sm:hidden">
           <PhoneRow />
         </div>

@@ -35,7 +35,7 @@ export function NearRail() {
       onRetry={retryNear}
       priorityCount={4}
       empty={
-        <div className="flex flex-col items-start gap-3 rounded-lg bg-surface p-4 shadow-card sm:flex-row sm:items-center">
+        <div className="flex flex-col items-start gap-3 rounded-lg border border-border bg-surface p-4 shadow-card sm:flex-row sm:items-center">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <p className="text-md font-semibold text-fg">{t('common.home.empty_title')}</p>
             <p className="text-sm text-muted">{t('common.home.empty_body')}</p>
@@ -81,8 +81,8 @@ export function ForYouRail() {
       title={t('common.home.for_you_title')}
       subtitle={t('web.home.for_you_hint')}
       Icon={Sparkles}
-      iconBox="bg-accent/15"
-      iconFg="text-accent"
+      iconBox="bg-accent"
+      iconFg="text-on-accent"
       seeAll={siteCode ? { pathname: '/tin', query: { site: siteCode } } : '/tin'}
       state={shown}
       onRetry={retry}

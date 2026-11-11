@@ -1,6 +1,6 @@
 // BannerCarousel — banner trượt ngang ở Hub (docs/design/home.md §4.4, §6, §10). Tràn mép màn: mỗi slide rộng bằng
 // khối nội dung (màn − 2 × 16), cách nhau 12, dừng đúng đầu slide (snap). Khung tối thiểu 16:7 (`aspect.banner`),
-// rounded-xl. Slide ảnh: ảnh phủ kín. Slide chữ theo tone — primary / accent: nền đậm, chữ on-*, nút CTA nền surface;
+// rounded-lg (16, cùng bo với card). Slide ảnh: ảnh phủ kín. Slide chữ theo tone — primary / accent: nền đậm, chữ on-*, nút CTA nền surface;
 // dịch vụ: nền service-soft, chữ fg, icon dịch vụ 64 góc phải dưới (mờ 90%), nút CTA nền primary. Nội dung p-5:
 // tiêu đề text-xl 700 tối đa 2 dòng, phụ đề text-sm 90% tối đa 2 dòng, nút h-9 px-4 rounded-full text-sm 600 (cả slide
 // là một vùng bấm — nút chỉ là gợi ý). Phóng chữ 150%: slide cao thêm theo nội dung (minHeight), mọi slide cao bằng nhau.
@@ -194,7 +194,7 @@ function Slide({
         accessibilityLabel={label}
         onPress={onPress}
         style={box}
-        className="overflow-hidden rounded-xl bg-surface-2 active:opacity-90"
+        className="overflow-hidden rounded-lg bg-surface-2 active:opacity-90"
       >
         <Image
           source={{ uri: slide.imageUri }}
@@ -214,7 +214,7 @@ function Slide({
       accessibilityLabel={label}
       onPress={onPress}
       style={box}
-      className={`overflow-hidden rounded-xl active:opacity-90 ${s.box}`}
+      className={`overflow-hidden rounded-lg active:opacity-90 ${s.box}`}
     >
       {s.service ? (
         <View className="absolute bottom-4 right-4 opacity-90">
@@ -227,7 +227,7 @@ function Slide({
             {slide.title}
           </Text>
           {slide.subtitle ? (
-            <Text variant="caption" tone={s.text} numberOfLines={2} className="opacity-90">
+            <Text variant="caption" weight="semibold" tone={s.text} numberOfLines={2}>
               {slide.subtitle}
             </Text>
           ) : null}

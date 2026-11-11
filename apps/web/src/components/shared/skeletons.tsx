@@ -1,14 +1,14 @@
 // Skeleton đúng hình nội dung (không spinner). ListingCardSkeleton theo bố cục ListingCard
-// (src/features/listing/components/listing-card.tsx, khớp app): ảnh 4:3 tràn mép → badge → tiêu đề 2 dòng → giá → khu + thời gian.
+// (src/features/listing/components/listing-card.tsx, khớp app): ảnh 4:3 tràn mép (chip danh mục nằm trên ảnh) → tiêu đề
+// 2 dòng → giá → khu + thời gian.
 // Đổi bố cục thẻ tin → sửa cả đây và app (SkeletonListingCard).
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function ListingCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-md bg-surface shadow-card">
+    <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-card">
       <Skeleton className="aspect-card w-full rounded-none" />
-      <div className="flex flex-col gap-2 p-3">
-        <Skeleton className="h-6 w-24 rounded-full" />
+      <div className="flex flex-col gap-2 p-3.5 pt-3">
         <Skeleton className="h-5 w-11/12" />
         <Skeleton className="h-5 w-2/3" />
         <Skeleton className="h-6 w-1/3" />
@@ -21,8 +21,8 @@ export function ListingCardSkeleton() {
 /** Thẻ dạng hàng (việc làm, đồ thất lạc): ô vuông trái + chữ phải. */
 export function ListingRowSkeleton() {
   return (
-    <div className="flex gap-3 rounded-md bg-surface p-3 shadow-card">
-      <Skeleton className="aspect-avatar w-24 shrink-0 rounded-sm sm:w-28" />
+    <div className="flex gap-3 rounded-lg border border-border bg-surface p-3 shadow-card">
+      <Skeleton className="aspect-avatar w-24 shrink-0 rounded-md sm:w-28" />
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-6 w-24 rounded-full" />
         <Skeleton className="h-5 w-11/12" />

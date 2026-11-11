@@ -135,7 +135,7 @@ export function GroupCard({ group, onPress, className, roleLabel }: GroupCardPro
 
 function CardBones() {
   return (
-    <View className="gap-2 rounded-md bg-surface p-3 shadow-card">
+    <View className="gap-2 rounded-lg border border-border bg-surface p-4 shadow-card">
       <View className="flex-row gap-1">
         <Skeleton className="h-6 w-24 rounded-full" />
         <Skeleton className="h-6 w-20 rounded-full" />

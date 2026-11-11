@@ -5,39 +5,42 @@
 
 export const colors = {
   light: {
-    primary: '#0B4F9C',
+    primary: '#0B4A9C',
     primaryLight: '#E6EFFA',
-    accent: '#F2762E',
+    /** Cam (nút Đăng, nhãn "Mới", số chưa đọc, banner). Chỉ làm NỀN với chữ / icon on-accent (trắng); không dùng làm màu chữ trên nền sáng (~3,6:1). */
+    accent: '#EA580C',
     success: '#1E9E5A',
     warning: '#E0A100',
     danger: '#D93025',
-    bg: '#F6F7F9',
+    bg: '#F8FAFC',
     surface: '#FFFFFF',
-    surface2: '#EEF0F3',
-    border: '#E2E5EA',
+    surface2: '#F1F5F9',
+    border: '#E2E8F0',
     text: '#111827',
-    textMuted: '#6B7280',
-    textDisabled: '#9CA3AF',
+    /** Slate đậm hơn #64748B một bậc để đạt ≥ 4,5:1 cả trên surface2. */
+    textMuted: '#5B6B82',
+    textDisabled: '#94A3B8',
     onPrimary: '#FFFFFF',
-    /** Chữ trên nút cam (Đăng tin): chữ trắng trên accent chỉ ~2,9:1, chữ tối đạt ≥ 4,5:1. */
-    onAccent: '#111827',
+    /** Chữ trên nền accent: trắng (~3,6:1 — đạt AA cho chữ lớn / đậm và icon; chữ nhỏ trên cam nên đậm). */
+    onAccent: '#FFFFFF',
   },
   dark: {
     primary: '#5B9BE6',
     primaryLight: '#15283F',
-    accent: '#F58A4C',
+    /** Cùng cam với light để chữ trắng trên cam vẫn đọc được (cam sáng #FB923C + trắng chỉ ~2,3:1). */
+    accent: '#EA580C',
     success: '#3CBF78',
     warning: '#F0B429',
     danger: '#F05252',
-    bg: '#0F1115',
-    surface: '#171A20',
-    surface2: '#1F232B',
-    border: '#2A2F38',
-    text: '#F3F4F6',
-    textMuted: '#9CA3AF',
-    textDisabled: '#6B7280',
-    onPrimary: '#0F1115',
-    onAccent: '#0F1115',
+    bg: '#0B1120',
+    surface: '#131B2B',
+    surface2: '#1C2537',
+    border: '#273247',
+    text: '#F1F5F9',
+    textMuted: '#94A3B8',
+    textDisabled: '#64748B',
+    onPrimary: '#0B1120',
+    onAccent: '#FFFFFF',
   },
 } as const;
 
@@ -71,14 +74,14 @@ export type ServiceKey = keyof (typeof serviceColors)['light'];
 
 /** Gradient header trang chủ / thương hiệu. */
 export const gradients = {
-  brand: ['#0B4F9C', '#1E6FD9'],
+  brand: ['#0B4A9C', '#1E6FD9'],
 } as const;
 
 /** Thang 4. Padding màn hình = 4 (16), khoảng cách card = 3 (12). */
 export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32 } as const;
 
-/** sm input · md card · lg sheet · xl · full chip. */
-export const radius = { sm: 6, md: 10, lg: 14, xl: 20, full: 999 } as const;
+/** sm input / badge vuông · md nút, ảnh thumbnail · lg card, sheet · xl header, khối lớn · full chip, pill. */
+export const radius = { sm: 8, md: 12, lg: 16, xl: 24, full: 999 } as const;
 
 export const font = {
   size: { xs: 12, sm: 14, md: 16, lg: 18, xl: 20, '2xl': 24, '3xl': 28 },
@@ -94,9 +97,14 @@ export const font = {
   },
 } as const;
 
+/** Bóng tông slate, 1 lớp (React Native không vẽ được nhiều lớp). Chỉ card, thanh nổi và FAB có bóng. */
 export const shadow = {
-  /** Chỉ card và FAB có bóng: 0 1 3 rgba(0,0,0,0.06). */
-  card: { x: 0, y: 1, blur: 3, color: 'rgba(0,0,0,0.06)' },
+  /** Card / khối nội dung: bóng toả rộng, rất nhạt. */
+  card: { x: 0, y: 2, blur: 8, color: 'rgba(15,23,42,0.06)' },
+  /** Thanh nổi (tab dưới, thanh CTA dính đáy): bóng hắt lên trên. */
+  bar: { x: 0, y: -2, blur: 10, color: 'rgba(15,23,42,0.06)' },
+  /** Nút Đăng nổi màu accent: quầng cam. */
+  fab: { x: 0, y: 6, blur: 16, color: 'rgba(234,88,12,0.35)' },
 } as const;
 
 export const motion = {

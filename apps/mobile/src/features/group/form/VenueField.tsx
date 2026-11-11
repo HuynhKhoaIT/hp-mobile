@@ -153,7 +153,7 @@ function VenueRow({ venue: v, onPress }: { venue: Venue; onPress: () => void }) 
             {sports}
           </Text>
           {meta ? (
-            <Text variant="caption" weight="medium" tone="accent" numberOfLines={1}>
+            <Text variant="caption" weight="medium" tone="primary" numberOfLines={1}>
               {meta}
             </Text>
           ) : null}
@@ -181,7 +181,7 @@ function SelectedVenue({ venue: v, onChange }: { venue: GroupVenue; onChange: ()
         </Text>
       ) : null}
       {meta ? (
-        <Text variant="caption" weight="medium" tone="accent">
+        <Text variant="caption" weight="medium" tone="primary">
           {meta}
         </Text>
       ) : null}

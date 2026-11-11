@@ -1,5 +1,5 @@
-// "Tìm nhanh" (§4.6, §10): tiêu đề khối text-lg 600 + hàng chip cuộn ngang (gap-2, mép 16) từ HOME_SHORTCUTS.
-// Chip cao 40 nền surface viền border, chấm màu dịch vụ size-2 trước chữ. Bấm → danh sách của tính năng với bộ lọc
+// "Tìm nhanh" (§4.6, §10, style Stitch): tiêu đề khối nhỏ text-md 600 + hàng chip cuộn ngang tràn mép (gap-2, lề 16)
+// từ HOME_SHORTCUTS. Chip pill cao 40 nền surface viền border, chấm cam size-2 (bg-accent) trước chữ. Bấm → danh sách của tính năng với bộ lọc
 // đặt sẵn (params `shortcut` của màn List) + event home_shortcut_click.
 import { HOME_SHORTCUTS } from '@hp/shared';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ export function QuickSearch() {
   const { t } = useTranslation();
   return (
     <View className="gap-3">
-      <SectionHeader className="px-4" title={t('home.shortcuts_title')} />
+      <SectionHeader className="px-4" size="md" title={t('home.shortcuts_title')} />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -23,7 +23,7 @@ export function QuickSearch() {
           <Chip
             key={s.id}
             size="sm"
-            dot={s.feature}
+            dot="accent"
             label={t(`home.shortcut.${s.id}`)}
             onPress={() => {
               track('home_shortcut_click', { shortcut: s.id });

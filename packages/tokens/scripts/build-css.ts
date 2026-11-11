@@ -2,7 +2,7 @@
 //   theme.css            Tailwind v4 @theme cho web
 //   tailwind.preset.cjs  preset Tailwind v3 cho NativeWind 4 (app); biến màu ở :root + media dark
 //                        (NativeWind đổi theo Appearance.setColorScheme nên Cài đặt sáng / tối vẫn có tác dụng)
-// Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card, bg-service-pass-soft + text-service-pass.
+// Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card / shadow-bar / shadow-fab, bg-service-pass-soft + text-service-pass.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { aspect, colors, font, radius, serviceColors, shadow, type ColorScheme, type ColorToken } from '../src/index.ts';
@@ -28,6 +28,8 @@ const COLOR_NAME: Record<ColorToken, string> = {
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 const px = (n: number) => `${n}px`;
+const shadowCss = ({ x, y, blur, color }: { x: number; y: number; blur: number; color: string }) =>
+  `${px(x)} ${px(y)} ${px(blur)} ${color}`;
 
 const colorVars = (scheme: 'light' | 'dark', indent: string) =>
   (Object.keys(COLOR_NAME) as ColorToken[]).map((k) => `${indent}--color-${COLOR_NAME[k]}: ${colors[scheme][k]};`).join('\n');
@@ -52,7 +54,7 @@ const lines = [
     `  --text-${k}--line-height: ${font.lineHeightRatio};`,
   ]),
   '',
-  `  --shadow-card: ${shadow.card.x}px ${shadow.card.y}px ${shadow.card.blur}px ${shadow.card.color};`,
+  ...Object.entries(shadow).map(([k, v]) => `  --shadow-${k}: ${shadowCss(v)};`),
   ...Object.entries(aspect).map(([k, v]) => `  --aspect-${k}: ${v};`),
   '  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;',
   "  --font-zh: var(--font-be-vietnam-pro), 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;",
@@ -114,7 +116,7 @@ const preset = {
       zh: [font.family.zh],
     },
     extend: {
-      boxShadow: { card: `${shadow.card.x}px ${shadow.card.y}px ${shadow.card.blur}px ${shadow.card.color}` },
+      boxShadow: Object.fromEntries(Object.entries(shadow).map(([k, v]) => [k, shadowCss(v)])),
       aspectRatio: aspect,
     },
   },

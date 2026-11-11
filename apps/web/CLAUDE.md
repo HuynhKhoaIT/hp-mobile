@@ -168,7 +168,7 @@ Luật:
 
 ## 8. Design & motion
 
-- Token từ `@hp/tokens` (giống app): `primary #0B4F9C` (xanh thép), `primaryLight #E6EFFA`, `accent #F2762E`, `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F6F7F9`, `surface #FFFFFF`; gradient thương hiệu `#0B4F9C → #1E6FD9`; màu dịch vụ: pass cam, trọ tím, việc xanh lá, ghép xe xanh ngọc, thể thao đỏ, thất lạc vàng. Dark mode bằng class.
+- Token từ `@hp/tokens` (giống app): `primary #0B4A9C` (xanh thép), `primaryLight #E6EFFA`, `accent #EA580C` (cam), `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F8FAFC`, `surface #FFFFFF`, `border #E2E8F0`, `muted #5B6B82` (tông slate); radius `sm 8 / md 12 / lg 16 / xl 24`, card `rounded-lg border border-border shadow-card`; bóng `shadow-card` / `shadow-bar` / `shadow-fab`; gradient thương hiệu `#0B4A9C → #1E6FD9`; màu dịch vụ: pass cam, trọ tím, việc xanh lá, ghép xe xanh ngọc, thể thao đỏ, thất lạc vàng. Dark mode bằng class.
 - Font: Be Vietnam Pro qua `next/font`; chữ Hán dùng font CJK của hệ thống (`--font-zh`).
 - Responsive mobile-first: < 640px giống app (bottom nav 5 mục, nút Đăng nổi giữa), ≥ 1024px header ngang + lưới 3–4 cột, chi tiết tin 2 cột (gallery trái, thông tin + CTA dính phải).
 - Card tin, badge, trạng thái nhìn giống app để người dùng chuyển qua lại không bỡ ngỡ.

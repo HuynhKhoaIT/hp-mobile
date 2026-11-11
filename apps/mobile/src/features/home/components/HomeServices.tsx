@@ -1,5 +1,5 @@
-// Lưới 8 dịch vụ (§4.3, §10): thẻ surface rounded-xl shadow-card p-4 nổi đè lên đáy header 48 (-mt-12 do màn đặt),
-// 4 cột × 2 hàng theo HOME_TILES (@hp/shared). Ô hiện lần lượt khi mở Hub (StaggerItem, motion.stagger).
+// Lưới 8 dịch vụ (§4.3, §10, style Stitch): MỘT thẻ surface rounded-lg viền border + shadow-card p-4 nổi đè lên đáy
+// header 48 (-mt-12 do màn đặt), 4 cột × 2 hàng theo HOME_TILES (@hp/shared). Ô hiện lần lượt khi mở Hub (StaggerItem, motion.stagger).
 // Nhãn: dịch vụ → common.feature.<id>, tiện ích → common.home.tiles.<id>; nhãn góc "Sắp có" / "Mới".
 import { HOME_TILES, type HomeTile } from '@hp/shared';
 import { ClipboardList, LayoutGrid } from 'lucide-react-native';
@@ -25,7 +25,7 @@ export function HomeServices({ className }: { className?: string }) {
   };
 
   return (
-    <View className={['rounded-xl bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
+    <View className={['rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
       <ServiceGrid>
         {HOME_TILES.map((tile, i) => (
           <StaggerItem key={tile.id} index={i} className="flex-1">

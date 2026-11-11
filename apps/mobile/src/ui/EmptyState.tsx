@@ -20,7 +20,7 @@ export function EmptyState({ title, description, icon = Inbox, action, compact =
     return (
       <View
         accessibilityRole="summary"
-        className={['gap-3 rounded-lg bg-surface p-3 shadow-card', className].filter(Boolean).join(' ')}
+        className={['gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}
       >
         <View className="flex-row items-center gap-3">
           <View className="size-10 items-center justify-center rounded-full bg-primary-light">

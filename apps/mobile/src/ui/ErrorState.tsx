@@ -29,7 +29,7 @@ export function ErrorState({
     return (
       <View
         accessibilityRole="alert"
-        className={['flex-row items-center gap-3 rounded-lg bg-surface p-3 shadow-card', className].filter(Boolean).join(' ')}
+        className={['flex-row items-center gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}
       >
         <View className="size-10 items-center justify-center rounded-full bg-surface-2">
           <Icon icon={CloudOff} tone="muted" />

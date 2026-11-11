@@ -1,7 +1,8 @@
 // Button — nút có chữ. Cao 48 (md, nút chính) / 44 (sm). Thu nhỏ 0.97 khi nhấn (tắt khi Reduce Motion).
 // Biến thể `accent` = Đăng tin (cam, chữ tối). Không cắt chữ (không numberOfLines). Haptic chỉ bật cho
 // đăng tin / tham gia nhóm / lưu tin (prop `haptic`). `inverse`: nút trên nền primary (header Hub) — nền surface, chữ
-// primary. `shape="pill"` bo tròn hẳn (nút trong header / banner).
+// primary. `glass`: nút trong mờ trên nền primary (Đăng nhập ở header Hub, style Stitch) — nền on-primary/15, viền
+// on-primary/30, chữ on-primary. `shape="pill"` bo tròn hẳn (nút trong header / banner).
 import * as Haptics from 'expo-haptics';
 import type { LucideIcon } from 'lucide-react-native';
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
@@ -11,7 +12,7 @@ import { Text, type TextTone } from './Text';
 import { useTheme } from './theme';
 import { usePressScale } from './usePressScale';
 
-export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'inverse';
+export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'inverse' | 'glass';
 export type ButtonSize = 'md' | 'sm';
 
 const BOX: Record<ButtonVariant, string> = {
@@ -22,6 +23,7 @@ const BOX: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent border-transparent',
   danger: 'bg-danger border-danger',
   inverse: 'bg-surface border-surface',
+  glass: 'bg-on-primary/15 border-on-primary/30',
 };
 const TONE: Record<ButtonVariant, TextTone> = {
   primary: 'onPrimary',
@@ -31,6 +33,7 @@ const TONE: Record<ButtonVariant, TextTone> = {
   ghost: 'primary',
   danger: 'onPrimary',
   inverse: 'primary',
+  glass: 'onPrimary',
 };
 const SIZE: Record<ButtonSize, string> = { md: 'min-h-12 px-5', sm: 'min-h-11 px-4' };
 

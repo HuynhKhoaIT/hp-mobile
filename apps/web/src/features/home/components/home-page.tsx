@@ -5,6 +5,8 @@
 // 1 giờ) nên HTML có tin thật kể cả khi tắt JS. Phần theo người dùng (lời chào, ảnh, chuông, khu đã chọn, thẻ cá nhân,
 // "Dành cho bạn") đọc ở trình duyệt sau khi biết phiên (HomeProvider) — có skeleton, không làm trang thành dynamic.
 // Header: điện thoại dùng header xanh của trang này (AppHeader ẩn ở "/"); từ 640px giữ AppHeader + dải chào (hub-header.tsx).
+// Style Stitch (2026-11): card bo lg + viền hairline + bóng nhạt; ô dịch vụ nền nhạt; chip chấm cam; điện thoại có
+// HubFooter (ngôn ngữ + pháp lý) trên dòng miễn trừ của layout.
 import { APP_NAME, type ListingFeature } from '@hp/shared';
 import { Inbox, Plus } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -21,6 +23,7 @@ import { BannerCarousel } from './banner-carousel';
 import { CommunitySection } from './community-section';
 import { HomeProvider } from './home-context';
 import { FeatureRail, ForYouRail, NearRail } from './home-rails';
+import { HubFooter } from './hub-footer';
 import { HubHeader } from './hub-header';
 import { AccountDeletedToast } from '@/features/profile/components/delete-account';
 import { HubSearch } from './hub-search';
@@ -93,6 +96,7 @@ export async function HomePage() {
           )}
 
           <CommunitySection stats={stats} />
+          <HubFooter />
         </div>
       </div>
     </HomeProvider>

@@ -657,7 +657,7 @@ src/
 
 | Token | Giá trị |
 | --- | --- |
-| Màu chính | Xanh Hòa Phát (lấy từ bộ nhận diện thương hiệu), màu nhấn cam cho nút Đăng |
+| Màu chính | Xanh Hòa Phát (lấy từ bộ nhận diện thương hiệu), màu nhấn vàng hổ phách cho nút Đăng |
 | Typography | Inter hoặc Be Vietnam Pro; cỡ 12/14/16/20/24; tiêu đề 600, thân 400 |
 | Spacing | thang 4: 4, 8, 12, 16, 24, 32 |
 | Radius | 8 cho card, 12 cho sheet, 999 cho chip |
@@ -690,14 +690,14 @@ Xây design system trước khi viết màn hình đầu tiên: mọi màn hình
 
 | Nhóm | Token | Giá trị (light) | Ghi chú |
 | --- | --- | --- | --- |
-| Màu thương hiệu | `primary` | xanh thép chủ đạo, gần màu Hòa Phát nhưng không sao chép logo (`#0B4F9C`) | nút chính, tab active, link |
+| Màu thương hiệu | `primary` | xanh thép chủ đạo, gần màu Hòa Phát nhưng không sao chép logo (`#0B4A9C`) | nút chính, tab active, link |
 |  | `primary.light` | `#E6EFFA` | nền chip/badge primary |
-|  | `accent` | cam `#F2762E` | nút Đăng tin, huy hiệu nổi bật |
+|  | `accent` | cam `#EA580C` (cả light / dark; chữ trên nền: `onAccent` trắng) | nút Đăng tin, nhãn "Mới", số chưa đọc |
 | Màu ngữ nghĩa | `success` / `warning` / `danger` | `#1E9E5A` / `#E0A100` / `#D93025` | trạng thái, cảnh báo lừa đảo |
-| Màu trung tính | `bg` / `surface` / `surface2` | `#F6F7F9` / `#FFFFFF` / `#EEF0F3` | nền màn hình / card / ô nhập |
-|  | `border` | `#E2E5EA` | viền 1px |
-|  | `text` / `text.muted` / `text.disabled` | `#111827` / `#6B7280` / `#9CA3AF` |  |
-| Dark mode | cùng tên token, giá trị đảo | `bg #0F1115`, `surface #171A20`, `text #F3F4F6` | component không được biết đang ở theme nào |
+| Màu trung tính | `bg` / `surface` / `surface2` | `#F8FAFC` / `#FFFFFF` / `#F1F5F9` | nền màn hình / card / ô nhập (tông slate) |
+|  | `border` | `#E2E8F0` | viền 1px (card có viền + bóng nhạt) |
+|  | `text` / `text.muted` / `text.disabled` | `#111827` / `#5B6B82` / `#94A3B8` |  |
+| Dark mode | cùng tên token, giá trị đảo | `bg #0B1120`, `surface #131B2B`, `text #F1F5F9` | component không được biết đang ở theme nào |
 | Typography | `xs 12 / sm 14 / md 16 / lg 18 / xl 20 / 2xl 24 / 3xl 28` | Be Vietnam Pro (vi/en), Noto Sans SC (zh) | line-height = size × 1,4; weight 400 thân, 500 nhãn, 600 tiêu đề, 700 giá tiền |
 | Spacing | `1 4 / 2 8 / 3 12 / 4 16 / 5 20 / 6 24 / 8 32` | thang 4 | padding màn hình = 16, khoảng cách card = 12 |
 | Radius | `sm 6 / md 10 / lg 14 / xl 20 / full 999` |  | input sm, card md, sheet lg, chip full |
@@ -771,21 +771,21 @@ Chỉ có 5 kiểu màn hình; mọi màn hình mới phải thuộc một trong
 // src/ui/tokens.ts
 export const colors = {
   light: {
-    primary: '#0B4F9C', primaryLight: '#E6EFFA', accent: '#F2762E',
+    primary: '#0B4A9C', primaryLight: '#E6EFFA', accent: '#EA580C',
     success: '#1E9E5A', warning: '#E0A100', danger: '#D93025',
-    bg: '#F6F7F9', surface: '#FFFFFF', surface2: '#EEF0F3', border: '#E2E5EA',
-    text: '#111827', textMuted: '#6B7280', textDisabled: '#9CA3AF',
+    bg: '#F8FAFC', surface: '#FFFFFF', surface2: '#F1F5F9', border: '#E2E8F0',
+    text: '#111827', textMuted: '#5B6B82', textDisabled: '#94A3B8',
   },
   dark: {
-    primary: '#5B9BE6', primaryLight: '#15283F', accent: '#F58A4C',
+    primary: '#5B9BE6', primaryLight: '#15283F', accent: '#FB923C',
     success: '#3CBF78', warning: '#F0B429', danger: '#F05252',
-    bg: '#0F1115', surface: '#171A20', surface2: '#1F232B', border: '#2A2F38',
-    text: '#F3F4F6', textMuted: '#9CA3AF', textDisabled: '#6B7280',
+    bg: '#0B1120', surface: '#131B2B', surface2: '#1C2537', border: '#273247',
+    text: '#F1F5F9', textMuted: '#94A3B8', textDisabled: '#64748B',
   },
 } as const;
 
 export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32 } as const;
-export const radius = { sm: 6, md: 10, lg: 14, xl: 20, full: 999 } as const;
+export const radius = { sm: 8, md: 12, lg: 16, xl: 24, full: 999 } as const;
 export const font = {
   size: { xs: 12, sm: 14, md: 16, lg: 18, xl: 20, '2xl': 24, '3xl': 28 },
   family: { regular: 'BeVietnamPro_400Regular', medium: 'BeVietnamPro_500Medium',
@@ -869,7 +869,7 @@ export function Button({ label, onPress, variant = 'primary', size = 'md',
 
 Phong cách tham chiếu là các super app phổ biến ở Việt Nam (Grab, MoMo, Zalo, Shopee): nền sáng, một màu chủ đạo mạnh, card bo tròn, nhiều khoảng thở, icon minh hoạ màu, mọi thứ quan trọng nằm trong tầm ngón cái.
 
-- **Màu**: xanh thép làm màu chủ đạo cho header trang chủ (gradient nhẹ `#0B4F9C → #1E6FD9`), nút chính, tab đang chọn. Mỗi dịch vụ có một màu nhận diện riêng ở icon (Pass đồ cam, Trọ tím, Việc xanh lá, Ghép xe xanh ngọc, Thể thao đỏ, Thất lạc vàng) để người dùng nhận ra bằng mắt, không cần đọc chữ.
+- **Màu**: xanh thép làm màu chủ đạo cho header trang chủ (gradient nhẹ `#0B4A9C → #1E6FD9`), nút chính, tab đang chọn. Mỗi dịch vụ có một màu nhận diện riêng ở icon (Pass đồ cam, Trọ tím, Việc xanh lá, Ghép xe xanh ngọc, Thể thao đỏ, Thất lạc vàng) để người dùng nhận ra bằng mắt, không cần đọc chữ.
 - **Trang chủ**: header xanh cong ở đáy chứa lời chào + ô tìm kiếm lớn; lưới 6 dịch vụ (icon 56px trong ô bo tròn 16, nhãn 2 dòng); banner trượt (sự kiện, ghép xe dịp lễ); các section ngang "Gần bạn", "Mới đăng", "Kèo hôm nay".
 - **Card**: ảnh chiếm 60% card, giá in đậm màu primary, thông tin phụ một dòng màu muted kèm icon (vị trí, thời gian), badge góc ảnh.
 - **Minh hoạ**: bộ illustration phẳng cùng phong cách cho empty state, onboarding, lỗi mạng; nhân vật là công nhân đội mũ bảo hộ, thân thiện.

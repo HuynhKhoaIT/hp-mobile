@@ -1,7 +1,7 @@
 // Icon — Lucide duy nhất (không trộn bộ khác). Kích thước: 'button' 20, 'tab' 24; nét 1.75; màu theo tone token.
 // Icon trang trí ẩn khỏi trình đọc màn hình; nút chỉ có icon phải đặt accessibilityLabel ở nút (IconButton).
 // `service` (pass, room…) tô màu nhận diện dịch vụ (t.serviceColors.<key>.fg) thay cho tone. `filled`: tô kín bằng cùng màu
-// (vd sao đã chọn của StarRating).
+// (vd sao đã chọn của StarRating). `strong`: nét đậm hơn 1 bậc (×1,25 — tab đang mở, nút Đăng).
 import type { LucideIcon } from 'lucide-react-native';
 import { Platform } from 'react-native';
 import type { TextTone } from './Text';
@@ -33,16 +33,17 @@ export type IconProps = {
   tone?: TextTone;
   service?: ServiceKey;
   filled?: boolean;
+  strong?: boolean;
 };
 
-export function Icon({ icon: Glyph, size = 'button', tone = 'default', service, filled = false }: IconProps) {
+export function Icon({ icon: Glyph, size = 'button', tone = 'default', service, filled = false, strong = false }: IconProps) {
   const t = useTheme();
   const px = typeof size === 'number' ? size : t.icon[size];
   const color = service ? t.serviceColors[service].fg : COLOR[tone](t.colors);
   return (
     <Glyph
       size={px}
-      strokeWidth={t.icon.strokeWidth}
+      strokeWidth={strong ? t.icon.strokeWidth * 1.25 : t.icon.strokeWidth}
       color={color}
       fill={filled ? color : 'none'}
       {...HIDDEN}

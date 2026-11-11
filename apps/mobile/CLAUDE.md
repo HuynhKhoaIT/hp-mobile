@@ -84,8 +84,9 @@ src/
 **Chỉ dùng component trong `@/ui`. Không hard-code màu, số pixel, font.** Component trong `src/ui` viết bằng NativeWind `className` dùng class sinh từ preset `@hp/tokens` (vd. `bg-primary`, `text-muted`, `p-4`, `rounded-md`) — cùng tên class với web. Giá trị cần cho animation hoặc thư viện không nhận className lấy qua `useTheme()` → `t.colors`, `t.space`, `t.radius`, `t.font`, `t.motion` (cũng đọc từ `@hp/tokens`). Không khai báo token lần thứ hai trong app.
 
 Token:
-- Màu: `primary #0B4F9C` (xanh thép chủ đạo), `primaryLight #E6EFFA`, `accent #F2762E` (nút Đăng), `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F6F7F9`, `surface #FFFFFF`, `surface2 #EEF0F3`, `border #E2E5EA`, `text #111827`, `textMuted #6B7280`, `textDisabled #9CA3AF`. Bộ dark cùng tên token: `bg #0F1115`, `surface #171A20`, `surface2 #1F232B`, `border #2A2F38`, `text #F3F4F6`, `primary #5B9BE6`.
-- Header trang chủ: gradient `#0B4F9C → #1E6FD9`.
+- Màu: `primary #0B4A9C` (xanh thép chủ đạo), `primaryLight #E6EFFA`, `accent #EA580C` (cam — nút Đăng, nhãn "Mới", số chưa đọc; chữ trên nền cam dùng `onAccent` trắng, lớn hoặc đậm), `success #1E9E5A`, `warning #E0A100`, `danger #D93025`, `bg #F8FAFC`, `surface #FFFFFF`, `surface2 #F1F5F9`, `border #E2E8F0`, `text #111827`, `textMuted #5B6B82`, `textDisabled #94A3B8` (tông slate). Bộ dark cùng tên token: `bg #0B1120`, `surface #131B2B`, `surface2 #1C2537`, `border #273247`, `text #F1F5F9`, `primary #5B9BE6`, `accent #EA580C` (giữ nguyên cam để chữ trắng đọc được).
+- Radius `sm 8 · md 12 · lg 16 · xl 24 · full`: card `rounded-lg` + `border border-border` + `shadow-card`; ảnh trong card / nút `rounded-md`; header Hub bo đáy `rounded-b-xl`; chip, ô tìm kiếm `rounded-full`. Bóng: `shadow-card`, `shadow-bar` (thanh tab dưới, thanh dính đáy), `shadow-fab` (nút Đăng nổi màu cam).
+- Header trang chủ: gradient `#0B4A9C → #1E6FD9`.
 - Màu dịch vụ (`t.serviceColors`): pass cam, room tím, job xanh lá, ride xanh ngọc, sport đỏ, lostFound vàng.
 - Spacing: 4 / 8 / 12 / 16 / 20 / 24 / 32. Padding màn hình 16, khoảng cách card 12.
 - Radius: sm 6 (input), md 10 (card), lg 14 (sheet), xl 20, full 999 (chip).

@@ -1,12 +1,13 @@
 // GroupCard — thẻ nhóm ghép dùng chung danh sách /ghep-xe, /ghep-tran và "Xem thêm". Hợp đồng hình ảnh với app
 // (apps/mobile/src/ui/GroupCard.tsx — đổi một bên thì đổi cả hai, cùng tên prop). Thứ tự thông tin:
-//   1 badge loại (sub_kind) + badge trạng thái (groupDisplayStatus)   2 tiêu đề 2 dòng (16 medium)
+//   1 badge loại (sub_kind) + badge trạng thái (groupDisplayStatus)   2 tiêu đề 2 dòng (16 semibold)
 //   3 giờ diễn ra (ngày + giờ)   4 điểm đi   5 điểm đến (ghép xe) — ghép trận: dòng 4 là sân (tên trong danh mục nếu
 //   có venue_id, không thì chữ tự nhập), không có dòng 5. Nhãn "Đang diễn ra" khi cron đã đổi sang in_progress.
 //   6 "Còn N chỗ" (số nhiều) · chi phí / người hoặc "Miễn phí" — kèo khai đội có sẵn (attributes.players_have →
 //     groupLineup) còn thiếu người: "Đã có 6/7 người · cần thêm 1" thay cho "Còn N chỗ" (đủ → "Đã đủ chỗ", như app)
 //   7 hàng avatar thành viên (+N) · "Tạo bởi {tên rút gọn}"
 // Ô icon dịch vụ (nền service-<kind>-soft) bên trái tiêu đề thay cho ảnh bìa (nhóm không có ảnh).
+// Style Stitch (đồng bộ ListingCard): card bo lg (16), viền hairline + bóng nhạt; ô icon bo md; chi phí màu primary.
 // Cả thẻ là một link tới /nhom/{slug}. Không 'use client', không async: render được ở Server Component (SSR danh sách)
 // lẫn Client Component (trang tiếp theo của "Xem thêm").
 import type { PublicGroup } from '@hp/core';
@@ -63,8 +64,8 @@ export function GroupCard({ group, now, extraBadge }: GroupCardProps) {
     <Link
       href={`/nhom/${group.slug ?? ''}`}
       className={cn(
-        'group flex h-full flex-col gap-2 rounded-md bg-surface p-3 shadow-card outline-none transition-transform duration-150',
-        'hover:-translate-y-0.5 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+        'group flex h-full flex-col gap-2 rounded-lg border border-border bg-surface p-3.5 shadow-card outline-none transition duration-150',
+        'hover:-translate-y-0.5 hover:border-primary/20 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:translate-y-0',
       )}
     >
       <div className="flex items-start gap-3">
@@ -77,7 +78,7 @@ export function GroupCard({ group, now, extraBadge }: GroupCardProps) {
             <Badge tone={GROUP_STATUS_TONE[status]}>{t(`group.status.${groupStatusKey(group, status)}`)}</Badge>
             {extraBadge}
           </div>
-          <h3 lang={group.lang} className="line-clamp-2 text-md font-medium text-fg">
+          <h3 lang={group.lang} className="line-clamp-2 text-md leading-snug font-semibold text-fg">
             {group.title}
           </h3>
         </div>
@@ -114,7 +115,7 @@ export function GroupCard({ group, now, extraBadge }: GroupCardProps) {
         <span aria-hidden className="text-muted">
           ·
         </span>
-        <span className="font-bold text-fg">{groupFeeText(group, t, locale)}</span>
+        <span className="font-bold text-primary">{groupFeeText(group, t, locale)}</span>
       </p>
 
       <div className="mt-auto flex items-center gap-2 border-t border-border pt-2">
@@ -138,7 +139,7 @@ export function GroupCard({ group, now, extraBadge }: GroupCardProps) {
 /** Skeleton đúng hình GroupCard (đổi bố cục thẻ → sửa cả đây và app). */
 export function GroupCardSkeleton() {
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-surface p-3 shadow-card">
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-3.5 shadow-card">
       <div className="flex items-start gap-3">
         <Skeleton className="size-11 shrink-0 rounded-md" />
         <div className="flex flex-1 flex-col gap-2">

@@ -1,4 +1,4 @@
-// Fab — nút nổi góc dưới phải cho hành động chính của màn danh sách (Đăng tin): nền accent, icon + chữ, bóng card.
+// Fab — nút nổi góc dưới phải cho hành động chính của màn danh sách (Đăng tin): nền accent, icon + chữ on-accent, shadow-fab.
 // Cao 48 (nút chính), nhấn thu nhỏ 0.97; nằm trên vùng an toàn đáy.
 import type { LucideIcon } from 'lucide-react-native';
 import { Pressable } from 'react-native';
@@ -27,7 +27,7 @@ export function Fab({ label, icon, onPress }: FabProps) {
         onPress={onPress}
         onPressIn={press.onPressIn}
         onPressOut={press.onPressOut}
-        className="min-h-12 flex-row items-center gap-2 rounded-full bg-accent px-5 shadow-card"
+        className="min-h-12 flex-row items-center gap-2 rounded-full bg-accent px-5 shadow-fab"
       >
         <Icon icon={icon} tone="onAccent" />
         <Text variant="label" tone="onAccent">

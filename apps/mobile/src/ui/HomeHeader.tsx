@@ -1,9 +1,11 @@
 // Header trang chủ (Hub) — docs/design/home.md §4.1, §4.2, §10. Ba phần là ba con trực tiếp của ScrollView của
 // Screen (để ô tìm kiếm dính bằng `stickyHeaderIndices`):
-//   HomeHeader        nền primary, px-4 pt-3: hàng 1 cao 48 (avatar size-10 viền 2px on-primary/30 | lời chào
-//                     text-lg 600 + dòng phụ text-md 90% | chuông size-11 nền on-primary/15) → chip khu
-//                     (MapPin 16 · text-sm 500 · ChevronDown 16, nền on-primary/15, rounded-full px-3 py-1).
-//                     Khách: logo chữ + nút Đăng nhập. Thu gọn theo cuộn: mờ dần + dịch lên 8 (Reduce Motion: chỉ mờ).
+//   HomeHeader        nền primary, px-4 pt-3 (style Stitch): hàng 1 cao 48 (avatar size-10 viền 2px on-primary/30 |
+//                     lời chào / tên app text-xl đậm 700 + câu phụ text-sm 90% | chuông size-11 nền on-primary/15) → chip
+//                     khu pill trong mờ (MapPin 16 · text-sm 500 · ChevronDown 16, nền on-primary/15, rounded-full px-3 py-1).
+//                     Khách: tên app + nút Đăng nhập pill trong mờ (Button glass). Hoạ tiết: 2 vòng tròn on-primary/10 +
+//                     1 vòng nét đứt on-primary/15 (trang trí, ẩn với trình đọc màn hình). Thu gọn theo cuộn: mờ dần +
+//                     dịch lên 8 (Reduce Motion: chỉ mờ).
 //   HomeHeaderSearch  dính trên cùng khi cuộn: ô tìm kiếm cao 48 rounded-full nền surface shadow-card trên nền primary.
 //   HomeHeaderCurve   phần đáy bo rounded-b-xl — cùng 8 dưới ô tìm kiếm tạo pb-16 (64) để lưới dịch vụ nổi lên 48.
 // NotificationBell: số chưa đọc (> 9 → "9+", 0 → ẩn), lắc nhẹ một lần khi số tăng. SiteChip dùng riêng được.
@@ -64,6 +66,17 @@ export function HomeHeader({ scrollY, user, loading = false, title, subtitle, si
     <View onLayout={onLayout} className="bg-primary px-4 pb-1 pt-3">
       {/* Nền xanh kéo dài lên trên: iOS kéo quá đầu trang (làm mới) vẫn thấy xanh, không lộ nền xám. */}
       <View className="absolute inset-x-0 bottom-full h-96 bg-primary" />
+      {/* Hoạ tiết: 2 vòng tròn on-primary mờ góc phải (giống web hub-header.tsx). Không tràn xuống ô tìm kiếm. */}
+      <View
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        pointerEvents="none"
+        className="absolute inset-0 overflow-hidden"
+      >
+        <View className="absolute -right-12 -top-16 size-40 rounded-full bg-on-primary/10" />
+        <View className="absolute -right-16 -top-10 size-28 rounded-full border border-dashed border-on-primary/15" />
+        <View className="absolute right-28 top-12 size-12 rounded-full bg-on-primary/10" />
+      </View>
       <AnimatedView style={collapse} className="gap-3">
         <View className="min-h-12 flex-row items-center gap-3">
           {loading ? (
@@ -87,17 +100,17 @@ export function HomeHeader({ scrollY, user, loading = false, title, subtitle, si
                 </Pressable>
               ) : null}
               <View className="flex-1">
-                <Text variant="title" tone="onPrimary" accessibilityRole="header">
+                <Text variant="titleLg" weight="bold" tone="onPrimary" accessibilityRole="header">
                   {title}
                 </Text>
                 {subtitle ? (
-                  <Text tone="onPrimary" className="opacity-90">
+                  <Text variant="caption" tone="onPrimary" className="opacity-90">
                     {subtitle}
                   </Text>
                 ) : null}
               </View>
               {user && bell ? <NotificationBell {...bell} /> : null}
-              {!user && signIn ? <Button size="sm" variant="inverse" shape="pill" label={signIn.label} onPress={signIn.onPress} /> : null}
+              {!user && signIn ? <Button size="sm" variant="glass" shape="pill" label={signIn.label} onPress={signIn.onPress} /> : null}
             </>
           )}
         </View>

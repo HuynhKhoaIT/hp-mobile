@@ -1,7 +1,9 @@
-// Lưới dịch vụ (docs/design/home.md §4.3, §10): thẻ surface nổi đè lên dải xanh 48px (-mt-12), 4 × 2 trên điện thoại,
-// 8 cột từ 768px. Ô: khung icon 56 bo lg nền dịch vụ nhạt + icon 28 + nhãn 1–2 dòng (không cắt chữ, khung nhãn min-h-10).
-// Nhãn góc "Sắp có" (ô mờ, vẫn bấm được → trang "Sắp có") / "Mới". Hiện lần lượt khi tải (stagger 30ms, trượt 8px;
-// giảm chuyển động → chỉ mờ dần 150ms). Server Component: link thật, chạy khi tắt JS.
+// Lưới dịch vụ (docs/design/home.md §4.3, §10; style Stitch): một thẻ surface (viền hairline + bóng nhạt) nổi đè lên dải
+// xanh 48px (-mt-12), 4 × 2 trên điện thoại, 8 cột từ 768px. Ô: khung icon 48 bo md nền dịch vụ nhạt + viền nhạt cùng tông
+// (ô tiện ích: primary-light) + icon 24 màu dịch vụ + nhãn 1–2 dòng (không cắt chữ, khung nhãn min-h-9).
+// Nhãn góc "Sắp có" (ô mờ, vẫn bấm được → trang "Sắp có") / "Mới" (cam đặc, chữ trắng đậm
+// on-accent). Hiện lần lượt khi tải (stagger 30ms, trượt 8px; giảm chuyển động → chỉ mờ dần 150ms). Server Component: link
+// thật, chạy khi tắt JS.
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -13,8 +15,11 @@ const STAGGER = ['delay-0', 'delay-30', 'delay-60', 'delay-90', 'delay-120', 'de
 export async function ServiceGrid() {
   const t = await getTranslations();
   return (
-    <nav aria-label={t('web.home.services_title')} className="relative rounded-xl bg-surface p-4 shadow-card">
-      <ul className="grid grid-cols-4 gap-x-2 gap-y-4 md:grid-cols-8">
+    <nav
+      aria-label={t('web.home.services_title')}
+      className="relative rounded-lg border border-border bg-surface px-3 py-4 shadow-card sm:p-4"
+    >
+      <ul className="grid grid-cols-4 gap-x-1 gap-y-3 md:grid-cols-8 md:gap-x-2">
         {HOME_TILE_VIEWS.map((tile, i) => {
           const label = t(tile.labelKey);
           const badge = tile.soon ? t('common.home.badge.soon') : tile.isNew ? t('common.home.badge.new') : null;
@@ -32,23 +37,32 @@ export async function ServiceGrid() {
                 aria-disabled={tile.soon || undefined}
                 aria-label={badge ? `${label} (${badge})` : undefined}
                 className={cn(
-                  'group flex h-full flex-col items-center gap-2 rounded-lg px-0.5 py-1 outline-none transition duration-200',
+                  'group flex h-full min-h-12 flex-col items-center gap-2 rounded-md px-0.5 py-1.5 outline-none transition duration-200',
                   'hover:bg-surface-2 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-97 motion-reduce:active:scale-100',
                 )}
               >
                 <span
                   className={cn(
-                    'relative flex size-14 shrink-0 items-center justify-center rounded-lg transition-transform duration-200',
+                    'relative size-12 shrink-0 transition-transform duration-200',
                     'group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0',
-                    tile.soft,
                   )}
                 >
-                  <tile.Icon aria-hidden strokeWidth={1.75} className={cn('size-7', tile.fg, tile.soon && 'opacity-60')} />
+                  {/* Mờ ở khung icon, không ở nhãn góc (nhãn "Sắp có" phải đọc rõ). */}
+                  <span
+                    className={cn(
+                      'flex size-full items-center justify-center rounded-md border',
+                      tile.soft,
+                      tile.edge,
+                      tile.soon && 'opacity-60',
+                    )}
+                  >
+                    <tile.Icon aria-hidden strokeWidth={1.75} className={cn('size-6', tile.fg)} />
+                  </span>
                   {badge ? (
                     <span
                       aria-hidden
                       className={cn(
-                        'absolute -top-1.5 -right-1.5 rounded-full px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap ring-2 ring-surface',
+                        'absolute -top-2 -right-3 rounded-full px-1.5 py-0.5 text-xs leading-none font-bold whitespace-nowrap uppercase ring-2 ring-surface',
                         tile.soon ? 'bg-surface-2 text-muted' : 'bg-accent text-on-accent',
                       )}
                     >
@@ -58,7 +72,7 @@ export async function ServiceGrid() {
                 </span>
                 <span
                   className={cn(
-                    'flex min-h-10 items-start justify-center text-center text-sm leading-tight font-medium text-fg',
+                    'flex min-h-9 items-start justify-center text-center text-xs leading-tight font-medium text-fg sm:text-sm',
                     tile.soon && 'opacity-60',
                   )}
                 >

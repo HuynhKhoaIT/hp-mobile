@@ -85,7 +85,7 @@ function NavList({
                 <span
                   aria-label={t(`count.${badge ?? 'pending'}`, { count })}
                   className={cn(
-                    'inline-flex min-w-6 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-on-accent',
+                    'inline-flex min-w-6 items-center justify-center rounded-full bg-warning/20 px-1.5 text-xs font-semibold text-fg',
                     collapsed && 'absolute top-1 right-1 min-w-5 px-1',
                   )}
                 >

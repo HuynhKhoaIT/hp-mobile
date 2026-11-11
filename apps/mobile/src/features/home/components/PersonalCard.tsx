@@ -66,7 +66,7 @@ export function PersonalCard({ className }: { className?: string }) {
       const s = card.stats;
       if (!s) return null;
       return (
-        <View className={['gap-3 rounded-xl bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
+        <View className={['gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
           <Text variant="label" weight="semibold" accessibilityRole="header">
             {t('home.card.mine_title')}
           </Text>
@@ -109,7 +109,7 @@ export function PersonalCard({ className }: { className?: string }) {
 /** Khung chờ đúng hình thẻ "Tin của bạn" (tiêu đề · 3 cột số · 2 nút). */
 function PersonalCardSkeleton({ className }: { className?: string }) {
   return (
-    <View className={['gap-3 rounded-xl bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
+    <View className={['gap-3 rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
       <Skeleton className="h-5 w-1/3" />
       <View className="flex-row py-1">
         {[0, 1, 2].map((i) => (
