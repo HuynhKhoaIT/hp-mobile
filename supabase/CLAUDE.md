@@ -40,7 +40,8 @@ supabase/
 │   ├── translate-content/
 │   └── (expire-content, remind-groups: hàm SQL do pg_cron gọi thẳng — mục 6)
 ├── tests/                    # pgTAP: *.test.sql cho RLS và trigger
-└── seed.sql                  # venues, 50 tin mẫu mỗi category, user test mỗi vai trò
+├── seed.sql                  # venues, 50 tin mẫu mỗi category (ảnh demo CC0), user test mỗi vai trò
+└── demo/                     # staging-demo.sql, ảnh demo CC0 (listing-images/, nguồn ảnh trong listing-images/credits.json), upload-demo-images.mjs, demo-images.sql
 packages/db/                  # database.types.ts sinh tự động — không sửa tay
 packages/shared/              # Zod schemas, enums, i18n — dùng chung app, web & Edge Functions
 packages/core/                # hàm gọi Supabase + query keys + hooks dùng chung app & web (đổi RPC/bảng → cập nhật ở đây)
@@ -182,7 +183,7 @@ export default handler(async ({ req, user, admin }) => {
 
 | Bucket | Truy cập | Đường dẫn & giới hạn |
 |---|---|---|
-| `listing-images` | đọc public, ghi khi `(storage.foldername(name))[1] = auth.uid()::text` | `{user_id}/{listing_id}/{n}.webp`, ≤ 2 MB, chỉ image/webp, image/jpeg |
+| `listing-images` | đọc public, ghi khi `(storage.foldername(name))[1] = auth.uid()::text` | `{user_id}/{listing_id}/{n}.webp`, ≤ 2 MB, chỉ image/webp, image/jpeg. Ngoại lệ dữ liệu mẫu: ảnh CC0 dùng chung `demo/<category>/<NN>.webp` (nguồn `supabase/demo/listing-images`, local nạp qua `[storage.buckets.listing-images]` trong `config.toml`, staging `supabase/demo/upload-demo-images.mjs` + `demo-images.sql`) |
 | `avatars` | đọc public, ghi thư mục của mình | `{user_id}/{timestamp}.webp`, ≤ 1 MB, 512px; `profiles.avatar_url` lưu path (ảnh Google: URL đầy đủ) — client dựng URL bằng `avatarUrl()` |
 | `verification` | riêng tư 5 MB (webp / jpeg / pdf); chủ upload vào `{uid}/…` (không bị cấm), chủ + staff đọc; không ghi đè / xoá từ client | `{user_id}/{badge}/{timestamp}.{ext}`; `purge-files` xoá 30 ngày sau khi duyệt |
 | `chat-images` | riêng tư, signed URL 1 giờ, chỉ member | `{conversation_id}/{message_id}.webp` |

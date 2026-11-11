@@ -2,6 +2,8 @@
 -- Không chạy trên production. Không có dữ liệu người thật (tên, tin, sân đều là mẫu).
 -- Khác seed local: tài khoản demo có UUID …0000000d000N và SĐT 8490000090N (không trùng tài khoản thật / số OTP test),
 -- KHÔNG có quyền moderator / admin, không có email staff, không có hội thoại mẫu.
+-- Ảnh tin: TRƯỚC khi chạy, tải bộ ảnh CC0 lên bucket listing-images (`node supabase/demo/upload-demo-images.mjs`, xem đầu file đó).
+-- Đã chạy file này từ trước khi có ảnh → chỉ cần tải ảnh rồi chạy supabase/demo/demo-images.sql.
 -- Chạy: Supabase Dashboard → dungquat-staging → SQL Editor → dán toàn bộ file → Run (một lần; chạy lại sẽ báo lỗi và không đổi gì).
 -- Gỡ: chạy khối "GỠ DỮ LIỆU DEMO" ở cuối file (đang để trong chú thích).
 
@@ -86,7 +88,9 @@ cross join (values
 -- ═══ seed/listings.sql ═══
 -- Tin đăng mẫu: 50 tin / category (500 tin). Chạy sau seed.sql ([db.seed] sql_paths).
 -- Chủ tin: user seed 01 / 04 / 05; vài tin của 03 (bị cấm → phải ẩn khỏi public_listings).
--- Không ảnh: client hiện ảnh giữ chỗ theo tính năng. lang đa dạng (vi nhiều nhất, có en / zh).
+-- Ảnh: bộ ảnh CC0 dùng chung `demo/<category>/<NN>.webp` trong bucket listing-images (nguồn: supabase/demo/listing-images,
+-- local tự nạp qua [storage.buckets.listing-images] trong config.toml); tin trọ thêm 2 ảnh chung `demo/room/extra-*`.
+-- Thẻ ra vào / bằng lái / thẻ ATM cố ý không ảnh (không làm mẫu đăng ảnh giấy tờ). lang đa dạng (vi nhiều nhất, có en / zh).
 -- Trạng thái: phần lớn active; mỗi category vài tin sold / draft / expired để thử lọc.
 -- attributes khớp Zod ListingAttributes (packages/shared/src/schemas/listing).
 -- setseed → dữ liệu giống nhau mỗi lần db reset. Không dữ liệu người thật.
@@ -117,6 +121,8 @@ declare
   v_desc text;
   v_loc extensions.geography;
   v_created timestamptz;
+  v_idx text;
+  v_images text[];
   i int;
 begin
   foreach v_cat in array enum_range(null::public.listing_category) loop
@@ -167,6 +173,12 @@ begin
       v_lang := case when (i - 1) % 10 = 8 then 'en' when (i - 1) % 10 = 9 then 'zh' else 'vi' end;
       if i > 10 then
         v_title := v_title || case v_lang when 'en' then ' #' || i when 'zh' then ' ' || i || '号' else ' (tin ' || i || ')' end;
+      end if;
+      v_idx := lpad((1 + (i - 1) % 10)::text, 2, '0');
+      v_images := case when v_cat || '/' || v_idx in ('lost/02', 'lost/07', 'found/03') then '{}'
+                       else array['demo/' || v_cat || '/' || v_idx || '.webp'] end;
+      if v_cat in ('room_rent', 'room_share') then
+        v_images := v_images || array['demo/room/extra-' || (1 + i % 4) || '.webp', 'demo/room/extra-' || (1 + (i + 1) % 4) || '.webp'];
       end if;
       v_site := v_sites[1 + (i % array_length(v_sites, 1))];
       select location into v_site_loc from public.sites where code = v_site;
@@ -235,9 +247,9 @@ begin
       end case;
 
       insert into public.listings (owner_id, category, status, title, description, price, price_type, attributes,
-                                   site, location, address_text, lang, view_count, created_at, updated_at, expires_at)
+                                   site, location, address_text, images, lang, view_count, created_at, updated_at, expires_at)
       values (v_owner, v_cat, v_status, v_title, v_desc, v_price, v_price_type, v_attrs,
-              v_site, v_loc, v_places[1 + floor(random() * array_length(v_places, 1))::int], v_lang,
+              v_site, v_loc, v_places[1 + floor(random() * array_length(v_places, 1))::int], v_images, v_lang,
               floor(random() * 200)::int, v_created, v_created,
               case when v_status = 'expired' then now() - interval '1 day'
                    else v_created + public.listing_default_ttl(v_cat) + interval '30 days' end);
@@ -408,3 +420,4 @@ commit;
 -- delete from public.listings where owner_id::text like '00000000-0000-4000-8000-0000000d000_';
 -- delete from auth.users where id::text like '00000000-0000-4000-8000-0000000d000_';
 -- commit;
+-- Ảnh demo dùng chung (demo/…) không thuộc thư mục user nào: xoá tay trong Dashboard → Storage → listing-images → demo nếu không còn dùng.
