@@ -85,17 +85,26 @@ export function useDeleteAccount() {
   });
 }
 
-/** "Đã nhận lại đồ" (chủ tin lost / found) → làm mới chi tiết, danh sách, tin của tôi. */
-export function useMarkListingReturned(listingId: string) {
+/**
+ * "Đã nhận lại đồ" (chủ tin lost / found) → làm mới chi tiết, danh sách, tin của tôi.
+ * `deferRefresh`: thành công thì KHÔNG làm mới ngay — nơi gọi đang hiện bước "Bàn giao thành công" / đánh giá trong cùng
+ * sheet (làm mới sớm khiến màn chi tiết gỡ sheet vì tin đã "trả lại"); gọi `refresh()` khi đóng sheet. Lỗi vẫn làm mới ngay.
+ */
+export function useMarkListingReturned(listingId: string, opts: { deferRefresh?: boolean } = {}) {
   const client = useSupabase();
   const qc = useQueryClient();
-  return useMutation<null, AppError, void>({
+  const refresh = () => {
+    void qc.invalidateQueries({ queryKey: keys.listing(listingId) });
+    void qc.invalidateQueries({ queryKey: keys.listings() });
+    void qc.invalidateQueries({ queryKey: keys.myListings() });
+    void qc.invalidateQueries({ queryKey: ['hp', 'listing', 'slug'] });
+  };
+  const mutation = useMutation<null, AppError, void>({
     mutationFn: () => unwrap(markListingReturned(client, listingId)),
-    onSettled: () => {
-      void qc.invalidateQueries({ queryKey: keys.listing(listingId) });
-      void qc.invalidateQueries({ queryKey: keys.listings() });
-      void qc.invalidateQueries({ queryKey: keys.myListings() });
-      void qc.invalidateQueries({ queryKey: ['hp', 'listing', 'slug'] });
+    onSuccess: () => {
+      if (!opts.deferRefresh) refresh();
     },
+    onError: refresh,
   });
+  return { ...mutation, refresh };
 }
