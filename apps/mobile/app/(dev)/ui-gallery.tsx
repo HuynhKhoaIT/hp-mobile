@@ -7,7 +7,9 @@ import { Redirect } from 'expo-router';
 import {
   Bell,
   ClipboardList,
+  Compass,
   Heart,
+  House,
   LayoutGrid,
   ListChecks,
   LogIn,
@@ -27,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { setLocale } from '@/core/i18n';
 import { type ThemePref, useSettings } from '@/core/settings';
+import { formatMoney } from '@/lib/format';
 import {
   AlertRow,
   Avatar,
@@ -97,6 +100,7 @@ import {
   Stepper,
   StickyCta,
   SuccessScreen,
+  TabBarItem,
   Text,
   type TextTone,
   type TextVariant,
@@ -216,6 +220,7 @@ export default function UiGalleryScreen() {
   const [area, setArea] = useState<string>('');
   const [saved, setSaved] = useState(false);
   const [tile, setTile] = useState<FeatureKey>('pass');
+  const [tab, setTab] = useState<'home' | 'explore' | 'post' | 'messages'>('home');
   const [photos, setPhotos] = useState<ImagePickerItem[]>(SAMPLE_PHOTOS);
   const [unread, setUnread] = useState(3);
   const [siteSheet, setSiteSheet] = useState(false);
@@ -283,6 +288,13 @@ export default function UiGalleryScreen() {
             <Button label={t('actions.save')} loading />
             <Button label={t('actions.save')} disabled />
           </Row>
+          <Row gap={2} wrap>
+            <Button iconOnly icon={MessageCircle} variant="secondary" label={t('listing:detail.contact')} />
+            <Button iconOnly icon={Share2} variant="outline" label={t('actions.share')} />
+            <Button iconOnly size="sm" icon={Heart} label={t('listing:bookmark.save')} />
+            <Button iconOnly icon={MessageCircle} variant="secondary" label={t('listing:detail.contact')} loading />
+            <Button iconOnly icon={MessageCircle} variant="secondary" label={t('listing:detail.contact')} disabled />
+          </Row>
           <Button label={t('actions.join')} fullWidth haptic onPress={() => toast.show(t('actions.join'), 'success')} />
         </Col>
       </Section>
@@ -349,7 +361,7 @@ export default function UiGalleryScreen() {
         </Card>
       </Section>
 
-      <Section title="Skeleton · Empty · Error">
+      <Section title="Skeleton shimmer · Empty · Error">
         <SkeletonListingCard />
         <EmptyState title={t('states.empty_title')} action={{ label: t('actions.post'), onPress: () => toast.show(t('actions.post')) }} />
         <ErrorState code="network" onRetry={() => toast.show(t('actions.retry'), 'danger')} />
@@ -420,7 +432,7 @@ export default function UiGalleryScreen() {
         />
       </Section>
 
-      <Section title="ServiceTile grid · ServiceGrid">
+      <Section title="ServiceTile grid · ServiceGrid · New badge float">
         <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
           <ServiceGrid>
             {FEATURE_KEYS.map((f, i) => (
@@ -442,6 +454,16 @@ export default function UiGalleryScreen() {
               <ServiceTile variant="grid" icon={LayoutGrid} label={t('home.tiles.all')} onPress={() => toast.show(t('home.tiles.all'))} />
             </View>
           </ServiceGrid>
+        </View>
+      </Section>
+
+      <Section title="TabBarItem · Post glow">
+        {/* Nút Đăng thở chậm khi chưa mở; bấm "Đăng" → xoay 45°, tắt quầng. Reduce Motion → đứng yên. */}
+        <View className="mt-6 flex-row border-t border-border bg-surface px-1 pt-1 shadow-bar">
+          <TabBarItem label={t('nav.home')} icon={House} focused={tab === 'home'} onPress={() => setTab('home')} />
+          <TabBarItem label={t('nav.explore')} icon={Compass} focused={tab === 'explore'} onPress={() => setTab('explore')} />
+          <TabBarItem label={t('nav.post')} icon={Plus} accent focused={tab === 'post'} onPress={() => setTab('post')} />
+          <TabBarItem label={t('nav.messages')} icon={MessageCircle} badge="3" focused={tab === 'messages'} onPress={() => setTab('messages')} />
         </View>
       </Section>
 
@@ -603,6 +625,32 @@ export default function UiGalleryScreen() {
             onPress={() => toast.show(l.title)}
           />
         ))}
+        {/* display.owner + prop bookmark (grid: tim nổi trên ảnh; row: góc thẻ) — trọ, việc ca kíp. */}
+        <View className="flex-row gap-3">
+          <ListingCard
+            listing={samples[1]}
+            layout="grid"
+            display={{ facts: ['area_m2'], owner: true, bookmark: true }}
+            bookmark={{ saved, onToggle: setSaved, labels: { save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') } }}
+            className="flex-1"
+            onPress={() => toast.show(samples[1].title)}
+          />
+          <View className="flex-1" />
+        </View>
+        <ListingCard
+          listing={samples[2]}
+          layout="row"
+          display={{ facts: ['shift'], owner: true, bookmark: true }}
+          bookmark={{ saved, onToggle: setSaved, labels: { save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') } }}
+          onPress={() => toast.show(samples[2].title)}
+        />
+        {/* display.description + đồ thất lạc đã trả lại (attributes.returned): ảnh mờ, tiêu đề gạch ngang, badge "Đã trả lại". */}
+        <ListingCard
+          listing={{ ...samples[3], description: t('dev.sample'), attributes: { returned: true } }}
+          layout="row"
+          display={{ description: true, owner: true, categoryBadge: { lost: { tone: 'danger', labelKey: 'listing:lost_found.kind_lost' } } }}
+          onPress={() => toast.show(samples[3].title)}
+        />
         <View className="flex-row flex-wrap gap-2">
           {SAMPLE_CATEGORIES.map((c) => (
             <ListingCover key={c} listing={{ category: c, images: [] }} className="aspect-card w-20 rounded-sm" />
@@ -709,6 +757,24 @@ export default function UiGalleryScreen() {
       <Section title="ImageGallery · PageHero">
         <ImageGallery uris={[]} accessibilityLabel={t('dev.sample')} />
         <ImageGallery uris={[]} bleed thumbnails accessibilityLabel={t('dev.sample')} />
+        <ImageGallery
+          uris={[]}
+          accessibilityLabel={t('dev.sample')}
+          placeholder={<ListingCover listing={{ images: [], category: 'room_rent' }} size="full" className="size-full" />}
+          overlayTop={
+            <>
+              <Badge overlay label={t('listing:availability.room')} tone="success" />
+              <Badge overlay label={t('profile.verified')} tone="primary" />
+            </>
+          }
+          overlayBottom={
+            <View className="self-start rounded-md bg-surface/90 px-3 py-1.5 shadow-card">
+              <Text variant="label" weight="bold" tone="primary">
+                {t('listing:card.per_month', { price: formatMoney(1_800_000) })}
+              </Text>
+            </View>
+          }
+        />
         <PageHero
           title={t('feature.room')}
           subtitle={t('listing:list.subtitle_room')}
@@ -808,7 +874,7 @@ export default function UiGalleryScreen() {
         />
       </Section>
 
-      <Section title="SuccessScreen · Notice">
+      <Section title="SuccessScreen (ripple) · Notice">
         <SuccessScreen
           celebrate
           title={t('listing:form.success_title')}
