@@ -1,4 +1,4 @@
-// Điều hướng hồ sơ: hồ sơ công khai (avatar ở tin, chat, "Xem hồ sơ" ở tab Tôi), huy hiệu, thông báo + cài đặt thông báo (tab Tôi).
+// Điều hướng hồ sơ: hồ sơ công khai (avatar ở tin, chat, "Xem hồ sơ" ở tab Tôi), huy hiệu, thông báo + cài đặt thông báo, xoá tài khoản (tab Tôi).
 // Feature khác được import profile (.claude/rules/mobile-features.md).
 import { router } from 'expo-router';
 
@@ -19,4 +19,9 @@ export function openNotifications() {
 /** Cài đặt thông báo đẩy. */
 export function openNotificationSettings() {
   router.push('/settings/notifications');
+}
+
+/** Xoá tài khoản (dòng "Xoá tài khoản" ở tab Tôi). */
+export function openDeleteAccount() {
+  router.push('/settings/delete-account');
 }

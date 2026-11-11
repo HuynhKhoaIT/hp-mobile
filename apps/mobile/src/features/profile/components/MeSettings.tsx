@@ -1,23 +1,20 @@
 // "Cài đặt & hỗ trợ" ở tab Tôi (style Stitch): tiêu đề vạch primary → MỘT thẻ các dòng ngăn vạch (ô icon 32 nền
 // surface-2 icon primary + nhãn + mũi tên): Tin đã lưu · Thông báo · Thông báo đẩy → Ngôn ngữ (hàng chip vi / en / zh,
-// đổi ngay) → Đăng xuất · Xoá tài khoản (ô icon danger/10, chữ danger đậm; xoá mở sheet gõ từ xác nhận).
+// đổi ngay) → Đăng xuất · Xoá tài khoản (ô icon danger/10, chữ danger đậm; mở màn xoá tài khoản settings/delete-account).
 // Khách: chỉ còn Ngôn ngữ.
 import { LOCALES } from '@hp/shared';
 import { Bell, BellRing, Heart, Languages, LogOut, UserX } from 'lucide-react-native';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { openSavedListings } from '@/features/listing/navigation';
 import { Card, Chip, Divider, Icon, MenuItem, Row, SectionHeader, Text } from '@/ui';
 import { useChangeLocale, useSignOut } from '../hooks';
-import { openNotifications, openNotificationSettings } from '../navigation';
-import { DeleteAccountSheet } from './DeleteAccountSheet';
+import { openDeleteAccount, openNotifications, openNotificationSettings } from '../navigation';
 
 export function MeSettings({ signedIn }: { signedIn: boolean }) {
   const { t } = useTranslation();
   const locale = useChangeLocale();
   const signOut = useSignOut();
-  const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
     <View className="gap-3">
@@ -53,11 +50,10 @@ export function MeSettings({ signedIn }: { signedIn: boolean }) {
             <Divider />
             <MenuItem iconBox icon={LogOut} label={t('auth:sign_out')} tone="danger" onPress={() => void signOut()} />
             <Divider />
-            <MenuItem iconBox icon={UserX} label={t('account.delete_title')} tone="danger" chevron={false} onPress={() => setDeleteOpen(true)} />
+            <MenuItem iconBox icon={UserX} label={t('account.delete_title')} tone="danger" onPress={openDeleteAccount} />
           </>
         ) : null}
       </Card>
-      {signedIn ? <DeleteAccountSheet open={deleteOpen} onClose={() => setDeleteOpen(false)} /> : null}
     </View>
   );
 }
