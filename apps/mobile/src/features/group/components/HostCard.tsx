@@ -24,7 +24,7 @@ export function HostCard({ group }: { group: Host }) {
 
   return (
     <View className="gap-2">
-      <SectionHeader title={t('detail.host')} />
+      <SectionHeader title={t('detail.host')} bar="primary" />
       <Card onPress={() => openProfile(group.host_id)} accessibilityLabel={`${name}, ${t('common:profile.view')}`}>
         <View className="flex-row items-start gap-3">
           <Avatar uri={profileAvatarUrl(group.host_avatar_url)} name={name || '?'} />

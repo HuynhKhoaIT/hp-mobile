@@ -16,11 +16,23 @@ export type GroupLabels = {
   emptyBody: string;
   /** Nút tạo nhóm (FAB + CTA khi rỗng). */
   create: string;
+  /** Dòng phụ dưới tiêu đề header xanh của danh sách. */
+  subtitle: string;
+  /** Tiêu đề khối danh sách (vạch cam) khi chưa tìm / lọc ("Chuyến sắp khởi hành"). */
+  upcoming: string;
+  /** Tiêu đề khối địa điểm ở chi tiết ("Lộ trình" / "Sân chơi") — cũng là tiêu đề khối địa điểm của form. */
+  placeTitle: string;
+  /** Mẹo an toàn riêng tính năng (đầu danh sách + chi tiết). */
+  tip: string;
 };
 
 export type GroupFormConfig = {
   /** Tiêu đề màn form. */
   titleKey: string;
+  /** Dòng phụ dưới tiêu đề header xanh của form. */
+  subtitleKey: string;
+  /** Tiêu đề khối "số chỗ + chi phí" ("Chỗ trống & chi phí" / "Người chơi & chi phí"). */
+  seatsSectionKey: string;
   subKindLabelKey: string;
   startsAtLabelKey: string;
   seatsLabelKey: string;
