@@ -23,7 +23,7 @@ export default async function Page({ params }: PageProps<'/[locale]/tao-nhom/[ki
   if (!isGroupKind(kind)) notFound();
   return (
     <section className="mx-auto w-full max-w-3xl px-4 py-6">
-      <Suspense fallback={<GroupFormSkeleton />}>
+      <Suspense fallback={<GroupFormSkeleton kind={kind} />}>
         <CreateGroupView kind={kind} />
       </Suspense>
     </section>

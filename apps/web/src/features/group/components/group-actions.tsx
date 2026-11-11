@@ -13,6 +13,9 @@
 // Tuần 8: chủ nhóm / thành viên → "Chat nhóm" (/tin-nhan/{id} qua useGroupConversationId; null = chưa có quyền → ẩn).
 // Thành viên sau giờ bắt đầu → "Đánh giá" (RateGroupDialog) hoặc "Bạn đã chấm N/5". Link có #danh-gia (thông báo
 // group_completed, Nhóm của tôi) → tự mở dialog khi còn chấm được.
+// Style Stitch (thanh "Xác nhận đặt chỗ"): người chưa tham gia, nhóm còn chỗ — dưới 1024px nút Tham gia / Xin tham gia nằm
+// trên thanh dính đáy (ngay trên thanh điều hướng dưới của điện thoại, nền surface/95 + shadow-bar) cùng chi phí / người +
+// "Còn N chỗ" bên trái, nút bên phải; lời giải thích cách tham gia ở lại trong trang. Từ 1024px: trong cột phải dính.
 import { type PublicGroup, shareUrl } from '@hp/core';
 import {
   useCancelGroup,
@@ -44,7 +47,7 @@ import { ReportButton } from '@/features/report/components/report-button';
 import { Link, useRouter } from '@/i18n/navigation';
 import { publicEnv } from '@/lib/env';
 import { refreshGroupAction } from '../actions';
-import { groupTimeText } from '../display';
+import { groupFeeText, groupTimeText } from '../display';
 import { RATE_HASH } from '../rate-link';
 import { useLiveGroup } from '../use-live-group';
 import { JoinNoteDialog } from './join-note-dialog';
@@ -305,11 +308,13 @@ function GroupActionsInner({ initial }: { initial: PublicGroup }) {
     );
   } else {
     const label = g.requires_approval ? t('group.action.request') : t('group.action.join');
+    const seatsLeft = g.seats_left ?? Math.max(0, g.seats_total - g.seats_taken);
     const button = (
       <Button
         type="button"
         size="lg"
         variant="accent"
+        className="max-lg:flex-1"
         disabled={join.isPending}
         aria-busy={join.isPending || undefined}
         onClick={userId ? startJoin : undefined}
@@ -320,7 +325,18 @@ function GroupActionsInner({ initial }: { initial: PublicGroup }) {
     );
     main = (
       <>
-        {userId === null ? <LoginDialog trigger={button} intent={{ action: 'join', target: g.id }} /> : button}
+        <div className="z-30 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-above-nav max-lg:border-t max-lg:border-border max-lg:bg-surface/95 max-lg:px-4 max-lg:py-3 max-lg:shadow-bar max-lg:backdrop-blur-md sm:max-lg:bottom-0 sm:max-lg:pb-safe">
+          <div className="mx-auto flex max-w-3xl items-center gap-3 lg:flex-col lg:items-stretch">
+            <p className="flex w-2/5 min-w-0 flex-col lg:hidden">
+              <span className="line-clamp-2 text-md font-bold text-primary">{groupFeeText(g, t, locale)}</span>
+              <span className="flex items-center gap-1.5 text-sm font-medium text-fg">
+                <span aria-hidden className="size-2 shrink-0 rounded-full bg-success" />
+                {t('group.card.seats_left', { count: seatsLeft })}
+              </span>
+            </p>
+            {userId === null ? <LoginDialog trigger={button} intent={{ action: 'join', target: g.id }} /> : button}
+          </div>
+        </div>
         <p className="text-sm text-muted">{g.requires_approval ? t('group.detail.approval_hint') : t('group.detail.instant_hint')}</p>
       </>
     );
