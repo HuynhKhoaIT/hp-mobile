@@ -240,7 +240,11 @@
     "rating": "{{avg}} · {{count}} reviews",
     "no_rating": "No reviews yet",
     "not_found": "User not found",
-    "view": "View profile"
+    "view": "View profile",
+    "ratings_one": "{{count}} rating",
+    "ratings_other": "{{count}} ratings",
+    "settings_section": "Settings & support",
+    "verified": "Verified"
   },
   "badge_request": {
     "title": "Verification badges",

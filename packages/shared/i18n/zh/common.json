@@ -240,7 +240,11 @@
     "rating": "{{avg}} · {{count}} 条评价",
     "no_rating": "还没有评价",
     "not_found": "找不到该用户",
-    "view": "查看主页"
+    "view": "查看主页",
+    "ratings_one": "{{count}}条评价",
+    "ratings_other": "{{count}}条评价",
+    "settings_section": "设置与帮助",
+    "verified": "已认证"
   },
   "badge_request": {
     "title": "认证徽章",
