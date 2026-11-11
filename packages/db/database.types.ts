@@ -1226,6 +1226,11 @@ isOneToOne: false
               "avatar_url": string,"badges": (string)[],"display_name": string,"joined_at": string,"note": string,"rating_avg": number,"rating_count": number,"responded_at": string,"status": Database["public"]['Enums']["member_status"],"user_id": string
             }[]
                            },
+"list_listing_counterparts":
+{ Args: { "p_listing_id": string }; Returns: {
+              "avatar_url": string,"conversation_id": string,"display_name": string,"is_owner": boolean,"last_message_at": string,"my_score": number,"user_id": string
+            }[]
+                           },
 "list_lost_found_matches":
 { Args: { "p_listing_id": string }; Returns: {
               "address_text": string | null,
@@ -1298,6 +1303,9 @@ isOneToOne: false
                            },
 "rate_group":
 { Args: { "p_comment"?: string,"p_group_id": string,"p_score": number }; Returns: undefined
+                           },
+"rate_listing":
+{ Args: { "p_comment"?: string,"p_listing_id": string,"p_ratee_id": string,"p_score": number }; Returns: undefined
                            },
 "record_listing_view":
 { Args: { "p_listing_id": string }; Returns: undefined
