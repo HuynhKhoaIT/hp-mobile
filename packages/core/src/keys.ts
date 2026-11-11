@@ -32,6 +32,8 @@ export const keys = {
     kind ? (['hp', 'groups', kind, filters ?? {}] as const) : (['hp', 'groups'] as const),
   group: (id: string) => ['hp', 'group', id] as const,
   groupBySlug: (slug: string) => ['hp', 'group', 'slug', slug] as const,
+  /** Nhóm sắp diễn ra của một người (hồ sơ công khai) — con của keys.groups(): mutation nhóm làm mới cả nhánh. */
+  hostGroups: (hostId: string) => ['hp', 'groups', 'host', hostId] as const,
   /** Con của keys.group(id): invalidate keys.group(id) làm mới cả thành viên + trạng thái của mình. */
   groupMembers: (id: string) => ['hp', 'group', id, 'members'] as const,
   groupMembership: (id: string, userId: string) => ['hp', 'group', id, 'membership', userId] as const,

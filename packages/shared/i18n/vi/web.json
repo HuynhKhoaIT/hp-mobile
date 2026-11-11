@@ -342,5 +342,10 @@
     "operator_pending": "(tên người vận hành đang cập nhật)",
     "email_pending": "(email liên hệ đang cập nhật)",
     "delete_cta": "Mở cài đặt để xoá tài khoản"
+  },
+  "profile": {
+    "meta_title": "{{name}} – Hồ sơ thành viên",
+    "meta_description": "Tin đang đăng, nhóm đang mở và huy hiệu xác minh của {{name}} trên {{app}}.",
+    "not_found_body": "Tài khoản có thể đã bị xoá, bị khoá hoặc đường dẫn không đúng."
   }
 }

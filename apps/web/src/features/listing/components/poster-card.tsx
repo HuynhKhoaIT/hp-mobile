@@ -1,13 +1,15 @@
 // Thẻ người đăng (trang chi tiết, style Stitch — khớp OwnerCard của app): ảnh đại diện / chữ cái đầu + dấu xác minh khi có huy
 // hiệu, tên rút gọn (view đã che: "An N."), dải 2 số liệu trên nền bg: đánh giá · tham gia từ; huy hiệu xác minh.
-// Không có SĐT (chỉ lộ qua reveal_contact sau đăng nhập). Web chưa có trang hồ sơ công khai (/u/[id]) → không có nút
-// "Xem hồ sơ" như app. Khác Stitch (cố ý): không "số tin đã đăng", "thời gian phản hồi" — view công khai không có dữ liệu đó.
+// Không có SĐT (chỉ lộ qua reveal_contact sau đăng nhập). Nút "Xem hồ sơ" → /u/{owner_id} (hồ sơ công khai: tin khác, báo cáo /
+// chặn) như app. Khác Stitch (cố ý): không "số tin đã đăng", "thời gian phản hồi" — view công khai không có dữ liệu đó.
 import type { PublicListing } from '@hp/core';
 import { formatDate, formatNumber, type Locale } from '@hp/shared';
 import { BadgeCheck } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/shared/badge';
+import { Button } from '@/components/ui/button';
+import { Link } from '@/i18n/navigation';
 import { profileAvatarUrl } from '@/lib/images';
 import { BarHeading } from './safety-tip';
 
@@ -48,10 +50,13 @@ export function PosterCard({ listing, locale }: { listing: PublicListing; locale
               </span>
             ) : null}
           </div>
-          <div className="flex min-w-0 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col">
             <p className="truncate text-md font-semibold text-fg">{name}</p>
             {verified ? <p className="text-sm font-medium text-muted">{t('common.profile.verified')}</p> : null}
           </div>
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <Link href={`/u/${listing.owner_id}`}>{t('common.profile.view')}</Link>
+          </Button>
         </div>
 
         <dl className="grid grid-cols-2 rounded-md bg-bg py-2 text-center">

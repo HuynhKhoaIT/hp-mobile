@@ -76,27 +76,40 @@ export function useUnreadCount() {
 // ── Huy hiệu xác minh (tuần 10) ─────────────────────────────────────────────────
 
 export type BadgeStatus = 'owned' | 'pending' | 'rejected' | 'none';
-export type BadgeState = { badge: RequestableBadge; status: BadgeStatus; reason: string | null };
+export type BadgeState = {
+  badge: RequestableBadge;
+  status: BadgeStatus;
+  reason: string | null;
+  /** Ngày gửi yêu cầu mới nhất (chờ duyệt / bị từ chối); null khi đã có hoặc chưa xin. */
+  requestedAt: string | null;
+};
+
+/** Huy hiệu xin (lại) được: chưa xin hoặc bị từ chối. */
+export const canRequestBadge = (status: BadgeStatus) => status === 'none' || status === 'rejected';
 
 /**
  * 4 huy hiệu xin được (REQUESTABLE_BADGES) + trạng thái của mình: đã có (profiles.badges) → đang chờ duyệt / bị từ
- * chối (yêu cầu mới nhất của huy hiệu đó, kèm lý do) → chưa xin.
+ * chối (yêu cầu mới nhất của huy hiệu đó, kèm lý do + ngày gửi) → chưa xin. `phoneVerified`: huy hiệu 'phone' tự gán khi
+ * đăng ký bằng SĐT (không xin được, chỉ hiện ở khối tóm tắt).
  */
 export function useBadgeStates() {
   const me = useMyProfile();
   const requests = useMyBadgeRequests({ enabled: !!me.data });
   const owned = new Set(me.data?.badges ?? []);
   const states: BadgeState[] = REQUESTABLE_BADGES.map((badge) => {
-    if (owned.has(badge)) return { badge, status: 'owned', reason: null };
+    if (owned.has(badge)) return { badge, status: 'owned', reason: null, requestedAt: null };
     // Danh sách đã sắp mới nhất trước → yêu cầu đầu tiên của huy hiệu là trạng thái hiện tại.
     const latest = requests.data?.find((r) => r.badge === badge);
-    if (latest?.status === 'pending') return { badge, status: 'pending', reason: null };
-    if (latest?.status === 'rejected') return { badge, status: 'rejected', reason: latest.reject_reason };
-    return { badge, status: 'none', reason: null };
+    if (latest?.status === 'pending') return { badge, status: 'pending', reason: null, requestedAt: latest.created_at };
+    if (latest?.status === 'rejected') {
+      return { badge, status: 'rejected', reason: latest.reject_reason, requestedAt: latest.created_at };
+    }
+    return { badge, status: 'none', reason: null, requestedAt: null };
   });
   return {
     me,
     states,
+    phoneVerified: owned.has('phone'),
     isLoading: me.isLoading || (!!me.data && requests.isLoading),
     isError: me.isError || requests.isError,
     errorCode: (me.error ?? requests.error)?.code,

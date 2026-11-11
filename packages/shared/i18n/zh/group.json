@@ -242,7 +242,14 @@
     "price_label": "每小时参考价",
     "phone_label": "场地电话",
     "submit": "提交审核",
-    "submitted": "已提交，感谢推荐场地！"
+    "submitted": "已提交，感谢推荐场地！",
+    "contribute_subtitle": "帮工友们在下班后找到更多运动场地。",
+    "sports_hint": "选择该场地可进行的一项或多项运动。",
+    "section_place": "场地名称和地址",
+    "address_placeholder": "例如：Dốc Sỏi 市场后 200 米左转",
+    "section_contact": "价格和联系方式",
+    "phone_hint": "用于订场的电话——场地审核通过后公开显示。",
+    "review_body": "场地会归入你资料中的区域。24 小时内最多可推荐 5 个场地。"
   },
   "mine": {
     "title": "我的小组",
@@ -256,7 +263,12 @@
     "empty_past_title": "暂无已结束的小组",
     "empty_past_body": "你参加过的小组会显示在这里，便于评价。",
     "find_ride": "找拼车",
-    "find_sport": "找球局"
+    "find_sport": "找球局",
+    "subtitle": "你创建、已加入或待审核的拼车和球局",
+    "create": "创建小组",
+    "section_upcoming": "即将开始的拼车和球局",
+    "section_past": "已结束的拼车和球局",
+    "section_past_hint": "每次拼车或球局结束后为组长评分"
   },
   "rate": {
     "title": "评价组长",

@@ -8,20 +8,21 @@
 //   chuyển tới /nhom/[slug]); nhóm đã xong (group_completed) → /nhom/{slug}#danh-gia (đọc slug qua getGroup, mở sẵn
 //   dialog đánh giá chủ nhóm) · khớp đồ thất lạc (lost_found_match) → tin của người kia /tin/[slug] · kết quả xin huy hiệu
 //   (system, title_key badge_approved / badge_rejected, data {}) → /toi/huy-hieu · không rõ → ở lại trang.
-// "Đánh dấu đã đọc" → tất cả. Loading skeleton / lỗi + thử lại / trống. Web không có push (capabilities.appOnly).
+// "Đánh dấu đã đọc" → tất cả. Khách (phiên hết hạn giữa chừng) → mời đăng nhập (SignInPrompt). Loading skeleton / lỗi + thử
+// lại / trống. Web không có push (capabilities.appOnly).
 // Style Stitch (khớp màn Thông báo của app): header xanh (HeaderDecor; tràn mép + bo đáy trên điện thoại, khối bo xl từ
 // 640px) có H1 + nút "Đánh dấu đã đọc" trong mờ → các thẻ thông báo cách nhau 12 (NotificationRow).
 import { getGroup, getListing, type Notification } from '@hp/core';
 import { useMarkNotificationsRead, useNotifications, useSession, useSupabase, useUnreadNotificationCount } from '@hp/core/react';
 import { notificationTarget } from '@hp/shared';
-import { Bell, CheckCheck, LogIn } from 'lucide-react';
+import { Bell, CheckCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useRef } from 'react';
 import { ClientOnly } from '@/components/shared/client-only';
 import { HeaderDecor } from '@/components/shared/header-decor';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
-import { LoginDialog } from '@/components/shared/login-dialog';
+import { SignInPrompt } from '@/components/shared/sign-in-prompt';
 import { Button } from '@/components/ui/button';
 import { conversationHref } from '@/features/chat/use-chat';
 import { groupRateHref } from '@/features/group/rate-link';
@@ -151,23 +152,7 @@ function NotificationsContent() {
   if (session.isLoading || (session.userId && notifications.isPending)) {
     body = <NotificationsSkeleton />;
   } else if (!session.userId) {
-    body = (
-      <EmptyState
-        icon={Bell}
-        title={t('common.notifications.title')}
-        description={t('common.notifications.login_body')}
-        action={
-          <LoginDialog
-            trigger={
-              <Button>
-                <LogIn strokeWidth={1.75} aria-hidden />
-                {t('auth.sign_in')}
-              </Button>
-            }
-          />
-        }
-      />
-    );
+    body = <SignInPrompt description={t('common.notifications.login_body')} />;
   } else if (notifications.isError && notifications.items.length === 0) {
     body = <ErrorState code={notifications.error.code} onRetry={() => void notifications.refetch()} />;
   } else if (notifications.items.length === 0) {

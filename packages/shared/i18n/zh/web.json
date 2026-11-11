@@ -342,5 +342,10 @@
     "operator_pending": "（运营者名称待更新）",
     "email_pending": "（联系邮箱待更新）",
     "delete_cta": "打开设置以删除账户"
+  },
+  "profile": {
+    "meta_title": "{{name}} – 成员主页",
+    "meta_description": "{{name}}在{{app}}上的在售信息、进行中的组队和认证徽章。",
+    "not_found_body": "该账号可能已删除或被封禁，或链接有误。"
   }
 }

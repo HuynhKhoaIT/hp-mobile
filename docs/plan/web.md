@@ -105,7 +105,7 @@ g `ListingCard` của app khi có bảng `listings` (tránh đoán props)
 - [x] Đã kiểm `next start -p 3200` + curl: danh sách / chi tiết / `/tim-kiem?q=giay` 200 (ghi `search_logs`); tin đã bán 200 + banner, không JSON-LD; đã bán + `updated_at` 31 ngày trước → 307 → `/da-go` **410**; khách vào `/dang-tin`, `/toi/*` → 307 `/dang-nhap?next=`; chủ tin: `/dang-tin`, Tin của tôi, Đã lưu, trang sửa 200, người khác mở trang sửa → not-found; Server Action qua HTTP: hiện số (đăng nhập ok / khách `auth_required`), lưu tin, người khác đổi trạng thái → `not_found`, Zod `too_short` + `price_required`, gia hạn sớm `too_early`, đăng → đã bán (rời danh sách, chi tiết có banner) → mở lại → xoá (404); `/api/revalidate` 401 / 400 / 200; `/sitemap.xml`, `/robots.txt`; không có SĐT trong HTML công khai
 - [x] Theo backend mới (gửi duyệt lại): tin `rejected` có thao tác `manage.resubmit` trong menu (status `active` → DB chuyển `pending_review`, lý do `resubmit`, toast `form.pending_title`); trang sửa tin bị từ chối có nút chính `manage.resubmit` gửi `status: 'active'` kèm nội dung, màn kết quả theo status trả về; tin khác không phải nháp vẫn không gửi status. "Đánh dấu đã bán" chỉ cho pass đồ / trọ (việc làm / thất lạc chỉ Đóng tin) — khớp app
 - [ ] Chưa kiểm bằng trình duyệt (phiên không có công cụ trình duyệt): form nhiều bước, upload ảnh thật, toast, menu, LoginDialog + intent, 360 / 1440 px, dark mode
-- [ ] Còn lại: `opengraph-image.tsx` cho tin, `/u/[id]`, `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, "Xem thêm" không JS, bố cục 2 cột cho form ≥ 1024 px (hiện một cột, cùng thứ tự với app)
+- [ ] Còn lại: `opengraph-image.tsx` cho tin, `OpenInAppBar`, trang khu vực `/pass-do/[site]`…, "Xem thêm" không JS, bố cục 2 cột cho form ≥ 1024 px (hiện một cột, cùng thứ tự với app)
 
 ## 3f. Trang chủ Hub kiểu super app (cập nhật 2026-11-01)
 Theo `docs/design/home.md` (§3 thứ tự khối, §10 thông số). Route `/` nằm trong `(app)`; code ở `src/features/home/*`.
@@ -142,7 +142,7 @@ Code: `app/[locale]/admin/**` (route), `src/features/admin/**`, `src/components/
 - [x] tsc, lint, i18n:check, `pnpm --filter web build` xanh; curl đăng nhập thật: các route mới 200, khách 307 sang đăng nhập
 - [ ] Chưa thử bằng trình duyệt: realtime, đang gõ, gửi ảnh, cuộn, 360 / 1440 px, dark
 - [ ] Dev log (có từ trước): "unstable value Date.now() while prerendering" ở trang đã đăng nhập — nguồn `createServerClient` trong `getCurrentUserId` / `UserMenu`; đề xuất `await connection()` trước khi tạo client
-- [ ] `/u/[id]` (hồ sơ công khai web) + báo cáo hồ sơ ngoài chat; trang nhóm (tuần 7)
+- [x] `/u/[id]` (hồ sơ công khai web, noindex + follow, ISR 10 phút) + báo cáo / chặn hồ sơ ngoài chat — 2026-11-11; trang nhóm (tuần 7)
 
 ## 3i. Tuần 7 — ghép xe / ghép trận (cập nhật 2026-11-02)
 - [x] Engine `src/features/group/` (config, filters, queries, actions, metadata, json-ld, components) + `features/ride/config.ts`, `features/sport/config.ts` — khác biệt chỉ ở config (kind, đường dẫn, icon, màu, có điểm đến, JSON-LD)

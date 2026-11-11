@@ -77,6 +77,32 @@ export async function getGroupBySlug(client: Client, slug: string): Promise<Resu
   return fromSupabase<PublicGroup>(res, true);
 }
 
+/**
+ * Nhóm sắp diễn ra do một người tạo (trang hồ sơ công khai): còn mở / đủ người, chưa tới giờ, sớm nhất trước.
+ * Đọc view public_groups (anon được; ẩn khi chặn hai chiều, chủ nhóm bị khoá / đã xoá). Cursor "<starts_at>|<id>".
+ */
+export async function listGroupsByHost(
+  client: Client,
+  v: { hostId: string; cursor?: string | null; limit?: number },
+): Promise<Result<GroupPage>> {
+  const limit = Math.min(Math.max(v.limit ?? 20, 1), 50);
+  let q = client
+    .from('public_groups')
+    .select(GROUP_COLUMNS)
+    .eq('host_id', v.hostId)
+    .in('status', ['open', 'full'])
+    .eq('is_past', false)
+    .order('starts_at', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(limit);
+  if (v.cursor) {
+    const [at, id] = v.cursor.split('|');
+    q = q.or(`starts_at.gt.${at},and(starts_at.eq.${at},id.gt.${id})`);
+  }
+  const res = fromSupabase<PublicGroup[]>(await q);
+  return res.error ? res : ok(toPage(res.data ?? [], limit));
+}
+
 /** Trạng thái của chính mình trong nhóm (null = chưa tham gia). Khách → null. */
 export async function getMyMembership(client: Client, groupId: string): Promise<Result<MemberStatus | null>> {
   const { data: session } = await client.auth.getSession();

@@ -59,7 +59,7 @@ export default function NotificationsScreen() {
       </View>
       {focused ? <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} /> : null}
       {!session.isLoading && !session.userId ? (
-        <View className="px-4 pt-4">
+        <View className="flex-1 px-4">
           <SignInPrompt />
         </View>
       ) : session.isLoading || list.isLoading ? (

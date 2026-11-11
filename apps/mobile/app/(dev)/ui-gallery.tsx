@@ -667,6 +667,7 @@ export default function UiGalleryScreen() {
         <GroupCard
           group={sampleGroup({ id: 'g6', status: 'completed', kind: 'sport', sub_kind: 'badminton', destination_text: null })}
           roleLabel={t('group:mine.role_accepted')}
+          roleTone="success"
         />
         <SkeletonGroupCard />
         <SkeletonGroupDetail />
@@ -1010,6 +1011,27 @@ export default function UiGalleryScreen() {
           <ToggleRow label={t('notifications.prefs.messages')} hint={t('notifications.prefs.messages_hint')} value={toggle} onValueChange={setToggle} />
           <Divider />
           <ToggleRow label={t('notifications.prefs.groups')} value={false} onValueChange={() => undefined} disabled />
+        </Card>
+        {/* iconBox: ô icon nền nhạt — 'primary' hoặc màu dịch vụ (Cài đặt thông báo). */}
+        <Card padded={false}>
+          <ToggleRow
+            icon={MessageCircle}
+            iconBox="primary"
+            label={t('notifications.prefs.messages')}
+            hint={t('notifications.prefs.messages_hint')}
+            value={toggle}
+            onValueChange={setToggle}
+          />
+          <Divider />
+          <ToggleRow
+            icon={Search}
+            iconBox="lostFound"
+            label={t('notifications.prefs.lost_found')}
+            hint={t('notifications.prefs.lost_found_hint')}
+            value={false}
+            onValueChange={() => undefined}
+            disabled
+          />
         </Card>
       </Section>
 
