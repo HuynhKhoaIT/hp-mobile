@@ -242,7 +242,14 @@
     "price_label": "Reference price per hour",
     "phone_label": "Venue phone number",
     "submit": "Submit for review",
-    "submitted": "Submitted. Thanks for suggesting a venue!"
+    "submitted": "Submitted. Thanks for suggesting a venue!",
+    "contribute_subtitle": "Help co-workers find more places to play after their shift.",
+    "sports_hint": "Pick one or more sports played at this venue.",
+    "section_place": "Name & address",
+    "address_placeholder": "E.g. 200 m behind Doc Soi market, turn left",
+    "section_contact": "Price & contact",
+    "phone_hint": "The number people call to book — shown publicly once the venue is approved.",
+    "review_body": "The venue is filed under the area in your profile. You can suggest up to 5 venues in 24 hours."
   },
   "mine": {
     "title": "My groups",

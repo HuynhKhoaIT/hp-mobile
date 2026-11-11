@@ -242,7 +242,14 @@
     "price_label": "Giá tham khảo mỗi giờ",
     "phone_label": "Số điện thoại của sân",
     "submit": "Gửi duyệt",
-    "submitted": "Đã gửi. Cảm ơn bạn đã góp sân!"
+    "submitted": "Đã gửi. Cảm ơn bạn đã góp sân!",
+    "contribute_subtitle": "Giúp anh em có thêm chỗ chơi sau giờ tan ca.",
+    "sports_hint": "Chọn một hoặc nhiều môn chơi được ở sân này.",
+    "section_place": "Tên & địa chỉ sân",
+    "address_placeholder": "VD: sau chợ Dốc Sỏi 200 m, rẽ trái",
+    "section_contact": "Giá & liên hệ",
+    "phone_hint": "Số để anh em gọi đặt sân — hiện công khai khi sân được duyệt.",
+    "review_body": "Sân được xếp vào khu trong hồ sơ của bạn. Bạn góp được tối đa 5 sân trong 24 giờ."
   },
   "mine": {
     "title": "Nhóm của tôi",

@@ -223,7 +223,10 @@
       "groups": "Ghép xe, ghép trận",
       "groups_hint": "Yêu cầu tham gia, nhắc giờ đi",
       "lost_found": "Đồ thất lạc",
-      "lost_found_hint": "Có tin khớp với đồ bạn tìm"
+      "lost_found_hint": "Có tin khớp với đồ bạn tìm",
+      "section_title": "Loại thông báo",
+      "enable_all": "Bật tất cả",
+      "commitment": "Chỉ báo về tin nhắn, tin đăng, nhóm, huy hiệu và đồ thất lạc của bạn. Không gửi quảng cáo."
     },
     "system_off": "Thông báo của ứng dụng đang tắt trong cài đặt điện thoại.",
     "open_settings": "Mở cài đặt",
@@ -231,7 +234,13 @@
       "title": "Bật thông báo?",
       "body": "Để biết ngay khi có người nhắn tin hoặc tin của bạn được duyệt.",
       "allow": "Bật thông báo",
-      "later": "Để sau"
+      "later": "Để sau",
+      "headline": "Đừng bỏ lỡ tin quan trọng",
+      "status_off": "Chưa bật trên máy này",
+      "status_denied": "Đang tắt trong cài đặt máy",
+      "status_on": "Đã bật trên máy này",
+      "on_body": "Thông báo hiện trên màn hình khoá theo các loại bạn chọn bên dưới.",
+      "denied_tip": "Mở Cài đặt của điện thoại → Thông báo → bật cho ứng dụng này."
     }
   },
   "profile": {
@@ -317,7 +326,27 @@
     "delete_confirm_label": "Gõ XOA để xác nhận",
     "delete_confirm_word": "XOA",
     "delete_action": "Xoá vĩnh viễn tài khoản",
-    "deleted": "Tài khoản đã được xoá."
+    "deleted": "Tài khoản đã được xoá.",
+    "delete_subtitle": "Bảo mật & quyền riêng tư",
+    "delete_warning_title": "Bạn chắc chắn muốn xoá tài khoản?",
+    "delete_warning_body": "Tài khoản sẽ bị ẩn ngay và xoá vĩnh viễn sau 30 ngày. Không thể hoàn tác.",
+    "delete_what_title": "Điều gì sẽ xảy ra",
+    "delete_item_profile_title": "Hồ sơ & huy hiệu",
+    "delete_item_profile_body": "Hồ sơ, ảnh đại diện và huy hiệu xác minh ẩn với mọi người ngay, xoá hẳn sau 30 ngày.",
+    "delete_item_listings_title": "Tin đăng & ảnh",
+    "delete_item_listings_body": "Mọi tin đăng ẩn ngay; tin và ảnh bị xoá hẳn sau 30 ngày.",
+    "delete_item_groups_title": "Nhóm ghép xe & ghép trận",
+    "delete_item_groups_body": "Nhóm bạn tạo còn đang mở bị huỷ; bạn rời các nhóm đã tham gia hoặc đang chờ duyệt.",
+    "delete_item_messages_title": "Tin nhắn",
+    "delete_item_messages_body": "Sau 30 ngày, tin nhắn bạn đã gửi được giữ lại nhưng ẩn danh để cuộc trò chuyện của người khác không bị mất.",
+    "delete_tag_now": "Ngay khi xoá",
+    "delete_tag_30d": "Xoá sau 30 ngày",
+    "delete_tag_anonymous": "Giữ ẩn danh",
+    "delete_grace_title": "Ẩn ngay, xoá hẳn sau 30 ngày",
+    "delete_grace_body": "Ngay khi xác nhận, bạn được đăng xuất, không nhận thông báo nữa và mọi người không còn thấy tài khoản của bạn. Sau 30 ngày, dữ liệu bị xoá vĩnh viễn theo Nghị định 13/2023 về bảo vệ dữ liệu cá nhân.",
+    "delete_confirm_title": "Xác nhận xoá",
+    "delete_keep": "Giữ tài khoản",
+    "delete_sheet_title": "Xoá tài khoản ngay?"
   },
   "coach": {
     "label": "Hướng dẫn nhanh",

@@ -223,7 +223,10 @@
       "groups": "Rides and games",
       "groups_hint": "Join requests, departure reminders",
       "lost_found": "Lost and found",
-      "lost_found_hint": "A post matches what you are looking for"
+      "lost_found_hint": "A post matches what you are looking for",
+      "section_title": "Notification types",
+      "enable_all": "Turn all on",
+      "commitment": "Only about your messages, listings, groups, badges and lost items. No ads."
     },
     "system_off": "Notifications for this app are turned off in your phone settings.",
     "open_settings": "Open settings",
@@ -231,7 +234,13 @@
       "title": "Turn on notifications?",
       "body": "Know right away when someone messages you or your listing is approved.",
       "allow": "Turn on",
-      "later": "Not now"
+      "later": "Not now",
+      "headline": "Don't miss what matters",
+      "status_off": "Off on this phone",
+      "status_denied": "Turned off in phone settings",
+      "status_on": "On for this phone",
+      "on_body": "Notifications appear on your lock screen for the types you choose below.",
+      "denied_tip": "Open your phone's Settings → Notifications → turn them on for this app."
     }
   },
   "profile": {
@@ -317,7 +326,27 @@
     "delete_confirm_label": "Type DELETE to confirm",
     "delete_confirm_word": "DELETE",
     "delete_action": "Delete my account",
-    "deleted": "Your account has been deleted."
+    "deleted": "Your account has been deleted.",
+    "delete_subtitle": "Security & privacy",
+    "delete_warning_title": "Are you sure you want to delete your account?",
+    "delete_warning_body": "Your account is hidden immediately and permanently deleted after 30 days. This cannot be undone.",
+    "delete_what_title": "What happens",
+    "delete_item_profile_title": "Profile & badges",
+    "delete_item_profile_body": "Your profile, photo and verification badges are hidden from everyone right away and deleted after 30 days.",
+    "delete_item_listings_title": "Listings & photos",
+    "delete_item_listings_body": "All your listings are hidden right away; listings and photos are deleted after 30 days.",
+    "delete_item_groups_title": "Rides & matches",
+    "delete_item_groups_body": "Open groups you host are cancelled; you leave groups you joined or asked to join.",
+    "delete_item_messages_title": "Messages",
+    "delete_item_messages_body": "After 30 days, messages you sent are kept anonymously so other people’s conversations stay intact.",
+    "delete_tag_now": "Right away",
+    "delete_tag_30d": "Deleted after 30 days",
+    "delete_tag_anonymous": "Kept anonymously",
+    "delete_grace_title": "Hidden now, deleted after 30 days",
+    "delete_grace_body": "As soon as you confirm, you are signed out, stop receiving notifications and nobody can see your account. After 30 days your data is permanently deleted, as required by Decree 13/2023 on personal data protection.",
+    "delete_confirm_title": "Confirm deletion",
+    "delete_keep": "Keep my account",
+    "delete_sheet_title": "Delete your account now?"
   },
   "coach": {
     "label": "Quick tour",
