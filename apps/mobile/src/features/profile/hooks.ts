@@ -1,6 +1,16 @@
 // Hook riêng mobile của hồ sơ: đổi ngôn ngữ (i18next + MMKV ngay, profiles.locale khi đã đăng nhập), đăng xuất,
-// huy hiệu xác minh (chụp / chọn giấy tờ → nén → useRequestBadge), xoá tài khoản (useDeleteAccount → đăng xuất).
-import { useDeleteAccount, useMyBadgeRequests, useMyProfile, useRequestBadge, useUpdateProfile } from '@hp/core/react';
+// đổi ảnh đại diện, tên khu làm việc + số thông báo chưa đọc (hero tab Tôi), huy hiệu xác minh (chụp / chọn giấy tờ →
+// nén → useRequestBadge), xoá tài khoản (useDeleteAccount → đăng xuất).
+import {
+  useDeleteAccount,
+  useMyBadgeRequests,
+  useMyProfile,
+  useRequestBadge,
+  useSites,
+  useUnreadNotificationCount,
+  useUpdateProfile,
+  useUploadAvatar,
+} from '@hp/core/react';
 import { type Locale, REQUESTABLE_BADGES, type RequestableBadge } from '@hp/shared';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +19,7 @@ import { getLocale, setLocale } from '@/core/i18n';
 import { type PickedImage, pickImages, prepareVerificationImage, takePhoto } from '@/core/upload';
 import { useErrorText } from '@/lib/errors';
 import { toast } from '@/ui';
+import { pickAvatar } from './avatar';
 
 /** Đổi ngôn ngữ app; đã đăng nhập thì lưu cả profiles.locale (push / email theo ngôn ngữ này). Lỗi lưu không chặn đổi. */
 export function useChangeLocale() {
@@ -31,6 +42,35 @@ export function useSignOut() {
     const res = await signOutApp();
     toast.show(res.error ? t('errors:unknown') : t('signed_out'), res.error ? 'danger' : 'info');
   };
+}
+
+/**
+ * Đổi ảnh đại diện: chọn ảnh (pickAvatar: quyền + cắt vuông + nén) → useUploadAvatar (cache hồ sơ tự cập nhật).
+ * Lỗi (chọn ảnh / tải lên) → `onError(code)`: onboarding hiện dưới nút, hero tab Tôi hiện toast.
+ */
+export function useAvatarChange(userId: string, onError: (code: string) => void) {
+  const upload = useUploadAvatar();
+  const [picking, setPicking] = useState(false);
+  const choose = async () => {
+    setPicking(true);
+    const prepared = await pickAvatar();
+    setPicking(false);
+    if (!prepared) return;
+    if ('error' in prepared) return onError(prepared.error);
+    upload.mutate({ userId, ...prepared.data }, { onError: (e) => onError(e.code) });
+  };
+  return { choose: () => void choose(), isPending: picking || upload.isPending, isUploading: upload.isPending };
+}
+
+/** Tên khu làm việc của hồ sơ (sites.code = profiles.site); chưa chọn khu / danh sách chưa về → null. */
+export function useSiteName(code: string | null | undefined) {
+  const sites = useSites();
+  return code ? (sites.data?.find((s) => s.code === code)?.name ?? null) : null;
+}
+
+/** Số thông báo chưa đọc (chuông ở hero tab Tôi; 0 khi khách). */
+export function useUnreadCount() {
+  return useUnreadNotificationCount().data ?? 0;
 }
 
 // ── Huy hiệu xác minh (tuần 10) ─────────────────────────────────────────────────

@@ -3,6 +3,7 @@
 // + icon 20 màu dịch vụ, hoặc tone primary / accent); `subtitle` text-sm muted dưới tiêu đề; `chevron` thêm
 // ChevronRight 20 sau chữ liên kết (text-md 500 primary). Vùng chạm liên kết ≥ 44.
 // `size` 'md' (Hub, style Stitch): tiêu đề text-md 600 thay cho text-lg — khối gọn, tên khu dài ít xuống dòng.
+// `bar` (tab Tôi, style Stitch): vạch đứng w-1.5 h-4 rounded-full trước tiêu đề (accent / primary, trang trí) + tiêu đề đậm 700.
 import { ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { Icon } from './Icon';
@@ -22,6 +23,8 @@ export type SectionHeaderProps = {
   chevron?: boolean;
   /** Cỡ tiêu đề: 'lg' (mặc định, text-lg) · 'md' (text-md 600, các khối ở Hub). */
   size?: 'md' | 'lg';
+  /** Vạch đứng màu trước tiêu đề (trang trí) — tiêu đề đậm 700. */
+  bar?: 'accent' | 'primary';
   className?: string;
 };
 
@@ -45,12 +48,13 @@ function HeaderIcon({ icon }: { icon: SectionHeaderIcon }) {
   );
 }
 
-export function SectionHeader({ title, subtitle, icon, action, chevron = false, size = 'lg', className }: SectionHeaderProps) {
+export function SectionHeader({ title, subtitle, icon, action, chevron = false, size = 'lg', bar, className }: SectionHeaderProps) {
   return (
-    <View className={['min-h-11 flex-row items-center gap-3', className].filter(Boolean).join(' ')}>
+    <View className={['min-h-11 flex-row items-center', bar ? 'gap-2' : 'gap-3', className].filter(Boolean).join(' ')}>
+      {bar ? <View className={`h-4 w-1.5 rounded-full ${bar === 'accent' ? 'bg-accent' : 'bg-primary'}`} /> : null}
       {icon ? <HeaderIcon icon={icon} /> : null}
       <View className="flex-1">
-        <Text variant={size === 'md' ? 'label' : 'title'} weight="semibold" accessibilityRole="header">
+        <Text variant={size === 'md' ? 'label' : 'title'} weight={bar ? 'bold' : 'semibold'} accessibilityRole="header">
           {title}
         </Text>
         {subtitle ? (
