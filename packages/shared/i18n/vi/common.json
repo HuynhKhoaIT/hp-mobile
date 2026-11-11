@@ -33,7 +33,7 @@
     "job": "Tìm việc",
     "lostFound": "Đồ thất lạc",
     "ride": "Ghép xe về quê",
-    "sport": "Ghép trận"
+    "sport": "Kèo thể thao"
   },
   "status": {
     "draft": "Bản nháp",
@@ -220,7 +220,7 @@
       "messages_hint": "Khi có người nhắn cho bạn",
       "listings": "Tin đăng của bạn",
       "listings_hint": "Duyệt, từ chối, sắp hết hạn",
-      "groups": "Ghép xe, ghép trận",
+      "groups": "Ghép xe, kèo thể thao",
       "groups_hint": "Yêu cầu tham gia, nhắc giờ đi",
       "lost_found": "Đồ thất lạc",
       "lost_found_hint": "Có tin khớp với đồ bạn tìm",
@@ -335,7 +335,7 @@
     "delete_item_profile_body": "Hồ sơ, ảnh đại diện và huy hiệu xác minh ẩn với mọi người ngay, xoá hẳn sau 30 ngày.",
     "delete_item_listings_title": "Tin đăng & ảnh",
     "delete_item_listings_body": "Mọi tin đăng ẩn ngay; tin và ảnh bị xoá hẳn sau 30 ngày.",
-    "delete_item_groups_title": "Nhóm ghép xe & ghép trận",
+    "delete_item_groups_title": "Nhóm ghép xe & kèo thể thao",
     "delete_item_groups_body": "Nhóm bạn tạo còn đang mở bị huỷ; bạn rời các nhóm đã tham gia hoặc đang chờ duyệt.",
     "delete_item_messages_title": "Tin nhắn",
     "delete_item_messages_body": "Sau 30 ngày, tin nhắn bạn đã gửi được giữ lại nhưng ẩn danh để cuộc trò chuyện của người khác không bị mất.",

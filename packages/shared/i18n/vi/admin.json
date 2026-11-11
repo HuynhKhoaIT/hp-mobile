@@ -624,7 +624,7 @@
   },
   "groups": {
     "title": "Nhóm ghép",
-    "subtitle": "Ghép xe và ghép trận. Huỷ nhóm vi phạm — thành viên nhận thông báo.",
+    "subtitle": "Ghép xe và kèo thể thao. Huỷ nhóm vi phạm — thành viên nhận thông báo.",
     "table_label": "Danh sách nhóm",
     "opens_new_tab": "(mở tab mới)",
     "host_filter": "Đang xem nhóm của một người dùng.",
@@ -705,7 +705,7 @@
       "empty_body": "Sân người dùng góp sẽ hiện ở tab Chờ duyệt.",
       "confirm": {
         "approve_title": "Duyệt sân “{{name}}”?",
-        "approve_body": "Sân hiện cho mọi người khi tạo kèo ghép trận.",
+        "approve_body": "Sân hiện cho mọi người khi tạo kèo thể thao.",
         "reject_title": "Từ chối sân “{{name}}”?",
         "reject_body": "Sân không được dùng khi tạo kèo.",
         "hide_title": "Ẩn sân “{{name}}”?",
@@ -888,7 +888,7 @@
       "job": "Tìm việc",
       "lost-found": "Đồ thất lạc",
       "ride": "Ghép xe",
-      "sport": "Ghép trận"
+      "sport": "Kèo thể thao"
     },
     "toast": {
       "enabled": "Đã bật “{{title}}”",

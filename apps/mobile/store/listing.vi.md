@@ -12,7 +12,7 @@ Việc làm, ghép xe, đồ thất lạc
 
 ## Mô tả ngắn Google Play (≤ 80 ký tự)
 
-Pass đồ, tìm trọ, tìm việc, ghép xe, ghép trận quanh khu Dung Quất.
+Pass đồ, tìm trọ, tìm việc, ghép xe, kèo thể thao quanh khu Dung Quất.
 
 ## Mô tả đầy đủ (≤ 4000 ký tự)
 
@@ -35,7 +35,7 @@ Tin việc chính và việc làm thêm ngoài ca.
 GHÉP XE
 Tạo hoặc tham gia chuyến đi chung về thành phố, về quê. Chủ chuyến có thể duyệt thành viên, cả nhóm nhắn tin với nhau.
 
-GHÉP TRẬN
+KÈO THỂ THAO
 Tìm người đá bóng, cầu lông, pickleball; chọn sân và chốt kèo ngay trong nhóm.
 
 Dùng dễ, dùng an toàn:
@@ -54,13 +54,13 @@ Dùng dễ, dùng an toàn:
 
 ## Từ khoá App Store (≤ 100 ký tự, phân cách bằng dấu phẩy)
 
-pass đồ,đồ cũ,tìm trọ,phòng trọ,tìm việc,làm thêm,ghép xe,đồ thất lạc,ghép trận,Dung Quất
+pass đồ,đồ cũ,tìm trọ,phòng trọ,tìm việc,làm thêm,ghép xe,đồ thất lạc,kèo thể thao,Dung Quất
 
 Không dùng "Hòa Phát" làm từ khoá: dễ bị hiểu là có liên quan và vi phạm quy định nhãn hiệu của store.
 
 ## Có gì mới (phiên bản 1.0.0)
 
-Phiên bản đầu tiên: pass đồ, tìm trọ, tìm việc, đồ thất lạc, ghép xe, ghép trận, nhắn tin, thông báo và huy hiệu xác minh.
+Phiên bản đầu tiên: pass đồ, tìm trọ, tìm việc, đồ thất lạc, ghép xe, kèo thể thao, nhắn tin, thông báo và huy hiệu xác minh.
 
 ## Danh sách ảnh chụp màn hình
 
@@ -79,7 +79,7 @@ Quy tắc khi chụp:
 | 3 | Chi tiết tin có ảnh, nút Nhắn tin | `listing/[id]` | Xem rõ, hỏi ngay |
 | 4 | Danh sách Tìm trọ, lọc khoảng cách | `listings/[feature]` | Tìm trọ theo khoảng cách |
 | 5 | Chi tiết chuyến Ghép xe | `group/[id]` | Ghép xe về quê |
-| 6 | Danh sách Ghép trận | `groups/[kind]` | Tìm người chơi, chốt kèo |
+| 6 | Danh sách Kèo thể thao | `groups/[kind]` | Tìm người chơi, chốt kèo |
 | 7 | Hội thoại chat | `chat/[conversationId]` | Nhắn tin trực tiếp |
 | 8 | Đăng tin thành công | `listing/new/[category]` | Đăng tin nhanh |
 
