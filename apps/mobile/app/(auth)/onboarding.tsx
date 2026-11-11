@@ -1,18 +1,26 @@
 // Screen type: Form
-// Onboarding 3 bước (giống web): 1 ngôn ngữ (đổi ngay) · 2 tên + đồng ý điều khoản (bắt buộc, Nghị định 13/2023) ·
-// 3 nơi làm việc + quan tâm (bỏ qua được). Ảnh đại diện ở bước 2, không bắt buộc, upload ngay khi chọn. Lưu một lần ở bước cuối (useCompleteOnboarding của @hp/core).
+// Onboarding 3 bước (giống web; style Stitch "Chọn nơi làm việc"): thanh trên (quay lại · viên "Bước x/3" · Bỏ qua ở bước
+// cuối) + thanh tiến độ chia đoạn → khối mở đầu (ô icon + tiêu đề + câu phụ) từng bước:
+// 1 ngôn ngữ (đổi ngay) · 2 ảnh đại diện (không bắt buộc, upload ngay khi chọn) + tên + đồng ý điều khoản (bắt buộc,
+// Nghị định 13/2023) · 3 nơi làm việc (thẻ chọn, bấm lại để bỏ) + quan tâm (chip có chấm màu dịch vụ), bỏ qua được.
+// Không có mục "cư trú" như bản thiết kế (hồ sơ chỉ có profiles.site + interests). Lưu một lần ở bước cuối
+// (useCompleteOnboarding của @hp/core). Cuối màn: dòng miễn trừ.
 import { needsOnboarding } from '@hp/core';
 import { useCompleteOnboarding, useMyProfile, useSites } from '@hp/core/react';
 import { CONSENT_VERSION, FEATURES, type Feature, LOCALES, type Locale } from '@hp/shared';
 import * as WebBrowser from 'expo-web-browser';
+import { Factory, Languages, RefreshCw, UserRound } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { finishAuthFlow } from '@/core/auth';
+import { AuthHero } from '@/features/auth/components/AuthHero';
+import { OnboardingTopBar } from '@/features/auth/components/OnboardingTopBar';
+import { SiteChoice } from '@/features/auth/components/SiteChoice';
 import { AvatarPicker } from '@/features/profile/components/AvatarPicker';
 import { getLocale, setLocale } from '@/core/i18n';
 import { useErrorText } from '@/lib/errors';
 import { webPageUrl } from '@/lib/urls';
-import { Button, Checkbox, Chip, Col, ErrorState, Header, Input, Row, Screen, Skeleton, Text, toast } from '@/ui';
+import { Button, Checkbox, Chip, Col, ErrorState, Icon, Input, Row, Screen, SectionHeader, Skeleton, Text, toast } from '@/ui';
 
 const TOTAL = 3;
 
@@ -95,14 +103,16 @@ export default function OnboardingScreen() {
 
   return (
     <Screen scroll keyboard>
-      <Header back={step > 1} onBack={() => setStep((s) => s - 1)} title={t('auth:onboarding.step', { current: step, total: TOTAL })} />
+      <OnboardingTopBar
+        step={step}
+        total={TOTAL}
+        onBack={step > 1 ? () => setStep((s) => s - 1) : undefined}
+        action={step === TOTAL ? { label: t('auth:onboarding.skip'), onPress: () => save(false), disabled: complete.isPending } : undefined}
+      />
 
       {step === 1 ? (
-        <Col gap={4} className="pt-4">
-          <Text variant="heading" accessibilityRole="header">
-            {t('auth:onboarding.language_title')}
-          </Text>
-          <Text tone="muted">{t('auth:onboarding.language_hint')}</Text>
+        <Col gap={5} className="pt-4">
+          <AuthHero icon={Languages} title={t('auth:onboarding.language_title')} subtitle={t('auth:onboarding.language_hint')} />
           <Row gap={2} wrap>
             {LOCALES.map((l) => (
               <Chip key={l} label={t(`locale.${l}`)} selected={locale === l} onPress={() => chooseLocale(l)} />
@@ -113,10 +123,8 @@ export default function OnboardingScreen() {
       ) : null}
 
       {step === 2 ? (
-        <Col gap={4} className="pt-4">
-          <Text variant="heading" accessibilityRole="header">
-            {t('auth:onboarding.name_title')}
-          </Text>
+        <Col gap={5} className="pt-4">
+          <AuthHero icon={UserRound} title={t('auth:onboarding.name_title')} />
           {me.data ? <AvatarPicker userId={me.data.id} value={me.data.avatar_url} name={name} /> : null}
           <Input
             label={t('auth:onboarding.name_label')}
@@ -157,40 +165,28 @@ export default function OnboardingScreen() {
 
       {step === 3 ? (
         <Col gap={6} className="pt-4">
-          <Col gap={3}>
-            <Text variant="heading" accessibilityRole="header">
-              {t('auth:onboarding.site_title')}
-            </Text>
-            <Text tone="muted">{t('auth:onboarding.site_hint')}</Text>
-            {sites.isLoading ? (
-              <Row gap={2} wrap>
-                {Array.from({ length: 4 }, (_, i) => (
-                  <Skeleton key={i} className="h-11 w-40 rounded-full" />
-                ))}
-              </Row>
-            ) : sites.isError ? (
-              <ErrorState code={sites.error.code} onRetry={() => void sites.refetch()} />
-            ) : (
-              <Row gap={2} wrap>
-                {(sites.data ?? []).map((s) => (
-                  <Chip
-                    key={s.code}
-                    label={s.name}
-                    selected={chosenSite === s.code}
-                    onPress={() => setSite(chosenSite === s.code ? null : s.code)}
-                  />
-                ))}
-              </Row>
-            )}
+          <Col gap={4}>
+            <AuthHero icon={Factory} title={t('auth:onboarding.site_title')} subtitle={t('auth:onboarding.site_hint')} />
+            <SiteChoice
+              sites={sites.data ?? []}
+              loading={sites.isLoading}
+              errorCode={sites.isError ? sites.error.code : null}
+              onRetry={() => void sites.refetch()}
+              value={chosenSite}
+              onChange={setSite}
+            />
+            <Row gap={2}>
+              <Icon icon={RefreshCw} tone="muted" size={16} />
+              <Text variant="caption" tone="muted" className="flex-1">
+                {t('auth:onboarding.site_change_hint')}
+              </Text>
+            </Row>
           </Col>
           <Col gap={3}>
-            <Text variant="title" accessibilityRole="header">
-              {t('auth:onboarding.interests_title')}
-            </Text>
-            <Text tone="muted">{t('auth:onboarding.interests_hint')}</Text>
+            <SectionHeader bar="accent" title={t('auth:onboarding.interests_title')} subtitle={t('auth:onboarding.interests_hint')} />
             <Row gap={2} wrap>
               {FEATURES.map((f) => (
-                <Chip key={f} label={t(`feature.${f}`)} selected={chosenInterests.includes(f)} onPress={() => toggleInterest(f)} />
+                <Chip key={f} dot={f} label={t(`feature.${f}`)} selected={chosenInterests.includes(f)} onPress={() => toggleInterest(f)} />
               ))}
             </Row>
           </Col>
@@ -199,12 +195,13 @@ export default function OnboardingScreen() {
               {errorText(error)}
             </Text>
           ) : null}
-          <Col gap={2}>
-            <Button label={t('auth:onboarding.finish')} fullWidth loading={complete.isPending} onPress={() => save(true)} />
-            <Button label={t('auth:onboarding.skip')} variant="ghost" fullWidth disabled={complete.isPending} onPress={() => save(false)} />
-          </Col>
+          <Button label={t('auth:onboarding.finish')} fullWidth loading={complete.isPending} onPress={() => save(true)} />
         </Col>
       ) : null}
+
+      <Text variant="micro" tone="muted" className="pt-8 text-center">
+        {t('disclaimer')}
+      </Text>
     </Screen>
   );
 }
