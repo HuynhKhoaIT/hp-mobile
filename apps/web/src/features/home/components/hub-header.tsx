@@ -11,6 +11,7 @@ import { APP_NAME, givenName } from '@hp/shared';
 import { CircleUser, LogIn } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { HeaderDecor } from '@/components/shared/header-decor';
 import { LoginDialog } from '@/components/shared/login-dialog';
 import { NotificationBell } from '@/features/notifications/components/notification-bell';
 import { Link } from '@/i18n/navigation';
@@ -112,20 +113,6 @@ function WideGreeting() {
         <p className="text-3xl font-bold">{greeting}</p>
       )}
       <p className="text-lg opacity-90">{t('common.home.subtitle')}</p>
-    </div>
-  );
-}
-
-/**
- * Hoạ tiết nền (style Stitch, nhẹ): vòng tròn on-primary mờ + vòng nét đứt lồng ngoài ở góc phải, một đốm nhỏ
- * (trang trí, ẩn với trình đọc màn hình, không nhận chạm). Giống app (HomeHeader).
- */
-function HeaderDecor() {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <span className="absolute -top-16 -right-12 size-40 rounded-full bg-on-primary/10 sm:-top-32 sm:right-16 sm:size-64" />
-      <span className="absolute -top-24 -right-20 size-56 rounded-full border-2 border-dashed border-on-primary/15 sm:-top-44 sm:right-6 sm:size-88" />
-      <span className="absolute top-12 right-28 size-12 rounded-full bg-on-primary/10 sm:top-14 sm:right-1/4 sm:size-16" />
     </div>
   );
 }
