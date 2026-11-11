@@ -1,6 +1,8 @@
 // Danh sách tin cuộn vô hạn (FlashList v2, cursor) dùng chung 4 tính năng: skeleton đúng hình thẻ → rỗng có CTA
 // → lỗi có Thử lại → lưới / hàng theo config.card.variant; kéo để làm mới; chân danh sách: đang tải / hết tin / thử lại.
+// Điểm nhấn thẻ (config.card.display): config tính năng của từng tin khi có `configOf` (danh sách trộn), không thì `config`.
 import type { PublicListing } from '@hp/core';
+import type { ListingCategory } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +24,8 @@ import type { ListingFeatureConfig } from '../types';
 
 export type ListingFeedProps = {
   config: ListingFeatureConfig;
+  /** Config tính năng theo category của tin (danh sách 'all') — prop `display` của thẻ. */
+  configOf?: (category: ListingCategory) => ListingFeatureConfig;
   items: PublicListing[];
   isLoading: boolean;
   isError: boolean;
@@ -93,7 +97,12 @@ export function ListingFeed(p: ListingFeedProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item, index }) => (
         <StaggerItem index={index} className={grid ? (index % 2 === 0 ? 'pb-3 pr-1.5' : 'pb-3 pl-1.5') : 'pb-3'}>
-          <ListingCard listing={item} layout={p.config.card.variant} onPress={() => openListing(item.id)} />
+          <ListingCard
+            listing={item}
+            layout={p.config.card.variant}
+            display={(p.configOf?.(item.category) ?? p.config).card.display}
+            onPress={() => openListing(item.id)}
+          />
         </StaggerItem>
       )}
       onEndReached={loadMore}

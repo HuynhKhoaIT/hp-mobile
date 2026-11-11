@@ -34,6 +34,7 @@ export default function EditListingScreen() {
           userId={me.data.id}
           defaultSite={me.data.site}
           lang={getLocale()}
+          phone={me.data.phone}
         />
       </Screen>
     );

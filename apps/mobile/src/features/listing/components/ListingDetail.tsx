@@ -1,11 +1,20 @@
 // Chi tiết tin (mọi category) — dùng cho cả `listing/[id]` (điều hướng nội bộ) và `tin/[slug]` (Universal Link).
-// Thứ tự khớp web: ảnh (hoặc ô giữ chỗ lớn) → tiêu đề, giá, badge, đăng lúc + lượt xem → banner tin đã bán /
-// đóng / hết hạn → mẹo an toàn → thông tin (attributes) → mô tả → khu vực (gần đúng) → người đăng → tin tương tự;
-// thanh dính đáy: Nhắn tin + Hiện số điện thoại (cần đăng nhập) · chủ tin: Sửa tin + Tin của tôi · tin không còn
-// hiện: không có liên hệ.
+// Style Stitch "Chi tiết tin Pass / phòng trọ / tin rơi đồ" — một bố cục chung, khác nhau theo config tính năng:
+//   1 ảnh tràn mép 4:3 + đếm ảnh + hàng ảnh nhỏ (hoặc ô giữ chỗ lớn khi chưa có ảnh)
+//   2 thẻ tóm tắt: badge (danh mục — nhãn / tone theo config.card.display.categoryBadge, vd "Mất đồ" đỏ; "Đã trả lại";
+//     ngôn ngữ) → tiêu đề → giá lớn màu primary (đơn vị /tháng chữ nhỏ; đồ thất lạc không có giá) → nhãn thông số nổi bật
+//     (config.card.display.facts, vd trọ "20 m² · Có gác") → khu (gần đúng ~300 m) · đăng lúc · lượt xem
+//   3 banner tin đã bán / đóng / hết hạn / đã nhận lại → "Tin có thể khớp" (đồ thất lạc, chủ tin)
+//   4 mẹo an toàn riêng tính năng (config.tipKey; mặc định detail.safety_tip) → thông tin (lưới ô AttributeList)
+//   5 người đăng (OwnerCard) → mô tả (+ nút Dịch) → tin tương tự (thẻ cùng điểm nhấn)
+// Thanh dính đáy (StickyCta elevated): Nhắn tin + Hiện số → Gọi (reveal_contact, cần đăng nhập); nút chính theo
+// config.detail.primaryCta ('call' cho trọ / đồ thất lạc) · chủ tin: Sửa tin + Tin của tôi (+ "Đã nhận lại đồ") · tin không
+// còn hiện: không có liên hệ.
+// Khác Stitch (cố ý): không "Trả giá / Đề xuất giá", Zalo, "Hẹn xem", giá gốc gạch ngang, bảng chi phí / khoảng cách tới
+// từng nhà máy, bản đồ, "đang trực tuyến" — không có tính năng / dữ liệu đó; chỉ hiện thông số người đăng đã nhập.
 // Tuần 10: nút Dịch (tin khác ngôn ngữ đang dùng) đổi tiêu đề + mô tả sang bản dịch tự động / "Xem bản gốc".
-// Tuần 9 (config.detail.lostFound — đồ thất lạc, chủ tin): "Tin có thể khớp" + "Đã nhận lại đồ" (sheet xác nhận →
-// RPC markListingReturned: returned + đóng tin); tin đã nhận lại có nhãn "Đã trả lại".
+// Tuần 9 (config.detail.lostFound — đồ thất lạc, chủ tin): "Tin có thể khớp" + "Đã nhận lại đồ" / "Đã trả cho chủ"
+// (ReturnedSheet — style Stitch L2 → RPC markListingReturned: returned + đóng tin); tin đã nhận lại có nhãn "Đã trả lại".
 import { type AppError, listingDisplayStatus, type PublicListing } from '@hp/core';
 import { useRecordListingView, useSimilarListings } from '@hp/core/react';
 import { formatVnPhone, type ListingCategory } from '@hp/shared';
@@ -16,12 +25,12 @@ import { ScrollView, View } from 'react-native';
 import { track } from '@/core/analytics';
 import { formatRelative } from '@/lib/format';
 import { listingImageUrl } from '@/lib/images';
-import { isReturned, usePriceText, useSiteText } from '@/lib/listing';
+import { isReturned, useCardFacts, usePriceText, useSiteText } from '@/lib/listing';
 import {
   Badge,
   Button,
   Card,
-  ConfirmSheet,
+  Divider,
   EmptyState,
   ErrorState,
   Icon,
@@ -35,12 +44,13 @@ import {
   StickyCta,
   Text,
 } from '@/ui';
-import { useContactListing, useIsOwner, useListingMatches, useListingTranslation, useMarkReturned, useRevealPhone } from '../hooks';
+import { useContactListing, useIsOwner, useListingMatches, useListingTranslation, useRevealPhone } from '../hooks';
 import { backOrHome, openEditListing, openListing, openMyListings } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 import { AttributeList } from './AttributeList';
 import { ListingRail } from './ListingRail';
 import { OwnerCard } from './OwnerCard';
+import { ReturnedSheet, returnedLabelKeys } from './ReturnedSheet';
 
 /** Phần cần của kết quả useListing / useListingBySlug. */
 export type ListingQueryState = {
@@ -66,7 +76,7 @@ export function ListingDetailState({
   if (query.data) return <ListingDetailBody listing={query.data} config={configOf?.(query.data.category)} />;
   if (query.isLoading) {
     return (
-      <ScrollView className="flex-1" contentContainerClassName="pb-6">
+      <ScrollView className="-mx-4 flex-1" contentContainerClassName="px-4 pb-6">
         <SkeletonListingDetail />
       </ScrollView>
     );
@@ -90,13 +100,13 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
   const returned = isReturned(listing);
   const price = usePriceText()(listing);
   const siteText = useSiteText();
+  const facts = useCardFacts()(listing, config?.card.display?.facts);
   const similar = useSimilarListings(listing.id);
   const isOwner = useIsOwner(listing);
   const display = listingDisplayStatus(listing);
   // Đồ thất lạc của mình, còn đang hiện, chưa nhận lại → tin khớp + nút "Đã nhận lại đồ".
   const lostFoundOpen = isOwner && !!config?.detail?.lostFound && !returned && display === 'active';
   const [returnOpen, setReturnOpen] = useState(false);
-  const markReturned = useMarkReturned(listing.id);
   useRecordListingView(listing.id);
   useEffect(() => {
     track('view_listing', { listing_id: listing.id, category: listing.category });
@@ -104,34 +114,79 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
 
   const site = siteText(listing);
   const showLang = listing.lang !== i18n.language && i18n.exists(`common:locale.${listing.lang}`);
+  const categoryBadge = config?.card.display?.categoryBadge?.[listing.category];
   const meta = [
     t('detail.posted_at', { time: formatRelative(listing.created_at) }),
     t('detail.views', { count: listing.view_count }),
   ].join(' · ');
+  const cut = price.lastIndexOf('/');
 
   return (
     <>
-      <ScrollView className="flex-1" contentContainerClassName="gap-5 pb-6" showsVerticalScrollIndicator={false}>
+      {/* ScrollView tràn mép (-mx-4, nội dung px-4): ảnh / tin tương tự `bleed` chạm mép màn mà không bị khung cuộn cắt. */}
+      <ScrollView className="-mx-4 flex-1" contentContainerClassName="gap-5 px-4 pb-6" showsVerticalScrollIndicator={false}>
         {listing.images.length > 0 ? (
-          <ImageGallery uris={listing.images.map((p) => listingImageUrl(p, 'full'))} accessibilityLabel={listing.title} />
+          <ImageGallery
+            bleed
+            uris={listing.images.map((p) => listingImageUrl(p, 'full'))}
+            thumbnails={listing.images.map((p) => listingImageUrl(p, 'thumb'))}
+            accessibilityLabel={listing.title}
+          />
         ) : (
-          <ListingCover listing={listing} size="full" className="aspect-card w-full rounded-md" />
+          <ListingCover listing={listing} size="full" className="-mx-4 aspect-card" />
         )}
 
-        <View className="gap-2">
-          <Text variant="heading" accessibilityRole="header" selectable>
-            {translation.title}
-          </Text>
-          {price ? <Text variant="price">{price}</Text> : null}
+        <Card className="gap-3">
           <View className="flex-row flex-wrap gap-1">
-            <Badge label={t(`common:category.${listing.category}`)} />
+            <Badge
+              label={categoryBadge?.labelKey ? t(categoryBadge.labelKey) : t(`common:category.${listing.category}`)}
+              tone={categoryBadge?.tone}
+            />
             {returned ? <Badge label={t('lost_found.returned_badge')} tone="success" /> : null}
             {showLang ? <Badge label={t(`common:locale.${listing.lang}`)} tone="primary" /> : null}
           </View>
+          <Text variant="heading" accessibilityRole="header" selectable>
+            {translation.title}
+          </Text>
+          {price ? (
+            <Text variant="heading" weight="bold" tone="primary">
+              {cut > 0 ? price.slice(0, cut) : price}
+              {cut > 0 ? (
+                <Text variant="body" weight="semibold" tone="muted">
+                  {price.slice(cut)}
+                </Text>
+              ) : null}
+            </Text>
+          ) : null}
+          {facts.length > 0 ? (
+            <View className="flex-row flex-wrap gap-1.5">
+              {facts.map((f) => (
+                <View key={f} className="rounded-sm bg-primary-light px-2.5 py-1">
+                  <Text variant="caption" weight="semibold" tone="primary">
+                    {f}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+          <Divider />
+          {site ? (
+            <View className="gap-0.5">
+              <View className="flex-row items-start gap-1.5">
+                <Icon icon={MapPin} tone="primary" size={18} />
+                <Text variant="label" className="flex-1">
+                  {site}
+                </Text>
+              </View>
+              <Text variant="caption" tone="muted">
+                {t('detail.approx_location')}
+              </Text>
+            </View>
+          ) : null}
           <Text variant="caption" tone="muted">
             {meta}
           </Text>
-        </View>
+        </Card>
 
         {returned ? (
           <Notice icon={PackageCheck} title={t('lost_found.returned_badge')} text={t('lost_found.returned_done')} />
@@ -141,74 +196,63 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
 
         {lostFoundOpen ? <LostFoundMatches listing={listing} /> : null}
 
-        <Notice tone="warning" text={t('detail.safety_tip')} />
+        <Notice variant="bordered" tone="warning" title={t('tip.title')} text={t(config?.tipKey ?? 'detail.safety_tip')} />
 
         <AttributeList listing={listing} />
 
-        <View className="gap-2">
-          <SectionHeader title={t('detail.description')} />
-          {translation.description ? (
-            <Text selectable>{translation.description}</Text>
-          ) : (
-            <Text tone="muted">{t('detail.no_description')}</Text>
-          )}
-          {translation.available ? (
-            <View className="flex-row flex-wrap items-center gap-2" accessibilityLiveRegion="polite">
-              {translation.translated ? (
-                <Text variant="caption" tone="muted">
-                  {t('translate.translated_note')}
-                </Text>
-              ) : null}
-              <Button
-                size="sm"
-                variant="ghost"
-                icon={Languages}
-                label={
-                  translation.translated
-                    ? t('translate.show_original')
-                    : translation.isPending
-                      ? t('translate.translating')
-                      : t('translate.action')
-                }
-                loading={translation.isPending}
-                onPress={translation.translated ? translation.showOriginal : translation.run}
-              />
-            </View>
-          ) : null}
-        </View>
-
-        {site ? (
-          <View className="gap-2">
-            <SectionHeader title={t('detail.location')} />
-            <View className="flex-row items-start gap-2">
-              <Icon icon={MapPin} tone="muted" />
-              <Text className="flex-1">{site}</Text>
-            </View>
-            <Text variant="caption" tone="muted">
-              {t('detail.approx_location')}
-            </Text>
-          </View>
-        ) : null}
-
         <OwnerCard listing={listing} />
+
+        <View className="gap-2">
+          <SectionHeader title={t('detail.description')} bar="primary" />
+          <Card className="gap-2">
+            {translation.description ? (
+              <Text selectable>{translation.description}</Text>
+            ) : (
+              <Text tone="muted">{t('detail.no_description')}</Text>
+            )}
+            {translation.available ? (
+              <View className="flex-row flex-wrap items-center gap-2" accessibilityLiveRegion="polite">
+                {translation.translated ? (
+                  <Text variant="caption" tone="muted">
+                    {t('translate.translated_note')}
+                  </Text>
+                ) : null}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon={Languages}
+                  label={
+                    translation.translated
+                      ? t('translate.show_original')
+                      : translation.isPending
+                        ? t('translate.translating')
+                        : t('translate.action')
+                  }
+                  loading={translation.isPending}
+                  onPress={translation.translated ? translation.showOriginal : translation.run}
+                />
+              </View>
+            ) : null}
+          </Card>
+        </View>
 
         {similar.isLoading ? (
           <View className="gap-2">
-            <SectionHeader title={t('detail.similar')} />
+            <SectionHeader title={t('detail.similar')} bar="accent" />
             <SkeletonListingCard count={2} horizontal />
           </View>
         ) : similar.data && similar.data.length > 0 ? (
           <View className="gap-2">
-            <SectionHeader title={t('detail.similar')} />
-            <ListingRail items={similar.data} bleed />
+            <SectionHeader title={t('detail.similar')} bar="accent" />
+            <ListingRail items={similar.data} bleed display={config?.card.display} />
           </View>
         ) : null}
       </ScrollView>
 
       {isOwner ? (
-        <StickyCta>
+        <StickyCta elevated>
           {lostFoundOpen ? (
-            <Button label={t('lost_found.mark_returned')} icon={PackageCheck} fullWidth onPress={() => setReturnOpen(true)} />
+            <Button label={t(returnedLabelKeys(listing.category).action)} icon={PackageCheck} fullWidth onPress={() => setReturnOpen(true)} />
           ) : null}
           <View className="flex-row gap-2">
             <View className="flex-1">
@@ -226,20 +270,11 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
           </View>
         </StickyCta>
       ) : display === 'active' ? (
-        <ContactBar listing={listing} />
+        <ContactBar listing={listing} primary={config?.detail?.primaryCta ?? 'chat'} />
       ) : null}
 
       {lostFoundOpen ? (
-        <ConfirmSheet
-          open={returnOpen}
-          onClose={() => setReturnOpen(false)}
-          title={t('lost_found.mark_returned_confirm_title')}
-          body={t('lost_found.mark_returned_confirm_body')}
-          confirmLabel={t('lost_found.mark_returned')}
-          confirmVariant="primary"
-          loading={markReturned.isPending}
-          onConfirm={() => markReturned.markReturned(() => setReturnOpen(false))}
-        />
+        <ReturnedSheet listing={listing} open={returnOpen} onClose={() => setReturnOpen(false)} />
       ) : null}
     </>
   );
@@ -275,42 +310,56 @@ function LostFoundMatches({ listing }: { listing: PublicListing }) {
   );
 }
 
-/** Liên hệ người đăng: Nhắn tin (chat tuần 5) + Hiện số điện thoại → Gọi. Khách bấm → đăng nhập rồi làm tiếp. */
-function ContactBar({ listing }: { listing: PublicListing }) {
+/**
+ * Liên hệ người đăng: Nhắn tin (chat) + Hiện số điện thoại → Gọi (reveal_contact). `primary`: nút nào nền primary
+ * ('call' cho trọ / đồ thất lạc — cần gọi nhanh), nút còn lại viền. Khách bấm → đăng nhập rồi làm tiếp.
+ */
+function ContactBar({ listing, primary }: { listing: PublicListing; primary: 'chat' | 'call' }) {
   const { t } = useTranslation('listing');
   const contact = useContactListing();
   const phone = useRevealPhone(listing);
+  const chat = (
+    <Button
+      label={t('detail.contact')}
+      icon={MessageCircle}
+      variant={primary === 'chat' ? 'primary' : 'outline'}
+      fullWidth
+      loading={contact.isPending}
+      onPress={() => contact.open(listing)}
+    />
+  );
+  const call =
+    phone.revealed && phone.phone ? (
+      <Button
+        label={t('contact.call', { phone: formatVnPhone(phone.phone) })}
+        icon={Phone}
+        variant={primary === 'call' ? 'primary' : 'outline'}
+        fullWidth
+        onPress={() => phone.phone && phone.call(phone.phone)}
+      />
+    ) : (
+      <Button
+        label={t('contact.reveal')}
+        icon={Phone}
+        variant={primary === 'call' ? 'primary' : 'outline'}
+        fullWidth
+        loading={phone.isPending}
+        disabled={phone.revealed}
+        onPress={phone.reveal}
+      />
+    );
   return (
-    <StickyCta>
+    <StickyCta elevated>
       <View className="flex-row gap-2">
-        <View className="flex-1">
-          <Button label={t('detail.contact')} icon={MessageCircle} fullWidth loading={contact.isPending} onPress={() => contact.open(listing)} />
-        </View>
-        <View className="flex-1">
-          {phone.revealed && phone.phone ? (
-            <Button
-              label={t('contact.call', { phone: formatVnPhone(phone.phone) })}
-              icon={Phone}
-              variant="outline"
-              fullWidth
-              onPress={() => phone.phone && phone.call(phone.phone)}
-            />
-          ) : (
-            <Button
-              label={t('contact.reveal')}
-              icon={Phone}
-              variant="outline"
-              fullWidth
-              loading={phone.isPending}
-              disabled={phone.revealed}
-              onPress={phone.reveal}
-            />
-          )}
-        </View>
+        {/* Nút chính đặt bên phải (gần ngón cái), giống Stitch. */}
+        <View className="flex-1">{primary === 'call' ? chat : call}</View>
+        <View className="flex-1">{primary === 'call' ? call : chat}</View>
       </View>
-      <Text variant="caption" tone="muted" accessibilityLiveRegion="polite">
-        {phone.revealed && !phone.phone ? t('contact.no_phone') : t('contact.hint')}
-      </Text>
+      {phone.revealed && !phone.phone ? (
+        <Text variant="caption" tone="muted" accessibilityLiveRegion="polite">
+          {t('contact.no_phone')}
+        </Text>
+      ) : null}
     </StickyCta>
   );
 }

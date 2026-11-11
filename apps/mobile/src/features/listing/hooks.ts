@@ -77,8 +77,10 @@ export function useListingPreset(params: { shortcut?: string; categories?: strin
 }
 
 /**
- * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, bộ lọc đặt sẵn → useListingList (cursor, staleTime 60s).
- * Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event `search` một lần cho mỗi bộ lọc.
+ * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, khoảng cách, chip lọc nhanh theo thông số
+ * (config.quickFilters — bật / tắt; cùng khoá thì chip sau thay chip trước), bộ lọc đặt sẵn → useListingList (cursor,
+ * staleTime 60s). `clearAll` bỏ mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event
+ * `search` một lần cho mỗi bộ lọc.
  */
 export function useListingBrowser(
   config: ListingFeatureConfig,
@@ -95,6 +97,8 @@ export function useListingBrowser(
   /** Khoảng cách tới khu tối đa (mét, dạng chuỗi cho FilterBar); ALL = không lọc. */
   const [distance, setDistance] = useState<string>(ALL);
   const [preset, setPreset] = useState<ListingPreset | null>(asChip ? null : (initial.preset ?? null));
+  /** Chip lọc nhanh đang bật: khoá thông số → giá trị (search_listings p_attributes, ghép với thuộc tính đặt sẵn). */
+  const [attributes, setAttributes] = useState<Readonly<Record<string, string | boolean>>>({});
 
   const filters = useMemo(
     () => ({
@@ -106,12 +110,12 @@ export function useListingBrowser(
           : config.key === 'all'
             ? {}
             : { categories: [...config.categories] }),
-      ...(preset?.attributes ? { attributes: { ...preset.attributes } } : {}),
+      ...(preset?.attributes || Object.keys(attributes).length > 0 ? { attributes: { ...preset?.attributes, ...attributes } } : {}),
       ...(query ? { query } : {}),
       ...(site !== ALL ? { site } : {}),
       ...(distance !== ALL ? { maxDistanceM: Number(distance) } : {}),
     }),
-    [category, config.categories, config.key, preset, query, site, distance],
+    [category, config.categories, config.key, preset, query, site, distance, attributes],
   );
   const list = useListingList(filters);
 
@@ -143,8 +147,27 @@ export function useListingBrowser(
     setDistance,
     preset,
     clearPreset: () => setPreset(null),
-    /** Đang lọc (từ khoá / category / khu / khoảng cách / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
-    isFiltered: !!query || category !== ALL || site !== ALL || distance !== ALL || !!preset,
+    attributes,
+    /** Bật / tắt một chip lọc nhanh (cùng khoá: thay giá trị). */
+    toggleAttribute: (key: string, value: string | boolean) =>
+      setAttributes((prev) => {
+        const next = { ...prev };
+        if (prev[key] === value) delete next[key];
+        else next[key] = value;
+        return next;
+      }),
+    /** Bỏ mọi bộ lọc + từ khoá (chip "Xoá lọc"). */
+    clearAll: () => {
+      setInput('');
+      setQuery('');
+      setCategory(ALL);
+      setSite(ALL);
+      setDistance(ALL);
+      setPreset(null);
+      setAttributes({});
+    },
+    /** Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / đặt sẵn) → rỗng là "không tìm thấy", không phải "chưa có tin". */
+    isFiltered: !!query || category !== ALL || site !== ALL || distance !== ALL || !!preset || Object.keys(attributes).length > 0,
   };
 }
 

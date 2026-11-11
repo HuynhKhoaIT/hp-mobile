@@ -1,4 +1,5 @@
-// Danh sách mọi tin (Hub → "Xem tất cả"): không phải một tính năng, dùng chung engine như 4 tính năng Listing.
+// Danh sách mọi tin (Hub → "Xem tất cả", tab Khám phá, Tìm kiếm): không phải một tính năng, dùng chung engine như 4 tính
+// năng Listing. Thẻ / chi tiết của từng tin lấy điểm nhấn theo config tính năng của tin (route truyền `configOf`).
 import { LISTING_CATEGORIES } from '@hp/shared';
 import type { ListingFeatureConfig } from './types';
 
@@ -8,7 +9,8 @@ export const allListingsConfig: ListingFeatureConfig = {
   categories: LISTING_CATEGORIES,
   color: null,
   titleKey: 'listing:list.title_all',
+  subtitleKey: 'listing:list.subtitle_all',
   searchPlaceholderKey: 'common:nav.search_placeholder',
-  card: { variant: 'row', estimatedHeight: 140 },
+  card: { variant: 'row', estimatedHeight: 150 },
   filters: ['subcategory', 'site'],
 };

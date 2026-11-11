@@ -8,10 +8,21 @@
 // `status` trả về là kết quả thật sau kiểm duyệt của DB: active / pending_review / rejected / draft.
 // Bản đang soạn tự lưu cục bộ (useDraft, app-only `offlineDrafts`) cho tin mới.
 // `config.form.minPhotos` (trọ ≥ 3): Đăng / Lưu thay đổi khi thiếu ảnh → về bước Ảnh + báo lỗi; Lưu nháp vẫn được.
+// `config.form.primaryAttributes` đưa một số thông số lên bước 2 (kiểm khi bấm Tiếp tục, lỗi nhảy về bước 2);
+// `hiddenAttributes` không hiện (giá trị cũ vẫn giữ khi sửa). `primaryFields` / `detailFields` chia sẵn cho giao diện.
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type AppError, type MyListing, removeListingImages, type SavedListingResult } from '@hp/core';
 import { useCreateListing, useSupabase, useUpdateListing, useUploadListingImage } from '@hp/core/react';
-import { ATTRIBUTE_FIELDS, CreateListingInput, type ListingCategory, type Locale, MAX_LISTING_IMAGES } from '@hp/shared';
+import {
+  ATTRIBUTE_FIELDS,
+  CreateListingInput,
+  type ListingCategory,
+  type ListingFormStep,
+  listingFormStepOf,
+  type Locale,
+  MAX_LISTING_IMAGES,
+  splitAttributeFields,
+} from '@hp/shared';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useRef, useState } from 'react';
 import { type FieldPath, type FieldPathValue, useForm, useFormState, useWatch } from 'react-hook-form';
@@ -42,17 +53,13 @@ export type FormPhoto = {
 export type ListingFormMode = { kind: 'new'; category: ListingCategory } | { kind: 'edit'; listing: MyListing };
 export type SubmitTarget = 'publish' | 'draft';
 export type FormPhase = 'editing' | 'saving' | 'uploading' | 'upload_error' | 'done';
-export type FormStep = 1 | 2 | 3;
+export type FormStep = ListingFormStep;
 export const FORM_STEPS = 3;
 
 /** Bản đang soạn lưu cục bộ (khoá theo category). */
 type DraftSnapshot = { values: ListingFormValues; photos: FormPhoto[]; listingId: string | null };
 
 const DEFAULT_FORM: ListingFormConfig = { photos: 'optional', price: true, defaultPriceType: 'fixed' };
-
-/** Trường thuộc bước nào — lỗi từ server / Zod nhảy về đúng bước. */
-const STEP_OF: Record<string, FormStep> = { images: 1, title: 2, description: 2, price: 2, price_type: 2 };
-const stepOf = (path: string): FormStep => STEP_OF[path.split('.')[0] ?? ''] ?? 3;
 
 let photoSeq = 0;
 const newKey = () => `p${Date.now()}-${photoSeq++}`;
@@ -128,6 +135,9 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
   const upload = useUploadListingImage();
   const formConfig = config.form ?? DEFAULT_FORM;
   const category = mode.kind === 'new' ? mode.category : mode.listing.category;
+  // Chia bước dùng chung web (@hp/shared): thông số `primary` ở bước 2, trường ẩn bỏ khỏi form.
+  const { primary: primaryFields, details: detailFields } = splitAttributeFields(category, formConfig);
+  const primaryKeys = new Set(primaryFields.map((f) => f.key));
 
   const draft = useDraft<DraftSnapshot>(mode.kind === 'new' ? `listing-new:${category}` : null);
   const restoredDraft = draft.initial && draft.initial.values.category === category ? draft.initial : null;
@@ -274,7 +284,7 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
     for (const [path, codes] of fields) {
       form.setError(path as ListingFormField, { type: 'server', message: codes[0] ?? 'invalid_input' });
     }
-    if (fields[0]) setStep(stepOf(fields[0][0]));
+    if (fields[0]) setStep(listingFormStepOf(fields[0][0], primaryKeys));
     toast.show(errorText(error.code), 'danger');
   };
 
@@ -329,8 +339,11 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
     void form.handleSubmit(
       (out) => persist(out, target),
       (errors) => {
-        const first = Object.keys(errors)[0];
-        if (first) setStep(stepOf(first));
+        const first = Object.entries(errors)
+          .flatMap(([k, v]) => (k === 'attributes' && v && typeof v === 'object' ? Object.keys(v).map((a) => `attributes.${a}`) : [k]))
+          .map((path) => listingFormStepOf(path, primaryKeys))
+          .sort()[0];
+        if (first) setStep(first);
       },
     )();
   };
@@ -347,7 +360,13 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
   const next = async () => {
     if (step === 1) return setStep(2);
     if (step === 2) {
-      const ok = await form.trigger(['title', 'price', 'price_type', 'description']);
+      const ok = await form.trigger([
+        'title',
+        'price',
+        'price_type',
+        'description',
+        ...primaryFields.map((f): ListingFormField => `attributes.${f.key}`),
+      ]);
       if (ok) setStep(3);
     }
   };
@@ -375,6 +394,8 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
     form,
     category,
     formConfig,
+    primaryFields,
+    detailFields,
     step,
     setStep,
     next: () => void next(),
