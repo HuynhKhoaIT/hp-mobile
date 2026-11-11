@@ -1,8 +1,11 @@
-// Nội dung màn hội thoại: header + thẻ tin ngữ cảnh → danh sách tin đảo ngược (mới nhất ở đáy, cuộn lên tải tin cũ)
-// → ô nhập + nút ảnh. Realtime (tin mới, đang gõ) qua @hp/core; mở màn / có tin mới → đánh dấu đã đọc.
-// Lần đầu chat trên máy → hướng dẫn giao dịch an toàn. Tuỳ chọn: tắt thông báo, báo cáo, chặn / bỏ chặn.
+// Nội dung màn hội thoại (style Stitch "Khung Chat trực tiếp"): header xanh + thẻ tin / nhóm ngữ cảnh → danh sách tin
+// đảo ngược (mới nhất ở đáy, cuộn lên tải tin cũ; phân cách theo ngày bằng viên thuốc "Hôm nay / Hôm qua / ngày") → ô nhập
+// + nút ảnh + nút gửi cam. Tin người kia có avatar cạnh tin cuối chuỗi (cả chat 1-1). Realtime (tin mới, đang gõ) qua
+// @hp/core; mở màn / có tin mới → đánh dấu đã đọc. Lần đầu chat trên máy → hướng dẫn giao dịch an toàn.
+// Tuỳ chọn: tắt thông báo, báo cáo, chặn / bỏ chặn.
 // Chat nhóm (kind 'group'): tin của người khác kèm tên + avatar người gửi (useConversationMembers); tuỳ chọn chỉ còn tắt
-// thông báo + báo cáo nhóm (chặn / hiện SĐT chỉ có ở chat 1-1); rỗng → "Chào cả nhóm đi!".
+// thông báo + báo cáo nhóm (chặn chỉ có ở chat 1-1); rỗng → "Chào cả nhóm đi!".
+// Không có tin hệ thống / chia sẻ vị trí / trả lời nhanh / ghi âm của Stitch: chat không có các loại tin đó.
 import type { ChatMessage } from '@hp/core';
 import {
   useChatImageUrls,
@@ -131,10 +134,14 @@ export function ChatThread({ conversationId }: { conversationId: string }) {
     const firstOfRun =
       newDay || !older || older.sender_id !== item.sender_id || Date.parse(item.created_at) - Date.parse(older.created_at) > GROUP_MS;
     const member = isGroup && !mine && item.sender_id ? memberById.get(item.sender_id) : undefined;
-    const author =
-      isGroup && !mine
+    // Nhóm: tên + avatar người gửi; 1-1: chỉ avatar người kia (tên đã ở header).
+    const author = mine
+      ? undefined
+      : isGroup
         ? { name: member?.display_name || t('inbox.deleted_user'), avatarUri: profileAvatarUrl(member?.avatar_url) }
-        : undefined;
+        : c
+          ? { name: c.other_name || t('inbox.deleted_user'), avatarUri: profileAvatarUrl(c.other_avatar_url) }
+          : undefined;
     const status = mine ? messageStatus(item, { latestMine: item.id === latestMineId, otherReadAt: c?.other_last_read_at ?? null }) : undefined;
     const imageUri = item.localImageUri ?? (item.image_path ? images.data?.[item.image_path] : null);
 
@@ -142,7 +149,7 @@ export function ChatThread({ conversationId }: { conversationId: string }) {
       <View className={lastOfRun ? 'pb-3' : 'pb-1'}>
         {newDay ? (
           <View className="items-center py-3">
-            <Text variant="caption" tone="muted" className="rounded-full bg-surface-2 px-3 py-1">
+            <Text variant="caption" tone="muted" weight="medium" className="overflow-hidden rounded-full border border-border bg-surface-2 px-3 py-1">
               {dayLabel(item.created_at)}
             </Text>
           </View>
@@ -156,7 +163,7 @@ export function ChatThread({ conversationId }: { conversationId: string }) {
           status={status}
           showMeta={lastOfRun || status === 'failed'}
           author={author}
-          showAuthor={firstOfRun}
+          showAuthor={isGroup && firstOfRun}
           showAvatar={lastOfRun}
           onRetry={() => {
             if (!sender.retry(item)) discard(conversationId, item.id);

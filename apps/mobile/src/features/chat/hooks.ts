@@ -1,8 +1,11 @@
 // Hook chat riêng mobile (ghép @hp/core với điều hướng, chọn ảnh, MMKV). Dữ liệu + optimistic ở @hp/core/react.
-import type { ChatMessage, ConversationSummary } from '@hp/core';
+// Hộp thư: dịch vụ của hội thoại (conversationFeature) và lọc tại chỗ (useInboxFilter) ở @hp/core — dùng chung web;
+// chữ giá tin ngữ cảnh (useConversationPrice) dịch + định dạng ở đây.
+import { type ChatMessage, type ConversationSummary, conversationPriceSource } from '@hp/core';
 import { useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
 import { type ChatContentError, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
 import { router } from 'expo-router';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -12,6 +15,7 @@ import { kv, storage } from '@/core/storage';
 import { pickImages, prepareListingImage } from '@/core/upload';
 import { useErrorText } from '@/lib/errors';
 import { formatDate } from '@/lib/format';
+import { usePriceText } from '@/lib/listing';
 import { toast, type MessageStatus } from '@/ui';
 
 /** Hướng dẫn giao dịch an toàn: hiện một lần trước cuộc trò chuyện đầu tiên (CLAUDE.md mục 10), nhớ trên máy. */
@@ -150,3 +154,18 @@ export function usePreviewText() {
 
 /** Hội thoại nhóm (ghép xe / ghép trận) — không có "người kia", không chặn / hiện SĐT; ngữ cảnh là nhóm. */
 export const isGroupConversation = (c: Pick<ConversationSummary, 'kind'>) => c.kind === 'group';
+
+export { conversationFeature } from '@hp/core';
+export { type InboxFilter, useInboxFilter } from '@hp/core/react';
+
+/** Chữ giá của tin ngữ cảnh ("1.500.000 ₫", "Thoả thuận"…); việc làm / hội thoại nhóm / không giá → null. */
+export function useConversationPrice() {
+  const price = usePriceText();
+  return useCallback(
+    (c: Pick<ConversationSummary, 'listing_category' | 'listing_price' | 'listing_price_type'>) => {
+      const source = conversationPriceSource(c);
+      return source ? price(source) || null : null;
+    },
+    [price],
+  );
+}
