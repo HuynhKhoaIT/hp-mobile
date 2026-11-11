@@ -1,4 +1,4 @@
--- Tin đăng mẫu: 50 tin / category (500 tin). Chạy sau seed.sql ([db.seed] sql_paths).
+-- Tin đăng mẫu: 50 tin / category (800 tin). Chạy sau seed.sql ([db.seed] sql_paths).
 -- Chủ tin: user seed 01 / 04 / 05; vài tin của 03 (bị cấm → phải ẩn khỏi public_listings).
 -- Ảnh: bộ ảnh CC0 dùng chung `demo/<category>/<NN>.webp` trong bucket listing-images (nguồn: supabase/demo/listing-images,
 -- local tự nạp qua [storage.buckets.listing-images] trong config.toml); tin trọ thêm 2 ảnh chung `demo/room/extra-*`.
@@ -78,6 +78,31 @@ begin
         'Nhặt được ví ở bãi xe số 3', 'Nhặt được chìa khoá xe máy ở nhà ăn', 'Nhặt được thẻ ATM ở cây xăng Bình Đông', 'Nhặt được điện thoại Samsung trên xe đưa đón',
         'Nhặt được balo xanh ở trạm chờ xe', 'Nhặt được mũ bảo hiểm ở cổng phụ', 'Nhặt được kính cận ở phòng họp', 'Nhặt được túi đồ nghề ở xưởng',
         'Found a set of keys at the canteen', '捡到手机 在班车上']
+      -- Danh mục Pass đồ mở rộng (migration 20261112090000) — cuối enum nên dữ liệu ngẫu nhiên của danh mục cũ không đổi.
+      when 'pass_appliance' then array[
+        'Thanh lý tủ lạnh Sanyo 150 lít còn lạnh sâu', 'Bán máy giặt LG 8kg cửa trên', 'Pass quạt đứng Senko 3 tốc độ',
+        'Bán điều hoà Daikin 1HP inverter', 'Pass bình nóng lạnh Ariston 30L', 'Thanh lý tivi Samsung 43 inch',
+        'Bán tủ lạnh mini 50L cho phòng trọ', 'Pass máy giặt Electrolux 9kg cửa ngang', 'Used fridge 120L, works well', '出售二手洗衣机 7公斤']
+      when 'pass_fashion' then array[
+        'Pass áo khoác gió nam size L', 'Bán giày thể thao Biti''s size 41', 'Thanh lý túi xách nữ còn mới', 'Pass đồng hồ Casio chính hãng',
+        'Bán quần jean nam size 30', 'Pass váy công sở size M', 'Bán balo laptop chống nước', 'Thanh lý dép quai hậu size 40',
+        'Men''s jacket size XL, like new', '出售女士手提包 九成新']
+      when 'pass_sport' then array[
+        'Pass giày đá bóng Mizuno size 41', 'Bán vợt cầu lông Yonex còn căng', 'Pass vợt pickleball Joola', 'Bán bộ tạ tay 10kg tập tại phòng',
+        'Thanh lý xe đạp tập thể dục', 'Pass bóng đá Động Lực số 5', 'Bán giày cầu lông Lining size 40', 'Pass thảm tập yoga dày 8mm',
+        'Badminton racket, barely used', '出售足球鞋 41码']
+      when 'pass_tools' then array[
+        'Pass máy khoan Bosch GSB 550', 'Bán bộ cờ lê 12 chi tiết', 'Thanh lý máy mài cầm tay Makita', 'Pass bộ đồ nghề sửa xe máy',
+        'Bán đồng hồ đo điện vạn năng', 'Pass máy hàn điện tử mini', 'Bán thang nhôm rút 3m8', 'Thanh lý máy bơm hơi mini',
+        'Cordless drill set for sale', '出售电钻 工具箱']
+      when 'pass_baby' then array[
+        'Pass xe đẩy em bé gấp gọn', 'Bán quần áo sơ sinh 0–6 tháng', 'Thanh lý đồ chơi xếp hình cho bé', 'Pass máy hâm sữa Fatz',
+        'Bán cũi gỗ cho bé kèm nệm', 'Pass ghế ăn dặm cho bé', 'Bán địu em bé còn mới', 'Thanh lý bình sữa Pigeon',
+        'Baby stroller, foldable, clean', '出售婴儿推车 可折叠']
+      when 'pass_other' then array[
+        'Pass sách học tiếng Trung HSK 1–3', 'Bán đàn guitar acoustic cho người mới', 'Thanh lý chậu cây cảnh mini', 'Pass bộ ấm chén uống trà',
+        'Bán vali kéo size 24', 'Thanh lý sách truyện cũ', 'Bán bộ cần câu cá', 'Pass gương treo tường',
+        'Used books, 10 for 50k', '出售二手吉他']
     end;
 
     for i in 1..50 loop
@@ -91,6 +116,13 @@ begin
                        else array['demo/' || v_cat || '/' || v_idx || '.webp'] end;
       if v_cat in ('room_rent', 'room_share') then
         v_images := v_images || array['demo/room/extra-' || (1 + i % 4) || '.webp', 'demo/room/extra-' || (1 + (i + 1) % 4) || '.webp'];
+      end if;
+      -- Danh mục mới chưa có bộ ảnh riêng: điện lạnh dùng lại ảnh CC0 tủ lạnh / máy giặt / quạt; còn lại để trống (thẻ hiện ảnh chờ).
+      if v_cat in ('pass_appliance', 'pass_fashion', 'pass_sport', 'pass_tools', 'pass_baby', 'pass_other') then
+        v_images := case when v_cat = 'pass_appliance' and v_idx = '01' then array['demo/pass_home/01.webp']
+                         when v_cat = 'pass_appliance' and v_idx = '02' then array['demo/pass_home/05.webp']
+                         when v_cat = 'pass_appliance' and v_idx = '03' then array['demo/pass_electronics/05.webp']
+                         else '{}' end;
       end if;
       v_site := v_sites[1 + (i % array_length(v_sites, 1))];
       select location into v_site_loc from public.sites where code = v_site;
@@ -129,6 +161,41 @@ begin
         when v_cat = 'pass_home' then
           v_price := (100 + floor(random() * 50) * 50) * 1000;
           v_attrs := jsonb_build_object('condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
+        when v_cat = 'pass_appliance' then
+          v_price := (500 + floor(random() * 100) * 50) * 1000;
+          v_attrs := jsonb_build_object(
+            'appliance_type', (array['fridge', 'washer', 'fan', 'air_conditioner', 'water_heater', 'tv', 'fridge', 'washer', 'fridge', 'washer'])[1 + (i - 1) % 10],
+            'brand', (array['Sanyo', 'LG', 'Senko', 'Daikin', 'Ariston', 'Samsung', 'Aqua', 'Electrolux', 'Toshiba', 'Panasonic'])[1 + (i - 1) % 10],
+            'capacity', (array['150L', '8kg', '3 tốc độ', '1HP', '30L', '43 inch', '50L', '9kg', '120L', '7kg'])[1 + (i - 1) % 10],
+            'condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int],
+            'warranty_months', (array[0, 0, 3, 6])[1 + floor(random() * 4)::int]);
+        when v_cat = 'pass_fashion' then
+          v_price := (30 + floor(random() * 40) * 10) * 1000;
+          v_attrs := jsonb_build_object(
+            'fashion_type', (array['clothes', 'shoes', 'bag', 'watch', 'clothes', 'clothes', 'bag', 'shoes', 'clothes', 'bag'])[1 + (i - 1) % 10],
+            'size', (array['L', '41', 'Free size', 'Free size', '30', 'M', 'Free size', '40', 'XL', 'Free size'])[1 + (i - 1) % 10],
+            'condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
+        when v_cat = 'pass_sport' then
+          v_price := (50 + floor(random() * 60) * 10) * 1000;
+          v_attrs := jsonb_build_object(
+            'sport_type', (array['football', 'badminton', 'pickleball', 'gym', 'cycling', 'football', 'badminton', 'gym', 'badminton', 'football'])[1 + (i - 1) % 10],
+            'brand', (array['Mizuno', 'Yonex', 'Joola', 'Brosman', 'Elip', 'Động Lực', 'Lining', 'Adidas', 'Yonex', 'Nike'])[1 + (i - 1) % 10],
+            'condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
+        when v_cat = 'pass_tools' then
+          v_price := (80 + floor(random() * 80) * 10) * 1000;
+          v_attrs := jsonb_build_object(
+            'tool_type', (array['power_tool', 'hand_tool', 'power_tool', 'vehicle_repair', 'electrical', 'power_tool', 'construction', 'vehicle_repair', 'power_tool', 'power_tool'])[1 + (i - 1) % 10],
+            'brand', (array['Bosch', 'Stanley', 'Makita', 'Kingtony', 'Kyoritsu', 'Hồng Ký', 'Nikawa', 'Xiaomi', 'Dewalt', 'Total'])[1 + (i - 1) % 10],
+            'condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
+        when v_cat = 'pass_baby' then
+          v_price := (50 + floor(random() * 90) * 10) * 1000;
+          v_attrs := jsonb_build_object(
+            'baby_type', (array['stroller', 'clothes', 'toys', 'feeding', 'bed', 'feeding', 'other', 'feeding', 'stroller', 'stroller'])[1 + (i - 1) % 10],
+            'age_range', (array['0–3 tuổi', '0–6 tháng', '1–3 tuổi', '0–12 tháng', '0–3 tuổi', '6 tháng–3 tuổi', '0–2 tuổi', '0–12 tháng', '0–3 tuổi', '0–3 tuổi'])[1 + (i - 1) % 10],
+            'condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
+        when v_cat = 'pass_other' then
+          v_price := (20 + floor(random() * 50) * 10) * 1000;
+          v_attrs := jsonb_build_object('condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
         when v_cat in ('room_rent', 'room_share') then
           v_price := (800 + floor(random() * 25) * 100) * 1000;
           v_attrs := jsonb_build_object('area_m2', 12 + floor(random() * 30)::int,
@@ -157,6 +224,11 @@ begin
                                         'identifying_marks', 'Liên hệ để mô tả thêm',
                                         'returned', false);
       end case;
+      -- Vài tin cho tặng ở danh mục Pass đồ mới (bộ lọc / dải "Cho tặng" của trang chủ Pass đồ).
+      if v_cat in ('pass_appliance', 'pass_fashion', 'pass_sport', 'pass_tools', 'pass_baby', 'pass_other') and i % 13 = 0 then
+        v_price := null;
+        v_price_type := 'free';
+      end if;
 
       insert into public.listings (owner_id, category, status, title, description, price, price_type, attributes,
                                    site, location, address_text, images, lang, view_count, created_at, updated_at, expires_at)
