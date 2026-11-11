@@ -25,7 +25,13 @@
     "job_main": "全职工作",
     "job_parttime": "下班兼职",
     "lost": "我丢了东西",
-    "found": "我捡到东西"
+    "found": "我捡到东西",
+    "pass_appliance": "家电",
+    "pass_fashion": "服饰与个人用品",
+    "pass_sport": "运动用品",
+    "pass_tools": "工具设备",
+    "pass_baby": "母婴用品",
+    "pass_other": "其他物品"
   },
   "feature": {
     "pass": "二手交易",

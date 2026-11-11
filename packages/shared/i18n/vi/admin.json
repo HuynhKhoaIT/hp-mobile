@@ -864,7 +864,9 @@
       "all": "Tất cả",
       "app_home": "Trang chủ app",
       "web_home": "Trang chủ web",
-      "web_listing": "Danh sách web"
+      "web_listing": "Danh sách web",
+      "app_pass": "Trang chủ Pass đồ (app)",
+      "web_pass": "Trang chủ Pass đồ (web)"
     },
     "all_locales": "Mọi ngôn ngữ",
     "state": {

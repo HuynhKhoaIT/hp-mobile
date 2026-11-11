@@ -25,7 +25,13 @@
     "job_main": "Full-time jobs",
     "job_parttime": "Side jobs after shift",
     "lost": "I lost something",
-    "found": "I found something"
+    "found": "I found something",
+    "pass_appliance": "Appliances",
+    "pass_fashion": "Fashion & personal items",
+    "pass_sport": "Sports gear",
+    "pass_tools": "Tools & equipment",
+    "pass_baby": "Mom & baby",
+    "pass_other": "Other items"
   },
   "feature": {
     "pass": "Buy & sell",

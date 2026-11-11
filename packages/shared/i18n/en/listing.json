@@ -37,7 +37,8 @@
       "lost_found_text": "Found or lost something?",
       "found_cta": "Report a found item",
       "lost_cta": "Post a lost item"
-    }
+    },
+    "quick_free": "Free"
   },
   "card": {
     "no_image": "No photo",
@@ -108,7 +109,17 @@
     "lost_at": "When",
     "place": "Where",
     "identifying_marks": "Identifying marks",
-    "returned": "Returned"
+    "returned": "Returned",
+    "device_type": "Device type",
+    "storage": "Storage",
+    "home_type": "Item type",
+    "appliance_type": "Appliance type",
+    "capacity": "Capacity",
+    "fashion_type": "Item type",
+    "sport_type": "Sport",
+    "tool_type": "Tool type",
+    "baby_type": "Item type",
+    "age_range": "Age range"
   },
   "attr_value": {
     "condition": {
@@ -146,6 +157,63 @@
     "bool": {
       "yes": "Yes",
       "no": "No"
+    },
+    "device_type": {
+      "phone": "Phone",
+      "laptop": "Laptop",
+      "tablet": "Tablet",
+      "audio": "Audio",
+      "screen": "Monitor",
+      "other": "Other"
+    },
+    "home_type": {
+      "furniture": "Furniture",
+      "bedding": "Bedding",
+      "kitchen": "Kitchenware",
+      "shelf": "Shelves & cabinets",
+      "decor": "Decor",
+      "other": "Other"
+    },
+    "appliance_type": {
+      "fridge": "Fridge",
+      "washer": "Washing machine",
+      "air_conditioner": "Air conditioner",
+      "fan": "Fan",
+      "water_heater": "Water heater",
+      "tv": "TV",
+      "other": "Other"
+    },
+    "fashion_type": {
+      "clothes": "Clothes",
+      "shoes": "Shoes",
+      "bag": "Bags",
+      "watch": "Watches",
+      "accessory": "Accessories",
+      "other": "Other"
+    },
+    "sport_type": {
+      "football": "Football",
+      "badminton": "Badminton",
+      "pickleball": "Pickleball",
+      "gym": "Gym",
+      "cycling": "Cycling",
+      "other": "Other"
+    },
+    "tool_type": {
+      "power_tool": "Power tools",
+      "hand_tool": "Hand tools",
+      "vehicle_repair": "Vehicle repair",
+      "electrical": "Electrical",
+      "construction": "Construction",
+      "other": "Other"
+    },
+    "baby_type": {
+      "stroller": "Strollers",
+      "clothes": "Clothes",
+      "toys": "Toys",
+      "feeding": "Feeding",
+      "bed": "Cribs",
+      "other": "Other"
     }
   },
   "unit": {
@@ -241,13 +309,19 @@
       "pass_electronics": "Phones, laptops, headphones…",
       "pass_vehicle": "Motorbikes, bicycles, e-bikes…",
       "pass_ppe": "Boots, helmets, hi-vis vests…",
-      "pass_home": "Fans, rice cookers, mattresses…",
+      "pass_home": "Tables, chairs, mattresses, pots, shelves…",
       "room_rent": "Rooms, whole houses",
       "room_share": "Find a roommate",
       "job_main": "Full-time work",
       "job_parttime": "Extra work after your shift",
       "lost": "Ask the community to help find it",
-      "found": "Help it get back to its owner"
+      "found": "Help it get back to its owner",
+      "pass_appliance": "Fridges, washers, air conditioners, fans…",
+      "pass_fashion": "Clothes, shoes, bags, watches…",
+      "pass_sport": "Football boots, rackets, gym gear…",
+      "pass_tools": "Drills, motorbike repair kits, electrical tools…",
+      "pass_baby": "Strollers, newborn clothes, toys…",
+      "pass_other": "Books, instruments, plants…"
     },
     "photos_tip": {
       "pass": "Clear photos from every side help it sell faster.",
@@ -421,5 +495,47 @@
     "job": "Hiring",
     "lost": "Still looking",
     "found": "Waiting for owner"
+  },
+  "category_short": {
+    "pass_electronics": "Electronics",
+    "pass_vehicle": "Vehicles",
+    "pass_appliance": "Appliances",
+    "pass_home": "Home",
+    "pass_fashion": "Fashion",
+    "pass_sport": "Sports",
+    "pass_tools": "Tools",
+    "pass_baby": "Baby",
+    "pass_ppe": "Safety gear",
+    "pass_other": "Other",
+    "room_rent": "Rooms",
+    "room_share": "Roommates",
+    "job_main": "Full-time",
+    "job_parttime": "Part-time",
+    "lost": "Lost",
+    "found": "Found"
+  },
+  "sort": {
+    "label": "Sort",
+    "newest": "Newest",
+    "price_asc": "Price: low to high",
+    "price_desc": "Price: high to low"
+  },
+  "price_range": {
+    "label": "Price",
+    "any": "Any price",
+    "under_500k": "Under 500k",
+    "500k_2m": "500k – 2M",
+    "2m_5m": "2M – 5M",
+    "over_5m": "Over 5M"
+  },
+  "feature_home": {
+    "categories_title": "Categories",
+    "category_a11y": "Browse {{category}}",
+    "near_title": "Near {{site}}",
+    "near_title_any": "New around the sites",
+    "free_title": "Free giveaways",
+    "free_subtitle": "Items given away by neighbours — just pick them up",
+    "rail_category": "New in {{category}}",
+    "latest_title": "All {{feature}} listings"
   }
 }
