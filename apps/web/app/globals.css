@@ -7,6 +7,9 @@
 /* Dark mode theo class `dark` trên <html> (next-themes). */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Khu quản trị (app/[locale]/admin/layout.tsx gắn data-area="admin"): chỉ transition 150ms, không hiệu ứng lặp. */
+@custom-variant admin (&:where([data-area="admin"] *));
+
 /*
  * Tên ngữ nghĩa của shadcn/ui trỏ về token @hp/tokens — không thêm màu mới.
  * Lưu ý va chạm tên: `muted` và `accent` của token là màu CHỮ xám / màu cam nút Đăng, còn shadcn dùng

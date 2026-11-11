@@ -4,7 +4,9 @@
 // số hội thoại chưa đọc), Tôi. Icon luôn kèm chữ. Chừa vùng an toàn dưới (iPhone có thanh Home).
 // Style Stitch: nền surface/95 + mờ nền, viền trên hairline + shadow-bar, cao 64. Tab đang mở: primary, nét icon đậm hơn.
 // Nút Đăng: tròn 52 nền cam (accent) nổi lên trên thanh (-mt-6) + shadow-fab, icon Plus trắng on-accent;
-// vùng chạm là cả ô tab (≥ 64).
+// vùng chạm là cả ô tab (≥ 64). Nút Đăng "thở" chậm khi chưa ở trang đăng (::before nằm sau nút: lớp accent + shadow-fab
+// sáng dần + phóng ≤ 1.04, animate-fab-glow 2,8s/chu kỳ từ motion.ambient.glow của @hp/tokens — giống app TabBar);
+// giảm chuyển động → tắt hẳn.
 import { useUnreadConversationCount } from '@hp/core/react';
 import { Compass, Home, MessageCircle, Plus, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -51,8 +53,11 @@ export function BottomNav() {
                 {isPost ? (
                   <span
                     className={cn(
-                      '-mt-6 flex size-13 items-center justify-center rounded-full bg-accent text-on-accent shadow-fab ring-4 ring-surface transition-transform duration-150',
+                      'relative -mt-6 flex size-13 items-center justify-center rounded-full bg-accent text-on-accent shadow-fab ring-4 ring-surface transition-transform duration-150',
                       'group-active:scale-95 motion-reduce:transition-none motion-reduce:group-active:scale-100',
+                      // Quầng thở: thêm một lớp bóng cam phía sau nút; không nhận chạm.
+                      !active &&
+                        'before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-full before:bg-accent before:opacity-0 before:shadow-fab motion-safe:before:animate-fab-glow',
                     )}
                   >
                     <Icon strokeWidth={2.5} className="size-7" aria-hidden />

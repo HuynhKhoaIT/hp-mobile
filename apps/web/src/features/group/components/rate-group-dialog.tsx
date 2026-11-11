@@ -1,24 +1,21 @@
 'use client';
 
 // Đánh giá chủ nhóm sau buổi đi / buổi chơi (ns group.rate, giống app): 1–5 sao + nhận xét (không bắt buộc, ≤ 500 ký tự).
-// Sao là radiogroup đúng chuẩn ARIA: một điểm dừng Tab (roving tabindex), ← / → / ↑ / ↓ đổi số sao, Home / End về 1 / 5;
-// mỗi sao có nhãn "N sao – Tốt" và dòng chữ dưới hàng sao nói mức đang chọn (không chỉ dựa vào màu).
+// Sao: StarRatingInput (components/shared — radiogroup ARIA, phím mũi tên / Home / End); mỗi sao có nhãn "N sao – Tốt" và
+// dòng chữ dưới hàng sao nói mức đang chọn (không chỉ dựa vào màu).
 // Gửi bằng useRateGroup (@hp/core/react, optimistic: "Bạn đã chấm N/5" hiện ngay; lỗi → trả lại + báo trong dialog).
 // Chỉ là UI: RPC rate_group mới quyết định (thành viên đã được nhận, nhóm đã diễn ra, chưa chấm — group_not_finished,
 // already_rated, forbidden).
 import { useRateGroup } from '@hp/core/react';
 import { GROUP_RULES } from '@hp/shared';
-import { Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type KeyboardEvent, useId, useRef, useState } from 'react';
+import { useId, useState } from 'react';
+import { StarRatingInput } from '@/components/shared/star-rating-input';
 import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useErrorText } from '@/features/auth/components/use-error-text';
-import { cn } from '@/lib/utils';
-
-const SCORES = [1, 2, 3, 4, 5] as const;
 
 export function RateGroupDialog({
   open,
@@ -45,29 +42,10 @@ export function RateGroupDialog({
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const stars = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const pick = (n: number, focus = false) => {
+  const pick = (n: number) => {
     setScore(n);
     setError(null);
-    if (focus) stars.current[n - 1]?.focus();
-  };
-
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const current = score || 1;
-    const next =
-      e.key === 'ArrowRight' || e.key === 'ArrowUp'
-        ? Math.min(5, current + (score ? 1 : 0))
-        : e.key === 'ArrowLeft' || e.key === 'ArrowDown'
-          ? Math.max(1, current - 1)
-          : e.key === 'Home'
-            ? 1
-            : e.key === 'End'
-              ? 5
-              : null;
-    if (next === null) return;
-    e.preventDefault();
-    pick(next, true);
   };
 
   const submit = () => {
@@ -107,34 +85,13 @@ export function RateGroupDialog({
             <span id={labelId} className="sr-only">
               {t('group.rate.title')}
             </span>
-            <div role="radiogroup" aria-labelledby={labelId} aria-required className="flex gap-1" onKeyDown={onKeyDown}>
-              {SCORES.map((n) => {
-                const checked = score === n;
-                const filled = n <= score;
-                return (
-                  <button
-                    key={n}
-                    ref={(el) => {
-                      stars.current[n - 1] = el;
-                    }}
-                    type="button"
-                    role="radio"
-                    aria-checked={checked}
-                    aria-label={`${t('group.rate.score_label', { count: n })} – ${t(`group.rate.score_${n}`)}`}
-                    tabIndex={checked || (!score && n === 1) ? 0 : -1}
-                    disabled={rate.isPending}
-                    onClick={() => pick(n)}
-                    className="inline-flex size-12 items-center justify-center rounded-md outline-none transition-transform hover:scale-110 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:transition-none motion-reduce:hover:scale-100"
-                  >
-                    <Star
-                      aria-hidden
-                      strokeWidth={1.75}
-                      className={cn('size-8', filled ? 'fill-warning text-warning' : 'text-muted')}
-                    />
-                  </button>
-                );
-              })}
-            </div>
+            <StarRatingInput
+              value={score}
+              onChange={pick}
+              labelledBy={labelId}
+              disabled={rate.isPending}
+              starLabel={(n) => `${t('group.rate.score_label', { count: n })} – ${t(`group.rate.score_${n}`)}`}
+            />
             <p aria-live="polite" className="min-h-6 text-md font-medium text-fg">
               {score ? t(`group.rate.score_${score}`) : null}
             </p>

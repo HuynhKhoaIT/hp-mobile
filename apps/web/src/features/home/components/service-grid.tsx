@@ -2,7 +2,8 @@
 // xanh 48px (-mt-12), 4 × 2 trên điện thoại, 8 cột từ 768px. Ô: khung icon 48 bo md nền dịch vụ nhạt + viền nhạt cùng tông
 // (ô tiện ích: primary-light) + icon 24 màu dịch vụ + nhãn 1–2 dòng (không cắt chữ, khung nhãn min-h-9).
 // Nhãn góc "Sắp có" (ô mờ, vẫn bấm được → trang "Sắp có") / "Mới" (cam đặc, chữ trắng đậm
-// on-accent). Hiện lần lượt khi tải (stagger 30ms, trượt 8px; giảm chuyển động → chỉ mờ dần 150ms). Server Component: link
+// on-accent; nổi lên xuống nhẹ animate-badge-float −3px 2,4s/chu kỳ từ motion.ambient.float — giống app). Hover: khung icon
+// nâng 2px + bóng card, icon phóng 1.1. Giảm chuyển động → nhãn đứng yên, không nâng / phóng. Hiện lần lượt khi tải (stagger 30ms, trượt 8px; giảm chuyển động → chỉ mờ dần 150ms). Server Component: link
 // thật, chạy khi tắt JS.
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -50,20 +51,27 @@ export async function ServiceGrid() {
                   {/* Mờ ở khung icon, không ở nhãn góc (nhãn "Sắp có" phải đọc rõ). */}
                   <span
                     className={cn(
-                      'flex size-full items-center justify-center rounded-md border',
+                      'flex size-full items-center justify-center rounded-md border transition-shadow duration-200 group-hover:shadow-card',
                       tile.soft,
                       tile.edge,
                       tile.soon && 'opacity-60',
                     )}
                   >
-                    <tile.Icon aria-hidden strokeWidth={1.75} className={cn('size-6', tile.fg)} />
+                    <tile.Icon
+                      aria-hidden
+                      strokeWidth={1.75}
+                      className={cn(
+                        'size-6 transition-transform duration-200 group-hover:scale-110 motion-reduce:group-hover:scale-100',
+                        tile.fg,
+                      )}
+                    />
                   </span>
                   {badge ? (
                     <span
                       aria-hidden
                       className={cn(
                         'absolute -top-2 -right-3 rounded-full px-1.5 py-0.5 text-xs leading-none font-bold whitespace-nowrap uppercase ring-2 ring-surface',
-                        tile.soon ? 'bg-surface-2 text-muted' : 'bg-accent text-on-accent',
+                        tile.soon ? 'bg-surface-2 text-muted' : 'bg-accent text-on-accent motion-safe:animate-badge-float',
                       )}
                     >
                       {badge}

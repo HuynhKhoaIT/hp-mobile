@@ -29,7 +29,10 @@ export default async function AdminRootLayout({ children }: { children: ReactNod
         web: clientWebMessages(messages.web),
       }}
     >
-      {children}
+      {/* data-area="admin": variant `admin:` (globals.css) tắt hiệu ứng lặp của component dùng chung (vd vệt sáng skeleton). */}
+      <div data-area="admin" className="contents">
+        {children}
+      </div>
     </NextIntlClientProvider>
   );
 }
