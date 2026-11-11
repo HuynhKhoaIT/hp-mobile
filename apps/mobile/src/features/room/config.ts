@@ -4,8 +4,10 @@
 // (Hiện số → Gọi); mẹo xem phòng tận nơi, không đặt cọc qua mạng.
 // Chế độ bản đồ cluster: chờ key Goong + src/ui/MapView (chưa có thư viện bản đồ).
 // Stitch L2 (form): thẻ danh mục có icon; diện tích lên bước Thông tin chính; mẹo chụp ảnh phòng.
+// Stitch L3 ("Tìm phòng trọ & Nhà trọ"): chip "Dưới 1 triệu/tháng" (p_price_max); thẻ có dòng chủ trọ (+ dấu xác minh) và
+// nút tim lưu tin; dải "Bạn là chủ trọ? Đăng tin" đầu danh sách mở thẳng form phòng cho thuê.
 import { LISTING_FEATURES, LISTING_IMAGES } from '@hp/shared';
-import { House, Users } from 'lucide-react-native';
+import { House, Plus, Users } from 'lucide-react-native';
 import type { ListingFeatureConfig } from '@/features/listing/types';
 
 export const roomConfig: ListingFeatureConfig = {
@@ -19,8 +21,18 @@ export const roomConfig: ListingFeatureConfig = {
   quickFilters: [
     { key: 'has_loft', value: true },
     { key: 'has_parking', value: true },
+    { priceMax: 1_000_000, labelKey: 'listing:list.quick_price_under_1m' },
   ],
-  card: { variant: 'grid', estimatedHeight: 320, display: { facts: ['area_m2', 'has_loft', 'max_people'] } },
+  banner: {
+    variant: 'strip',
+    textKey: 'listing:list.banner.landlord_text',
+    actions: [{ labelKey: 'listing:list.banner.landlord_cta', category: 'room_rent', icon: Plus }],
+  },
+  card: {
+    variant: 'grid',
+    estimatedHeight: 360,
+    display: { facts: ['area_m2', 'has_loft', 'max_people'], owner: true, bookmark: true },
+  },
   filters: ['subcategory', 'site', 'distance'],
   distanceOptionsKm: [1, 2, 5],
   categoryIcons: { room_rent: House, room_share: Users },

@@ -1,15 +1,21 @@
 // Chi tiết tin (mọi category) — dùng cho cả `listing/[id]` (điều hướng nội bộ) và `tin/[slug]` (Universal Link).
 // Style Stitch "Chi tiết tin Pass / phòng trọ / tin rơi đồ" — một bố cục chung, khác nhau theo config tính năng:
-//   1 ảnh tràn mép 4:3 + đếm ảnh + hàng ảnh nhỏ (hoặc ô giữ chỗ lớn khi chưa có ảnh)
-//   2 thẻ tóm tắt: badge (danh mục — nhãn / tone theo config.card.display.categoryBadge, vd "Mất đồ" đỏ; "Đã trả lại";
-//     ngôn ngữ) → tiêu đề → giá lớn màu primary (đơn vị /tháng chữ nhỏ; đồ thất lạc không có giá) → nhãn thông số nổi bật
-//     (config.card.display.facts, vd trọ "20 m² · Có gác") → khu (gần đúng ~300 m) · đăng lúc · lượt xem
+//   1 ảnh tràn mép 4:3 + đếm ảnh + hàng ảnh nhỏ (hoặc ô giữ chỗ lớn khi chưa có ảnh); nhãn phủ góc trái trên: tình trạng
+//     (đang hiện: "Còn trống" / "Đang tuyển"… theo tính năng — listing.availability; đã bán / đóng / hết hạn: common.status;
+//     đồ đã nhận lại: "Đã trả lại") + "Đã xác minh" khi người đăng có huy hiệu; trọ: giá phủ góc trái dưới (nền surface/90 —
+//     không có token scrim / gradient tối nên dùng nền đặc thay dải mờ)
+//   2 thẻ tóm tắt: badge (danh mục — nhãn / tone theo config.card.display.categoryBadge, vd "Mất đồ" đỏ; ngôn ngữ) →
+//     "Mã tin #A1B2C3 · Đăng 25 phút trước" → tiêu đề → giá lớn màu primary (đơn vị /tháng chữ nhỏ; đồ thất lạc không có
+//     giá) → nhãn thông số nổi bật (config.card.display.facts, vd trọ "20 m² · Có gác") → khu (gần đúng ~300 m) → hết hạn ·
+//     lượt xem
 //   3 banner tin đã bán / đóng / hết hạn / đã nhận lại → "Tin có thể khớp" (đồ thất lạc, chủ tin)
-//   4 mẹo an toàn riêng tính năng (config.tipKey; mặc định detail.safety_tip) → thông tin (lưới ô AttributeList)
+//   4 mẹo an toàn riêng tính năng (config.tipKey; mặc định detail.safety_tip) → thông tin (lưới ô AttributeList + khối
+//     có tiêu đề theo groupAttributeRows: trọ Chi phí / Nội quy, việc Người phụ trách / Yêu cầu)
 //   5 người đăng (OwnerCard) → mô tả (+ nút Dịch) → tin tương tự (thẻ cùng điểm nhấn)
-// Thanh dính đáy (StickyCta elevated): Nhắn tin + Hiện số → Gọi (reveal_contact, cần đăng nhập); nút chính theo
-// config.detail.primaryCta ('call' cho trọ / đồ thất lạc) · chủ tin: Sửa tin + Tin của tôi (+ "Đã nhận lại đồ") · tin không
-// còn hiện: không có liên hệ.
+// Thanh dính đáy (StickyCta elevated, style Stitch "Chi tiết việc làm"): 2 nút vuông chỉ icon Gọi (Hiện số → Gọi,
+// reveal_contact, cần đăng nhập) + Nhắn tin, rồi nút chính rộng theo config.detail.primaryCta ('call' cho trọ / đồ thất lạc:
+// "Gọi hỏi phòng" → Hiện số → "Gọi 0912…"; 'chat': "Nhắn người bán" / "Nhắn tin ứng tuyển"…) · chủ tin: Sửa tin + Tin của
+// tôi (+ "Đã nhận lại đồ") · tin không còn hiện: không có liên hệ.
 // Khác Stitch (cố ý): không "Trả giá / Đề xuất giá", Zalo, "Hẹn xem", giá gốc gạch ngang, bảng chi phí / khoảng cách tới
 // từng nhà máy, bản đồ, "đang trực tuyến" — không có tính năng / dữ liệu đó; chỉ hiện thông số người đăng đã nhập.
 // Tuần 10: nút Dịch (tin khác ngôn ngữ đang dùng) đổi tiêu đề + mô tả sang bản dịch tự động / "Xem bản gốc".
@@ -17,13 +23,13 @@
 // (ReturnedSheet — style Stitch L2 → RPC markListingReturned: returned + đóng tin); tin đã nhận lại có nhãn "Đã trả lại".
 import { type AppError, listingDisplayStatus, type PublicListing } from '@hp/core';
 import { useRecordListingView, useSimilarListings } from '@hp/core/react';
-import { formatVnPhone, type ListingCategory } from '@hp/shared';
+import { featureOfCategory, formatVnPhone, type ListingCategory } from '@hp/shared';
 import { Languages, MapPin, MessageCircle, PackageCheck, Pencil, Phone, SearchX } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { track } from '@/core/analytics';
-import { formatRelative } from '@/lib/format';
+import { formatDate, formatRelative } from '@/lib/format';
 import { listingImageUrl } from '@/lib/images';
 import { isReturned, useCardFacts, usePriceText, useSiteText } from '@/lib/listing';
 import {
@@ -50,6 +56,7 @@ import type { ListingFeatureConfig } from '../types';
 import { AttributeList } from './AttributeList';
 import { ListingRail } from './ListingRail';
 import { OwnerCard } from './OwnerCard';
+import { ListingRateEntry } from './ListingRateSheet';
 import { ReturnedSheet, returnedLabelKeys } from './ReturnedSheet';
 
 /** Phần cần của kết quả useListing / useListingBySlug. */
@@ -115,26 +122,55 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
   const site = siteText(listing);
   const showLang = listing.lang !== i18n.language && i18n.exists(`common:locale.${listing.lang}`);
   const categoryBadge = config?.card.display?.categoryBadge?.[listing.category];
-  const meta = [
+  const feature = featureOfCategory(listing.category);
+  // Nhãn tình trạng trên ảnh: chữ + tone (không chỉ màu). Đồ thất lạc đang hiện theo category (Đang tìm / Chờ chủ nhận).
+  const status = returned
+    ? { label: t('lost_found.returned_badge'), tone: 'success' as const }
+    : display === 'active'
+      ? { label: t(`availability.${feature === 'lostFound' ? listing.category : feature}`), tone: 'success' as const }
+      : { label: t(`common:status.${display}`), tone: 'danger' as const };
+  // Cùng quy tắc với OwnerCard: có huy hiệu (đã dịch được) = đã xác minh.
+  const verified = listing.owner_badges.some((b) => i18n.exists(`listing:owner_badge.${b}`));
+  const header = [
+    listing.short_id ? t('detail.code', { code: listing.short_id.toUpperCase() }) : null,
     t('detail.posted_at', { time: formatRelative(listing.created_at) }),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  const meta = [
+    display === 'active' && listing.expires_at ? t('detail.expires_at', { date: formatDate(listing.expires_at) }) : null,
     t('detail.views', { count: listing.view_count }),
-  ].join(' · ');
+  ]
+    .filter(Boolean)
+    .join(' · ');
   const cut = price.lastIndexOf('/');
 
   return (
     <>
       {/* ScrollView tràn mép (-mx-4, nội dung px-4): ảnh / tin tương tự `bleed` chạm mép màn mà không bị khung cuộn cắt. */}
       <ScrollView className="-mx-4 flex-1" contentContainerClassName="gap-5 px-4 pb-6" showsVerticalScrollIndicator={false}>
-        {listing.images.length > 0 ? (
-          <ImageGallery
-            bleed
-            uris={listing.images.map((p) => listingImageUrl(p, 'full'))}
-            thumbnails={listing.images.map((p) => listingImageUrl(p, 'thumb'))}
-            accessibilityLabel={listing.title}
-          />
-        ) : (
-          <ListingCover listing={listing} size="full" className="-mx-4 aspect-card" />
-        )}
+        <ImageGallery
+          bleed
+          uris={listing.images.map((p) => listingImageUrl(p, 'full'))}
+          thumbnails={listing.images.map((p) => listingImageUrl(p, 'thumb'))}
+          accessibilityLabel={listing.title}
+          placeholder={<ListingCover listing={listing} size="full" className="size-full" />}
+          overlayTop={
+            <>
+              <Badge overlay label={status.label} tone={status.tone} />
+              {verified ? <Badge overlay label={t('common:profile.verified')} tone="primary" /> : null}
+            </>
+          }
+          overlayBottom={
+            feature === 'room' && price ? (
+              <View className="self-start rounded-md bg-surface/90 px-3 py-1.5 shadow-card">
+                <Text variant="label" weight="bold" tone="primary">
+                  {price}
+                </Text>
+              </View>
+            ) : undefined
+          }
+        />
 
         <Card className="gap-3">
           <View className="flex-row flex-wrap gap-1">
@@ -142,9 +178,11 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
               label={categoryBadge?.labelKey ? t(categoryBadge.labelKey) : t(`common:category.${listing.category}`)}
               tone={categoryBadge?.tone}
             />
-            {returned ? <Badge label={t('lost_found.returned_badge')} tone="success" /> : null}
             {showLang ? <Badge label={t(`common:locale.${listing.lang}`)} tone="primary" /> : null}
           </View>
+          <Text variant="caption" tone="muted">
+            {header}
+          </Text>
           <Text variant="heading" accessibilityRole="header" selectable>
             {translation.title}
           </Text>
@@ -189,7 +227,11 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
         </Card>
 
         {returned ? (
-          <Notice icon={PackageCheck} title={t('lost_found.returned_badge')} text={t('lost_found.returned_done')} />
+          <>
+            <Notice icon={PackageCheck} title={t('lost_found.returned_badge')} text={t('lost_found.returned_done')} />
+            {/* Người đã chat với chủ tin về món đồ: cảm ơn / đánh giá chủ tin (tự ẩn khi không có ai để chấm). */}
+            {isOwner ? null : <ListingRateEntry listingId={listing.id} />}
+          </>
         ) : display !== 'active' ? (
           <Notice tone="warning" title={t(`state.${display}`)} text={t('state.inactive_hint')} />
         ) : null}
@@ -311,53 +353,56 @@ function LostFoundMatches({ listing }: { listing: PublicListing }) {
 }
 
 /**
- * Liên hệ người đăng: Nhắn tin (chat) + Hiện số điện thoại → Gọi (reveal_contact). `primary`: nút nào nền primary
- * ('call' cho trọ / đồ thất lạc — cần gọi nhanh), nút còn lại viền. Khách bấm → đăng nhập rồi làm tiếp.
+ * Liên hệ người đăng (style Stitch): 2 nút vuông chỉ icon — Gọi (Hiện số → Gọi, reveal_contact) và Nhắn tin (chat) — rồi
+ * nút chính rộng theo `primary` ('call': trọ / đồ thất lạc; 'chat': pass / việc), nhãn theo tính năng
+ * (listing.contact.primary.<cta>_<feature>). Khách bấm → đăng nhập rồi làm tiếp. Đã hiện số mà người đăng không có SĐT →
+ * nút chính chuyển sang Nhắn tin + dòng contact.no_phone; đã hiện số khi nút chính là Nhắn tin → dòng "Số điện thoại: …".
  */
 function ContactBar({ listing, primary }: { listing: PublicListing; primary: 'chat' | 'call' }) {
   const { t } = useTranslation('listing');
   const contact = useContactListing();
   const phone = useRevealPhone(listing);
-  const chat = (
-    <Button
-      label={t('detail.contact')}
-      icon={MessageCircle}
-      variant={primary === 'chat' ? 'primary' : 'outline'}
-      fullWidth
-      loading={contact.isPending}
-      onPress={() => contact.open(listing)}
-    />
-  );
-  const call =
-    phone.revealed && phone.phone ? (
-      <Button
-        label={t('contact.call', { phone: formatVnPhone(phone.phone) })}
-        icon={Phone}
-        variant={primary === 'call' ? 'primary' : 'outline'}
-        fullWidth
-        onPress={() => phone.phone && phone.call(phone.phone)}
-      />
-    ) : (
-      <Button
-        label={t('contact.reveal')}
-        icon={Phone}
-        variant={primary === 'call' ? 'primary' : 'outline'}
-        fullWidth
-        loading={phone.isPending}
-        disabled={phone.revealed}
-        onPress={phone.reveal}
-      />
-    );
+  const feature = featureOfCategory(listing.category);
+  const noPhone = phone.revealed && !phone.phone;
+  const cta = primary === 'call' && noPhone ? 'chat' : primary;
+  const shown = phone.revealed && phone.phone ? formatVnPhone(phone.phone) : null;
+  const onCall = () => (phone.phone ? phone.call(phone.phone) : phone.reveal());
+  const chat = () => contact.open(listing);
   return (
     <StickyCta elevated>
-      <View className="flex-row gap-2">
-        {/* Nút chính đặt bên phải (gần ngón cái), giống Stitch. */}
-        <View className="flex-1">{primary === 'call' ? chat : call}</View>
-        <View className="flex-1">{primary === 'call' ? call : chat}</View>
+      <View className="flex-row items-center gap-2">
+        <Button
+          iconOnly
+          icon={Phone}
+          variant="secondary"
+          label={shown ? t('contact.call', { phone: shown }) : t('contact.reveal_call')}
+          loading={phone.isPending}
+          disabled={noPhone}
+          onPress={onCall}
+        />
+        <Button iconOnly icon={MessageCircle} variant="secondary" label={t('detail.contact')} loading={contact.isPending} onPress={chat} />
+        {/* Nút chính rộng bên phải (gần ngón cái), giống Stitch. */}
+        <View className="flex-1">
+          {cta === 'call' ? (
+            <Button
+              label={shown ? t('contact.call', { phone: shown }) : t(`contact.primary.call_${feature}`)}
+              icon={Phone}
+              fullWidth
+              loading={phone.isPending}
+              onPress={onCall}
+            />
+          ) : (
+            <Button label={t(`contact.primary.chat_${feature}`)} icon={MessageCircle} fullWidth loading={contact.isPending} onPress={chat} />
+          )}
+        </View>
       </View>
-      {phone.revealed && !phone.phone ? (
+      {noPhone ? (
         <Text variant="caption" tone="muted" accessibilityLiveRegion="polite">
           {t('contact.no_phone')}
+        </Text>
+      ) : shown && cta === 'chat' ? (
+        <Text variant="label" weight="semibold" accessibilityLiveRegion="polite" selectable>
+          {t('contact.phone_line', { phone: shown })}
         </Text>
       ) : null}
     </StickyCta>
