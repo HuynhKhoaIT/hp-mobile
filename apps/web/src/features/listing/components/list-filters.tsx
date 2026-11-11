@@ -1,14 +1,17 @@
 // Bộ lọc danh sách (style Stitch "Khám phá & Bộ lọc") — chạy được khi tắt JS: chip là link, ô tìm + khu + khoảng cách là
 // form GET. Hai phần:
 // - ListSearchForm: đặt trong header xanh — ô tìm nổi (nền surface, bo tròn, shadow-card), chọn khu, khoảng cách (trọ:
-//   `distanceOptions` từ config, ?distance=N km), nút Tìm. Giữ category + thuộc tính đang lọc qua input ẩn.
+//   `distanceOptions` từ config, ?distance=N km), giá (Pass đồ: `priceRanges` — ?price=<khoảng>), sắp xếp (`sortable` —
+//   ?sort=), nút Tìm. Giữ category + thuộc tính + giá tối đa + cho tặng đang lọc qua input ẩn.
 // - ListChips: dưới header — hàng chip danh mục (trang một tính năng: category, nhãn theo config.card.categoryBadge nếu có —
 //   đồ thất lạc "Mất đồ / Nhặt được"; /tin + /tim-kiem: 4 tính năng, link sang trang riêng) → hàng chip lọc nhanh theo thông
-//   số (config.quickFilters, bật / tắt — `?has_loft=1`; chip giá tối đa — `?price_max=1000000`) → thuộc tính khác đang lọc (chip "Tìm nhanh" của trang chủ) dạng
-//   viên có nút bỏ + "Xoá từ khoá" + "Xoá lọc" (bỏ mọi tham số) khi đang lọc.
-// Khác Stitch (cố ý): không thanh trượt giá / "Sắp xếp" / xác thực người bán / ship nội bộ — RPC và dữ liệu không có.
+//   số (config.quickFilters, bật / tắt — `?has_loft=1`; chip giá tối đa — `?price_max=1000000`; chip "Cho tặng" — `?free=1`)
+//   → thuộc tính khác đang lọc (chip "Tìm nhanh" của trang chủ) dạng
+//   viên có nút bỏ + "Xoá từ khoá" + "Xoá lọc" (bỏ mọi tham số) khi đang lọc / sắp xếp.
+// Khác Stitch (cố ý): không thanh trượt giá (khoảng giá đặt sẵn — tập hữu hạn, trang còn cache được) / xác thực người bán /
+// ship nội bộ — RPC và dữ liệu không có.
 import type { Site } from '@hp/core';
-import type { ListingCategory, ListingFeature } from '@hp/shared';
+import { LISTING_SORTS, type ListingCategory, type ListingFeature } from '@hp/shared';
 import { Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -17,7 +20,17 @@ import { Input } from '@/components/ui/input';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { LISTING_FEATURE_CONFIGS, LISTING_FEATURE_ORDER } from '../features';
-import { activeFilterCount, attributeQuery, attributesFor, filterQuery, isPriceQuickFilter, type ListFilterState } from '../filters';
+import {
+  attributeQuery,
+  attributesFor,
+  filterQuery,
+  isAttributeQuickFilter,
+  isFiltered,
+  isFreeQuickFilter,
+  isPriceQuickFilter,
+  type ListFilterState,
+  type PriceRange,
+} from '../filters';
 import { FilterSelect, SiteSelect } from './site-select';
 
 const RING = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
@@ -55,6 +68,8 @@ export function ListSearchForm({
   filters,
   sites,
   distanceOptions = [],
+  priceRanges = [],
+  sortable = false,
   searchPlaceholder,
 }: {
   /** Đường dẫn đã có tiền tố ngôn ngữ cho form GET. */
@@ -63,6 +78,10 @@ export function ListSearchForm({
   sites: Site[];
   /** Lựa chọn km của bộ lọc khoảng cách (rỗng = không hiện). */
   distanceOptions?: readonly number[];
+  /** Khoảng giá đặt sẵn (config.priceRanges; rỗng = không hiện ô giá). */
+  priceRanges?: readonly PriceRange[];
+  /** Ô sắp xếp (config.sortable). */
+  sortable?: boolean;
   searchPlaceholder: string;
 }) {
   const t = useTranslations();
@@ -70,6 +89,7 @@ export function ListSearchForm({
     <form action={action} role="search" className="flex flex-col gap-2 lg:flex-row">
       {filters.category ? <input type="hidden" name="category" value={filters.category} /> : null}
       {filters.priceMax ? <input type="hidden" name="price_max" value={filters.priceMax} /> : null}
+      {filters.freeOnly ? <input type="hidden" name="free" value="1" /> : null}
       {Object.entries(attributeQuery(filters.attributes)).map(([key, value]) => (
         <input key={key} type="hidden" name={key} value={value} />
       ))}
@@ -86,8 +106,10 @@ export function ListSearchForm({
         />
       </label>
       <div className="flex flex-wrap gap-2">
+        {/* key theo giá trị: select không điều khiển (defaultValue) → đổi lọc bằng link (điều hướng mềm) vẫn hiện đúng. */}
         {distanceOptions.length > 0 ? (
           <FilterSelect
+            key={`distance:${filters.distanceKm ?? ''}`}
             name="distance"
             options={distanceOptions.map((km) => ({ value: String(km), label: t('listing.distance.within', { km }) }))}
             value={filters.distanceKm === null ? null : String(filters.distanceKm)}
@@ -98,11 +120,35 @@ export function ListSearchForm({
         ) : null}
         {sites.length > 0 ? (
           <SiteSelect
+            key={`site:${filters.site ?? ''}`}
             sites={sites}
             value={filters.site}
             label={t('listing.list.site_filter')}
             anyLabel={t('listing.list.site_any')}
             className="min-w-40 flex-1 lg:w-56 lg:flex-none"
+          />
+        ) : null}
+        {priceRanges.length > 0 ? (
+          <FilterSelect
+            key={`price:${filters.priceRange ?? ''}`}
+            name="price"
+            options={priceRanges.map((r) => ({ value: r.key, label: t(`listing.price_range.${r.key}`) }))}
+            value={filters.priceRange}
+            label={t('listing.price_range.label')}
+            anyLabel={t('listing.price_range.any')}
+            className="min-w-40 flex-1 lg:w-48 lg:flex-none"
+          />
+        ) : null}
+        {sortable ? (
+          <FilterSelect
+            key={`sort:${filters.sort}`}
+            name="sort"
+            // Mặc định (mới nhất) = giá trị rỗng → không ghi ?sort= lên URL.
+            options={LISTING_SORTS.filter((s) => s !== 'newest').map((s) => ({ value: s, label: t(`listing.sort.${s}`) }))}
+            value={filters.sort === 'newest' ? null : filters.sort}
+            label={t('listing.sort.label')}
+            anyLabel={t('listing.sort.newest')}
+            className="min-w-40 flex-1 lg:w-48 lg:flex-none"
           />
         ) : null}
         <Button type="submit" size="lg" variant="outline" className="border-transparent font-semibold text-primary shadow-card">
@@ -128,10 +174,12 @@ export function ListChips({
 }) {
   const t = useTranslations();
   const cfg = feature ? LISTING_FEATURE_CONFIGS[feature] : null;
-  // Đổi chip danh mục giữ từ khoá / khu / khoảng cách / giá; sang trang tính năng khác (/tin) thì bỏ giá (mốc riêng tính năng).
+  // Đổi chip danh mục giữ từ khoá / khu / khoảng cách / giá / cho tặng / thứ tự; sang trang tính năng khác (/tin) chỉ giữ từ
+  // khoá / khu / khoảng cách (giá, cho tặng, thứ tự là bộ lọc riêng tính năng).
   const keep = { query: filters.query, site: filters.site, distanceKm: filters.distanceKm };
+  const keepInFeature = { ...keep, priceMax: filters.priceMax, priceRange: filters.priceRange, freeOnly: filters.freeOnly, sort: filters.sort };
   const quick = cfg?.quickFilters ?? [];
-  const isQuick = (key: string) => quick.some((q) => !isPriceQuickFilter(q) && q.key === key);
+  const isQuick = (key: string) => quick.some((q) => isAttributeQuickFilter(q) && q.key === key);
   /** Chữ của một thuộc tính: enum → tên giá trị ("Ca đêm"), bool → tên thuộc tính ("Có gác") / "…: Không". */
   const attributeLabel = (key: string, value: string | boolean) =>
     typeof value === 'boolean'
@@ -145,7 +193,7 @@ export function ListChips({
   };
   // Thuộc tính đang lọc không có chip lọc nhanh (vd từ chip "Tìm nhanh" trang chủ) → viên có nút bỏ.
   const otherAttributes = Object.entries(filters.attributes).filter(([key]) => !isQuick(key));
-  const filtered = activeFilterCount(filters) > 0;
+  const filtered = isFiltered(filters);
 
   return (
     <div className="flex flex-col gap-2">
@@ -167,7 +215,7 @@ export function ListChips({
           ) : null}
           <li>
             <Chip
-              href={{ pathname: path, query: filterQuery({ ...keep, priceMax: filters.priceMax, attributes: attributesFor(filters.attributes, categories) }) }}
+              href={{ pathname: path, query: filterQuery({ ...keepInFeature, attributes: attributesFor(filters.attributes, categories) }) }}
               selected={!filters.category}
             >
               {t('listing.list.filter_all')}
@@ -179,7 +227,7 @@ export function ListChips({
                   <Chip
                     href={{
                       pathname: path,
-                      query: filterQuery({ ...keep, priceMax: filters.priceMax, category: c, attributes: attributesFor(filters.attributes, [c]) }),
+                      query: filterQuery({ ...keepInFeature, category: c, attributes: attributesFor(filters.attributes, [c]) }),
                     }}
                     selected={filters.category === c}
                   >
@@ -210,6 +258,17 @@ export function ListChips({
                 return (
                   <li key={`price_max:${q.priceMax}`}>
                     <Chip href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax }) }} selected={on} pressed={on}>
+                      <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
+                      {t(q.labelKey)}
+                    </Chip>
+                  </li>
+                );
+              }
+              if (isFreeQuickFilter(q)) {
+                const on = filters.freeOnly;
+                return (
+                  <li key="free">
+                    <Chip href={{ pathname: path, query: filterQuery({ ...filters, freeOnly: !on }) }} selected={on} pressed={on}>
                       <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
                       {t(q.labelKey)}
                     </Chip>

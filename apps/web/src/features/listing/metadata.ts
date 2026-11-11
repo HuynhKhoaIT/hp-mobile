@@ -1,5 +1,6 @@
 // generateMetadata của trang danh sách và chi tiết tin (.claude/rules/web-seo-public.md): title, description,
-// canonical + hreflang (vi / en / zh / x-default), Open Graph. robots: trang lọc sâu (> 2 tham số) → noindex.
+// canonical + hreflang (vi / en / zh / x-default), Open Graph. robots: trang lọc sâu (> 2 tham số) hoặc biến thể giá / cho
+// tặng / sắp xếp (?price=, ?free=, ?sort=) → noindex.
 // Toàn site đang noindex ở layout gốc tới khi ra mắt (tuần 11) — trang không ghi đè thành index.
 import type { PublicListing } from '@hp/core';
 import { APP_NAME, priceLabel } from '@hp/shared';
@@ -8,8 +9,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { absoluteUrl, localeAlternates } from '@/i18n/alternates';
 import { listingImageUrl } from '@/lib/images';
 import { asLocale, priceText } from './display';
-import { LISTING_FEATURE_CONFIGS } from './features';
-import { activeFilterCount, filterQuery, parseListFilters, priceMaxOptions } from './filters';
+import { activeFilterCount, filterQuery, parseListFilters } from './filters';
 import { getPublicSites } from './queries';
 import { type ListScope, scopeInfo } from './scope';
 
@@ -21,20 +21,21 @@ const withQuery = (path: string, query: Record<string, string>) => {
 };
 
 export async function listMetadata(scope: ListScope, searchParams: Promise<RawParams>): Promise<Metadata> {
-  const { feature, path, categories, seoKey, distanceKm } = scopeInfo(scope);
+  const { path, categories, seoKey, filterOptions } = scopeInfo(scope);
   const locale = asLocale(await getLocale());
   const t = await getTranslations();
-  // Cùng mốc giá với trang (chip lọc nhanh giá) để ?price_max= được tính vào số tham số lọc (noindex khi lọc sâu).
-  const prices = priceMaxOptions(feature ? LISTING_FEATURE_CONFIGS[feature].quickFilters : undefined);
-  const filters = parseListFilters(await searchParams, categories, distanceKm, prices);
+  // Cùng bộ lọc tính năng với trang để ?price_max= / ?price= / ?free= / ?sort= được nhận đúng như trang.
+  const filters = parseListFilters(await searchParams, categories, filterOptions);
   const siteName = filters.site ? (await getPublicSites()).find((s) => s.code === filters.site)?.name : undefined;
 
   const title = siteName
     ? t(`web.listing.${seoKey}.heading_site`, { site: siteName })
     : t(`web.listing.${seoKey}.title`);
   const description = t(`web.listing.${seoKey}.description`);
-  // Canonical giữ category + khu (trang có nội dung riêng), bỏ từ khoá tìm kiếm.
+  // Canonical giữ category + khu (trang có nội dung riêng), bỏ từ khoá tìm kiếm, giá, cho tặng, thứ tự.
   const canonicalPath = withQuery(path, filterQuery({ category: filters.category, site: siteName ? filters.site : null }));
+  // Biến thể giá / cho tặng / thứ tự: cùng nội dung với trang gốc sắp lại → không index (canonical về trang gốc).
+  const variant = filters.sort !== 'newest' || filters.priceRange !== null || filters.freeOnly;
 
   return {
     title,
@@ -43,7 +44,7 @@ export async function listMetadata(scope: ListScope, searchParams: Promise<RawPa
     openGraph: { type: 'website', siteName: APP_NAME, title, description, url: absoluteUrl(canonicalPath, locale), locale },
     twitter: { card: 'summary' },
     // Lọc sâu (> 2 tham số) và trang kết quả tìm kiếm có từ khoá: noindex (trang mỏng, vô hạn biến thể).
-    ...(activeFilterCount(filters) > 2 || (scope === 'search' && filters.query) ? { robots: { index: false, follow: true } } : {}),
+    ...(activeFilterCount(filters) > 2 || variant || (scope === 'search' && filters.query) ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

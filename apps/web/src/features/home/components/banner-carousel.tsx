@@ -1,13 +1,14 @@
 'use client';
 
-// Banner trượt của trang chủ (docs/design/home.md §4.4, §6, §10). Dữ liệu: bảng `banners` (placement web_home) — server
+// Banner trượt của trang chủ (docs/design/home.md §4.4, §6, §10) và trang chủ mini Pass đồ. Dữ liệu: bảng `banners`
+// (placement `web_home` / `web_pass` — prop `placement`) — server
 // render sẵn (cache 300s, tag `banners`); server lỗi → tải lại ở trình duyệt, vẫn lỗi → khối lỗi + Thử lại. Rỗng → ẩn khối.
 // - Ảnh (bucket `banners`) phủ kín khung 16:7; không ảnh → thẻ chữ theo `tone` (primary / accent / màu dịch vụ).
 // - Trượt ngang bằng scroll-snap (vuốt trên điện thoại, kéo trackpad), chấm vị trí, nút trước / sau (desktop, bàn phím).
 // - Tự chuyển 5 giây; dừng khi rê chuột / focus bên trong, khi người dùng tự vuốt (dừng hẳn), khi khối ra khỏi màn hình
 //   hoặc tab ẩn; tắt khi giảm chuyển động. Có nút dừng / chạy (WCAG 2.2.2).
 // - Thẻ chữ: khung 16:7, nội dung dài (tiếng Anh) → thẻ cao thêm thay vì cắt chữ; mọi thẻ cao bằng nhau.
-import { type Banner, listBanners } from '@hp/core';
+import { type Banner, type BannerPlacement, listBanners } from '@hp/core';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
@@ -55,10 +56,20 @@ function useReducedMotion(): boolean {
   );
 }
 
-export function BannerCarousel({ initial, className }: { initial: Banner[] | null; className?: string }) {
+export function BannerCarousel({
+  initial,
+  placement = 'web_home',
+  className,
+}: {
+  initial: Banner[] | null;
+  /** Vị trí banner (bảng banners): trang chủ `web_home`, trang chủ mini Pass đồ `web_pass`. */
+  placement?: BannerPlacement;
+  className?: string;
+}) {
   const locale = asLocale(useLocale());
-  const load = useCallback(() => listBanners(createBrowserClient(), { placement: 'web_home', locale }), [locale]);
-  const [state, retry] = useLoadable(`banners:${locale}`, load, initial ? { key: `banners:${locale}`, data: initial } : null);
+  const load = useCallback(() => listBanners(createBrowserClient(), { placement, locale }), [placement, locale]);
+  const key = `banners:${placement}:${locale}`;
+  const [state, retry] = useLoadable(key, load, initial ? { key, data: initial } : null);
 
   if (state.status === 'loading' || state.status === 'idle') return <BannerSkeleton className={className} />;
   if (state.status === 'error') return <SectionError onRetry={retry} className={className} />;

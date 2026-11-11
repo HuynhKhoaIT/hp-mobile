@@ -25,7 +25,7 @@ import {
   type Site,
 } from '@hp/core';
 import type { Database } from '@hp/db';
-import type { ListingCategory } from '@hp/shared';
+import type { ListingCategory, ListingSort } from '@hp/shared';
 import { cacheLife, cacheTag } from 'next/cache';
 import type { AttributeFilter } from './filters';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -44,11 +44,19 @@ export type ListQuery = {
   attributes?: AttributeFilter;
   /** Cách khu làm việc tối đa (m) — chỉ giá trị trong config.distanceFilterKm (đã kiểm bằng parseListFilters). */
   maxDistanceM?: number;
-  /** Giá tối đa (VND) — chỉ mốc của chip lọc nhanh giá trong config (đã kiểm bằng parseListFilters). */
+  /** Giá tối thiểu / tối đa (VND) — chỉ mốc chip giá / khoảng giá đặt sẵn trong config (searchFiltersOf). */
+  priceMin?: number;
   priceMax?: number;
+  /** Chỉ tin cho tặng (?free=1). */
+  freeOnly?: boolean;
+  /** Thứ tự (?sort=) — thiếu = mới nhất. */
+  sort?: ListingSort;
 };
 
 const hasAttributes = (a: AttributeFilter | undefined): a is AttributeFilter => !!a && Object.keys(a).length > 0;
+
+/** Tham số trang đầu được cache: thứ tự khoá cố định, bỏ trường rỗng → khoá cache ổn định. */
+type CachedListKey = Omit<ListQuery, 'query'>;
 
 /** Lỗi đọc dữ liệu: message = mã errors.* (error.tsx không hiện message ở production, chỉ để log). */
 function unwrap<T>(result: Result<T>): T {
@@ -64,31 +72,38 @@ async function fetchListPage(q: ListQuery): Promise<Page<PublicListing>> {
       query: q.query || undefined,
       attributes: hasAttributes(q.attributes) ? { ...q.attributes } : undefined,
       maxDistanceM: q.maxDistanceM,
+      priceMin: q.priceMin,
       priceMax: q.priceMax,
+      freeOnly: q.freeOnly || undefined,
+      sort: q.sort,
       limit: LIST_PAGE_SIZE,
     }),
   );
 }
 
-/** Trang đầu theo danh mục / khu / thuộc tính / khoảng cách / giá tối đa (không từ khoá): tập tham số hữu hạn (whitelist) → cache 300s. */
-async function getCachedListPage(
-  categories: readonly ListingCategory[],
-  site: string | null,
-  attributes: AttributeFilter | undefined,
-  maxDistanceM: number | undefined,
-  priceMax: number | undefined,
-) {
+/**
+ * Trang đầu theo danh mục / khu / thuộc tính / khoảng cách / giá / cho tặng / thứ tự (không từ khoá): tập tham số hữu hạn
+ * (whitelist trong parseListFilters) → cache 300s.
+ */
+async function getCachedListPage(key: CachedListKey) {
   'use cache';
   cacheLife({ revalidate: 300 });
   cacheTag('listings');
-  const page = await fetchListPage({ categories, site, query: '', attributes, maxDistanceM, priceMax });
+  const page = await fetchListPage({ ...key, query: '' });
   return { page, now: Date.now() };
 }
 
 /** Trang đầu của danh sách. Có từ khoá → đọc theo request (không cache); chỉ gọi sau khi đã đọc searchParams. */
 export async function getListPage(q: ListQuery): Promise<Timed<{ page: Page<PublicListing> }>> {
   if (!q.query) {
-    return getCachedListPage(q.categories, q.site, hasAttributes(q.attributes) ? q.attributes : undefined, q.maxDistanceM, q.priceMax);
+    const key: CachedListKey = { categories: q.categories, site: q.site };
+    if (hasAttributes(q.attributes)) key.attributes = q.attributes;
+    if (q.maxDistanceM !== undefined) key.maxDistanceM = q.maxDistanceM;
+    if (q.priceMin !== undefined) key.priceMin = q.priceMin;
+    if (q.priceMax !== undefined) key.priceMax = q.priceMax;
+    if (q.freeOnly) key.freeOnly = true;
+    if (q.sort && q.sort !== 'newest') key.sort = q.sort;
+    return getCachedListPage(key);
   }
   const page = await fetchListPage(q);
   return { page, now: Date.now() };
