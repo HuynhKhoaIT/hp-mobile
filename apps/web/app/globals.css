@@ -35,6 +35,11 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Thanh dính đáy nằm ngay trên thanh điều hướng dưới của điện thoại (h-16 = 4rem + vùng an toàn) — liên hệ ở chi tiết tin. */
+@utility bottom-above-nav {
+  bottom: calc(4rem + env(safe-area-inset-bottom));
+}
+
 /* Dải cuộn ngang (banner, dải tin, chip): ẩn thanh cuộn — vuốt trên điện thoại, nút trước / sau trên desktop. */
 @utility no-scrollbar {
   scrollbar-width: none;

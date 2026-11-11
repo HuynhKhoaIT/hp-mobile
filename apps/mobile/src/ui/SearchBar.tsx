@@ -2,6 +2,7 @@
 // Tìm khi bấm Tìm trên bàn phím (onSubmit) — không gọi server theo từng ký tự (mạng yếu).
 // Có `onPress` → chỉ là nút trông như ô tìm kiếm (Hub → mở màn Tìm kiếm). `variant="elevated"` (header Hub,
 // docs/design/home.md §10): không viền, nền surface + shadow-card trên nền primary, chữ gợi ý text-md muted.
+// Ô nhập cũng nhận `variant="elevated"` (header xanh màn danh sách tin, style Stitch).
 import { Search, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
@@ -19,6 +20,8 @@ type SearchBarInputProps = {
   placeholder?: string;
   className?: string;
   autoFocus?: boolean;
+  /** 'elevated': không viền, shadow-card — đặt trên nền primary. */
+  variant?: 'outline' | 'elevated';
   onPress?: undefined;
 };
 
@@ -49,7 +52,7 @@ export function SearchBar(props: SearchBarProps) {
   return <SearchInput {...props} />;
 }
 
-function SearchInput({ value, onChangeText, onSubmit, onClear, placeholder, className, autoFocus }: SearchBarInputProps) {
+function SearchInput({ value, onChangeText, onSubmit, onClear, placeholder, className, autoFocus, variant = 'outline' }: SearchBarInputProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const clear =
@@ -59,9 +62,7 @@ function SearchInput({ value, onChangeText, onSubmit, onClear, placeholder, clas
       onSubmit('');
     });
   return (
-    <View
-      className={[BOX, className].filter(Boolean).join(' ')}
-    >
+    <View className={[variant === 'elevated' ? BOX_ELEVATED : BOX, className].filter(Boolean).join(' ')}>
       <Icon icon={Search} tone="muted" />
       <TextInput
         value={value}

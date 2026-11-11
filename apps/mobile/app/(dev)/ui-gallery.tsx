@@ -64,6 +64,7 @@ import {
   Input,
   ListingCard,
   ListingCover,
+  LogoMark,
   MenuItem,
   MessageBubble,
   Notice,
@@ -73,6 +74,8 @@ import {
   ToggleRow,
   MultiSelect,
   OptionSheet,
+  OtpInput,
+  PageHero,
   PriceInput,
   PromoCard,
   Row,
@@ -202,6 +205,7 @@ export default function UiGalleryScreen() {
   const setThemePref = useSettings((s) => s.setThemePref);
   const [text, setText] = useState('');
   const [price, setPrice] = useState<number | null>(1500000);
+  const [otp, setOtp] = useState('72');
   const [checked, setChecked] = useState(false);
   const [single, setSingle] = useState<FeatureKey | null>(null);
   const [multi, setMulti] = useState<FeatureKey[]>(['pass']);
@@ -296,6 +300,16 @@ export default function UiGalleryScreen() {
         <Input label={t('auth:otp.label')} value="12" error={t('errors:otp_invalid')} />
         <Input label={t('auth:phone.label')} value="0912 345 678" editable={false} />
         <PriceInput label={t('dev.sample')} value={price} onChange={setPrice} />
+      </Section>
+
+      <Section title="OtpInput · LogoMark">
+        <OtpInput value={otp} onChange={setOtp} label={t('auth:otp.label')} />
+        <OtpInput value="123456" onChange={() => undefined} label={t('auth:otp.label')} error={t('errors:otp_invalid')} />
+        <OtpInput value="12" onChange={() => undefined} label={t('auth:otp.label')} editable={false} />
+        <Row gap={4}>
+          <LogoMark />
+          <LogoMark size="lg" />
+        </Row>
       </Section>
 
       <Section title="Select · MultiSelect · Checkbox">
@@ -574,6 +588,21 @@ export default function UiGalleryScreen() {
         {samples.slice(2).map((l) => (
           <ListingCard key={l.id} listing={l} layout="row" onPress={() => toast.show(l.title)} />
         ))}
+        {/* display (config.card.display): nhãn thông số + badge danh mục theo tone (đồ thất lạc). */}
+        {samples.slice(2).map((l) => (
+          <ListingCard
+            key={`${l.id}-display`}
+            listing={l}
+            layout="row"
+            display={{
+              facts: ['shift', 'item_type'],
+              categoryBadge: { lost: { tone: 'danger', labelKey: 'listing:lost_found.kind_lost' } },
+              placeKey: 'place',
+              timeKey: 'lost_at',
+            }}
+            onPress={() => toast.show(l.title)}
+          />
+        ))}
         <View className="flex-row flex-wrap gap-2">
           {SAMPLE_CATEGORIES.map((c) => (
             <ListingCover key={c} listing={{ category: c, images: [] }} className="aspect-card w-20 rounded-sm" />
@@ -618,6 +647,8 @@ export default function UiGalleryScreen() {
         </Card>
         <RouteSummary from="Sân Vạn Tường" fromLabel={t('group:detail.venue')} />
         <RouteSummary variant="compact" from="Cổng Dung Quất" to="Đà Nẵng" fromLabel={t('group:detail.from')} toLabel={t('group:detail.to')} />
+        <RouteSummary variant="timeline" from="Cổng Dung Quất" to="Đà Nẵng" fromLabel={t('group:detail.from')} toLabel={t('group:detail.to')} />
+        <RouteSummary variant="timeline" from="Sân Vạn Tường" fromLabel={t('group:detail.venue')} />
         <Stepper
           label={t('group:form.seats_label_ride')}
           hint={t('group:form.seats_hint')}
@@ -675,8 +706,19 @@ export default function UiGalleryScreen() {
         <SkeletonListingDetail />
       </Section>
 
-      <Section title="ImageGallery">
+      <Section title="ImageGallery · PageHero">
         <ImageGallery uris={[]} accessibilityLabel={t('dev.sample')} />
+        <ImageGallery uris={[]} bleed thumbnails accessibilityLabel={t('dev.sample')} />
+        <PageHero
+          title={t('feature.room')}
+          subtitle={t('listing:list.subtitle_room')}
+          service="room"
+          onBack={() => toast.show(t('actions.back'))}
+          right={<IconButton icon={Heart} variant="glass" accessibilityLabel={t('listing:saved.title')} onPress={() => undefined} />}
+        >
+          <SearchBar variant="elevated" value={text} onChangeText={setText} onSubmit={() => undefined} placeholder={t('dev.sample')} />
+        </PageHero>
+        <PageHero title={t('nav.explore')} />
       </Section>
 
       <Section title="Notice · StickyCta · Fab · StaggerItem">
@@ -684,6 +726,10 @@ export default function UiGalleryScreen() {
         <Notice text={t('listing:detail.approx_location')} />
         <StickyCta>
           <Button label={t('listing:detail.contact')} icon={MessageCircle} fullWidth onPress={() => toast.show(t('listing:detail.contact_soon'))} />
+        </StickyCta>
+        <Notice variant="bordered" tone="warning" title={t('listing:tip.title')} text={t('listing:tip.room')} />
+        <StickyCta elevated>
+          <Button label={t('listing:contact.reveal')} icon={MessageCircle} fullWidth onPress={() => undefined} />
         </StickyCta>
         <View className="h-28 rounded-md border border-border">
           <Fab label={t('listing:list.post_cta')} icon={Plus} onPress={() => toast.show(t('coming_soon.body'))} />

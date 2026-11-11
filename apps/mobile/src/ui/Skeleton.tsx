@@ -1,6 +1,6 @@
 // Skeleton — khối chờ đúng hình nội dung; nhấp nháy 1.2s/lượt (t.motion.skeletonShimmerMs), tắt khi Reduce Motion.
 // SkeletonListingCard theo bố cục ListingCard (ảnh → badge → tiêu đề 2 dòng → giá → khu vực) — khớp web ListingCardSkeleton.
-// SkeletonListingDetail theo bố cục màn chi tiết tin.
+// SkeletonListingDetail theo bố cục màn chi tiết tin (ảnh tràn mép).
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
@@ -119,7 +119,8 @@ export function SkeletonListingCard({
 export function SkeletonListingDetail() {
   return (
     <View className="gap-4">
-      <Skeleton className="aspect-card w-full" />
+      {/* Ảnh tràn mép như ImageGallery bleed (chi tiết tin, style Stitch). */}
+      <Skeleton className="-mx-4 aspect-card rounded-none" />
       <View className="gap-2">
         <Skeleton className="h-7 w-11/12" />
         <Skeleton className="h-7 w-1/2" />
