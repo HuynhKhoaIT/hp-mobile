@@ -8,18 +8,18 @@
 // Chưa đọc: viền primary/30, tên + xem trước đậm, số trên nền accent (luôn kèm số, không chỉ màu). Đang mở: nền primary-light.
 // Chat nhóm (kind = 'group'): icon dịch vụ thay avatar · tiêu đề nhóm · "giờ hẹn · N thành viên" · xem trước
 // "{người gửi}: …". Hiện ngay khi được nhận vào nhóm, kể cả chưa có tin.
-// Khách (proxy đã chặn, phòng khi phiên hết hạn giữa chừng) → mời đăng nhập. Loading / lỗi + thử lại / trống + CTA;
+// Khách (proxy đã chặn, phòng khi phiên hết hạn giữa chừng) → mời đăng nhập (SignInPrompt dùng chung). Loading / lỗi + thử lại / trống + CTA;
 // lọc không có kết quả → "Xem tất cả". Không có tìm kiếm / "Đã đọc tất cả" của Stitch (chưa có RPC tương ứng).
 import type { ConversationSummary } from '@hp/core';
 import { useConversations, useSession, useUnreadConversationCount } from '@hp/core/react';
 import { formatDate, formatNumber, formatRelative, unreadBadge } from '@hp/shared';
-import { BadgeCheck, BellOff, LogIn, MessageCircle, ShieldCheck } from 'lucide-react';
+import { BadgeCheck, BellOff, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ClientOnly } from '@/components/shared/client-only';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
 import { HeaderDecor } from '@/components/shared/header-decor';
-import { LoginDialog } from '@/components/shared/login-dialog';
+import { SignInPrompt } from '@/components/shared/sign-in-prompt';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Button } from '@/components/ui/button';
 import { GROUP_FEATURE_CONFIGS } from '@/features/group/features';
@@ -76,21 +76,9 @@ function ConversationItems({ selectedId }: { selectedId: string | null }) {
   if (session.isLoading || (session.userId && conversations.isPending)) return <ConversationListSkeleton />;
   if (!session.userId) {
     return (
-      <EmptyState
-        icon={MessageCircle}
-        title={t('chat.inbox.login_title')}
-        description={t('chat.inbox.login_body')}
-        action={
-          <LoginDialog
-            trigger={
-              <Button>
-                <LogIn strokeWidth={1.75} aria-hidden />
-                {t('auth.sign_in')}
-              </Button>
-            }
-          />
-        }
-      />
+      <div className="px-4 pt-3 pb-4 lg:px-3">
+        <SignInPrompt description={t('chat.inbox.login_body')} />
+      </div>
     );
   }
   if (conversations.isError && conversations.items.length === 0) {

@@ -44,6 +44,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { type FormEvent, useId, useRef, useState } from 'react';
 import { Badge, type BadgeTone } from '@/components/shared/badge';
 import { ErrorState } from '@/components/shared/error-state';
+import { SignInPrompt } from '@/components/shared/sign-in-prompt';
 import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -70,8 +71,8 @@ export function BadgeRequestView() {
   const profile = useMyProfile();
   const requests = useMyBadgeRequests();
 
-  // Phiên hết hạn giữa chừng (proxy đã chặn khách khi vào trang) → báo cần đăng nhập thay vì skeleton mãi.
-  if (!profile.isLoading && !profile.userId) return <ErrorState code="auth_required" />;
+  // Phiên hết hạn giữa chừng (proxy đã chặn khách khi vào trang) → mời đăng nhập thay vì skeleton mãi.
+  if (!profile.isLoading && !profile.userId) return <SignInPrompt />;
   if (profile.isLoading || requests.isPending) return <BadgeRequestSkeleton />;
   if (profile.isError || requests.isError) {
     const code = profile.error?.code ?? requests.error?.code;
