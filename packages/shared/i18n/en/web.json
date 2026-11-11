@@ -342,5 +342,10 @@
     "operator_pending": "(operator name to be updated)",
     "email_pending": "(contact email to be updated)",
     "delete_cta": "Open settings to delete your account"
+  },
+  "profile": {
+    "meta_title": "{{name}} – Member profile",
+    "meta_description": "Active listings, open groups and verification badges of {{name}} on {{app}}.",
+    "not_found_body": "The account may have been deleted or suspended, or the link is wrong."
   }
 }
