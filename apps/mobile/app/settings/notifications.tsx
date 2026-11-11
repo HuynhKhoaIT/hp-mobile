@@ -1,68 +1,39 @@
 // Screen type: Form
-// Cài đặt thông báo: bật / tắt push theo nhóm (profiles.notification_prefs — công tắc đổi ngay, lỗi thì trả lại),
-// thẻ bật quyền push của máy. Chỉ ảnh hưởng push; danh sách Thông báo trong app vẫn đủ. Khách → mời đăng nhập.
-import { useMyProfile, useNotificationPrefs, useUpdateNotificationPrefs } from '@hp/core/react';
-import { NOTIFICATION_PREF_KEYS, type NotificationPrefKey } from '@hp/shared';
-import type { LucideIcon } from 'lucide-react-native';
-import { BriefcaseBusiness, Car, MessageCircle, SearchCheck } from 'lucide-react-native';
-import { Fragment } from 'react';
+// Cài đặt thông báo (từ chuông Thông báo / tab Tôi) — style Stitch "Cài đặt thông báo đẩy (PushPermissionCard)": header xanh
+// (PageHero: quay lại trong mờ, "Thông báo đẩy" + dòng phụ) → NotificationSettings: thẻ quyền push của máy (xin quyền mềm /
+// mở Cài đặt máy / đã bật) → "Loại thông báo" + Bật tất cả → công tắc theo nhóm (profiles.notification_prefs — đổi ngay, lỗi
+// thì trả lại) → cam kết không quảng cáo. Chỉ ảnh hưởng push; danh sách Thông báo trong app vẫn đủ. Khách → mời đăng nhập
+// (SignInPrompt); hồ sơ đang về → skeleton đúng hình; lỗi → thử lại; kéo làm mới. Header xanh tràn lên vùng trạng thái → chữ
+// thanh trạng thái sáng khi màn đang mở. Khác Stitch: xem đầu NotificationSettings.tsx / PushPermissionCard.tsx.
+import { useMyProfile } from '@hp/core/react';
+import { useIsFocused } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
 import { backOrHome } from '@/features/listing/navigation';
-import { PushPermissionCard } from '@/features/notifications/components/PushPermissionCard';
+import { NotificationSettings, NotificationSettingsSkeleton } from '@/features/notifications/components/NotificationSettings';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
-import { useErrorText } from '@/lib/errors';
-import { Card, Col, Divider, ErrorState, Header, Screen, Skeleton, Text, toast, ToggleRow } from '@/ui';
-
-const ICON: Record<NotificationPrefKey, LucideIcon> = {
-  messages: MessageCircle,
-  listings: BriefcaseBusiness,
-  groups: Car,
-  lost_found: SearchCheck,
-};
+import { ErrorState, PageHero, Screen, useScheme } from '@/ui';
 
 export default function NotificationSettingsScreen() {
   const { t } = useTranslation();
-  const errorText = useErrorText();
   const me = useMyProfile();
-  const prefs = useNotificationPrefs(me.data);
-  const update = useUpdateNotificationPrefs();
-
-  const toggle = (key: NotificationPrefKey, next: boolean) =>
-    update.mutate({ ...prefs, [key]: next }, { onError: (e) => toast.show(errorText(e.code), 'danger') });
+  const focused = useIsFocused();
+  const scheme = useScheme();
 
   return (
-    <Screen scroll>
-      <Header title={t('notifications.prefs.title')} back onBack={backOrHome} />
+    <Screen>
+      <PageHero title={t('notifications.prefs.title')} subtitle={t('notifications.prefs.subtitle')} onBack={backOrHome} />
       {!me.isLoading && !me.userId ? (
-        <SignInPrompt />
+        <SignInPrompt description={t('notifications.login_body')} />
       ) : me.isError ? (
         <ErrorState code={me.error.code} onRetry={() => void me.refetch()} />
       ) : !me.data ? (
         // Có phiên nhưng hồ sơ chưa về (đang tải / đang khôi phục cache persist)
-        <Col gap={3}>
-          <Skeleton className="h-24 w-full rounded-md" />
-          <Skeleton className="h-64 w-full rounded-md" />
-        </Col>
+        <NotificationSettingsSkeleton />
       ) : (
-        <Col gap={4}>
-          <PushPermissionCard />
-          <Text tone="muted">{t('notifications.prefs.subtitle')}</Text>
-          <Card padded={false}>
-            {NOTIFICATION_PREF_KEYS.map((key, i) => (
-              <Fragment key={key}>
-                {i > 0 ? <Divider /> : null}
-                <ToggleRow
-                  icon={ICON[key]}
-                  label={t(`notifications.prefs.${key}`)}
-                  hint={t(`notifications.prefs.${key}_hint`)}
-                  value={prefs[key]}
-                  onValueChange={(next) => toggle(key, next)}
-                />
-              </Fragment>
-            ))}
-          </Card>
-        </Col>
+        <NotificationSettings profile={me.data} onRefresh={me.refetch} />
       )}
+      {focused ? <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} /> : null}
     </Screen>
   );
 }

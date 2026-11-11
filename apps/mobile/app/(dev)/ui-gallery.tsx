@@ -1012,6 +1012,27 @@ export default function UiGalleryScreen() {
           <Divider />
           <ToggleRow label={t('notifications.prefs.groups')} value={false} onValueChange={() => undefined} disabled />
         </Card>
+        {/* iconBox: ô icon nền nhạt — 'primary' hoặc màu dịch vụ (Cài đặt thông báo). */}
+        <Card padded={false}>
+          <ToggleRow
+            icon={MessageCircle}
+            iconBox="primary"
+            label={t('notifications.prefs.messages')}
+            hint={t('notifications.prefs.messages_hint')}
+            value={toggle}
+            onValueChange={setToggle}
+          />
+          <Divider />
+          <ToggleRow
+            icon={Search}
+            iconBox="lostFound"
+            label={t('notifications.prefs.lost_found')}
+            hint={t('notifications.prefs.lost_found_hint')}
+            value={false}
+            onValueChange={() => undefined}
+            disabled
+          />
+        </Card>
       </Section>
 
       <Section title={t('dev.service_colors')}>
