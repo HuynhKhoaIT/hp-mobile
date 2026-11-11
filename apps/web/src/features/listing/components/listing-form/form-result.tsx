@@ -4,6 +4,8 @@
 //   active → form.success_* (sửa tin: form.saved) · pending_review → form.pending_* + lý do (manage.reason.*)
 //   rejected → form.rejected_* + lý do · draft → form.draft_saved.
 // Liên kết: Xem tin / Đăng tin khác / Tin của tôi (+ Sửa tin khi bị từ chối).
+// Đăng / lưu thành công (active): MỘT vòng lan quanh dấu tích (animate-success-ripple: sau 200ms, viền success phóng
+// 1 → 1.6 và mờ dần 900ms, không lặp — motion.ripple của @hp/tokens, giống app SuccessScreen); giảm chuyển động → không vòng.
 import type { SavedListingResult } from '@hp/core';
 import { CircleCheck, Clock, FileText, OctagonAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -44,7 +46,13 @@ export function FormResult({
 
   return (
     <section aria-live="polite" className="flex flex-col items-center gap-4 rounded-lg bg-surface p-6 text-center shadow-card">
-      <span className={cn('flex size-16 items-center justify-center rounded-full', view.tone)}>
+      <span className={cn('relative flex size-16 items-center justify-center rounded-full', view.tone)}>
+        {result.status === 'active' ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-full border-2 border-success opacity-0 motion-safe:animate-success-ripple"
+          />
+        ) : null}
         <view.Icon aria-hidden strokeWidth={1.75} className="size-8" />
       </span>
       <h2 className="text-xl font-semibold text-fg">{title}</h2>

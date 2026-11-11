@@ -4,7 +4,7 @@
 //   `distanceOptions` từ config, ?distance=N km), nút Tìm. Giữ category + thuộc tính đang lọc qua input ẩn.
 // - ListChips: dưới header — hàng chip danh mục (trang một tính năng: category, nhãn theo config.card.categoryBadge nếu có —
 //   đồ thất lạc "Mất đồ / Nhặt được"; /tin + /tim-kiem: 4 tính năng, link sang trang riêng) → hàng chip lọc nhanh theo thông
-//   số (config.quickFilters, bật / tắt — `?has_loft=1`) → thuộc tính khác đang lọc (chip "Tìm nhanh" của trang chủ) dạng
+//   số (config.quickFilters, bật / tắt — `?has_loft=1`; chip giá tối đa — `?price_max=1000000`) → thuộc tính khác đang lọc (chip "Tìm nhanh" của trang chủ) dạng
 //   viên có nút bỏ + "Xoá từ khoá" + "Xoá lọc" (bỏ mọi tham số) khi đang lọc.
 // Khác Stitch (cố ý): không thanh trượt giá / "Sắp xếp" / xác thực người bán / ship nội bộ — RPC và dữ liệu không có.
 import type { Site } from '@hp/core';
@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { LISTING_FEATURE_CONFIGS, LISTING_FEATURE_ORDER } from '../features';
-import { activeFilterCount, attributeQuery, attributesFor, filterQuery, type ListFilterState } from '../filters';
+import { activeFilterCount, attributeQuery, attributesFor, filterQuery, isPriceQuickFilter, type ListFilterState } from '../filters';
 import { FilterSelect, SiteSelect } from './site-select';
 
 const RING = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
@@ -69,6 +69,7 @@ export function ListSearchForm({
   return (
     <form action={action} role="search" className="flex flex-col gap-2 lg:flex-row">
       {filters.category ? <input type="hidden" name="category" value={filters.category} /> : null}
+      {filters.priceMax ? <input type="hidden" name="price_max" value={filters.priceMax} /> : null}
       {Object.entries(attributeQuery(filters.attributes)).map(([key, value]) => (
         <input key={key} type="hidden" name={key} value={value} />
       ))}
@@ -127,9 +128,10 @@ export function ListChips({
 }) {
   const t = useTranslations();
   const cfg = feature ? LISTING_FEATURE_CONFIGS[feature] : null;
+  // Đổi chip danh mục giữ từ khoá / khu / khoảng cách / giá; sang trang tính năng khác (/tin) thì bỏ giá (mốc riêng tính năng).
   const keep = { query: filters.query, site: filters.site, distanceKm: filters.distanceKm };
   const quick = cfg?.quickFilters ?? [];
-  const isQuick = (key: string) => quick.some((q) => q.key === key);
+  const isQuick = (key: string) => quick.some((q) => !isPriceQuickFilter(q) && q.key === key);
   /** Chữ của một thuộc tính: enum → tên giá trị ("Ca đêm"), bool → tên thuộc tính ("Có gác") / "…: Không". */
   const attributeLabel = (key: string, value: string | boolean) =>
     typeof value === 'boolean'
@@ -165,7 +167,7 @@ export function ListChips({
           ) : null}
           <li>
             <Chip
-              href={{ pathname: path, query: filterQuery({ ...keep, attributes: attributesFor(filters.attributes, categories) }) }}
+              href={{ pathname: path, query: filterQuery({ ...keep, priceMax: filters.priceMax, attributes: attributesFor(filters.attributes, categories) }) }}
               selected={!filters.category}
             >
               {t('listing.list.filter_all')}
@@ -175,7 +177,10 @@ export function ListChips({
             ? categories.map((c) => (
                 <li key={c}>
                   <Chip
-                    href={{ pathname: path, query: filterQuery({ ...keep, category: c, attributes: attributesFor(filters.attributes, [c]) }) }}
+                    href={{
+                      pathname: path,
+                      query: filterQuery({ ...keep, priceMax: filters.priceMax, category: c, attributes: attributesFor(filters.attributes, [c]) }),
+                    }}
                     selected={filters.category === c}
                   >
                     {categoryLabel(c)}
@@ -200,6 +205,17 @@ export function ListChips({
         <nav aria-label={t('listing.list.quick_filters')} className="no-scrollbar -mx-4 overflow-x-auto px-4">
           <ul className="flex gap-2 py-1">
             {quick.map((q) => {
+              if (isPriceQuickFilter(q)) {
+                const on = filters.priceMax === q.priceMax;
+                return (
+                  <li key={`price_max:${q.priceMax}`}>
+                    <Chip href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax }) }} selected={on} pressed={on}>
+                      <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
+                      {t(q.labelKey)}
+                    </Chip>
+                  </li>
+                );
+              }
               const on = filters.attributes[q.key] === q.value;
               const next: Record<string, string | boolean> = { ...filters.attributes };
               if (on) delete next[q.key];

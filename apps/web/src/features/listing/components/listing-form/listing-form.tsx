@@ -64,6 +64,8 @@ type Props = {
   phone: string | null;
   /** ?feature= của /dang-tin. */
   initialFeature: ListingFeature | null;
+  /** ?category= của /dang-tin (đã kiểm thuộc initialFeature) — vào thẳng bước Ảnh. */
+  initialCategory: ListingCategory | null;
   /** Tin đang sửa (mode edit). */
   listing: MyListing | null;
 };
@@ -81,13 +83,13 @@ const singleCategory = (f: ListingFeature | null): ListingCategory | null => {
 
 const newKey = () => (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Math.random()).slice(2));
 
-export function ListingForm({ mode, userId, sites, defaults, phone, initialFeature, listing }: Props) {
+export function ListingForm({ mode, userId, sites, defaults, phone, initialFeature, initialCategory, listing }: Props) {
   const t = useTranslations();
   const errorText = useErrorText();
   const router = useRouter();
 
   const startFeature = listing ? featureOfCategory(listing.category) : initialFeature;
-  const startCategory = listing?.category ?? singleCategory(initialFeature);
+  const startCategory = listing?.category ?? initialCategory ?? singleCategory(initialFeature);
   const [feature, setFeature] = useState<ListingFeature | null>(startFeature);
   const [category, setCategory] = useState<ListingCategory | null>(startCategory);
   const [step, setStep] = useState<0 | FormStep>(startCategory ? 1 : 0);

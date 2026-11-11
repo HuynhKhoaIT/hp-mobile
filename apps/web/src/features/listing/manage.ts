@@ -3,7 +3,8 @@
 // Khớp app (hợp đồng tuần 4): Sửa · Đánh dấu đã bán (chỉ pass đồ / trọ) · Đóng tin · Mở lại (đã bán / đã đóng)
 // · Gửi duyệt lại (bị từ chối → DB chuyển pending_review, lý do `resubmit`) · Gia hạn (≤ 3 ngày cuối hoặc đã hết hạn) · Xoá.
 // Đồ thất lạc (Stitch L2 "Đồ thất lạc của tôi", khớp app MyListingRow): đang đăng, chưa trả → "Đã nhận lại đồ" / "Đã trả cho
-// chủ" (mark_listing_returned) là nút nhanh chính; đã trả lại → không còn Mở lại.
+// chủ" (mark_listing_returned) là nút nhanh chính; đã trả lại → không còn Mở lại, nút nhanh chính "Cảm ơn người trả đồ" /
+// "Đánh giá người nhận" (rate_listing — RateListingDialog).
 import type { MyListing, MyListingsTab } from '@hp/core';
 import { featureOfCategory, type ListingStatus } from '@hp/shared';
 import type { BadgeTone } from '@/components/shared/badge';
@@ -15,7 +16,7 @@ export const RENEW_WINDOW_DAYS = 3;
 /** Tab "Tin của tôi" (listMyListings): Chờ duyệt gồm cả bị từ chối; Đã đóng gồm đã bán / đã đóng / hết hạn. */
 export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
 
-export type ManageAction = 'edit' | 'sold' | 'returned' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
+export type ManageAction = 'edit' | 'sold' | 'returned' | 'rate' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
 
 /** active quá expires_at (cron chưa kịp đổi) coi như hết hạn. */
 export function ownerStatus(l: Pick<MyListing, 'status' | 'expires_at'>, now: number): ListingStatus {
@@ -46,6 +47,7 @@ export function manageActions(l: Pick<MyListing, 'status' | 'expires_at' | 'cate
     out.push('close');
   }
   if ((status === 'sold' || status === 'closed') && !returned) out.push('reopen');
+  if (returned) out.push('rate');
   if (status === 'rejected') out.push('resubmit');
   if (canRenew(l, now)) out.push('renew');
   out.push('delete');
@@ -111,6 +113,7 @@ export function quickActions(status: ListingStatus, actions: readonly ManageActi
       break;
     case 'sold':
     case 'closed':
+      add('rate', 'primary');
       add('reopen', 'outline');
       add('edit', 'outline');
       break;

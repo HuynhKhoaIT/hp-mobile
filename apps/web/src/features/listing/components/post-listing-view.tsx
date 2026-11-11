@@ -1,7 +1,7 @@
 // Khung server của form đăng / sửa tin (đọc theo request: cookie phiên → luôn nằm trong <Suspense> của page).
 // Lấy hồ sơ (khu mặc định, SĐT của chính chủ để nhắc số nào hiện qua "Hiện số"), danh mục khu, tin đang sửa rồi giao cho
 // ListingForm (client). Khung trang: tràn mép trên điện thoại (header xanh của form), từ 640px là khối giữa trang.
-import { type ListingFeature, LISTING_FEATURES } from '@hp/shared';
+import { featureOfCategory, LISTING_CATEGORIES, type ListingCategory, type ListingFeature, LISTING_FEATURES } from '@hp/shared';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -12,9 +12,16 @@ import { ListingForm } from './listing-form/listing-form';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
-function parseFeature(raw: RawParams): ListingFeature | null {
-  const v = Array.isArray(raw.feature) ? raw.feature[0] : raw.feature;
-  return v && v in LISTING_FEATURES ? (v as ListingFeature) : null;
+const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+
+/** ?feature= và ?category= (banner danh sách mở thẳng đúng danh mục). Category lạ / không thuộc feature → bỏ qua. */
+function parsePreset(raw: RawParams): { feature: ListingFeature | null; category: ListingCategory | null } {
+  const f = first(raw.feature);
+  const c = first(raw.category);
+  const category = c && (LISTING_CATEGORIES as readonly string[]).includes(c) ? (c as ListingCategory) : null;
+  const feature = f && f in LISTING_FEATURES ? (f as ListingFeature) : null;
+  if (category && (!feature || featureOfCategory(category) === feature)) return { feature: featureOfCategory(category), category };
+  return { feature, category: null };
 }
 
 async function ContextError({ code }: { code: string }) {
@@ -24,21 +31,22 @@ async function ContextError({ code }: { code: string }) {
   );
 }
 
-/** /dang-tin?feature=pass|room|job|lostFound */
+/** /dang-tin?feature=pass|room|job|lostFound[&category=<code>] */
 export async function PostListingView({ searchParams }: { searchParams: Promise<RawParams> }) {
-  const feature = parseFeature(await searchParams);
+  const { feature, category } = parsePreset(await searchParams);
   const ctx = await getPostFormContext();
   if (ctx.error) return <ContextError code={ctx.error.code} />;
   const locale = asLocale(await getLocale());
   return (
     <ListingForm
-      key={feature ?? 'none'}
+      key={category ?? feature ?? 'none'}
       mode="create"
       userId={ctx.data.profile.id}
       sites={ctx.data.sites}
       defaults={{ site: ctx.data.profile.site, lang: locale }}
       phone={ctx.data.profile.phone}
       initialFeature={feature}
+      initialCategory={category}
       listing={null}
     />
   );
@@ -60,6 +68,7 @@ export async function EditListingView({ params }: { params: Promise<{ id: string
       defaults={{ site: ctx.data.profile.site, lang: locale }}
       phone={ctx.data.profile.phone}
       initialFeature={null}
+      initialCategory={null}
       listing={listing.data}
     />
   );

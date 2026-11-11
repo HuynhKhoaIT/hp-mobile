@@ -6,8 +6,10 @@
 // Cả hai dùng chung useManage: gọi Server Action (actions.ts) → toast manage.*_done → làm mới query "Tin của tôi" của
 // TanStack (khối xem trước ở /toi + số trên chip) và router.refresh() (trang /toi/tin-cua-toi đọc theo request).
 // Thao tác nào hiện do manage.ts quyết định (chỉ UI); DB mới là nơi chặn.
-// Đồ thất lạc: "Đã nhận lại đồ" / "Đã trả cho chủ" → ReturnedDialog (thẻ món đồ + nhắc đối chiếu, style Stitch L2) →
-// markListingReturnedAction. Cần `returnable` (tiêu đề, loại, ảnh, attributes) để dựng thẻ trong hộp xác nhận.
+// Đồ thất lạc: "Đã nhận lại đồ" / "Đã trả cho chủ" → ReturnedDialog (xác nhận → "Bàn giao thành công" → đánh giá, style
+// Stitch; RPC mark_listing_returned trong hộp, đóng hộp mới làm mới danh sách để thẻ không biến mất giữa chừng). Đã trả lại →
+// "Cảm ơn người trả đồ" / "Đánh giá người nhận" → RateListingDialog (rate_listing). Cần `returnable` (tiêu đề, loại, ảnh,
+// attributes) để dựng thẻ trong hộp.
 import { keys } from '@hp/core';
 import { formatDate } from '@hp/shared';
 import { useQueryClient } from '@tanstack/react-query';
@@ -21,6 +23,7 @@ import {
   Pencil,
   RotateCcw,
   Send,
+  Star,
   Trash2,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
@@ -39,10 +42,11 @@ import { useErrorText } from '@/features/auth/components/use-error-text';
 import { Link, useRouter } from '@/i18n/navigation';
 import type { ActionResult } from '@/lib/action-result';
 import { cn } from '@/lib/utils';
-import { deleteListingAction, markListingReturnedAction, renewListingAction, setListingStatusAction } from '../actions';
+import { deleteListingAction, renewListingAction, setListingStatusAction } from '../actions';
 import { asLocale } from '../display';
 import type { ManageAction, QuickAction } from '../manage';
-import { ReturnedDialog, type ReturnedListing, returnedLabelKeys } from './returned-dialog';
+import { RateListingDialog } from './rate-listing-dialog';
+import { rateLabelKey, ReturnedDialog, type ReturnedListing, returnedLabelKeys } from './returned-dialog';
 
 const editHref = (id: string) => `/toi/tin-cua-toi/${id}/sua`;
 
@@ -50,6 +54,7 @@ const ICON: Record<QuickAction['action'], LucideIcon> = {
   edit: Pencil,
   sold: CircleCheck,
   returned: PackageCheck,
+  rate: Star,
   close: Archive,
   reopen: RotateCcw,
   resubmit: Send,
@@ -58,7 +63,6 @@ const ICON: Record<QuickAction['action'], LucideIcon> = {
 
 function useManage(id: string, returnable?: ReturnedListing) {
   const t = useTranslations('listing.manage');
-  const tLost = useTranslations('listing.lost_found');
   const tForm = useTranslations('listing.form');
   const locale = asLocale(useLocale());
   const errorText = useErrorText();
@@ -66,7 +70,7 @@ function useManage(id: string, returnable?: ReturnedListing) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [pending, startTransition] = useTransition();
-  const [confirm, setConfirm] = useState<'sold' | 'delete' | 'returned' | null>(null);
+  const [confirm, setConfirm] = useState<'sold' | 'delete' | 'returned' | 'rate' | null>(null);
 
   const run = <T,>(action: () => Promise<ActionResult<T>>, done: (data: T) => string) => {
     startTransition(async () => {
@@ -85,10 +89,15 @@ function useManage(id: string, returnable?: ReturnedListing) {
 
   const markSold = () => run(() => setListingStatusAction({ id, status: 'sold' }), () => t('sold_done'));
   const remove = () => run(() => deleteListingAction(id), () => t('deleted'));
-  const markReturned = () => run(() => markListingReturnedAction(id), () => tLost('returned_done'));
+  // Sau khi trả đồ (đóng hộp): làm mới số liệu / khối xem trước + trang (thẻ chuyển sang "Đã đóng" + "Đã trả lại").
+  const afterReturned = () => {
+    void queryClient.invalidateQueries({ queryKey: keys.myListings() });
+    router.refresh();
+  };
   const handlers: Record<Exclude<QuickAction['action'], 'edit'>, () => void> = {
     sold: () => setConfirm('sold'),
     returned: () => setConfirm('returned'),
+    rate: () => setConfirm('rate'),
     close: () => run(() => setListingStatusAction({ id, status: 'closed' }), () => t('closed_done')),
     reopen: () => run(() => setListingStatusAction({ id, status: 'active' }), () => t('reopened')),
     resubmit: () => run(() => setListingStatusAction({ id, status: 'active' }), () => tForm('pending_title')),
@@ -117,13 +126,16 @@ function useManage(id: string, returnable?: ReturnedListing) {
         onConfirm={remove}
       />
       {returnable ? (
-        <ReturnedDialog
-          open={confirm === 'returned'}
-          onOpenChange={(open) => setConfirm(open ? 'returned' : null)}
-          listing={returnable}
-          pending={pending}
-          onConfirm={markReturned}
-        />
+        <>
+          <ReturnedDialog
+            open={confirm === 'returned'}
+            onOpenChange={(open) => setConfirm(open ? 'returned' : null)}
+            listingId={id}
+            listing={returnable}
+            onFinished={afterReturned}
+          />
+          <RateListingDialog open={confirm === 'rate'} onOpenChange={(open) => setConfirm(open ? 'rate' : null)} listingId={id} />
+        </>
       ) : null}
     </>
   );
@@ -185,6 +197,12 @@ export function MyListingMenu({
               {tLost(returnedLabelKeys(returnable.category).action)}
             </DropdownMenuItem>
           ) : null}
+          {actions.includes('rate') && returnable ? (
+            <DropdownMenuItem onSelect={handlers.rate}>
+              <Star strokeWidth={1.75} aria-hidden />
+              {tLost(rateLabelKey(returnable.category))}
+            </DropdownMenuItem>
+          ) : null}
           {actions.includes('close') ? (
             <DropdownMenuItem onSelect={handlers.close}>
               <Archive strokeWidth={1.75} aria-hidden />
@@ -226,7 +244,7 @@ export function MyListingMenu({
 }
 
 /** Nhãn ngắn của nút nhanh ("Đã bán" thay "Đánh dấu đã bán" — nút hẹp). */
-const QUICK_LABEL: Record<Exclude<QuickAction['action'], 'returned'>, string> = {
+const QUICK_LABEL: Record<Exclude<QuickAction['action'], 'returned' | 'rate'>, string> = {
   edit: 'edit',
   sold: 'sold_confirm',
   close: 'mark_closed',
@@ -257,7 +275,7 @@ export function MyListingQuickActions({
   const t = useTranslations('listing.manage');
   const tLost = useTranslations('listing.lost_found');
   const { pending, handlers, dialogs } = useManage(id, returnable);
-  const shown = returnable ? items : items.filter((q) => q.action !== 'returned');
+  const shown = returnable ? items : items.filter((q) => q.action !== 'returned' && q.action !== 'rate');
   if (shown.length === 0) return null;
   // Không có nút chính (đang đăng chưa tới hạn gia hạn, đã đóng) → các nút viền chia đều.
   const hasMain = shown.some((q) => q.tone !== 'outline');
@@ -277,7 +295,9 @@ export function MyListingQuickActions({
               <Icon aria-hidden strokeWidth={1.75} />
               {action === 'returned'
                 ? tLost(returnedLabelKeys(returnable?.category ?? 'lost').action)
-                : t(QUICK_LABEL[action])}
+                : action === 'rate'
+                  ? tLost(rateLabelKey(returnable?.category ?? 'lost'))
+                  : t(QUICK_LABEL[action])}
             </>
           );
           return action === 'edit' ? (

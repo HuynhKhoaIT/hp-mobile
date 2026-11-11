@@ -25,6 +25,10 @@ export const lostFoundConfig: ListingFeatureConfig = {
     },
     placeKey: 'place',
     timeKey: 'lost_at',
+    // Stitch L3 ("Tìm kiếm đồ thất lạc & Nhặt được", khớp app): mô tả 2 dòng + dòng người đăng; tin đã trả lại: ảnh mờ +
+    // tiêu đề gạch ngang (listing-card).
+    description: true,
+    owner: true,
   },
   quickFilters: [
     { key: 'item_type', value: 'card' },
@@ -32,6 +36,15 @@ export const lostFoundConfig: ListingFeatureConfig = {
     { key: 'item_type', value: 'phone' },
     { key: 'item_type', value: 'keys' },
   ],
+  // Khối 2 nút đầu danh sách → /dang-tin chọn sẵn "Tôi nhặt được" / "Tôi làm mất".
+  banner: {
+    variant: 'actions',
+    textKey: 'listing.list.banner.lost_found_text',
+    actions: [
+      { labelKey: 'listing.list.banner.found_cta', category: 'found', Icon: HandHeart },
+      { labelKey: 'listing.list.banner.lost_cta', category: 'lost', Icon: Megaphone },
+    ],
+  },
   tipKey: 'listing.tip.lostFound',
   primaryCta: 'call',
   // Stitch L2 (khớp app): 2 thẻ lớn "Tôi làm mất / Tôi nhặt được" ở bước chọn danh mục; hộp nhắc che số giấy tờ ở bước

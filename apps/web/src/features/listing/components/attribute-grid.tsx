@@ -1,7 +1,9 @@
 // Thông tin tin (readAttributes của @hp/shared) dạng lưới ô — style Stitch, khớp AttributeList của app: mỗi ô có icon theo
 // thông số (ô size-8 nền primary-light), nhãn text-sm muted, giá trị đậm; thông số chữ dài (yêu cầu, đặc điểm nhận dạng,
 // nơi mất / nhặt, giờ giấc) chiếm cả hàng. `returned` không hiện (nhãn "Đã trả lại" ở đầu trang). Server Component.
-import type { AttributeField, AttributeValue } from '@hp/shared';
+// AttributeSections (khớp AttributeList của app): lưới "Thông tin" chung + khối có tiêu đề theo groupAttributeRows của
+// @hp/shared — trọ "Chi phí" / "Nội quy", việc "Người phụ trách" (tên; SĐT chỉ qua Gọi) / "Yêu cầu" (đoạn chữ).
+import { type AttributeField, type AttributeValue, groupAttributeRows, type ListingCategory } from '@hp/shared';
 import {
   Bike,
   BriefcaseBusiness,
@@ -28,6 +30,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { BarHeading } from './safety-tip';
 
 /** Icon theo khoá thông số — giống ATTRIBUTE_ICON của app (apps/mobile/src/features/listing/components/AttributeList.tsx). */
 const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
@@ -82,7 +85,7 @@ export function AttributeGrid({
         return (
           <div
             key={field.key}
-            className={cn('flex min-h-14 items-start gap-2.5 rounded-md border border-border bg-bg p-2.5', WIDE.has(field.key) && 'col-span-2')}
+            className={cn('flex min-h-14 items-start gap-2.5 rounded-md border border-border bg-bg p-2.5', (WIDE.has(field.key) || rows.length === 1) && 'col-span-2')}
           >
             <span aria-hidden className="flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary-light text-primary">
               <Icon strokeWidth={1.75} className="size-4.5" />
@@ -97,5 +100,61 @@ export function AttributeGrid({
         );
       })}
     </dl>
+  );
+}
+
+type Row = { field: AttributeField; value: AttributeValue };
+
+/** Các khối thông số của trang chi tiết: "Thông tin" (lưới chung) + khối theo nhóm của category. Không có dòng → null. */
+export function AttributeSections({
+  category,
+  rows,
+  title,
+  groupTitle,
+  label,
+  valueText,
+  lang,
+}: {
+  category: ListingCategory;
+  rows: Row[];
+  /** Tiêu đề lưới chung (`listing.detail.attributes`). */
+  title: string;
+  /** Tiêu đề khối (`listing.attr_group.<key>`). */
+  groupTitle: (key: string) => string;
+  label: (key: string) => string;
+  valueText: (field: AttributeField, value: AttributeValue) => string;
+  lang: string;
+}) {
+  if (rows.length === 0) return null;
+  const { general, groups } = groupAttributeRows(category, rows);
+  return (
+    <>
+      {general.length > 0 ? (
+        <section aria-labelledby="attributes-heading" className="flex flex-col gap-2">
+          <BarHeading id="attributes-heading" tone="primary">
+            {title}
+          </BarHeading>
+          <AttributeGrid rows={general} label={label} valueText={valueText} lang={lang} />
+        </section>
+      ) : null}
+      {groups.map((g) => (
+        <section key={g.key} aria-labelledby={`attributes-${g.key}-heading`} className="flex flex-col gap-2">
+          <BarHeading id={`attributes-${g.key}-heading`} tone="primary">
+            {groupTitle(g.key)}
+          </BarHeading>
+          {g.layout === 'text' ? (
+            <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4 shadow-card">
+              {g.rows.map(({ field, value }) => (
+                <p key={field.key} lang={lang} className="text-md whitespace-pre-line break-words text-fg">
+                  {valueText(field, value)}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <AttributeGrid rows={g.rows} label={label} valueText={valueText} lang={lang} />
+          )}
+        </section>
+      ))}
+    </>
   );
 }

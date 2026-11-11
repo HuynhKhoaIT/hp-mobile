@@ -5,15 +5,32 @@
 // (embla-carousel có trong danh sách thư viện nhưng chưa cài; CSS scroll-snap đủ cho tuần 3.)
 // Style Stitch (khớp ImageGallery bleed + thumbnails của app): điện thoại tràn mép (-mx-4, không bo), từ 640px bo lg; bộ đếm có
 // icon máy ảnh; ≥ 2 ảnh → hàng ảnh nhỏ size-16 bên dưới, bấm để nhảy tới ảnh (ảnh đang xem viền primary, aria-current).
+// Khớp ImageGallery của app: `placeholder` (khung 4:3 khi chưa có ảnh — ListingPlaceholder), `overlayTop` (góc trái trên:
+// nhãn tình trạng / xác minh — Badge overlay), `overlayBottom` (góc trái dưới, chừa chỗ bộ đếm: giá trọ trên nền surface/90).
 import { Camera, ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useRef, useState } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { listingImageUrl } from '@/lib/images';
 import { cn } from '@/lib/utils';
 
-export function ListingGallery({ images, title }: { images: string[]; title: string }) {
+export function ListingGallery({
+  images,
+  title,
+  placeholder,
+  overlayTop,
+  overlayBottom,
+}: {
+  images: string[];
+  title: string;
+  /** Nội dung khung khi chưa có ảnh. */
+  placeholder?: ReactNode;
+  /** Nhãn phủ góc trái trên ảnh. */
+  overlayTop?: ReactNode;
+  /** Khối phủ góc trái dưới ảnh (chừa chỗ bộ đếm ảnh bên phải). */
+  overlayBottom?: ReactNode;
+}) {
   const t = useTranslations();
   const track = useRef<HTMLUListElement>(null);
   const [index, setIndex] = useState(0);
@@ -29,6 +46,7 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
   return (
     <div className="-mx-4 flex flex-col gap-3 sm:mx-0">
       <div className="relative overflow-hidden bg-surface-2 sm:rounded-lg">
+        {total === 0 ? <div className="aspect-card w-full">{placeholder}</div> : null}
         <ul
           ref={track}
           onScroll={(e) => setIndex(Math.round(e.currentTarget.scrollLeft / Math.max(1, e.currentTarget.clientWidth)))}
@@ -80,6 +98,12 @@ export function ListingGallery({ images, title }: { images: string[]; title: str
               <ChevronRight strokeWidth={1.75} />
             </Button>
           </>
+        ) : null}
+        {overlayTop ? (
+          <div className="pointer-events-none absolute top-3 right-3 left-3 flex flex-wrap gap-1.5">{overlayTop}</div>
+        ) : null}
+        {overlayBottom ? (
+          <div className={cn('pointer-events-none absolute bottom-3 left-3', total > 1 ? 'right-28' : 'right-3')}>{overlayBottom}</div>
         ) : null}
       </div>
       {total > 1 ? (

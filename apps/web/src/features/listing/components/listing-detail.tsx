@@ -13,8 +13,13 @@
 // toàn riêng (config.tipKey) → lưới ô thông tin → người đăng → liên hệ (nút chính theo config.primaryCta; dưới 1024px là thanh
 // dính đáy) → mô tả → tin tương tự. Khác Stitch (cố ý): không trả giá, Zalo, hẹn xem, giá gốc gạch, bảng khoảng cách tới từng
 // nhà máy, bản đồ — không có tính năng / dữ liệu đó.
+// Stitch "Chi tiết phòng trọ" / "Chi tiết việc làm" (khớp ListingDetail của app): nhãn phủ trên ảnh — tình trạng (đang hiện:
+// listing.availability "Còn trống" / "Đang tuyển"…; đã bán / đóng / hết hạn: common.status; đồ đã nhận lại: "Đã trả lại") +
+// "Đã xác minh" (người đăng có huy hiệu); trọ: giá phủ góc dưới ảnh trên nền surface/90 (không có token scrim / gradient tối
+// nên dùng nền đặc); "Mã tin #A1B2C3 · Đăng …" trên tiêu đề; "Hết hạn {ngày} · lượt xem" cuối thẻ; thông số chia khối có tiêu
+// đề (AttributeSections — trọ Chi phí / Nội quy, việc Người phụ trách / Yêu cầu); thanh liên hệ [Gọi] [Nhắn tin] [nút chính].
 import { listingDisplayStatus, type PublicListing } from '@hp/core';
-import { formatDistance, formatRelative, priceLabel, readAttributes } from '@hp/shared';
+import { featureOfCategory, formatDate, formatDistance, formatRelative, priceLabel, readAttributes } from '@hp/shared';
 import { ChevronLeft, Info, MapPin } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Badge } from '@/components/shared/badge';
@@ -25,7 +30,7 @@ import { attributeText, asLocale, cardFacts, isReturned, priceText } from '../di
 import { configOfCategory } from '../features';
 import { listingJsonLd } from '../json-ld';
 import { getSimilarListings } from '../queries';
-import { AttributeGrid, HIDDEN_ATTRIBUTES } from './attribute-grid';
+import { AttributeSections, HIDDEN_ATTRIBUTES } from './attribute-grid';
 import { BookmarkButton } from './bookmark-button';
 import { ListingActions } from './listing-actions';
 import { ListingGallery } from './listing-gallery';
@@ -51,6 +56,15 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
   const badge = cfg.card?.categoryBadge?.[listing.category];
   const facts = cardFacts(listing, cfg.card?.facts, t, locale);
   const cut = price.lastIndexOf('/');
+  const feature = featureOfCategory(listing.category);
+  // Nhãn tình trạng trên ảnh: chữ + tone (không chỉ màu). Đồ thất lạc đang hiện theo category (Đang tìm / Chờ chủ nhận).
+  const status = returned
+    ? { label: t('listing.lost_found.returned_badge'), tone: 'success' as const }
+    : active
+      ? { label: t(`listing.availability.${feature === 'lostFound' ? listing.category : feature}`), tone: 'success' as const }
+      : { label: t(`common.status.${displayStatus}`), tone: 'danger' as const };
+  // Cùng quy tắc với PosterCard: có huy hiệu (đã dịch được) = đã xác minh.
+  const verified = listing.owner_badges.some((b) => t.has(`listing.owner_badge.${b}`));
   const jsonLd = active
     ? listingJsonLd(listing, cfg.jsonLd, { url: absoluteUrl(`/tin/${listing.slug}`, locale), categoryName })
     : null;
@@ -81,28 +95,54 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
 
         <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
           <div className="order-1 lg:col-span-7 lg:row-start-1">
-            {listing.images.length > 0 ? (
-              <ListingGallery images={listing.images} title={listing.title} />
-            ) : (
-              <div className="-mx-4 aspect-card overflow-hidden sm:mx-0 sm:rounded-lg">
-                <ListingPlaceholder category={listing.category} size="lg" />
-              </div>
-            )}
+            <ListingGallery
+              images={listing.images}
+              title={listing.title}
+              placeholder={<ListingPlaceholder category={listing.category} size="lg" />}
+              overlayTop={
+                <>
+                  <Badge overlay tone={status.tone}>
+                    {status.label}
+                  </Badge>
+                  {verified ? (
+                    <Badge overlay tone="primary">
+                      {t('common.profile.verified')}
+                    </Badge>
+                  ) : null}
+                </>
+              }
+              overlayBottom={
+                feature === 'room' && price ? (
+                  <p className="inline-flex rounded-md bg-surface/90 px-3 py-1.5 text-md font-bold text-primary shadow-card backdrop-blur-sm">
+                    {price}
+                  </p>
+                ) : undefined
+              }
+            />
           </div>
 
           {/* Cột phải (desktop, dính khi cuộn). Điện thoại: `contents` để các khối con xếp theo order giữa cột trái. */}
           <div className="contents lg:sticky lg:top-20 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
             <header className="order-2 flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
               <div className="flex flex-wrap gap-1">
-                {!active ? <Badge tone="danger">{t(`common.status.${displayStatus}`)}</Badge> : null}
                 <Badge tone={badge?.tone}>{badge?.labelKey ? t(badge.labelKey) : categoryName}</Badge>
-                {returned ? <Badge tone="success">{t('listing.lost_found.returned_badge')}</Badge> : null}
                 {foreign ? (
                   <Badge tone="primary" lang={listing.lang}>
                     {t(`common.locale.${listing.lang}`)}
                   </Badge>
                 ) : null}
               </div>
+              <p className="text-sm text-muted">
+                {listing.short_id ? (
+                  <>
+                    {t('listing.detail.code', { code: listing.short_id.toUpperCase() })}
+                    {' · '}
+                  </>
+                ) : null}
+                <time dateTime={listing.created_at}>
+                  {t('listing.detail.posted_at', { time: formatRelative(listing.created_at, locale, new Date(now)) })}
+                </time>
+              </p>
               <div className="flex items-start gap-3">
                 <TranslatableText
                   as="h1"
@@ -150,10 +190,14 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                   </>
                 ) : null}
                 <p className="text-sm text-muted">
-                  <time dateTime={listing.created_at}>
-                    {t('listing.detail.posted_at', { time: formatRelative(listing.created_at, locale, new Date(now)) })}
-                  </time>
-                  {' · '}
+                  {active && listing.expires_at ? (
+                    <>
+                      <time dateTime={listing.expires_at}>
+                        {t('listing.detail.expires_at', { date: formatDate(listing.expires_at, locale) })}
+                      </time>
+                      {' · '}
+                    </>
+                  ) : null}
                   {t('listing.detail.views', { count: listing.view_count })}
                 </p>
               </div>
@@ -171,6 +215,7 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                 slug={listing.slug}
                 title={listing.title}
                 ownerId={listing.owner_id}
+                category={listing.category}
                 active={active}
                 primaryCta={cfg.primaryCta}
               />
@@ -179,17 +224,17 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
 
           <div className="contents lg:col-span-7 lg:row-start-2 lg:flex lg:flex-col lg:gap-6">
             {attributes.length > 0 ? (
-              <section aria-labelledby="attributes-heading" className="order-4 flex flex-col gap-2">
-                <BarHeading id="attributes-heading" tone="primary">
-                  {t('listing.detail.attributes')}
-                </BarHeading>
-                <AttributeGrid
+              <div className="order-4 flex flex-col gap-6">
+                <AttributeSections
+                  category={listing.category}
                   rows={attributes}
+                  title={t('listing.detail.attributes')}
+                  groupTitle={(key) => t(`listing.attr_group.${key}`)}
                   label={(key) => t(`listing.attr.${key}`)}
                   valueText={(field, value) => attributeText(field, value, t, locale)}
                   lang={listing.lang}
                 />
-              </section>
+              </div>
             ) : null}
 
             <section aria-labelledby="description-heading" className="order-7 flex flex-col gap-2">

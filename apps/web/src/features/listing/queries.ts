@@ -44,6 +44,8 @@ export type ListQuery = {
   attributes?: AttributeFilter;
   /** Cách khu làm việc tối đa (m) — chỉ giá trị trong config.distanceFilterKm (đã kiểm bằng parseListFilters). */
   maxDistanceM?: number;
+  /** Giá tối đa (VND) — chỉ mốc của chip lọc nhanh giá trong config (đã kiểm bằng parseListFilters). */
+  priceMax?: number;
 };
 
 const hasAttributes = (a: AttributeFilter | undefined): a is AttributeFilter => !!a && Object.keys(a).length > 0;
@@ -62,29 +64,31 @@ async function fetchListPage(q: ListQuery): Promise<Page<PublicListing>> {
       query: q.query || undefined,
       attributes: hasAttributes(q.attributes) ? { ...q.attributes } : undefined,
       maxDistanceM: q.maxDistanceM,
+      priceMax: q.priceMax,
       limit: LIST_PAGE_SIZE,
     }),
   );
 }
 
-/** Trang đầu theo danh mục / khu / thuộc tính / khoảng cách (không từ khoá): tập tham số hữu hạn (whitelist) → cache 300s. */
+/** Trang đầu theo danh mục / khu / thuộc tính / khoảng cách / giá tối đa (không từ khoá): tập tham số hữu hạn (whitelist) → cache 300s. */
 async function getCachedListPage(
   categories: readonly ListingCategory[],
   site: string | null,
   attributes: AttributeFilter | undefined,
   maxDistanceM: number | undefined,
+  priceMax: number | undefined,
 ) {
   'use cache';
   cacheLife({ revalidate: 300 });
   cacheTag('listings');
-  const page = await fetchListPage({ categories, site, query: '', attributes, maxDistanceM });
+  const page = await fetchListPage({ categories, site, query: '', attributes, maxDistanceM, priceMax });
   return { page, now: Date.now() };
 }
 
 /** Trang đầu của danh sách. Có từ khoá → đọc theo request (không cache); chỉ gọi sau khi đã đọc searchParams. */
 export async function getListPage(q: ListQuery): Promise<Timed<{ page: Page<PublicListing> }>> {
   if (!q.query) {
-    return getCachedListPage(q.categories, q.site, hasAttributes(q.attributes) ? q.attributes : undefined, q.maxDistanceM);
+    return getCachedListPage(q.categories, q.site, hasAttributes(q.attributes) ? q.attributes : undefined, q.maxDistanceM, q.priceMax);
   }
   const page = await fetchListPage(q);
   return { page, now: Date.now() };

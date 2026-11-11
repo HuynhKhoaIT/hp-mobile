@@ -13,10 +13,12 @@ export const jobConfig: ListingFeatureConfig = {
   cardLayout: 'row',
   jsonLd: 'job',
   // Stitch L1 (khớp app): lọc nhanh ca ngày / ca đêm, thẻ có nhãn ca làm, mẹo không nộp phí để được nhận việc.
-  card: { facts: ['shift'] },
+  // Stitch L3 ("Danh sách việc làm ca kíp", khớp app): thêm chip "Ca xoay"; thẻ có dòng người đăng (+ dấu xác minh) và tim lưu tin.
+  card: { facts: ['shift'], owner: true, bookmark: true },
   quickFilters: [
     { key: 'shift', value: 'day' },
     { key: 'shift', value: 'night' },
+    { key: 'shift', value: 'rotating' },
   ],
   tipKey: 'listing.tip.job',
   primaryCta: 'chat',
