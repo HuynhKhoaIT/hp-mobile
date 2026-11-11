@@ -107,6 +107,17 @@ export const shadow = {
   fab: { x: 0, y: 6, blur: 16, color: 'rgba(234,88,12,0.35)' },
 } as const;
 
+/**
+ * Dải sáng quét qua skeleton (app + web): màu giữa của gradient trong suốt → màu này → trong suốt, đặt trên nền surface2.
+ * rgba vì dải phải mờ dần hai mép; light: trắng sáng lên trên slate nhạt, dark: slate nhạt hắt lên trên nền tối.
+ */
+export const shimmer = {
+  light: 'rgba(255,255,255,0.7)',
+  dark: 'rgba(148,163,184,0.14)',
+} as const;
+
+const SKELETON_SHIMMER_MS = 1200;
+
 export const motion = {
   instant: { duration: 100, easing: 'ease-out' },
   fast: { duration: 200, easing: 'ease-out' },
@@ -116,7 +127,22 @@ export const motion = {
   reduced: { duration: 150, easing: 'ease-out' },
   /** Item danh sách hiện lần lượt. */
   stagger: { delay: 30, maxItems: 8, translateY: 8 },
-  skeletonShimmerMs: 1200,
+  skeletonShimmerMs: SKELETON_SHIMMER_MS,
+  /**
+   * Skeleton: dải sáng chéo quét trái → phải, một lượt = skeletonShimmerMs. `band` = bề rộng dải / bề rộng khối,
+   * `skewDeg` = độ nghiêng dải. Reduce Motion → khối đứng yên, không dải.
+   */
+  shimmer: { duration: SKELETON_SHIMMER_MS, easing: 'ease-in-out', band: 0.4, skewDeg: -20 },
+  /**
+   * Chuyển động nền lặp vô hạn, nhịp chậm — CHỈ nút Đăng (`glow`: quầng shadow-fab sáng dần + phóng ≤ 1.04) và nhãn "Mới"
+   * (`float`: nổi lên `translateY` px rồi về). `duration` = một chu kỳ đi + về. Reduce Motion → tắt hẳn (không fade thay thế).
+   */
+  ambient: {
+    glow: { duration: 2800, easing: 'ease-in-out', scale: 1.04 },
+    float: { duration: 2400, easing: 'ease-in-out', translateY: -3 },
+  },
+  /** Vòng lan quanh dấu tích thành công: chạy MỘT lần (sau `delay`), phóng 1 → `scale`, mờ `opacity` → 0. Reduce Motion → không vòng. */
+  ripple: { duration: 900, delay: 200, easing: 'ease-out', scale: 1.6, opacity: 0.5 },
 } as const;
 
 /** Tỉ lệ khung ảnh: thẻ tin 4:3, avatar 1:1, banner Hub 16:7 (class `aspect-card`, `aspect-avatar`, `aspect-banner` ở app và web). */
@@ -128,5 +154,5 @@ export const hitTarget = { primary: 48, secondary: 44 } as const;
 /** Kích thước icon Lucide. */
 export const icon = { button: 20, tab: 24, strokeWidth: 1.75 } as const;
 
-export const tokens = { colors, serviceColors, gradients, space, radius, font, shadow, motion, aspect, hitTarget, icon } as const;
+export const tokens = { colors, serviceColors, gradients, space, radius, font, shadow, shimmer, motion, aspect, hitTarget, icon } as const;
 export type Tokens = typeof tokens;

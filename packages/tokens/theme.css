@@ -56,8 +56,31 @@
   --aspect-card: 4 / 3;
   --aspect-avatar: 1 / 1;
   --aspect-banner: 16 / 7;
+  --color-shimmer: rgba(255,255,255,0.7);
   --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;
   --font-zh: var(--font-be-vietnam-pro), 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  --animate-skeleton-shimmer: skeleton-shimmer 1200ms ease-in-out infinite;
+  --animate-fab-glow: fab-glow 2800ms ease-in-out infinite;
+  --animate-badge-float: badge-float 2400ms ease-in-out infinite;
+  --animate-success-ripple: success-ripple 900ms ease-out 200ms 1 forwards;
+
+  @keyframes skeleton-shimmer {
+    from { transform: translateX(-150%) skewX(-20deg); }
+    to { transform: translateX(300%) skewX(-20deg); }
+  }
+  @keyframes fab-glow {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.04); }
+  }
+  @keyframes badge-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes success-ripple {
+    from { opacity: 0.5; transform: scale(1); }
+    to { opacity: 0; transform: scale(1.6); }
+  }
 }
 
 /* Dark mode bằng class `dark` trên <html> (next-themes). */
@@ -89,4 +112,5 @@
   --color-service-sport-soft: #3A2224;
   --color-service-lost-found: #E6BE55;
   --color-service-lost-found-soft: #3A3220;
+  --color-shimmer: rgba(148,163,184,0.14);
 }

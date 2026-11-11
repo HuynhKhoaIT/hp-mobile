@@ -5,7 +5,7 @@
 // Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card / shadow-bar / shadow-fab, bg-service-pass-soft + text-service-pass.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { aspect, colors, font, radius, serviceColors, shadow, type ColorScheme, type ColorToken } from '../src/index.ts';
+import { aspect, colors, font, motion, radius, serviceColors, shadow, shimmer, type ColorScheme, type ColorToken } from '../src/index.ts';
 
 // Tên token → tên biến CSS (class Tailwind). text* đổi tên để tránh "text-text".
 const COLOR_NAME: Record<ColorToken, string> = {
@@ -40,6 +40,35 @@ const serviceVars = (scheme: 'light' | 'dark', indent: string) =>
     `${indent}--color-service-${kebab(k)}-soft: ${v.soft};`,
   ]);
 
+// Animation web (Tailwind v4: --animate-* → class animate-*, @keyframes trong @theme chỉ xuất khi class được dùng).
+// Thời lượng / easing / biên độ lấy từ motion; dùng kèm motion-safe: hoặc tắt bằng motion-reduce: ở component.
+const ms = (n: number) => `${n}ms`;
+const { shimmer: sh, ambient, ripple } = motion;
+const animate = [
+  `  --animate-skeleton-shimmer: skeleton-shimmer ${ms(sh.duration)} ${sh.easing} infinite;`,
+  `  --animate-fab-glow: fab-glow ${ms(ambient.glow.duration)} ${ambient.glow.easing} infinite;`,
+  `  --animate-badge-float: badge-float ${ms(ambient.float.duration)} ${ambient.float.easing} infinite;`,
+  `  --animate-success-ripple: success-ripple ${ms(ripple.duration)} ${ripple.easing} ${ms(ripple.delay)} 1 forwards;`,
+  '',
+  // Dải rộng `band` × khối: bắt đầu ngoài mép trái (−150% bề rộng dải, chừa phần nghiêng), kết thúc ngoài mép phải.
+  '  @keyframes skeleton-shimmer {',
+  `    from { transform: translateX(-150%) skewX(${sh.skewDeg}deg); }`,
+  `    to { transform: translateX(${Math.round(100 / sh.band + 50)}%) skewX(${sh.skewDeg}deg); }`,
+  '  }',
+  '  @keyframes fab-glow {',
+  '    0%, 100% { opacity: 0; transform: scale(1); }',
+  `    50% { opacity: 1; transform: scale(${ambient.glow.scale}); }`,
+  '  }',
+  '  @keyframes badge-float {',
+  '    0%, 100% { transform: translateY(0); }',
+  `    50% { transform: translateY(${px(ambient.float.translateY)}); }`,
+  '  }',
+  '  @keyframes success-ripple {',
+  `    from { opacity: ${ripple.opacity}; transform: scale(1); }`,
+  `    to { opacity: 0; transform: scale(${ripple.scale}); }`,
+  '  }',
+];
+
 const lines = [
   '/* SINH TỰ ĐỘNG từ packages/tokens/src/index.ts — không sửa tay. Chạy: pnpm --filter @hp/tokens build */',
   '',
@@ -56,14 +85,18 @@ const lines = [
   '',
   ...Object.entries(shadow).map(([k, v]) => `  --shadow-${k}: ${shadowCss(v)};`),
   ...Object.entries(aspect).map(([k, v]) => `  --aspect-${k}: ${v};`),
+  `  --color-shimmer: ${shimmer.light};`,
   '  --font-sans: var(--font-be-vietnam-pro), system-ui, sans-serif;',
   "  --font-zh: var(--font-be-vietnam-pro), 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;",
+  '',
+  ...animate,
   '}',
   '',
   '/* Dark mode bằng class `dark` trên <html> (next-themes). */',
   '.dark {',
   colorVars('dark', '  '),
   ...serviceVars('dark', '  '),
+  `  --color-shimmer: ${shimmer.dark};`,
   '}',
   '',
 ];
