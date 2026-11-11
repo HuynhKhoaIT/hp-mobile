@@ -74,3 +74,43 @@ export const ATTRIBUTE_FIELDS: Record<ListingCategory, readonly AttributeField[]
   lost: LOST_FOUND,
   found: LOST_FOUND,
 };
+
+// ── Form đăng tin: chia thông số theo bước (app + web) ───────────────────────────────────────────────────────────
+
+/** Bước form đăng tin sau khi chọn danh mục: 1 ảnh · 2 thông tin chính · 3 chi tiết. */
+export type ListingFormStep = 1 | 2 | 3;
+
+/** Phần `form` của config tính năng quyết định thông số nằm ở bước nào. */
+export type AttributeFormLayout = {
+  /** Khoá hiện ở bước 2 (theo thứ tự này) thay vì bước 3; khoá không có trong category bị bỏ qua. */
+  primaryAttributes?: readonly string[];
+  /** Khoá không hiện trong form (vd `returned` của đồ thất lạc); giá trị cũ vẫn giữ khi sửa. */
+  hiddenAttributes?: readonly string[];
+};
+
+/** Chia ATTRIBUTE_FIELDS[category]: bước 2 (theo thứ tự primaryAttributes) · bước 3 (còn lại), bỏ trường ẩn. */
+export function splitAttributeFields(
+  category: ListingCategory,
+  layout: AttributeFormLayout | undefined,
+): { primary: AttributeField[]; details: AttributeField[] } {
+  const all = ATTRIBUTE_FIELDS[category];
+  const hidden = new Set(layout?.hiddenAttributes ?? []);
+  const primary = (layout?.primaryAttributes ?? [])
+    .filter((k) => !hidden.has(k))
+    .map((k) => all.find((f) => f.key === k))
+    .filter((f): f is AttributeField => f !== undefined);
+  const taken = new Set(primary.map((f) => f.key));
+  return { primary, details: all.filter((f) => !taken.has(f.key) && !hidden.has(f.key)) };
+}
+
+const STEP_OF_FIELD: Readonly<Record<string, ListingFormStep>> = { images: 1, title: 2, description: 2, price: 2, price_type: 2 };
+
+/**
+ * Bước chứa một ô theo path lỗi Zod / form ("title", "images", "images.0", "attributes.year") để nhảy về đúng bước khi
+ * lỗi. `primary`: khoá thông số nằm ở bước 2 (splitAttributeFields(...).primary).
+ */
+export function listingFormStepOf(path: string, primary: ReadonlySet<string> = new Set()): ListingFormStep {
+  const [head = '', key = ''] = path.split('.');
+  if (head === 'attributes' && primary.has(key)) return 2;
+  return STEP_OF_FIELD[head] ?? 3;
+}

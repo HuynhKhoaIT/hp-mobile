@@ -18,6 +18,10 @@
   "list": {
     "title_ride": "拼车回家",
     "title_sport": "约球",
+    "subtitle_ride": "结伴回乡、上下班——与同事分摊油费",
+    "subtitle_sport": "下班后约人踢足球、打羽毛球、匹克球",
+    "upcoming_ride": "即将出发的行程",
+    "upcoming_sport": "即将开始的球局",
     "search_placeholder_ride": "搜索目的地、路线…",
     "search_placeholder_sport": "搜索场地、项目…",
     "empty_title_ride": "还没有拼车",
@@ -59,6 +63,10 @@
   "detail": {
     "title_ride": "拼车详情",
     "title_sport": "约球详情",
+    "place_title_ride": "路线",
+    "place_title_sport": "场地",
+    "tip_ride": "在人多的地方上车，上车前核对车牌和司机。不要提前给陌生人转账。",
+    "tip_sport": "在人多的场地见面。场地费现场分摊，不要提前给陌生人转账。",
     "from": "出发地",
     "to": "目的地",
     "venue": "场地",
@@ -133,6 +141,11 @@
   "form": {
     "title_ride": "发起拼车",
     "title_sport": "发起约球",
+    "subtitle_ride": "车上还有空位？带同事一起走，分摊油费",
+    "subtitle_sport": "人不够？下班后再约几个人上场",
+    "section_seats_ride": "空位与费用",
+    "section_seats_sport": "人数与费用",
+    "section_about": "标题与备注",
     "sub_kind_label_ride": "车型",
     "sub_kind_label_sport": "项目",
     "origin_label": "出发地",

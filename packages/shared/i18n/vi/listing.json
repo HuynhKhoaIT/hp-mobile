@@ -22,7 +22,14 @@
     "post_cta": "Đăng tin",
     "load_more": "Xem thêm",
     "end": "Bạn đã xem hết tin",
-    "loading_more": "Đang tải thêm…"
+    "loading_more": "Đang tải thêm…",
+    "subtitle_pass": "Đồ cũ còn tốt từ anh em quanh khu",
+    "subtitle_room": "Phòng trọ, ở ghép gần nơi làm việc",
+    "subtitle_job": "Việc chính và việc làm thêm ngoài ca",
+    "subtitle_lostFound": "Báo mất đồ, tìm chủ cho đồ nhặt được",
+    "subtitle_all": "Tin mới quanh khu làm việc của bạn",
+    "clear_filters": "Xoá lọc",
+    "quick_filters": "Lọc nhanh"
   },
   "card": {
     "no_image": "Chưa có ảnh",
@@ -59,7 +66,11 @@
     "not_found_body": "Tin đã bị gỡ, hết hạn hoặc liên kết không đúng.",
     "back_to_list": "Về danh sách",
     "image_count": "Ảnh {{current}}/{{total}}",
-    "safety_tip": "Không chuyển tiền đặt cọc trước khi xem hàng / xem phòng."
+    "safety_tip": "Không chuyển tiền đặt cọc trước khi xem hàng / xem phòng.",
+    "stat_rating": "Đánh giá",
+    "stat_joined": "Tham gia",
+    "no_rating_short": "Chưa có",
+    "image_thumb": "Xem ảnh {{current}}/{{total}}"
   },
   "attr": {
     "brand": "Hãng",
@@ -214,7 +225,34 @@
       "months": "tháng",
       "people": "người"
     },
-    "photos_min": "Cần ít nhất {{min}} ảnh cho loại tin này."
+    "photos_min": "Cần ít nhất {{min}} ảnh cho loại tin này.",
+    "hero_title": "Đăng tin {{feature}}",
+    "hero_hint": "Đăng miễn phí — 3 bước, khoảng 1 phút.",
+    "category_hint": {
+      "pass_electronics": "Điện thoại, laptop, tai nghe…",
+      "pass_vehicle": "Xe máy, xe đạp, xe điện…",
+      "pass_ppe": "Giày, mũ, áo phản quang…",
+      "pass_home": "Quạt, nồi cơm, đệm, tủ…",
+      "room_rent": "Phòng trọ, nhà nguyên căn",
+      "room_share": "Tìm người ở cùng",
+      "job_main": "Việc toàn thời gian",
+      "job_parttime": "Làm thêm sau giờ ca",
+      "lost": "Nhờ mọi người cùng tìm",
+      "found": "Tìm lại chủ cho món đồ"
+    },
+    "photos_tip": {
+      "pass": "Ảnh rõ nét, đủ các mặt giúp đồ bán nhanh hơn.",
+      "room": "Chụp phòng, nhà vệ sinh, lối vào để người thuê yên tâm."
+    },
+    "privacy_title": "Bảo vệ thông tin cá nhân",
+    "privacy_body": "Che bớt số trên CCCD, thẻ ngân hàng, thẻ nhân viên trước khi tải ảnh để kẻ gian không mạo danh nhận đồ.",
+    "price_title": "Giá",
+    "contact_title": "Liên hệ",
+    "contact_chat": "Người xem nhắn tin cho bạn ngay trong ứng dụng.",
+    "contact_phone": "Số {{phone}} chỉ hiện khi người xem đã đăng nhập và bấm Hiện số.",
+    "contact_no_phone": "Tài khoản chưa có số điện thoại — người xem sẽ nhắn tin cho bạn.",
+    "title_hint_lostFound": "VD: Rơi ví da nâu ở cổng số 2. Từ 5 đến 120 ký tự.",
+    "description_hint_lostFound": "Màu sắc, nhãn hiệu, đồ bên trong… Giữ lại một chi tiết riêng để hỏi người đến nhận."
   },
   "manage": {
     "title": "Tin của tôi",
@@ -303,6 +341,18 @@
     "mark_returned_confirm_title": "Đánh dấu đã nhận lại?",
     "mark_returned_confirm_body": "Tin sẽ đóng lại và không còn hiện công khai.",
     "returned_done": "Tuyệt vời! Đồ đã về với chủ.",
-    "returned_badge": "Đã trả lại"
+    "returned_badge": "Đã trả lại",
+    "kind_lost": "Mất đồ",
+    "kind_found": "Nhặt được",
+    "mark_returned_found": "Đã trả cho chủ",
+    "mark_returned_found_confirm_title": "Đánh dấu đã trả cho chủ?",
+    "returned_check": "Trước khi trao đồ, hỏi người nhận một đặc điểm riêng (màu, vết xước, đồ bên trong) để chắc đúng chủ."
+  },
+  "tip": {
+    "title": "Mẹo an toàn",
+    "pass": "Hẹn xem và thử đồ ở nơi đông người (cổng nhà máy, căng-tin). Không chuyển tiền trước khi nhận hàng.",
+    "room": "Đến xem phòng tận nơi, kiểm tra điện nước. Không đặt cọc qua mạng khi chưa xem phòng.",
+    "job": "Không nộp phí, đặt cọc hay giao giấy tờ gốc để được nhận việc.",
+    "lostFound": "Hỏi đặc điểm riêng của món đồ để trả đúng chủ. Che bớt số CCCD, thẻ nhân viên khi chụp ảnh giấy tờ."
   }
 }

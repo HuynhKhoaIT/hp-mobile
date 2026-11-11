@@ -211,6 +211,8 @@
     "empty_body": "新消息、信息审核结果和提醒会显示在这里。",
     "login_body": "登录后即可收到消息和信息的通知。",
     "unread": "未读",
+    "needs_reply": "待回复",
+    "review_request": "查看并审核申请",
     "prefs": {
       "title": "推送通知",
       "subtitle": "选择在锁屏上显示的通知类型。应用内列表不受影响。",
