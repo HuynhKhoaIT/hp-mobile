@@ -1,6 +1,6 @@
 {
   "meta": {
-    "description": "Pass đồ, tìm trọ, tìm việc, ghép xe, ghép trận cho người lao động quanh khu Dung Quất."
+    "description": "Pass đồ, tìm trọ, tìm việc, ghép xe, kèo thể thao cho người lao động quanh khu Dung Quất."
   },
   "header": {
     "home": "Về trang chủ",
@@ -44,7 +44,7 @@
     "delete_account": "Xoá tài khoản",
     "contact": "Liên hệ",
     "drafting": "Nội dung trang này đang được soạn và sẽ có trước khi ứng dụng ra mắt.",
-    "about_body": "{{appName}} là ứng dụng cộng đồng giúp người lao động quanh khu Dung Quất mua bán đồ cũ, tìm phòng trọ, tìm việc, tìm đồ thất lạc, ghép xe và ghép trận thể thao.",
+    "about_body": "{{appName}} là ứng dụng cộng đồng giúp người lao động quanh khu Dung Quất mua bán đồ cũ, tìm phòng trọ, tìm việc, tìm đồ thất lạc, ghép xe và kèo thể thao.",
     "about_independent": "Đây là ứng dụng cá nhân, độc lập, không thuộc và không đại diện cho Tập đoàn Hòa Phát."
   },
   "login": {
@@ -118,7 +118,7 @@
       "description": "Rủ đồng nghiệp đi chung xe về quê, ra sân bay, chia tiền xăng: các chuyến sắp khởi hành quanh khu Dung Quất."
     },
     "sport": {
-      "title": "Ghép trận quanh Dung Quất",
+      "title": "Kèo thể thao quanh Dung Quất",
       "description": "Tìm thêm người đá bóng, đánh cầu lông, pickleball sau ca quanh khu Dung Quất."
     },
     "upcoming_ride": "Chuyến sắp khởi hành",
@@ -142,10 +142,10 @@
   },
   "marketing": {
     "meta_title": "Giới thiệu {{appName}}",
-    "meta_description": "Mua bán đồ cũ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe và ghép trận cho người lao động quanh khu Dung Quất.",
+    "meta_description": "Mua bán đồ cũ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe và kèo thể thao cho người lao động quanh khu Dung Quất.",
     "hero": {
       "title": "Mọi việc quanh khu Dung Quất, gọn trong một ứng dụng",
-      "subtitle": "Pass đồ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe, ghép trận — dành cho người lao động trong khu.",
+      "subtitle": "Pass đồ, tìm trọ, tìm việc, tìm đồ thất lạc, ghép xe, kèo thể thao — dành cho người lao động trong khu.",
       "cta_web": "Dùng ngay trên web",
       "cta_app": "Tải app",
       "qr_hint": "Quét mã để tải app",
@@ -195,7 +195,7 @@
       },
       "venue": {
         "title": "Chủ sân",
-        "body": "Đưa sân lên danh sách để các nhóm ghép trận chọn khi tạo trận."
+        "body": "Đưa sân lên danh sách để mọi người chọn khi tạo kèo thể thao."
       },
       "employer": {
         "title": "Nhà tuyển dụng",
@@ -271,7 +271,7 @@
         "b3": "Nhắc giờ đi trước 60 phút (trên app)"
       },
       "sport": {
-        "title": "Ghép trận",
+        "title": "Kèo thể thao",
         "summary": "Tìm đội đá bóng, cầu lông, pickleball; thiếu người thì mời thêm.",
         "b1": "Chọn sân có sẵn hoặc góp sân mới",
         "b2": "Trận đã có đội hình vẫn tìm thêm người được",
