@@ -1,7 +1,16 @@
 // Chat 1-1 + chat nhóm (migration 20261102090000_chat, 20261103100000_group_lifecycle_chat). Hội thoại tạo qua RPC; tin nhắn insert qua PostgREST + RLS;
 // ảnh ở bucket riêng tư chat-images (signed URL); realtime: postgres_changes trên messages + Broadcast "đang gõ".
 import type { Database, Tables } from '@hp/db';
-import { CHAT, chatImagePath, conversationTopic, SendMessageInput } from '@hp/shared';
+import {
+  CHAT,
+  chatImagePath,
+  conversationTopic,
+  type Feature,
+  featureOfCategory,
+  LISTING_CATEGORIES,
+  type ListingCategory,
+  SendMessageInput,
+} from '@hp/shared';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { type Client, clampLimit, fail, fromSupabase, ok, type Result, toAppError } from './result';
 import type { Page } from './social';
@@ -10,6 +19,24 @@ export type ConversationSummary = Database['public']['Functions']['list_conversa
 export type Message = Tables<'messages'>;
 /** Tin nhắn trong cache client: thêm trạng thái gửi (optimistic) và ảnh cục bộ khi chưa upload xong. */
 export type ChatMessage = Message & { status?: 'sending' | 'failed'; localImageUri?: string | null };
+
+const isListingCategory = (v: string | null | undefined): v is ListingCategory =>
+  !!v && (LISTING_CATEGORIES as readonly string[]).includes(v);
+
+/** Dịch vụ của hội thoại (màu / icon / nhãn ở hộp thư): tin → theo category, nhóm → ride / sport. Không xác định → null. */
+export function conversationFeature(c: Pick<ConversationSummary, 'kind' | 'listing_category' | 'group_kind'>): Feature | null {
+  if (c.kind === 'group') return c.group_kind === 'sport' ? 'sport' : c.group_kind === 'ride' ? 'ride' : null;
+  return isListingCategory(c.listing_category) ? featureOfCategory(c.listing_category) : null;
+}
+
+/**
+ * Nguồn giá của tin ngữ cảnh cho priceLabel (@hp/shared) — client tự dịch + định dạng. Việc làm (lương nằm trong
+ * attributes, hộp thư không có) / hội thoại nhóm / không giá → null.
+ */
+export function conversationPriceSource(c: Pick<ConversationSummary, 'listing_category' | 'listing_price' | 'listing_price_type'>) {
+  if (!isListingCategory(c.listing_category) || c.listing_category.startsWith('job_') || !c.listing_price_type) return null;
+  return { category: c.listing_category, price: c.listing_price, price_type: c.listing_price_type, attributes: {} };
+}
 
 /** Mở (hoặc lấy lại) hội thoại với chủ tin. Lỗi: auth_required, banned, not_found, cannot_chat_self, blocked. */
 export async function startListingConversation(client: Client, listingId: string): Promise<Result<string>> {
