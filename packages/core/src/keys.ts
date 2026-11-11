@@ -19,6 +19,9 @@ export const keys = {
   listingBySlug: (slug: string) => ['hp', 'listing', 'slug', slug] as const,
   similarListings: (id: string) => ['hp', 'listing', id, 'similar'] as const,
   myListings: (tab?: string) => (tab ? (['hp', 'my-listings', tab] as const) : (['hp', 'my-listings'] as const)),
+  /** Mini-app: tin của tôi trong danh mục của một tính năng — con của myListings() nên mutation tin tự làm mới. */
+  featureListings: (categories: readonly string[], tab: string) => ['hp', 'my-listings', 'feature', categories.join(','), tab] as const,
+  featureListingsSummary: (categories: readonly string[]) => ['hp', 'my-listings', 'feature', categories.join(','), 'summary'] as const,
   myListing: (id: string) => ['hp', 'my-listing', id] as const,
   savedListings: () => ['hp', 'bookmarks', 'listing', 'items'] as const,
   homeFeed: (site?: string | null) => ['hp', 'listings', 'home-feed', site ?? ''] as const,
