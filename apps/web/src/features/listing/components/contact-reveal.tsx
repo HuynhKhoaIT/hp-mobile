@@ -3,6 +3,8 @@
 // "Hiện số điện thoại" (trang chi tiết, tin đang đăng). SĐT KHÔNG có trong HTML công khai: chỉ lấy sau khi bấm, qua
 // revealContactAction (RPC reveal_contact: đăng nhập, 20 lần / giờ, ghi audit). Khách → LoginDialog (intent "reveal":
 // sau đăng nhập tự hiện số). Có số → nút "Gọi 0912 345 678" (tel:+84…); không có → contact.no_phone; lỗi → errors.*.
+// `primary` (config.primaryCta = 'call', trọ / đồ thất lạc): nút nền primary, không thì viền. `compact` (thanh liên hệ dính
+// đáy trên điện thoại < 1024px): ẩn dòng gợi ý dưới nút ở cỡ đó (thanh gọn), desktop vẫn hiện.
 import { formatVnPhone } from '@hp/shared';
 import { Phone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -13,7 +15,17 @@ import { Button } from '@/components/ui/button';
 import { useErrorText } from '@/features/auth/components/use-error-text';
 import { revealContactAction } from '../actions';
 
-export function ContactReveal({ listingId, userId }: { listingId: string; userId: string | null | undefined }) {
+export function ContactReveal({
+  listingId,
+  userId,
+  primary = true,
+  compact = false,
+}: {
+  listingId: string;
+  userId: string | null | undefined;
+  primary?: boolean;
+  compact?: boolean;
+}) {
   const t = useTranslations('listing.contact');
   const errorText = useErrorText();
   const [revealed, setRevealed] = useState<{ phone: string | null } | null>(null);
@@ -42,7 +54,7 @@ export function ContactReveal({ listingId, userId }: { listingId: string; userId
   let control;
   if (revealed?.phone) {
     control = (
-      <Button asChild size="lg" className="w-full">
+      <Button asChild size="lg" variant={primary ? 'default' : 'outline'} className="w-full">
         <a href={`tel:+${revealed.phone}`}>
           <Phone strokeWidth={1.75} aria-hidden />
           {t('call', { phone: formatVnPhone(revealed.phone) })}
@@ -56,6 +68,7 @@ export function ContactReveal({ listingId, userId }: { listingId: string; userId
       <Button
         type="button"
         size="lg"
+        variant={primary ? 'default' : 'outline'}
         className="w-full"
         disabled={userId === undefined || pending}
         onClick={userId ? reveal : undefined}
@@ -75,7 +88,7 @@ export function ContactReveal({ listingId, userId }: { listingId: string; userId
           {errorText(error)}
         </p>
       ) : null}
-      <p className="text-sm text-muted">{t('hint')}</p>
+      <p className={compact ? 'text-sm text-muted max-lg:hidden' : 'text-sm text-muted'}>{t('hint')}</p>
     </div>
   );
 }

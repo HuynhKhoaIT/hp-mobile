@@ -6,6 +6,9 @@
 //     grid → nổi ở góc trái trên ảnh (nền surface/90); row → hàng badge trên tiêu đề (ô ảnh 96px quá chật để đè chip)
 //   3 tiêu đề 2 dòng (16 semibold)   4 giá 18 px đậm 700 màu primary
 //   5 ghim MapPin + "Cách {khu} {khoảng cách}" (hoặc tên khu) · thời gian đăng
+// `display` (config.card của tính năng — ListingGrid tự lấy theo category, khớp app): tối đa 3 nhãn thông số dưới giá (trọ:
+// diện tích · có gác · ở tối đa), badge danh mục đổi nhãn + tone (đồ thất lạc: "Mất đồ" đỏ / "Nhặt được" xanh), dòng 5 lấy
+// nơi + thời điểm từ attributes (đồ thất lạc: place · lost_at).
 // Cả thẻ là một link tới /tin/{slug}. Không 'use client', không async: render được ở Server Component (SSR danh sách)
 // lẫn Client Component (trang tiếp theo của "Xem thêm").
 import { listingCover, type PublicListing } from '@hp/core';
@@ -18,7 +21,8 @@ import { Badge } from '@/components/shared/badge';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { listingImageUrl } from '@/lib/images';
-import { asLocale, isReturned, priceText } from '../display';
+import { asLocale, attributeString, cardFacts, isReturned, priceText } from '../display';
+import type { ListingCardDisplay } from '../feature-config';
 import { ListingPlaceholder } from './listing-placeholder';
 
 export type ListingCardProps = {
@@ -31,24 +35,31 @@ export type ListingCardProps = {
   now: number;
   /** Ảnh bìa tải sớm (thẻ đầu màn hình, LCP). */
   priority?: boolean;
+  /** Điểm nhấn theo tính năng (config.card). */
+  display?: ListingCardDisplay;
 };
 
-export function ListingCard({ listing, layout = 'grid', now, priority = false }: ListingCardProps) {
+export function ListingCard({ listing, layout = 'grid', now, priority = false, display }: ListingCardProps) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
   const cover = listingCover(listing);
   const isRow = layout === 'row';
 
-  const where =
-    listing.site_name && listing.distance_to_site_m !== null
+  const place = attributeString(listing, display?.placeKey);
+  const where = place
+    ? place
+    : listing.site_name && listing.distance_to_site_m !== null
       ? t('listing.card.distance_to_site', {
           site: listing.site_name,
           distance: formatDistance(listing.distance_to_site_m, locale),
         })
       : listing.site_name;
-  const when = formatRelative(listing.created_at, locale, new Date(now));
+  const time = attributeString(listing, display?.timeKey) ?? listing.created_at;
+  const when = formatRelative(time, locale, new Date(now));
+  const facts = cardFacts(listing, display?.facts, t, locale);
 
-  const category = t(`common.category.${listing.category}`);
+  const badge = display?.categoryBadge?.[listing.category];
+  const category = badge?.labelKey ? t(badge.labelKey) : t(`common.category.${listing.category}`);
   const returned = isReturned(listing) ? t('listing.lost_found.returned_badge') : null;
   const foreign = listing.lang !== locale ? t(`common.locale.${listing.lang}`) : null;
 
@@ -82,7 +93,7 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
         )}
         {isRow ? null : (
           <div className="absolute inset-x-2 top-2 flex flex-wrap items-start gap-1">
-            <ImageChip>{category}</ImageChip>
+            <ImageChip className={badge?.tone === 'danger' ? 'text-danger' : undefined}>{category}</ImageChip>
             {returned ? (
               <ImageChip icon={<CircleCheck aria-hidden strokeWidth={2} className="size-3.5 shrink-0 text-success" />}>
                 {returned}
@@ -99,7 +110,7 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
       <div className={cn('flex min-w-0 flex-1 flex-col gap-1', !isRow && 'p-3.5 pt-3')}>
         {isRow ? (
           <div className="flex flex-wrap gap-1">
-            <Badge>{category}</Badge>
+            <Badge tone={badge?.tone}>{category}</Badge>
             {returned ? <Badge tone="success">{returned}</Badge> : null}
             {foreign ? (
               <Badge tone="primary" lang={listing.lang}>
@@ -112,11 +123,20 @@ export function ListingCard({ listing, layout = 'grid', now, priority = false }:
           {listing.title}
         </h3>
         <ListingPrice text={priceText(priceLabel(listing), t, locale)} />
+        {facts.length > 0 ? (
+          <ul className="flex flex-wrap gap-1">
+            {facts.map((f) => (
+              <li key={f} className="max-w-full truncate rounded-sm bg-surface-2 px-2 py-0.5 text-sm font-medium text-muted">
+                {f}
+              </li>
+            ))}
+          </ul>
+        ) : null}
         <p className="mt-auto flex min-w-0 items-center gap-1 pt-0.5 text-sm text-muted">
           {where ? <MapPin aria-hidden strokeWidth={1.75} className="size-4 shrink-0" /> : null}
           <span className="line-clamp-1 min-w-0">
             {where ? `${where} · ` : null}
-            <time dateTime={listing.created_at}>{when}</time>
+            <time dateTime={time}>{when}</time>
           </span>
         </p>
       </div>

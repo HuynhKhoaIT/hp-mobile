@@ -1,4 +1,5 @@
-// Chữ hiển thị của tin (giá, thông số) — dùng cho card, chi tiết, metadata, JSON-LD; chạy được cả server lẫn client.
+// Chữ hiển thị của tin (giá, thông số, nhãn thông số trên thẻ) — dùng cho card, chi tiết, metadata, JSON-LD; chạy được cả
+// server lẫn client.
 // Quy tắc (giá nào, thông số nào, thứ tự) nằm ở @hp/shared (priceLabel, readAttributes) để app và web giống nhau;
 // ở đây chỉ dịch (t) + định dạng (format.ts) theo locale.
 import {
@@ -10,7 +11,9 @@ import {
   formatNumber,
   type Locale,
   LOCALES,
+  type ListingCategory,
   type PriceLabel,
+  readAttributes,
 } from '@hp/shared';
 
 /** Đồ thất lạc đã về với chủ (chủ tin bấm "Đã nhận lại đồ" → attributes.returned = true + đóng tin). */
@@ -76,4 +79,40 @@ export function attributeText(field: AttributeField, value: AttributeValue, t: T
     case 'text':
       return String(value);
   }
+}
+
+/**
+ * Nhãn nhỏ trên thẻ / khối tóm tắt chi tiết theo `keys` (config.card.facts của tính năng, theo thứ tự): enum / số → giá trị
+ * ("Như mới", "20 m²"), bool → tên thông số khi true ("Có gác"; false bỏ), text / ngày giờ bỏ qua. Khớp useCardFacts của app.
+ */
+export function cardFacts(
+  listing: { category: ListingCategory; attributes: unknown },
+  keys: readonly string[] | undefined,
+  t: Translate,
+  locale: Locale,
+  max = 3,
+): string[] {
+  if (!keys?.length) return [];
+  const rows = readAttributes(listing.category, listing.attributes);
+  const out: string[] = [];
+  for (const key of keys) {
+    const row = rows.find((r) => r.field.key === key);
+    if (!row || row.field.kind === 'text' || row.field.kind === 'datetime') continue;
+    if (row.field.kind === 'bool') {
+      if (row.value === true) out.push(t(`listing.attr.${key}`));
+    } else {
+      out.push(attributeText(row.field, row.value, t, locale));
+    }
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/** Giá trị chuỗi của một thông số (vd `place`, `lost_at` của đồ thất lạc) — null khi không có / sai kiểu. */
+export function attributeString(listing: { attributes: unknown }, key: string | undefined): string | null {
+  if (!key) return null;
+  const a = listing.attributes;
+  if (!a || typeof a !== 'object' || Array.isArray(a)) return null;
+  const v = (a as Record<string, unknown>)[key];
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
 }

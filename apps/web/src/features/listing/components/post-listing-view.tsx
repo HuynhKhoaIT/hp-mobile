@@ -1,5 +1,6 @@
 // Khung server của form đăng / sửa tin (đọc theo request: cookie phiên → luôn nằm trong <Suspense> của page).
-// Lấy hồ sơ (khu mặc định), danh mục khu, tin đang sửa rồi giao cho ListingForm (client).
+// Lấy hồ sơ (khu mặc định, SĐT của chính chủ để nhắc số nào hiện qua "Hiện số"), danh mục khu, tin đang sửa rồi giao cho
+// ListingForm (client). Khung trang: tràn mép trên điện thoại (header xanh của form), từ 640px là khối giữa trang.
 import { type ListingFeature, LISTING_FEATURES } from '@hp/shared';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -36,6 +37,7 @@ export async function PostListingView({ searchParams }: { searchParams: Promise<
       userId={ctx.data.profile.id}
       sites={ctx.data.sites}
       defaults={{ site: ctx.data.profile.site, lang: locale }}
+      phone={ctx.data.profile.phone}
       initialFeature={feature}
       listing={null}
     />
@@ -56,17 +58,25 @@ export async function EditListingView({ params }: { params: Promise<{ id: string
       userId={ctx.data.profile.id}
       sites={ctx.data.sites}
       defaults={{ site: ctx.data.profile.site, lang: locale }}
+      phone={ctx.data.profile.phone}
       initialFeature={null}
       listing={listing.data}
     />
   );
 }
 
+/** Khung chờ đúng hình form: header xanh (nút tròn + tiêu đề) → thẻ chọn loại tin (lưới 4 ô) → nút. */
 export function ListingFormSkeleton() {
   return (
-    <div className="flex flex-col gap-6">
-      <Skeleton className="h-8 w-40" />
-      <div className="flex flex-col gap-4 rounded-lg bg-surface p-6 shadow-card">
+    <div aria-hidden className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 rounded-b-xl bg-primary px-4 pt-3 pb-5 sm:rounded-xl sm:p-6">
+        <div className="flex min-h-12 items-center gap-3">
+          <div className="size-11 rounded-full bg-on-primary/15" />
+          <div className="h-6 w-40 rounded-full bg-on-primary/15" />
+        </div>
+        <div className="h-9 rounded-md bg-on-primary/10" />
+      </div>
+      <div className="mx-4 flex flex-col gap-4 rounded-lg border border-border bg-surface p-4 shadow-card sm:mx-0 sm:p-6">
         <Skeleton className="h-6 w-48" />
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {Array.from({ length: 4 }, (_, i) => (

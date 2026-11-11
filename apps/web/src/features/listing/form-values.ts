@@ -1,9 +1,11 @@
 // Giá trị form "Đăng nhanh" (chuỗi như người dùng gõ) ↔ input CreateListingInput / UpdateListingInput của @hp/shared.
 // Không phụ thuộc React: logic thuần để form và kiểm tra dùng chung. Thứ tự bước khớp app (hợp đồng tuần 4):
-//   0 chọn tính năng / danh mục → 1 ảnh → 2 thông tin chính (tiêu đề, giá, mô tả) → 3 chi tiết (ATTRIBUTE_FIELDS, khu, địa chỉ, ngôn ngữ).
+//   0 chọn tính năng / danh mục → 1 ảnh → 2 thông tin chính (tiêu đề, thông số chính theo config.form.primaryAttributes, giá,
+//   mô tả) → 3 chi tiết (ATTRIBUTE_FIELDS còn lại trừ trường ẩn, khu, địa chỉ, ngôn ngữ).
 import type { MyListing } from '@hp/core';
 import {
   ATTRIBUTE_FIELDS,
+  type ListingFormStep,
   featureOfCategory,
   type ListingCategory,
   type ListingFeature,
@@ -27,7 +29,8 @@ export type FormValues = {
   lang: Locale;
 };
 
-export type FormStep = 1 | 2 | 3;
+/** Bước form (dùng chung app — @hp/shared splitAttributeFields / listingFormStepOf chia thông số theo bước). */
+export type FormStep = ListingFormStep;
 export const FORM_STEPS: readonly FormStep[] = [1, 2, 3];
 
 /** Ô giá chỉ có ở pass đồ và trọ (việc làm: lương trong chi tiết; thất lạc: không có giá). */
@@ -142,11 +145,4 @@ export function buildContent(category: ListingCategory, v: FormValues) {
     address_text: v.address_text.trim() || null,
     lang: v.lang,
   };
-}
-
-/** Bước chứa một ô (path lỗi Zod: "title", "attributes.year", "images"…) để nhảy về đúng bước khi lỗi. */
-export function stepOfField(path: string): FormStep {
-  if (path === 'images') return 1;
-  if (path === 'title' || path === 'description' || path === 'price' || path === 'price_type') return 2;
-  return 3;
 }
