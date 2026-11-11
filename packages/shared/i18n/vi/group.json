@@ -256,7 +256,12 @@
     "empty_past_title": "Chưa có nhóm đã qua",
     "empty_past_body": "Các nhóm bạn đã đi sẽ hiện ở đây để đánh giá.",
     "find_ride": "Tìm chuyến xe",
-    "find_sport": "Tìm kèo"
+    "find_sport": "Tìm kèo",
+    "subtitle": "Chuyến xe, kèo bạn tạo, đã tham gia hoặc đang chờ duyệt",
+    "create": "Tạo nhóm",
+    "section_upcoming": "Chuyến & kèo sắp tới",
+    "section_past": "Chuyến & kèo đã qua",
+    "section_past_hint": "Chấm điểm chủ nhóm sau mỗi chuyến, mỗi kèo"
   },
   "rate": {
     "title": "Đánh giá chủ nhóm",

@@ -256,7 +256,12 @@
     "empty_past_title": "暂无已结束的小组",
     "empty_past_body": "你参加过的小组会显示在这里，便于评价。",
     "find_ride": "找拼车",
-    "find_sport": "找球局"
+    "find_sport": "找球局",
+    "subtitle": "你创建、已加入或待审核的拼车和球局",
+    "create": "创建小组",
+    "section_upcoming": "即将开始的拼车和球局",
+    "section_past": "已结束的拼车和球局",
+    "section_past_hint": "每次拼车或球局结束后为组长评分"
   },
   "rate": {
     "title": "评价组长",

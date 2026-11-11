@@ -256,7 +256,12 @@
     "empty_past_title": "No past groups yet",
     "empty_past_body": "Groups you have been in will show up here for rating.",
     "find_ride": "Find a ride",
-    "find_sport": "Find a game"
+    "find_sport": "Find a game",
+    "subtitle": "Rides and games you host, joined or are waiting to join",
+    "create": "Create group",
+    "section_upcoming": "Upcoming rides & games",
+    "section_past": "Past rides & games",
+    "section_past_hint": "Rate the host after each ride or game"
   },
   "rate": {
     "title": "Rate the host",
