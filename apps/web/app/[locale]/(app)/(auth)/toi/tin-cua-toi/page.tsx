@@ -1,5 +1,6 @@
-// /toi/tin-cua-toi — Tin của tôi: tab Đang đăng / Chờ duyệt / Nháp / Đã đóng, menu thao tác từng tin.
-// Đọc theo request (cookie phiên + ?tab) → trong <Suspense>; fallback giữ khung tab + skeleton đúng hình dòng tin.
+// /toi/tin-cua-toi — Tin của tôi (style Stitch "Quản lý tin đăng"): tiêu đề có vạch cam + nút Đăng tin, hàng chip trạng thái
+// có số (Đang đăng / Chờ duyệt / Nháp / Đã đóng), thẻ quản lý có hàng thao tác nhanh + menu ⋮.
+// Đọc theo request (cookie phiên + ?tab) → trong <Suspense>; fallback giữ hàng chip + skeleton đúng hình thẻ.
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
@@ -16,7 +17,10 @@ export default async function Page({ searchParams }: PageProps<'/[locale]/toi/ti
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-fg">{t('title')}</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-fg">
+          <span aria-hidden className="h-5 w-1.5 shrink-0 rounded-full bg-accent" />
+          {t('title')}
+        </h1>
         <PostListingButton />
       </div>
       <Suspense

@@ -1,96 +1,57 @@
 // Screen type: Hub
-// Tab Tôi: hồ sơ (ảnh đại diện đổi được, tên, tham gia từ) → Tin của tôi, Tin đã lưu, Nhóm của tôi (tuần 8), Huy hiệu
-// xác minh (tuần 10) → thông báo → ngôn ngữ → đăng xuất, Xoá tài khoản (sheet gõ từ xác nhận, tuần 10) → miễn trừ.
-// Thông báo + cài đặt thông báo đẩy (tuần 6). Khách: lời mời đăng nhập + đổi ngôn ngữ.
+// Tab Tôi (style Stitch "Trang cá nhân & Quản lý tin đăng"): hero xanh tràn mép (tiêu đề + chuông, thẻ hồ sơ trong mờ:
+// avatar bấm đổi ảnh, dấu xác minh, tên, khu, tham gia từ; nút Xem hồ sơ + Huy hiệu xác minh) → dải số liệu (tin đang
+// đăng · lượt xem · đánh giá) → lối tắt (Đăng tin · Tin của tôi · Nhóm của tôi) → khối Tin của tôi (chip trạng thái có
+// số + tối đa 3 thẻ quản lý) → Cài đặt & hỗ trợ (Tin đã lưu, Thông báo, Thông báo đẩy, Ngôn ngữ, Đăng xuất, Xoá tài
+// khoản) → miễn trừ. Khách: hero mời đăng nhập → Ngôn ngữ → miễn trừ. Mỗi khối tự có khung chờ / rỗng / lỗi.
 import { useMyProfile } from '@hp/core/react';
-import { LOCALES } from '@hp/shared';
-import { router } from 'expo-router';
-import { Bell, BellRing, Heart, ListChecks, LogOut, ShieldCheck, UserX, Users } from 'lucide-react-native';
-import { useState } from 'react';
+import { useIsFocused } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useTranslation } from 'react-i18next';
-import { openMyGroups } from '@/features/group/navigation';
-import { openMyListings, openSavedListings } from '@/features/listing/navigation';
-import { AvatarPicker } from '@/features/profile/components/AvatarPicker';
-import { DeleteAccountSheet } from '@/features/profile/components/DeleteAccountSheet';
-import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
-import { useChangeLocale, useSignOut } from '@/features/profile/hooks';
-import { openBadges } from '@/features/profile/navigation';
-import { formatDate } from '@/lib/format';
-import { Card, Chip, Col, Divider, ErrorState, MenuItem, Row, Screen, SectionHeader, Skeleton, Text } from '@/ui';
+import { View } from 'react-native';
+import { MeListingsPreview } from '@/features/profile/components/MeListingsPreview';
+import { MeSettings } from '@/features/profile/components/MeSettings';
+import { ProfileHero } from '@/features/profile/components/ProfileHero';
+import { ProfileShortcuts, ProfileShortcutsSkeleton } from '@/features/profile/components/ProfileShortcuts';
+import { ProfileStats, ProfileStatsSkeleton } from '@/features/profile/components/ProfileStats';
+import { ErrorState, Screen, Text, useScheme } from '@/ui';
 
 export default function MeScreen() {
   const { t } = useTranslation();
+  const focused = useIsFocused();
+  const scheme = useScheme();
   const me = useMyProfile();
-  const locale = useChangeLocale();
-  const signOut = useSignOut();
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const profile = me.data ?? null;
 
   return (
-    <Screen scroll tab>
-      <Text variant="heading" accessibilityRole="header" className="pb-3 pt-4">
-        {t('nav.me')}
-      </Text>
+    <Screen scroll edgeToEdge tab statusBar="primary">
+      <ProfileHero profile={profile} loading={me.isLoading} error={me.isError} />
 
-      {me.isLoading ? (
-        <Col gap={3}>
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </Col>
-      ) : me.isError ? (
-        <ErrorState code={me.error.code} onRetry={() => void me.refetch()} />
-      ) : !me.data ? (
-        <SignInPrompt />
-      ) : (
-        <Col gap={5}>
-          <Card>
-            <Col gap={3}>
-              <Col gap={1}>
-                <Text variant="title">{me.data.full_name}</Text>
-                <Text variant="caption" tone="muted">
-                  {t('listing:detail.member_since', { date: formatDate(me.data.created_at) })}
-                </Text>
-              </Col>
-              <AvatarPicker userId={me.data.id} value={me.data.avatar_url} name={me.data.full_name} />
-            </Col>
-          </Card>
-          <Card padded={false}>
-            <MenuItem icon={ListChecks} label={t('listing:manage.title')} onPress={() => openMyListings()} />
-            <Divider />
-            <MenuItem icon={Heart} label={t('listing:saved.title')} onPress={openSavedListings} />
-            <Divider />
-            <MenuItem icon={Users} label={t('group:mine.title')} onPress={() => openMyGroups()} />
-            <Divider />
-            <MenuItem icon={ShieldCheck} label={t('badge_request.title')} onPress={openBadges} />
-          </Card>
-          <Card padded={false}>
-            <MenuItem icon={Bell} label={t('notifications.title')} onPress={() => router.push('/notifications')} />
-            <Divider />
-            <MenuItem icon={BellRing} label={t('notifications.prefs.title')} onPress={() => router.push('/settings/notifications')} />
-          </Card>
-        </Col>
-      )}
+      <View className="gap-6 px-4 pt-4">
+        {me.isLoading ? (
+          <>
+            <ProfileStatsSkeleton />
+            <ProfileShortcutsSkeleton />
+          </>
+        ) : me.isError ? (
+          <ErrorState code={me.error.code} onRetry={() => void me.refetch()} />
+        ) : profile ? (
+          <>
+            <ProfileStats profile={profile} />
+            <ProfileShortcuts />
+            <MeListingsPreview />
+          </>
+        ) : null}
 
-      <Col gap={3} className="pt-6">
-        <SectionHeader title={t('settings.language')} />
-        <Row gap={2} wrap>
-          {LOCALES.map((l) => (
-            <Chip key={l} label={t(`locale.${l}`)} selected={locale.current === l} onPress={() => locale.change(l)} />
-          ))}
-        </Row>
-      </Col>
+        {me.isLoading ? null : <MeSettings signedIn={!!profile} />}
 
-      {me.data ? (
-        <Card padded={false} className="mt-6">
-          <MenuItem icon={LogOut} label={t('auth:sign_out')} tone="danger" chevron={false} onPress={() => void signOut()} />
-          <Divider />
-          <MenuItem icon={UserX} label={t('account.delete_title')} tone="danger" chevron={false} onPress={() => setDeleteOpen(true)} />
-        </Card>
-      ) : null}
-      <DeleteAccountSheet open={deleteOpen} onClose={() => setDeleteOpen(false)} />
+        <Text variant="caption" tone="muted" className="text-center">
+          {t('disclaimer')}
+        </Text>
+      </View>
 
-      <Text variant="caption" tone="muted" className="pt-6 text-center">
-        {t('disclaimer')}
-      </Text>
+      {/* Hero xanh: chữ / icon thanh trạng thái tương phản với primary (sáng → chữ trắng, tối → chữ tối). */}
+      {focused ? <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} /> : null}
     </Screen>
   );
 }

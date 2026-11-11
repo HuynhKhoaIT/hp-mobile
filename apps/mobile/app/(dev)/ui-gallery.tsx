@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   Sparkles,
   SquarePlus,
+  Star,
 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -471,6 +472,17 @@ export default function UiGalleryScreen() {
             ]}
           />
         </View>
+        {/* icon sau số: điểm đánh giá ở tab Tôi. */}
+        <View className="rounded-lg border border-border bg-surface py-3.5 shadow-card">
+          <StatColumns
+            size="md"
+            items={[
+              { value: '4', label: t('profile.listings'), tone: 'primary' },
+              { value: '1.204', label: t('home.card.views'), tone: 'primary' },
+              { value: '4,9', label: t('profile.ratings', { count: 28 }), tone: 'primary', icon: { glyph: Star, tone: 'accent' } },
+            ]}
+          />
+        </View>
         <Row gap={3}>
           <StatTile className="flex-1" value="1.234" label={t('home.stats.users')} />
           <StatTile className="flex-1" value="460" label={t('home.stats.listings')} />
@@ -540,6 +552,14 @@ export default function UiGalleryScreen() {
               onChange={setArea}
             />
           }
+        />
+        {/* appearance solid + count + bleed: hàng trạng thái "Tin của tôi" (tab Tôi, style Stitch). */}
+        <FilterBar
+          appearance="solid"
+          bleed
+          options={featureOptions.map((o, i) => ({ ...o, count: i < 3 ? i * 2 + 1 : undefined }))}
+          value={chip}
+          onChange={setChip}
         />
       </Section>
 
@@ -689,6 +709,22 @@ export default function UiGalleryScreen() {
           <MenuItem icon={Heart} label={t('listing:saved.title')} onPress={() => toast.show(t('listing:saved.title'))} />
           <Divider />
           <MenuItem icon={LogOut} label={t('auth:sign_out')} tone="danger" chevron={false} onPress={() => toast.show(t('auth:signed_out'))} />
+        </Card>
+        {/* iconBox + description + SectionHeader bar: khối "Cài đặt & hỗ trợ" tab Tôi. */}
+        <SectionHeader bar="primary" title={t('profile.settings_section')} />
+        <SectionHeader bar="accent" title={t('listing:manage.title')} action={{ label: t('home.see_all'), onPress: () => undefined }} />
+        <Card padded={false}>
+          <MenuItem iconBox icon={Heart} label={t('listing:saved.title')} onPress={() => toast.show(t('listing:saved.title'))} />
+          <Divider />
+          <MenuItem
+            iconBox
+            icon={Bell}
+            label={t('notifications.prefs.title')}
+            description={t('notifications.prefs.subtitle')}
+            onPress={() => toast.show(t('notifications.prefs.title'))}
+          />
+          <Divider />
+          <MenuItem iconBox icon={LogOut} label={t('auth:sign_out')} tone="danger" onPress={() => toast.show(t('auth:signed_out'))} />
         </Card>
       </Section>
 

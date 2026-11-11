@@ -1,19 +1,18 @@
-// "Tin của tôi" (/toi/tin-cua-toi?tab=active|pending|draft|closed): tab là link (chạy khi tắt JS), danh sách đọc theo request
-// (cookie phiên — trong <Suspense> của page), "Xem thêm" đọc trang sau ở trình duyệt. Tab "Chờ duyệt" gồm cả tin bị từ chối,
-// "Đã đóng" gồm đã bán / đã đóng / hết hạn (listMyListings của @hp/core).
+// "Tin của tôi" (/toi/tin-cua-toi?tab=active|pending|draft|closed), style Stitch: hàng chip trạng thái có số (link `?tab=` —
+// chạy khi tắt JS; số đọc ở trình duyệt, MyListingChips) rồi các thẻ quản lý (MyListingRow: ảnh + badge nổi, giá, hàng thao
+// tác nhanh). Danh sách đọc theo request (cookie phiên — trong <Suspense> của page), "Xem thêm" đọc trang sau ở trình duyệt.
+// Tab "Chờ duyệt" gồm cả tin bị từ chối, "Đã đóng" gồm đã bán / đã đóng / hết hạn (listMyListings của @hp/core).
 import type { MyListingsTab } from '@hp/core';
-import { FileText } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/navigation';
-import { cn } from '@/lib/utils';
+import { MY_LISTING_TABS } from '../manage';
 import { getMyListingsPage } from '../queries';
-import { MyListingRow } from './my-listing-row';
+import { MyListingChips } from './my-listing-chips';
+import { MyListingRow, MyListingSkeletonRows } from './my-listing-row';
 import { MyListingsMore } from './my-listings-more';
-
-export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -22,28 +21,9 @@ export function parseTab(raw: RawParams): MyListingsTab {
   return (MY_LISTING_TABS as readonly string[]).includes(v ?? '') ? (v as MyListingsTab) : 'active';
 }
 
-export async function MyListingsTabs({ current }: { current: MyListingsTab | null }) {
-  const t = await getTranslations('listing.manage');
-  return (
-    <nav aria-label={t('title')} className="-mx-4 overflow-x-auto px-4">
-      <ul className="flex gap-2 border-b border-border">
-        {MY_LISTING_TABS.map((tab) => (
-          <li key={tab}>
-            <Link
-              href={{ pathname: '/toi/tin-cua-toi', query: { tab } }}
-              aria-current={current === tab ? 'page' : undefined}
-              className={cn(
-                'inline-flex min-h-11 items-center border-b-2 px-3 text-md font-medium whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                current === tab ? 'border-primary text-primary' : 'border-transparent text-muted hover:text-fg',
-              )}
-            >
-              {t(`tab.${tab}`)}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
+/** Hàng chip (link `?tab=`); `current = null` khi chưa đọc searchParams (fallback Suspense). */
+export function MyListingsTabs({ current }: { current: MyListingsTab | null }) {
+  return <MyListingChips current={current} />;
 }
 
 export async function MyListingsView({ searchParams }: { searchParams: Promise<RawParams> }) {
@@ -70,8 +50,11 @@ export async function MyListingsView({ searchParams }: { searchParams: Promise<R
           title={t('listing.manage.empty_title')}
           description={t('listing.manage.empty_body')}
           action={
-            <Button asChild variant="accent">
-              <Link href="/dang-tin">{t('listing.list.post_cta')}</Link>
+            <Button asChild variant="accent" className="font-semibold">
+              <Link href="/dang-tin">
+                <Plus aria-hidden strokeWidth={2} />
+                {t('listing.list.post_cta')}
+              </Link>
             </Button>
           }
         />
@@ -92,18 +75,5 @@ export async function MyListingsView({ searchParams }: { searchParams: Promise<R
 }
 
 export function MyListingsSkeletonRows() {
-  return (
-    <ul className="flex flex-col gap-3">
-      {Array.from({ length: 4 }, (_, i) => (
-        <li key={i} className="flex gap-3 rounded-md bg-surface p-3 shadow-card">
-          <Skeleton className="aspect-avatar w-20 shrink-0 rounded-sm sm:w-24" />
-          <div className="flex flex-1 flex-col gap-2">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-6 w-1/3 rounded-full" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
+  return <MyListingSkeletonRows />;
 }

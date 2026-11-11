@@ -1,13 +1,16 @@
-// Quy tắc hiển thị "Tin của tôi" (thuần, không React): trạng thái hiện, thao tác được phép trong menu. Chỉ là UI —
+// Quy tắc hiển thị "Tin của tôi" (thuần, không React): trạng thái hiện, thao tác được phép trong menu, hàng thao tác nhanh. Chỉ là UI —
 // DB (trigger guard, renew_listing) mới quyết định; thao tác sai trả lỗi (forbidden / too_early) và hiện toast.
 // Khớp app (hợp đồng tuần 4): Sửa · Đánh dấu đã bán (chỉ pass đồ / trọ) · Đóng tin · Mở lại (đã bán / đã đóng)
 // · Gửi duyệt lại (bị từ chối → DB chuyển pending_review, lý do `resubmit`) · Gia hạn (≤ 3 ngày cuối hoặc đã hết hạn) · Xoá.
-import type { MyListing } from '@hp/core';
+import type { MyListing, MyListingsTab } from '@hp/core';
 import { featureOfCategory, type ListingStatus } from '@hp/shared';
 import type { BadgeTone } from '@/components/shared/badge';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const RENEW_WINDOW_DAYS = 3;
+
+/** Tab "Tin của tôi" (listMyListings): Chờ duyệt gồm cả bị từ chối; Đã đóng gồm đã bán / đã đóng / hết hạn. */
+export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
 
 export type ManageAction = 'edit' | 'sold' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
 
@@ -58,4 +61,49 @@ export const STATUS_TONE: Record<ListingStatus, BadgeTone> = {
 /** Trạng thái có trang công khai /tin/[slug] (public_listings). */
 export function hasPublicPage(status: ListingStatus): boolean {
   return status === 'active' || status === 'sold' || status === 'closed' || status === 'expired';
+}
+
+/** Tin đã ngừng hiển thị (thẻ quản lý viền đứt, ảnh nhạt, chữ muted). */
+export function isInactive(status: ListingStatus): boolean {
+  return status === 'sold' || status === 'closed' || status === 'expired';
+}
+
+export type QuickAction = { action: Exclude<ManageAction, 'delete'>; tone: 'primary' | 'accent' | 'outline' };
+
+/**
+ * Hàng thao tác nhanh dưới thẻ "Tin của tôi" (style Stitch): tối đa 1 nút chính + 2 nút viền, chọn trong `actions`
+ * (manageActions). Xoá chỉ ở menu ⋮. Bị từ chối → Gửi duyệt lại + Sửa; nháp / chờ duyệt → Sửa; đang đăng → (Gia hạn)
+ * + Sửa + Đã bán / Đóng tin; hết hạn → Gia hạn + Sửa; đã bán / đã đóng → Mở lại + Sửa.
+ */
+export function quickActions(status: ListingStatus, actions: readonly ManageAction[]): QuickAction[] {
+  const out: QuickAction[] = [];
+  const add = (action: QuickAction['action'], tone: QuickAction['tone']) => {
+    if (actions.includes(action)) out.push({ action, tone });
+  };
+  switch (status) {
+    case 'rejected':
+      add('resubmit', 'primary');
+      add('edit', 'outline');
+      break;
+    case 'draft':
+    case 'pending_review':
+      add('edit', 'primary');
+      break;
+    case 'active':
+      add('renew', 'accent');
+      add('edit', 'outline');
+      if (actions.includes('sold')) add('sold', 'outline');
+      else add('close', 'outline');
+      break;
+    case 'expired':
+      add('renew', 'accent');
+      add('edit', 'outline');
+      break;
+    case 'sold':
+    case 'closed':
+      add('reopen', 'outline');
+      add('edit', 'outline');
+      break;
+  }
+  return out;
 }

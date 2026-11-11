@@ -1,12 +1,13 @@
 // Hook riêng mobile của engine Listing — chỉ gọi lại @hp/core và thêm phần của app (state bộ lọc, toast, haptic,
 // Share sheet, gọi điện, requireAuth, analytics). Không gọi supabase trực tiếp, không khai báo query key.
-import { logSearch, type MyListing, type PublicListing } from '@hp/core';
+import { logSearch, type MyListing, type MyListingsTab, type PublicListing } from '@hp/core';
 import {
   useBookmarkedListingIds,
   useDeleteListing,
   useListingList,
   useLostFoundMatches,
   useMarkListingReturned,
+  useMyListingStats,
   useRenewListing,
   useRevealContact,
   useSession,
@@ -217,6 +218,28 @@ export function useRevealPhone(listing: Pick<PublicListing, 'id' | 'category'>) 
       Linking.openURL(`tel:${toE164(phone)}`).catch(() => toast.show(errorText('unknown'), 'danger'));
     },
   };
+}
+
+/** Tab "Tin của tôi" (khớp web) — `?tab=` của màn my-listings. */
+export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
+
+export const isMyListingsTab = (v: string | undefined): v is MyListingsTab => !!v && (MY_LISTING_TABS as readonly string[]).includes(v);
+
+/**
+ * Chip tab "Tin của tôi" kèm số tin (my_listing_stats): Đang đăng = active · Chờ duyệt = pending + rejected (tab gồm cả
+ * bị từ chối, xem TAB_STATUSES ở @hp/core) · Nháp = drafts · Đã đóng không có số. Số chưa về / lỗi → chip không số.
+ */
+export function useMyListingTabOptions() {
+  const { t } = useTranslation('listing');
+  const stats = useMyListingStats();
+  const s = stats.data;
+  const count: Record<MyListingsTab, number | undefined> = {
+    active: s?.active,
+    pending: s ? s.pending + s.rejected : undefined,
+    draft: s?.drafts,
+    closed: undefined,
+  };
+  return MY_LISTING_TABS.map((value) => ({ value, label: t(`manage.tab.${value}`), count: count[value] }));
 }
 
 /** Còn ≤ 3 ngày hoặc đã hết hạn → được gia hạn (server kiểm lại: too_early). */

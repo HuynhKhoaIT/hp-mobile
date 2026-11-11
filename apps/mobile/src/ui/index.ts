@@ -22,6 +22,7 @@ export { FilterBar, type FilterBarProps, type FilterOption } from './FilterBar';
 export { GROUP_STATUS_TONE, GroupCard, type GroupCardProps, SkeletonGroupCard, SkeletonGroupDetail, useGroupTexts } from './GroupCard';
 export { Header, type HeaderProps } from './Header';
 export {
+  HeroDecor,
   HomeHeader,
   HomeHeaderCurve,
   type HomeHeaderProps,

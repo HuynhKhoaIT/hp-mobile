@@ -240,7 +240,11 @@
     "rating": "{{avg}} · {{count}} đánh giá",
     "no_rating": "Chưa có đánh giá",
     "not_found": "Không tìm thấy người dùng",
-    "view": "Xem hồ sơ"
+    "view": "Xem hồ sơ",
+    "ratings_one": "{{count}} đánh giá",
+    "ratings_other": "{{count}} đánh giá",
+    "settings_section": "Cài đặt & hỗ trợ",
+    "verified": "Đã xác minh"
   },
   "badge_request": {
     "title": "Huy hiệu xác minh",
