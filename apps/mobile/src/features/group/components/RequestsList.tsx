@@ -1,6 +1,10 @@
-// Chủ nhóm: yêu cầu tham gia đang chờ (ảnh, tên công khai, đánh giá, lời nhắn) + Nhận / Từ chối. Dòng biến mất ngay
-// khi bấm (optimistic trong useRespondJoin), lỗi → hiện lại + toast. Hết chỗ → nút Nhận tắt (server vẫn kiểm: group_full).
+// Chủ nhóm: yêu cầu tham gia đang chờ (style Stitch "Thông báo có người đặt chuyến"): tiêu đề có vạch cam + số yêu cầu,
+// mỗi yêu cầu một thẻ viền cam nhạt — ảnh, tên công khai, đánh giá, lời nhắn (khung trích dẫn vạch cam) → Từ chối (viền) |
+// Nhận (primary, bên phải gần ngón cái). Dòng biến mất ngay khi bấm (optimistic trong useRespondJoin), lỗi → hiện lại +
+// toast. Hết chỗ → nút Nhận tắt (server vẫn kiểm: group_full).
+// Khác Stitch (cố ý): không "Liên hệ" / số điện thoại / ghế số / thanh toán trên thẻ — chat nhóm mở sau khi nhận.
 import type { GroupMember, PublicGroup } from '@hp/core';
+import { Check, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatNumber } from '@/lib/format';
@@ -16,9 +20,9 @@ export function RequestsList({ group }: { group: PublicGroup }) {
 
   return (
     <View className="gap-2">
-      <SectionHeader title={t('requests.title')} subtitle={subtitle} />
+      <SectionHeader title={t('requests.title')} subtitle={subtitle} bar="accent" />
       {requests.isLoading ? (
-        <View className="gap-3 rounded-md bg-surface p-3 shadow-card">
+        <View className="gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
           <View className="flex-row items-center gap-3">
             <Skeleton className="h-10 w-10 rounded-full" />
             <View className="flex-1 gap-2">
@@ -31,7 +35,9 @@ export function RequestsList({ group }: { group: PublicGroup }) {
       ) : requests.isError ? (
         <ErrorState compact code={requests.error.code} onRetry={() => void requests.refetch()} />
       ) : requests.pending.length === 0 ? (
-        <Text tone="muted">{t('requests.empty')}</Text>
+        <Card>
+          <Text tone="muted">{t('requests.empty')}</Text>
+        </Card>
       ) : (
         <View className="gap-3">
           {requests.pending.map((m) => (
@@ -69,27 +75,31 @@ function RequestRow({
       ? t('listing:detail.rating', { avg: formatNumber(Math.round(m.rating_avg * 10) / 10), count: m.rating_count })
       : t('listing:detail.no_rating');
   return (
-    <Card className="gap-3">
+    <Card className="gap-3 border-2 border-accent/40">
       <View className="flex-row items-start gap-3">
         <Avatar uri={profileAvatarUrl(m.avatar_url)} name={m.display_name || '?'} />
-        <View className="flex-1 gap-1">
-          <Text variant="label">{m.display_name}</Text>
+        <View className="flex-1 gap-0.5">
+          <Text variant="label" weight="semibold">
+            {m.display_name}
+          </Text>
           <Text variant="caption" tone="muted">
             {rating}
           </Text>
-          {m.note ? (
-            <Text tone="muted" selectable className="italic">
-              {m.note}
-            </Text>
-          ) : null}
         </View>
       </View>
+      {m.note ? (
+        <View className="rounded-sm border-l-2 border-accent bg-surface-2 px-3 py-2">
+          <Text tone="muted" selectable className="italic">
+            {m.note}
+          </Text>
+        </View>
+      ) : null}
       <View className="flex-row gap-2">
         <View className="flex-1">
-          <Button label={t('requests.accept')} size="sm" fullWidth disabled={busy || full} onPress={onAccept} />
+          <Button label={t('requests.decline')} icon={X} size="sm" variant="outline" fullWidth disabled={busy} onPress={onDecline} />
         </View>
         <View className="flex-1">
-          <Button label={t('requests.decline')} size="sm" variant="outline" fullWidth disabled={busy} onPress={onDecline} />
+          <Button label={t('requests.accept')} icon={Check} size="sm" fullWidth disabled={busy || full} onPress={onAccept} />
         </View>
       </View>
     </Card>

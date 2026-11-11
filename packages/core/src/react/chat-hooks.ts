@@ -1,6 +1,6 @@
 // Hook chat + báo cáo / chặn (tuần 5). Gửi tin optimistic: tin hiện ngay trạng thái 'sending'; lỗi → 'failed' và
 // GIỮ trong cache để gửi lại / bỏ (không rollback mất chữ người dùng đã gõ). Realtime chèn tin của người kia vào cache.
-import { CHAT, type ReportInput } from '@hp/shared';
+import { CHAT, type Feature, FEATURES, type ReportInput } from '@hp/shared';
 import { type InfiniteData, type QueryClient, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -8,6 +8,7 @@ import {
   chatImageUrls,
   type ConversationMember,
   type ConversationSummary,
+  conversationFeature,
   countUnreadConversations,
   getConversation,
   getGroupConversationId,
@@ -400,4 +401,41 @@ function findCachedConversation(qc: QueryClient, id: string): ConversationSummar
     if (hit) return hit;
   }
   return undefined;
+}
+
+// ── Hộp thư: lọc tại chỗ (app + web) ────────────────────────────────────────────────────────────────────────────
+
+export type InboxFilter = 'all' | 'unread' | Feature;
+
+/** Đang lọc mà ít hơn số dòng này (khoảng một màn hình) → tải thêm trang. */
+const FILTER_MIN_VISIBLE = 8;
+
+/**
+ * Lọc hộp thư tại chỗ trên các trang đã tải: Tất cả · Chưa đọc · theo dịch vụ. Chip dịch vụ chỉ có khi hộp thư có từ 2
+ * dịch vụ trở lên (một dịch vụ thì trùng "Tất cả"); dịch vụ đang lọc không còn → về Tất cả. Đang lọc mà ít hơn một màn
+ * kết quả và server còn trang → tự tải trang kế để không bỏ sót hội thoại cũ hơn.
+ */
+export function useInboxFilter(list: {
+  items: ConversationSummary[];
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => unknown;
+}) {
+  const { items, hasNextPage, isFetchingNextPage, fetchNextPage } = list;
+  const [filter, setFilter] = useState<InboxFilter>('all');
+  const features = useMemo(() => {
+    const present = FEATURES.filter((f) => items.some((c) => conversationFeature(c) === f));
+    return present.length > 1 ? present : [];
+  }, [items]);
+  const active: InboxFilter = filter === 'all' || filter === 'unread' || features.includes(filter) ? filter : 'all';
+  const visible = useMemo(
+    () =>
+      active === 'all' ? items : items.filter((c) => (active === 'unread' ? c.unread_count > 0 : conversationFeature(c) === active)),
+    [items, active],
+  );
+  const short = active !== 'all' && visible.length < FILTER_MIN_VISIBLE;
+  useEffect(() => {
+    if (short && hasNextPage && !isFetchingNextPage) void fetchNextPage();
+  }, [short, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  return { filter: active, setFilter, features, visible };
 }

@@ -22,7 +22,14 @@
     "post_cta": "发布信息",
     "load_more": "加载更多",
     "end": "已经到底了",
-    "loading_more": "正在加载…"
+    "loading_more": "正在加载…",
+    "subtitle_pass": "附近工友的二手好物",
+    "subtitle_room": "工作地点附近的出租房、合租",
+    "subtitle_job": "全职工作和下班后的兼职",
+    "subtitle_lostFound": "发布失物，帮拾到的物品找主人",
+    "subtitle_all": "你工作区附近的新信息",
+    "clear_filters": "清除筛选",
+    "quick_filters": "快速筛选"
   },
   "card": {
     "no_image": "暂无图片",
@@ -59,7 +66,11 @@
     "not_found_body": "信息已被删除、已过期或链接有误。",
     "back_to_list": "返回列表",
     "image_count": "图片 {{current}}/{{total}}",
-    "safety_tip": "看货、看房之前不要先付定金。"
+    "safety_tip": "看货、看房之前不要先付定金。",
+    "stat_rating": "评价",
+    "stat_joined": "加入",
+    "no_rating_short": "暂无",
+    "image_thumb": "查看第 {{current}}/{{total}} 张图片"
   },
   "attr": {
     "brand": "品牌",
@@ -214,7 +225,34 @@
       "months": "个月",
       "people": "人"
     },
-    "photos_min": "此类信息至少需要 {{min}} 张照片。"
+    "photos_min": "此类信息至少需要 {{min}} 张照片。",
+    "hero_title": "发布{{feature}}信息",
+    "hero_hint": "免费发布 — 3 步，约 1 分钟。",
+    "category_hint": {
+      "pass_electronics": "手机、笔记本、耳机…",
+      "pass_vehicle": "摩托车、自行车、电动车…",
+      "pass_ppe": "劳保鞋、安全帽、反光衣…",
+      "pass_home": "风扇、电饭煲、床垫…",
+      "room_rent": "单间、整套房屋",
+      "room_share": "找室友合租",
+      "job_main": "全职工作",
+      "job_parttime": "下班后兼职",
+      "lost": "请大家帮忙寻找",
+      "found": "帮物品找到失主"
+    },
+    "photos_tip": {
+      "pass": "照片清晰、多角度，更容易卖出。",
+      "room": "拍下房间、卫生间和入口，让租客放心。"
+    },
+    "privacy_title": "保护个人信息",
+    "privacy_body": "上传前请遮挡身份证、银行卡、工牌上的部分号码，防止他人冒领。",
+    "price_title": "价格",
+    "contact_title": "联系方式",
+    "contact_chat": "对方可直接在应用内给你发消息。",
+    "contact_phone": "你的号码 {{phone}} 仅在对方登录并点击「显示号码」后可见。",
+    "contact_no_phone": "账号尚未绑定手机号 — 对方将通过消息联系你。",
+    "title_hint_lostFound": "例如：在 2 号门丢失棕色皮钱包。5–120 个字。",
+    "description_hint_lostFound": "颜色、品牌、里面的物品… 保留一个细节用来询问认领人。"
   },
   "manage": {
     "title": "我的信息",
@@ -303,6 +341,18 @@
     "mark_returned_confirm_title": "标记为已物归原主？",
     "mark_returned_confirm_body": "该信息将关闭，不再公开显示。",
     "returned_done": "太好了！物品已物归原主。",
-    "returned_badge": "已归还"
+    "returned_badge": "已归还",
+    "kind_lost": "丢失",
+    "kind_found": "拾到",
+    "mark_returned_found": "已归还失主",
+    "mark_returned_found_confirm_title": "标记为已归还失主？",
+    "returned_check": "交还前，请认领人说出一个独有特征（颜色、划痕、里面的物品），确认是失主。"
+  },
+  "tip": {
+    "title": "安全提示",
+    "pass": "在人多的地方（厂门口、食堂）见面验货。收到货之前不要先付款。",
+    "room": "亲自上门看房，检查水电。没看房之前不要在网上付定金。",
+    "job": "不要为求职缴纳任何费用或押金，也不要交出证件原件。",
+    "lostFound": "询问物品的特征，确认是真正的失主。拍证件照片时请遮住身份证号、工卡号。"
   }
 }

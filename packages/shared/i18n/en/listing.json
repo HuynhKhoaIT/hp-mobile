@@ -22,7 +22,14 @@
     "post_cta": "Post a listing",
     "load_more": "Load more",
     "end": "You've reached the end",
-    "loading_more": "Loading more…"
+    "loading_more": "Loading more…",
+    "subtitle_pass": "Good second-hand stuff from people nearby",
+    "subtitle_room": "Rooms and shared rooms near work",
+    "subtitle_job": "Full-time jobs and after-shift side jobs",
+    "subtitle_lostFound": "Report lost items, return found ones",
+    "subtitle_all": "New posts around your work area",
+    "clear_filters": "Clear filters",
+    "quick_filters": "Quick filters"
   },
   "card": {
     "no_image": "No photo",
@@ -59,7 +66,11 @@
     "not_found_body": "It was removed, has expired, or the link is wrong.",
     "back_to_list": "Back to listings",
     "image_count": "Photo {{current}}/{{total}}",
-    "safety_tip": "Never pay a deposit before seeing the item or room."
+    "safety_tip": "Never pay a deposit before seeing the item or room.",
+    "stat_rating": "Rating",
+    "stat_joined": "Joined",
+    "no_rating_short": "None yet",
+    "image_thumb": "View photo {{current}} of {{total}}"
   },
   "attr": {
     "brand": "Brand",
@@ -214,7 +225,34 @@
       "months": "months",
       "people": "people"
     },
-    "photos_min": "This type of listing needs at least {{min}} photos."
+    "photos_min": "This type of listing needs at least {{min}} photos.",
+    "hero_title": "Post in {{feature}}",
+    "hero_hint": "Free to post — 3 steps, about a minute.",
+    "category_hint": {
+      "pass_electronics": "Phones, laptops, headphones…",
+      "pass_vehicle": "Motorbikes, bicycles, e-bikes…",
+      "pass_ppe": "Boots, helmets, hi-vis vests…",
+      "pass_home": "Fans, rice cookers, mattresses…",
+      "room_rent": "Rooms, whole houses",
+      "room_share": "Find a roommate",
+      "job_main": "Full-time work",
+      "job_parttime": "Extra work after your shift",
+      "lost": "Ask the community to help find it",
+      "found": "Help it get back to its owner"
+    },
+    "photos_tip": {
+      "pass": "Clear photos from every side help it sell faster.",
+      "room": "Show the room, bathroom and entrance so renters feel sure."
+    },
+    "privacy_title": "Protect personal details",
+    "privacy_body": "Cover part of the numbers on ID cards, bank cards and staff badges before uploading so no one can falsely claim the item.",
+    "price_title": "Price",
+    "contact_title": "Contact",
+    "contact_chat": "People can message you right in the app.",
+    "contact_phone": "Your number {{phone}} only shows to signed-in people who tap Show number.",
+    "contact_no_phone": "Your account has no phone number — people will message you instead.",
+    "title_hint_lostFound": "E.g. Lost a brown leather wallet at gate 2. 5 to 120 characters.",
+    "description_hint_lostFound": "Colour, brand, what's inside… Keep one detail private to ask whoever claims it."
   },
   "manage": {
     "title": "My listings",
@@ -303,6 +341,18 @@
     "mark_returned_confirm_title": "Mark as returned?",
     "mark_returned_confirm_body": "The listing will be closed and hidden from public view.",
     "returned_done": "Great! The item is back with its owner.",
-    "returned_badge": "Returned"
+    "returned_badge": "Returned",
+    "kind_lost": "Lost",
+    "kind_found": "Found",
+    "mark_returned_found": "Returned to owner",
+    "mark_returned_found_confirm_title": "Mark as returned to owner?",
+    "returned_check": "Before handing it over, ask the claimant for a private detail (colour, scratches, contents) to be sure it's theirs."
+  },
+  "tip": {
+    "title": "Safety tip",
+    "pass": "Meet in a busy place (factory gate, canteen) to check the item. Don't pay before you get it.",
+    "room": "Visit the room in person and check power and water. Don't pay a deposit online before seeing it.",
+    "job": "Never pay a fee or deposit, or hand over original documents, to get a job.",
+    "lostFound": "Ask about unique details to make sure it goes to the real owner. Cover ID and staff card numbers in photos."
   }
 }

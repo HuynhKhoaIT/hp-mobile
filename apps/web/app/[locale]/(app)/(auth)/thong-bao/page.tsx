@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Page() {
   return (
-    <section className="mx-auto flex w-full max-w-3xl flex-col py-6">
+    <section className="mx-auto flex w-full max-w-3xl flex-col pb-6 sm:pt-6">
       <NotificationsView />
     </section>
   );

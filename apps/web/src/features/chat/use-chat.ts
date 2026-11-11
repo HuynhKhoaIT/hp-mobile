@@ -1,15 +1,17 @@
 'use client';
 
 // Hook chat riêng web (ghép @hp/core/react với điều hướng, chọn ảnh, localStorage). Dữ liệu + optimistic + Realtime ở
-// @hp/core/react — cùng hành vi với app (apps/mobile/src/features/chat/hooks.ts).
-import type { ChatMessage, ConversationSummary } from '@hp/core';
+// @hp/core/react — cùng hành vi với app (apps/mobile/src/features/chat/hooks.ts). Hộp thư: dịch vụ của hội thoại
+// (conversationFeature) và lọc tại chỗ (useInboxFilter) ở @hp/core — dùng chung app; chữ giá tin ngữ cảnh
+// (useConversationPrice) dịch + định dạng ở đây.
+import { type ChatMessage, type ConversationSummary, conversationPriceSource } from '@hp/core';
 import { useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
-import { type ChatContentError, formatDate, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
+import { type ChatContentError, formatDate, hasPhoneNumber, isChatContentError, newUuid, priceLabel } from '@hp/shared';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useSyncExternalStore } from 'react';
 import { useToast } from '@/components/shared/toast';
 import { useErrorText } from '@/features/auth/components/use-error-text';
-import { asLocale } from '@/features/listing/display';
+import { asLocale, priceText } from '@/features/listing/display';
 import { prepareListingImage } from '@/features/listing/listing-image';
 import { useRouter } from '@/i18n/navigation';
 
@@ -178,4 +180,22 @@ export function usePreviewText() {
     if (c.last_sender_id === userId) return t('chat.inbox.you', { text });
     return isGroupChat(c) && c.last_sender_name ? t('web.chat.group_preview', { name: c.last_sender_name, text }) : text;
   };
+}
+
+// ── Hộp thư: dịch vụ, giá, lọc tại chỗ (giống app) ────────────────────────────────────────────────────────────
+
+export { conversationFeature } from '@hp/core';
+export { type InboxFilter, useInboxFilter } from '@hp/core/react';
+
+/** Chữ giá của tin ngữ cảnh; việc làm / hội thoại nhóm / không giá → null. */
+export function useConversationPrice() {
+  const t = useTranslations();
+  const locale = asLocale(useLocale());
+  return useCallback(
+    (c: Pick<ConversationSummary, 'listing_category' | 'listing_price' | 'listing_price_type'>) => {
+      const source = conversationPriceSource(c);
+      return source ? priceText(priceLabel(source), t, locale) || null : null;
+    },
+    [t, locale],
+  );
 }

@@ -1,4 +1,5 @@
-// Hàng thành viên ở chi tiết: avatar chồng mép (≤ 8 người đã nhận từ public_groups.members, +N) + số chỗ còn lại.
+// Khối thành viên ở chi tiết (tiêu đề có vạch, style Stitch): thẻ chứa avatar chồng mép (≤ 8 người đã nhận từ
+// public_groups.members, +N) + số chỗ còn lại.
 // Tham gia ngay → avatar của mình bay vào hàng (AvatarStack) và số chỗ đếm ngược (Ticker). AvatarStack luôn được
 // mount (kể cả khi chưa có ai) để avatar đầu tiên cũng có hiệu ứng.
 import type { PublicGroup } from '@hp/core';
@@ -6,7 +7,7 @@ import { groupMembersPreview } from '@hp/shared';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { profileAvatarUrl } from '@/lib/images';
-import { AvatarStack, SectionHeader, Text, Ticker, useGroupTexts } from '@/ui';
+import { AvatarStack, Card, SectionHeader, Text, Ticker, useGroupTexts } from '@/ui';
 
 export function MembersRow({ group }: { group: PublicGroup }) {
   const { t } = useTranslation('group');
@@ -16,8 +17,8 @@ export function MembersRow({ group }: { group: PublicGroup }) {
 
   return (
     <View className="gap-2">
-      <SectionHeader title={t('detail.members', { count: group.seats_taken })} />
-      <View className="flex-row flex-wrap items-center gap-3">
+      <SectionHeader title={t('detail.members', { count: group.seats_taken })} bar="primary" />
+      <Card className="flex-row flex-wrap items-center gap-3">
         <AvatarStack
           max={6}
           total={group.seats_taken}
@@ -31,7 +32,7 @@ export function MembersRow({ group }: { group: PublicGroup }) {
           </Text>
         ) : null}
         <Ticker text={texts.seats(group)} variant="label" tone={left > 0 ? 'success' : 'muted'} />
-      </View>
+      </Card>
     </View>
   );
 }

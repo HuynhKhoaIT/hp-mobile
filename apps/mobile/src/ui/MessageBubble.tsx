@@ -1,9 +1,10 @@
 // MessageBubble — một tin nhắn trong màn hội thoại. Của mình: nền primary, bên phải, góc dưới phải nhọn; người kia:
-// nền surface, bên trái. Ảnh (signed URL hoặc ảnh cục bộ khi đang gửi) bo theo bong bóng. Dòng phụ: giờ + trạng thái
-// (đang gửi / đã gửi / đã xem); lỗi → chữ đỏ "Chưa gửi được. Chạm để gửi lại" (không truyền tin chỉ bằng màu).
-// Chat nhóm: `author` (tin của người khác) → tên người gửi phía trên tin đầu chuỗi (`showAuthor`) + avatar nhỏ bên trái
-// tin cuối chuỗi (`showAvatar`); tin giữa chuỗi chừa chỗ avatar để bong bóng thẳng hàng.
-import { CircleAlert } from 'lucide-react-native';
+// nền surface viền border, bên trái. Ảnh (signed URL hoặc ảnh cục bộ khi đang gửi)
+// bo theo bong bóng. Dòng phụ: giờ + trạng thái chữ (đang gửi / đã gửi / đã xem) kèm icon đồng hồ / ✓ / ✓✓ (đã xem: màu
+// primary); lỗi → chữ đỏ "Chưa gửi được. Chạm để gửi lại" (không truyền tin chỉ bằng màu / icon).
+// `author` (tin của người khác — chat nhóm, hoặc chat 1-1 chỉ để hiện avatar) → tên người gửi phía trên tin đầu chuỗi
+// (`showAuthor`) + avatar nhỏ bên trái tin cuối chuỗi (`showAvatar`); tin giữa chuỗi chừa chỗ avatar để bong bóng thẳng hàng.
+import { Check, CheckCheck, CircleAlert, Clock, type LucideIcon } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 import { Avatar } from './Avatar';
@@ -13,6 +14,8 @@ import { Text } from './Text';
 import { useTheme } from './theme';
 
 export type MessageStatus = 'sending' | 'sent' | 'seen' | 'failed';
+
+const STATUS_ICON: Record<Exclude<MessageStatus, 'failed'>, LucideIcon> = { sending: Clock, sent: Check, seen: CheckCheck };
 
 export type MessageBubbleProps = {
   mine: boolean;
@@ -107,9 +110,14 @@ export function MessageBubble({
           </Text>
         </Pressable>
       ) : showMeta ? (
-        <Text variant="caption" tone="muted">
-          {statusText && mine ? `${time} · ${statusText}` : time}
-        </Text>
+        <View className="flex-row items-center gap-1 px-1">
+          <Text variant="caption" tone="muted">
+            {statusText && mine ? `${time} · ${statusText}` : time}
+          </Text>
+          {mine && status ? (
+            <Icon icon={STATUS_ICON[status]} tone={status === 'seen' ? 'primary' : 'muted'} size={16} />
+          ) : null}
+        </View>
       ) : null}
     </View>
   );

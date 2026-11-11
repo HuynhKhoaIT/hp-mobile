@@ -211,6 +211,8 @@
     "empty_body": "New messages, listing reviews and reminders will show up here.",
     "login_body": "Log in to get updates about your messages and listings.",
     "unread": "Unread",
+    "needs_reply": "Needs your reply",
+    "review_request": "Review the request",
     "prefs": {
       "title": "Push notifications",
       "subtitle": "Choose what shows on your lock screen. The in-app list stays complete.",

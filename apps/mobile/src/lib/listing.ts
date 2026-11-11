@@ -1,11 +1,21 @@
-// Chữ hiển thị của tin dùng chung card và chi tiết: giá (priceLabel của @hp/shared) và dòng khu vực.
-// Quy tắc (cái gì hiện) ở @hp/shared để khớp web; ở đây chỉ dịch + định dạng theo ngôn ngữ đang dùng.
+// Chữ hiển thị của tin dùng chung card và chi tiết: giá (priceLabel của @hp/shared), dòng khu vực, chữ một thông số
+// (readAttributes — bảng thông tin ở chi tiết + nhãn nhỏ trên thẻ). Quy tắc (cái gì hiện) ở @hp/shared để khớp web; ở đây
+// chỉ dịch + định dạng theo ngôn ngữ đang dùng.
 import type { PublicListing } from '@hp/core';
-import { featureOfCategory, type ListingStatus, type PriceLabel, type PricePer, priceLabel } from '@hp/shared';
+import {
+  type AttributeField,
+  type AttributeValue,
+  featureOfCategory,
+  type ListingStatus,
+  type PriceLabel,
+  type PricePer,
+  priceLabel,
+  readAttributes,
+} from '@hp/shared';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BadgeTone } from '@/ui';
-import { formatDistance, formatMoney } from './format';
+import { formatDate, formatDistance, formatMoney, formatNumber } from './format';
 
 const PER_KEY: Record<PricePer, string> = {
   month: 'listing:card.per_month',
@@ -75,4 +85,82 @@ export function isReturned(listing: Pick<PublicListing, 'category' | 'attributes
   if (featureOfCategory(listing.category) !== 'lostFound') return false;
   const attrs = listing.attributes;
   return !!attrs && typeof attrs === 'object' && !Array.isArray(attrs) && attrs.returned === true;
+}
+
+const MONEY_PER: Record<string, string> = {
+  kwh: 'listing:unit.per_kwh',
+  month: 'listing:card.per_month',
+  hour: 'listing:card.per_hour',
+  day: 'listing:card.per_day',
+};
+
+/**
+ * Chữ một thông số (readAttributes của @hp/shared — cùng nguồn với Zod và web): enum `attr_value.<key>.<value>`, có / không,
+ * số kèm đơn vị, tiền (VND), ngày giờ (giờ Việt Nam). Khớp attributeText của web (features/listing/display.ts).
+ */
+export function useAttributeText() {
+  const { t } = useTranslation('listing');
+  return useCallback(
+    (field: AttributeField, value: AttributeValue): string => {
+      switch (field.kind) {
+        case 'enum':
+          return t(`attr_value.${field.key}.${String(value)}`);
+        case 'bool':
+          return t(value ? 'attr_value.bool.yes' : 'attr_value.bool.no');
+        case 'int': {
+          const n = Number(value);
+          if (field.unit === 'year') return t('unit.year', { value: String(n) });
+          if (field.unit === 'm2' || field.unit === 'km') return t(`unit.${field.unit}`, { value: formatNumber(n) });
+          if (field.unit === 'months' || field.unit === 'people') return t(`unit.${field.unit}`, { count: n });
+          return formatNumber(n);
+        }
+        case 'money': {
+          const price = formatMoney(Number(value));
+          return field.per ? t(MONEY_PER[field.per], { price }) : price;
+        }
+        case 'datetime':
+          return formatDate(String(value), 'datetime');
+        case 'text':
+          return String(value);
+      }
+    },
+    [t],
+  );
+}
+
+/**
+ * Nhãn nhỏ trên thẻ tin theo `keys` (config.card.display.facts của tính năng, theo thứ tự khai báo): enum / số → giá trị
+ * ("Như mới", "20 m²"), bool → tên thông số khi true ("Có gác"; false bỏ), text dài bỏ qua. Tối đa `max` nhãn.
+ */
+export function useCardFacts() {
+  const { t } = useTranslation('listing');
+  const text = useAttributeText();
+  return useCallback(
+    (listing: Pick<PublicListing, 'category' | 'attributes'>, keys: readonly string[] | undefined, max = 3): string[] => {
+      if (!keys?.length) return [];
+      const rows = readAttributes(listing.category, listing.attributes);
+      const out: string[] = [];
+      for (const key of keys) {
+        const row = rows.find((r) => r.field.key === key);
+        if (!row || row.field.kind === 'text' || row.field.kind === 'datetime') continue;
+        if (row.field.kind === 'bool') {
+          if (row.value === true) out.push(t(`attr.${key}`));
+        } else {
+          out.push(text(row.field, row.value));
+        }
+        if (out.length >= max) break;
+      }
+      return out;
+    },
+    [t, text],
+  );
+}
+
+/** Giá trị chuỗi của một thông số (vd `place`, `lost_at` của đồ thất lạc) — null khi không có / sai kiểu. */
+export function attributeString(listing: Pick<PublicListing, 'attributes'>, key: string | undefined): string | null {
+  if (!key) return null;
+  const attrs = listing.attributes;
+  if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) return null;
+  const v = (attrs as Record<string, unknown>)[key];
+  return typeof v === 'string' && v.trim() ? v.trim() : null;
 }

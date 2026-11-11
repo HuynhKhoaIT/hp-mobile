@@ -1,10 +1,11 @@
 // Hàng ngang thẻ tin. 'compact' (chi tiết "Tin tương tự"): thẻ grid w-44. 'hub' (dải tin ở trang chủ,
 // docs/design/home.md §10): thẻ grid w-52 (208), cách nhau 12, lề 16, dừng đúng đầu thẻ (snap theo bề rộng thẻ đo được).
 // Ít item (≤ 10), không cần ảo hoá → ScrollView ngang (không lồng list cùng chiều trong màn cuộn dọc).
+// `display`: điểm nhấn thẻ theo tính năng (chi tiết → tin tương tự cùng tính năng).
 import type { PublicListing } from '@hp/core';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ListingCard, useTheme } from '@/ui';
+import { ListingCard, type ListingCardDisplay, useTheme } from '@/ui';
 import { openListing } from '../navigation';
 
 export type ListingRailProps = {
@@ -16,9 +17,11 @@ export type ListingRailProps = {
   onItemPress?: (listing: PublicListing, index: number) => void;
   /** Số thẻ đầu tải ảnh ưu tiên cao (dải đầu tiên của Hub: 4). */
   priorityCount?: number;
+  /** Điểm nhấn thẻ (config.card.display). */
+  display?: ListingCardDisplay;
 };
 
-export function ListingRail({ items, variant = 'compact', bleed = false, onItemPress, priorityCount = 0 }: ListingRailProps) {
+export function ListingRail({ items, variant = 'compact', bleed = false, onItemPress, priorityCount = 0, display }: ListingRailProps) {
   const { space } = useTheme();
   const [cardWidth, setCardWidth] = useState(0);
   const hub = variant === 'hub';
@@ -42,6 +45,7 @@ export function ListingRail({ items, variant = 'compact', bleed = false, onItemP
           <ListingCard
             listing={listing}
             layout="grid"
+            display={display}
             imagePriority={i < priorityCount ? 'high' : undefined}
             onPress={() => {
               onItemPress?.(listing, i);

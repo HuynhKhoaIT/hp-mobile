@@ -5,16 +5,20 @@
 // → (5) MapPin + "Cách <khu> <khoảng cách>" (hoặc tên khu) · thời gian đăng.
 // Style Stitch: Card bo lg viền hairline; `grid` đặt badge (2) dạng nhãn nổi (Badge overlay) ở góc trái trên ảnh,
 // `row` giữ badge trong thân thẻ (ảnh vuông nhỏ không đủ chỗ).
+// `display` (config.card.display của tính năng — khớp web `card` trong config): (4b) tối đa 3 nhãn thông số dưới giá
+// (trọ: diện tích · có gác · ở tối đa; pass: tình trạng; việc: ca), badge danh mục đổi nhãn + tone theo category (đồ thất
+// lạc: "Mất đồ" đỏ / "Nhặt được" xanh), dòng (5) lấy nơi + thời điểm từ attributes (đồ thất lạc: place · lost_at) thay
+// cho khu · thời gian đăng. Không truyền → thẻ chung (dải tin ở Hub, Tin đã lưu…).
 // ListingCover dùng lại ở chi tiết (ô giữ chỗ cỡ lớn khi tin chưa có ảnh).
 import { listingCover, type PublicListing } from '@hp/core';
-import { featureOfCategory } from '@hp/shared';
+import { featureOfCategory, type ListingCategory } from '@hp/shared';
 import { MapPin } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatRelative } from '@/lib/format';
 import { listingImageUrl } from '@/lib/images';
-import { isReturned, usePriceText, useSiteText } from '@/lib/listing';
-import { Badge } from './Badge';
+import { attributeString, isReturned, useCardFacts, usePriceText, useSiteText } from '@/lib/listing';
+import { Badge, type BadgeTone } from './Badge';
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { Image } from './interop';
@@ -24,6 +28,18 @@ import { useTheme } from './theme';
 
 export type ListingCardLayout = 'grid' | 'row';
 
+/** Điểm nhấn của thẻ theo tính năng (config.card.display) — xem chú thích đầu file. */
+export type ListingCardDisplay = {
+  /** Khoá attributes hiện thành nhãn nhỏ dưới giá (thứ tự hiển thị, tối đa 3). */
+  facts?: readonly string[];
+  /** Badge danh mục theo category: tone + key i18n nhãn thay cho `common:category.<code>`. */
+  categoryBadge?: Partial<Record<ListingCategory, { tone: BadgeTone; labelKey?: string }>>;
+  /** Khoá attributes text thay tên khu ở dòng cuối (vd `place`). */
+  placeKey?: string;
+  /** Khoá attributes datetime thay thời gian đăng ở dòng cuối (vd `lost_at`). */
+  timeKey?: string;
+};
+
 export type ListingCardProps = {
   listing: PublicListing;
   layout?: ListingCardLayout;
@@ -32,6 +48,8 @@ export type ListingCardProps = {
   className?: string;
   /** Ưu tiên tải ảnh (vd 4 thẻ đầu của dải đầu tiên ở Hub: 'high'). */
   imagePriority?: 'low' | 'normal' | 'high';
+  /** Điểm nhấn theo tính năng (config.card.display). */
+  display?: ListingCardDisplay;
 };
 
 const join = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -77,20 +95,25 @@ export function ListingCover({
   );
 }
 
-export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority }: ListingCardProps) {
+export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority, display }: ListingCardProps) {
   const { t, i18n } = useTranslation();
   const priceText = usePriceText();
   const siteText = useSiteText();
+  const cardFacts = useCardFacts();
   const price = priceText(listing);
-  const site = siteText(listing);
-  const meta = [site, formatRelative(listing.created_at)].filter(Boolean).join(' · ');
+  const site = attributeString(listing, display?.placeKey) ?? siteText(listing);
+  const time = attributeString(listing, display?.timeKey) ?? listing.created_at;
+  const meta = [site, formatRelative(time)].filter(Boolean).join(' · ');
+  const facts = cardFacts(listing, display?.facts);
   const showLang = listing.lang !== i18n.language && i18n.exists(`common:locale.${listing.lang}`);
   const returned = isReturned(listing);
   const grid = layout === 'grid';
+  const categoryBadge = display?.categoryBadge?.[listing.category];
+  const category = categoryBadge?.labelKey ? t(categoryBadge.labelKey) : t(`common:category.${listing.category}`);
 
   const badges = (
     <View pointerEvents="none" className={grid ? 'absolute left-2 right-2 top-2 flex-row flex-wrap gap-1' : 'flex-row flex-wrap gap-1'}>
-      <Badge overlay={grid} label={t(`common:category.${listing.category}`)} numberOfLines={1} />
+      <Badge overlay={grid} label={category} tone={categoryBadge?.tone} numberOfLines={1} />
       {returned ? <Badge overlay={grid} label={t('listing:lost_found.returned_badge')} tone="success" numberOfLines={1} /> : null}
       {showLang ? <Badge overlay={grid} label={t(`common:locale.${listing.lang}`)} tone="primary" numberOfLines={1} /> : null}
     </View>
@@ -115,6 +138,17 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
           ) : null}
         </Text>
       ) : null}
+      {facts.length > 0 ? (
+        <View className="flex-row flex-wrap gap-1">
+          {facts.map((f) => (
+            <View key={f} className="max-w-full rounded-sm bg-surface-2 px-2 py-0.5">
+              <Text variant="caption" weight="medium" tone="muted" numberOfLines={1}>
+                {f}
+              </Text>
+            </View>
+          ))}
+        </View>
+      ) : null}
       <View className="flex-row items-center gap-1">
         {site ? <Icon icon={MapPin} tone="muted" size={14} /> : null}
         <Text variant="caption" tone="muted" numberOfLines={1} className="flex-1">
@@ -128,7 +162,9 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
     <Card
       padded={!grid}
       onPress={onPress}
-      accessibilityLabel={[listing.title, returned ? t('listing:lost_found.returned_badge') : null, price, meta].filter(Boolean).join(', ')}
+      accessibilityLabel={[category, listing.title, returned ? t('listing:lost_found.returned_badge') : null, price, ...facts, meta]
+        .filter(Boolean)
+        .join(', ')}
       className={className}
     >
       {grid ? (

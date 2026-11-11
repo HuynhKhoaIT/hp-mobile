@@ -32,7 +32,7 @@ export function GroupAttributeList({ group }: { group: Pick<PublicGroup, 'kind' 
   if (rows.length === 0) return null;
   return (
     <View className="gap-2">
-      <SectionHeader title={t('detail.attributes')} />
+      <SectionHeader title={t('detail.attributes')} bar="primary" />
       <Card>
         {rows.map((row, i) => (
           <Fragment key={row.key}>

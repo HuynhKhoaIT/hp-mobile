@@ -3,6 +3,7 @@
 import { type ListingFeature, LISTING_FEATURES } from '@hp/shared';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { LISTING_CONFIGS } from '@/features/configs';
 import { PostPicker } from '@/features/listing/components/PostPicker';
 import { backOrHome } from '@/features/listing/navigation';
 import { Header, Screen } from '@/ui';
@@ -15,7 +16,7 @@ export default function NewListingPickerScreen() {
   return (
     <Screen scroll>
       <Header title={t('form.title_new')} back onBack={backOrHome} />
-      <PostPicker initialFeature={isFeature(feature) ? feature : undefined} />
+      <PostPicker configs={LISTING_CONFIGS} initialFeature={isFeature(feature) ? feature : undefined} />
     </Screen>
   );
 }

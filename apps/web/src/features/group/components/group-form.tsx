@@ -9,6 +9,12 @@
 //   (ghép xe để trống: "điểm đi → điểm đến") → ghi chú → duyệt người tham gia → thông tin thêm.
 // Kiểm bằng CreateGroupInput (@hp/shared) ngay ở trình duyệt để báo lỗi từng ô; ghi qua Server Action createGroupAction
 // (cùng cách /dang-tin). Thành công → /nhom/{slug}. Lỗi DB (starts_too_soon, rate_limited, banned…) → errors.<code>.
+// Style Stitch "Đăng chuyến xe ghép" (khớp GroupForm của app): header xanh (HeaderDecor; ô icon dịch vụ, H1 + dòng phụ
+// group.form.subtitle_<kind>) → các khối thẻ có tiêu đề vạch: loại → "Lộ trình" / "Sân chơi" → giờ → chỗ trống / người chơi
+// + chi phí (+ đội có sẵn) → tiêu đề & ghi chú → thông tin thêm (duyệt người tham gia + GROUP_ATTRIBUTE_FIELDS). Nút Huỷ +
+// Đăng: dưới 1024px trên thanh dính đáy (ngay trên thanh điều hướng dưới của điện thoại), từ 1024px cuối form.
+// Khác Stitch (cố ý): không "Lưu nháp", ca kíp cố định / lặp lại, loại xe 4–7 chỗ, tiện ích, giá gợi ý, nhận tiền QR — không
+// có dữ liệu / tính năng đó.
 import { flattenIssues } from '@hp/core';
 import {
   CreateGroupInput,
@@ -25,9 +31,10 @@ import {
   type SkillLevel,
 } from '@hp/shared';
 import { useTranslations } from 'next-intl';
-import { useId, useState, useSyncExternalStore } from 'react';
+import { type ReactNode, useId, useState, useSyncExternalStore } from 'react';
 import { ChoiceChip } from '@/components/shared/choice-chip';
 import { ClientOnly } from '@/components/shared/client-only';
+import { HeaderDecor } from '@/components/shared/header-decor';
 import { useToast } from '@/components/shared/toast';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -36,6 +43,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { useErrorText } from '@/features/auth/components/use-error-text';
 import { ChoiceField, Field } from '@/features/listing/components/listing-form/field';
+import { BarHeading } from '@/features/listing/components/safety-tip';
 import { Link, useRouter } from '@/i18n/navigation';
 import { createGroupAction } from '../actions';
 import { GROUP_FEATURE_CONFIGS } from '../features';
@@ -68,6 +76,23 @@ type Values = {
 
 type Errors = Record<string, string[]>;
 
+const CARD = 'flex flex-col gap-5 rounded-lg border border-border bg-surface p-4 shadow-card sm:p-6';
+
+/** Một khối của form: tiêu đề có vạch primary (+ ghi chú nhỏ) → nội dung trong thẻ. */
+function FormBlock({ id, title, note, children }: { id: string; title: string; note?: string; children: ReactNode }) {
+  return (
+    <section aria-labelledby={id} className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        <BarHeading id={id} tone="primary">
+          {title}
+        </BarHeading>
+        {note ? <span className="text-sm text-muted">{note}</span> : null}
+      </div>
+      <div className={CARD}>{children}</div>
+    </section>
+  );
+}
+
 const DAY_MS = 86_400_000;
 const pad = (n: number) => String(n).padStart(2, '0');
 const localDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -76,8 +101,16 @@ const digits = (s: string) => s.replace(/\D/g, '');
 /** Ngày hôm nay / ngày xa nhất cho <input type="date"> — chỉ có ở trình duyệt (server: rỗng, không đặt min / max). */
 const noSubscribe = () => () => undefined;
 function useDateBounds(): { min: string; max: string } | null {
-  const min = useSyncExternalStore(noSubscribe, () => localDate(new Date()), () => '');
-  const max = useSyncExternalStore(noSubscribe, () => localDate(new Date(Date.now() + GROUP_RULES.maxDaysAhead * DAY_MS)), () => '');
+  const min = useSyncExternalStore(
+    noSubscribe,
+    () => localDate(new Date()),
+    () => '',
+  );
+  const max = useSyncExternalStore(
+    noSubscribe,
+    () => localDate(new Date(Date.now() + GROUP_RULES.maxDaysAhead * DAY_MS)),
+    () => '',
+  );
   return min ? { min, max } : null;
 }
 
@@ -121,9 +154,7 @@ function buildInput(kind: GroupKind, v: Values, lang: Locale) {
         }
       : {
           ...(v.skill_level ? { skill_level: v.skill_level } : {}),
-          ...(GROUP_FEATURE_CONFIGS[kind].hasLineup && v.players_have !== null
-            ? { players_have: Number(digits(v.players_have)) }
-            : {}),
+          ...(GROUP_FEATURE_CONFIGS[kind].hasLineup && v.players_have !== null ? { players_have: Number(digits(v.players_have)) } : {}),
         };
   return {
     kind,
@@ -204,15 +235,15 @@ export function GroupForm({
   return (
     <form
       noValidate
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-6 max-lg:pb-24"
       onSubmit={(e) => {
         e.preventDefault();
         void submit();
       }}
     >
-      <h1 className="text-2xl font-semibold text-fg">{t(`group.form.title_${kind}`)}</h1>
+      <GroupFormHero kind={kind} />
 
-      <div className="flex flex-col gap-5 rounded-lg bg-surface p-4 shadow-card sm:p-6">
+      <div className={CARD}>
         <ChoiceField label={t(`group.form.sub_kind_label_${kind}`)} error={err('sub_kind')}>
           {cfg.subKinds.map((s) => (
             <ChoiceChip
@@ -224,17 +255,20 @@ export function GroupForm({
                 const seats = Number(digits(values.seats));
                 // Sân đã chọn không có môn mới → bỏ chọn (trigger cũng báo invalid_venue).
                 const dropVenue = !!values.venue && !(values.venue.sports as readonly string[]).includes(s);
-                change(
-                  { sub_kind: s, ...(seats > max ? { seats: String(max) } : {}), ...(dropVenue ? { venue: null } : {}) },
-                  ['sub_kind', 'seats_total', 'venue_id'],
-                );
+                change({ sub_kind: s, ...(seats > max ? { seats: String(max) } : {}), ...(dropVenue ? { venue: null } : {}) }, [
+                  'sub_kind',
+                  'seats_total',
+                  'venue_id',
+                ]);
               }}
             >
               {t(`group.sub_kind.${s}`)}
             </ChoiceChip>
           ))}
         </ChoiceField>
+      </div>
 
+      <FormBlock id="group-place-heading" title={t(`group.detail.place_title_${kind}`)}>
         {cfg.hasDestination ? (
           <>
             <Field label={t('group.form.origin_label')} hint={t('group.form.origin_hint')} error={err('origin_text')}>
@@ -258,9 +292,7 @@ export function GroupForm({
                   placeholder={t('group.form.destination_placeholder')}
                   autoComplete="off"
                   disabled={busy}
-                  onChange={(e) =>
-                    change({ destination_text: e.target.value, destination_place: null }, ['destination_text', 'title'])
-                  }
+                  onChange={(e) => change({ destination_text: e.target.value, destination_place: null }, ['destination_text', 'title'])}
                 />
               )}
             </Field>
@@ -294,9 +326,11 @@ export function GroupForm({
             />
           </ClientOnly>
         )}
+      </FormBlock>
 
+      <FormBlock id="group-time-heading" title={t(`group.form.starts_at_label_${kind}`)}>
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-2 text-md font-medium text-fg">{t(`group.form.starts_at_label_${kind}`)}</legend>
+          <legend className="sr-only">{t(`group.form.starts_at_label_${kind}`)}</legend>
           <div className="grid grid-cols-2 gap-3">
             <Field label={t('group.form.date_label')}>
               {(control) => (
@@ -331,7 +365,9 @@ export function GroupForm({
             <p className="text-sm text-muted">{t('web.group.starts_hint')}</p>
           )}
         </fieldset>
+      </FormBlock>
 
+      <FormBlock id="group-seats-heading" title={t(`group.form.section_seats_${kind}`)}>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field
             label={t(`group.form.seats_label_${kind}`)}
@@ -379,7 +415,9 @@ export function GroupForm({
             onChange={(players_have) => change({ players_have }, ['attributes.players_have'])}
           />
         ) : null}
+      </FormBlock>
 
+      <FormBlock id="group-about-heading" title={t('group.form.section_about')}>
         <Field
           label={t('group.form.title_label')}
           hint={kind === 'ride' ? t('group.form.title_hint_auto') : undefined}
@@ -420,7 +458,9 @@ export function GroupForm({
             />
           )}
         </Field>
+      </FormBlock>
 
+      <FormBlock id="group-details-heading" title={t('group.form.details_title')} note={t('group.form.optional')}>
         <div className="flex items-start gap-3">
           <Checkbox
             id={approvalId}
@@ -439,17 +479,17 @@ export function GroupForm({
             </p>
           </div>
         </div>
-      </div>
-
-      <section aria-labelledby="group-details-heading" className="flex flex-col gap-4 rounded-lg bg-surface p-4 shadow-card sm:p-6">
-        <h2 id="group-details-heading" className="flex flex-wrap items-baseline gap-2 text-lg font-semibold text-fg">
-          {t('group.form.details_title')}
-          <span className="text-sm font-normal text-muted">{t('group.form.optional')}</span>
-        </h2>
         {GROUP_ATTRIBUTE_FIELDS[kind].map((field) => (
-          <AttributeInput key={field.key} field={field} values={values} disabled={busy} error={err(`attributes.${field.key}`)} onChange={change} />
+          <AttributeInput
+            key={field.key}
+            field={field}
+            values={values}
+            disabled={busy}
+            error={err(`attributes.${field.key}`)}
+            onChange={change}
+          />
         ))}
-      </section>
+      </FormBlock>
 
       {formError ? (
         <p role="alert" className="rounded-md bg-danger/10 p-3 text-md text-danger">
@@ -457,15 +497,37 @@ export function GroupForm({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button asChild variant="outline" size="lg">
-          <Link href={cfg.path}>{t('common.actions.cancel')}</Link>
-        </Button>
-        <Button type="submit" size="lg" variant="accent" disabled={busy} aria-busy={busy || undefined}>
-          {busy ? t('group.form.submitting') : t(`group.form.submit_${kind}`)}
-        </Button>
+      <div className="z-30 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-above-nav max-lg:border-t max-lg:border-border max-lg:bg-surface/95 max-lg:px-4 max-lg:py-3 max-lg:shadow-bar max-lg:backdrop-blur-md sm:max-lg:bottom-0 sm:max-lg:pb-safe">
+        <div className="mx-auto flex max-w-3xl gap-2 max-lg:*:flex-1 lg:justify-end">
+          <Button asChild variant="outline" size="lg">
+            <Link href={cfg.path}>{t('common.actions.cancel')}</Link>
+          </Button>
+          <Button type="submit" size="lg" variant="accent" disabled={busy} aria-busy={busy || undefined}>
+            {busy ? t('group.form.submitting') : t(`group.form.submit_${kind}`)}
+          </Button>
+        </div>
       </div>
     </form>
+  );
+}
+
+/** Header xanh của form (cả khung chờ GroupFormSkeleton dùng): ô icon dịch vụ, H1 + dòng phụ theo kind. */
+export function GroupFormHero({ kind }: { kind: GroupKind }) {
+  const t = useTranslations();
+  const cfg = GROUP_FEATURE_CONFIGS[kind];
+  return (
+    <div className="relative -mx-4 -mt-6 overflow-hidden rounded-b-xl bg-primary text-on-primary sm:mx-0 sm:mt-0 sm:rounded-xl">
+      <HeaderDecor />
+      <div className="relative flex items-start gap-3 px-4 pt-4 pb-5 sm:p-6">
+        <span aria-hidden className={`flex size-10 shrink-0 items-center justify-center rounded-md ${cfg.tone.soft}`}>
+          <cfg.Icon strokeWidth={1.75} className={`size-6 ${cfg.tone.fg}`} />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <h1 className="text-xl font-bold sm:text-2xl">{t(`group.form.title_${kind}`)}</h1>
+          <p className="text-sm text-on-primary/90 sm:text-md">{t(`group.form.subtitle_${kind}`)}</p>
+        </div>
+      </div>
+    </div>
   );
 }
 

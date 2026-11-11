@@ -3,6 +3,9 @@
 // Hành động trang chi tiết (cột phải, dính khi cuộn). Ghi lượt xem khi người xem đã đăng nhập.
 // - Chủ tin xem tin của mình → "Sửa tin" + "Tin của tôi" (không liên hệ chính mình). Chỉ là UI: RLS mới quyết định quyền.
 // - Tin đang đăng: "Hiện số điện thoại" (ContactReveal) + Nhắn tin (StartChatButton → /tin-nhan/[id]; khách → LoginDialog).
+//   Style Stitch: dưới 1024px hai nút nằm trên thanh dính đáy (ngay trên thanh điều hướng dưới của điện thoại, nền surface/95
+//   + shadow-bar), nút chính bên phải; `primaryCta` (config tính năng): 'call' → Hiện số / Gọi nền primary (trọ, đồ thất lạc),
+//   'chat' → Nhắn tin nền primary. Từ 1024px: hai nút xếp dọc trong cột phải dính.
 // - Tin đã bán / đóng / hết hạn: ẩn liên hệ, chỉ còn Chia sẻ (banner trạng thái ở trang).
 // - Người xem không phải chủ tin: "Báo cáo tin" (ReportButton; khách → LoginDialog).
 // - Chia sẻ: Web Share API (điện thoại); không có → sao chép link web (shareUrl của @hp/core) + toast "Đã sao chép".
@@ -17,6 +20,7 @@ import { useSessionUser } from '@/features/auth/components/use-session-user';
 import { StartChatButton } from '@/features/chat/components/start-chat-button';
 import { ReportButton } from '@/features/report/components/report-button';
 import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
 import { publicEnv } from '@/lib/env';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { ContactReveal } from './contact-reveal';
@@ -27,6 +31,7 @@ export function ListingActions({
   title,
   ownerId,
   active,
+  primaryCta = 'chat',
 }: {
   listingId: string;
   slug: string;
@@ -34,6 +39,8 @@ export function ListingActions({
   ownerId: string;
   /** listingDisplayStatus === 'active' (còn liên hệ được). */
   active: boolean;
+  /** Nút liên hệ chính (config.primaryCta). */
+  primaryCta?: 'chat' | 'call';
 }) {
   const t = useTranslations();
   const toast = useToast();
@@ -104,14 +111,23 @@ export function ListingActions({
     );
   }
 
+  const call = primaryCta === 'call';
   return (
     <div className="flex flex-col gap-3">
-      <ContactReveal listingId={listingId} userId={userId} />
-      <div className="flex gap-2">
-        <StartChatButton listingId={listingId} userId={userId} />
-        {shareButton}
+      <div className="z-30 max-lg:fixed max-lg:inset-x-0 max-lg:bottom-above-nav max-lg:border-t max-lg:border-border max-lg:bg-surface/95 max-lg:px-4 max-lg:py-3 max-lg:shadow-bar max-lg:backdrop-blur-md sm:max-lg:bottom-0 sm:max-lg:pb-safe">
+        <div className={cn('mx-auto flex max-w-3xl items-start gap-2 *:flex-1 lg:flex-col lg:*:w-full', call ? 'flex-row' : 'flex-row-reverse')}>
+          <StartChatButton
+            listingId={listingId}
+            userId={userId}
+            className={call ? undefined : 'border-primary bg-primary text-on-primary hover:bg-primary/90'}
+          />
+          <ContactReveal listingId={listingId} userId={userId} primary={call} compact />
+        </div>
       </div>
-      {reportButton}
+      <div className="flex gap-2 *:flex-1">
+        {shareButton}
+        {reportButton}
+      </div>
     </div>
   );
 }

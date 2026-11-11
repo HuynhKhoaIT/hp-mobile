@@ -2,10 +2,12 @@
 //   ảnh bìa vuông 88 / 96 bo md + badge trạng thái (common.status.*) nổi góc trái trên ảnh │ tiêu đề 2 dòng + menu ⋮
 //   │ giá 18 px đậm primary │ lượt xem · hết hạn
 //   hộp ghi chú chờ duyệt / bị từ chối + lý do (manage.reason.*) │ hàng thao tác nhanh (quickActions) ngăn bởi đường kẻ.
+// Đồ thất lạc (Stitch L2 "Đồ thất lạc của tôi", khớp app): nhãn Mất đồ / Nhặt được dưới tiêu đề; đang đăng → nút nhanh chính
+// "Đã nhận lại đồ" / "Đã trả cho chủ" (ReturnedDialog); đã trả lại → badge "Đã trả lại" thay "Đã đóng".
 // Tin đã bán / đã đóng / hết hạn: viền đứt, ảnh nhạt, tiêu đề + giá màu muted (vẫn ≥ 4,5:1). Không async, không 'use client':
 // dùng được cho trang đầu (server) và các trang "Xem thêm" / khối xem trước (client).
 import type { MyListing } from '@hp/core';
-import { formatDate, priceLabel } from '@hp/shared';
+import { featureOfCategory, formatDate, priceLabel } from '@hp/shared';
 import { CircleAlert, Clock, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
@@ -14,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from '@/i18n/navigation';
 import { listingImageUrl } from '@/lib/images';
 import { cn } from '@/lib/utils';
-import { asLocale, priceText } from '../display';
+import { asLocale, isReturned, priceText } from '../display';
 import { hasPublicPage, isInactive, manageActions, ownerStatus, quickActions, STATUS_TONE } from '../manage';
 import { ListingPlaceholder } from './listing-placeholder';
 import { MyListingMenu, MyListingQuickActions } from './my-listing-menu';
@@ -35,6 +37,11 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
   const price = priceText(priceLabel(listing), t, locale);
   const showExpiry = !!listing.expires_at && (status === 'active' || status === 'expired');
   const note = status === 'pending_review' || status === 'rejected' ? status : null;
+  const lostFound = featureOfCategory(listing.category) === 'lostFound';
+  const returned = lostFound && isReturned(listing);
+  const returnable = lostFound
+    ? { title: listing.title, category: listing.category, images: listing.images, attributes: listing.attributes }
+    : undefined;
 
   return (
     <article className={cn(CARD, inactive ? 'border-dashed border-border' : 'border-border')}>
@@ -53,8 +60,8 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
             <ListingPlaceholder category={listing.category} size="sm" />
           )}
           <div className="absolute inset-x-1.5 top-1.5 flex">
-            <Badge overlay tone={STATUS_TONE[status]}>
-              {t(`common.status.${status}`)}
+            <Badge overlay tone={returned ? 'success' : STATUS_TONE[status]}>
+              {returned ? t('listing.lost_found.returned_badge') : t(`common.status.${status}`)}
             </Badge>
           </div>
         </div>
@@ -68,8 +75,13 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
                 {listing.title}
               </Link>
             </h3>
-            <MyListingMenu id={listing.id} title={listing.title} actions={actions} className="-mt-1.5 -mr-1.5" />
+            <MyListingMenu id={listing.id} title={listing.title} actions={actions} returnable={returnable} className="-mt-1.5 -mr-1.5" />
           </div>
+          {lostFound ? (
+            <Badge tone={listing.category === 'found' ? 'success' : 'danger'} className="self-start">
+              {t(listing.category === 'found' ? 'listing.lost_found.kind_found' : 'listing.lost_found.kind_lost')}
+            </Badge>
+          ) : null}
           {price ? <p className={cn('text-lg font-bold', inactive ? 'text-muted' : 'text-primary')}>{price}</p> : null}
           <p className="mt-auto flex flex-wrap items-center gap-x-2 text-sm text-muted">
             <span className="inline-flex items-center gap-1">
@@ -112,7 +124,7 @@ export function MyListingRow({ listing, now }: { listing: MyListing; now: number
         </div>
       ) : null}
 
-      <MyListingQuickActions id={listing.id} title={listing.title} items={quickActions(status, actions)} />
+      <MyListingQuickActions id={listing.id} title={listing.title} items={quickActions(status, actions)} returnable={returnable} />
     </article>
   );
 }

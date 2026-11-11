@@ -1,8 +1,10 @@
 // Danh sách nhóm cuộn vô hạn (FlashList v2, cursor "<starts_at>|<id>") dùng chung ride / sport: skeleton đúng hình
 // GroupCard → rỗng có CTA tạo nhóm (đang lọc: "không có nhóm phù hợp") → lỗi có Thử lại → thẻ một cột;
-// kéo để làm mới; chân danh sách: đang tải / hết / thử lại.
+// kéo để làm mới; chân danh sách: đang tải / hết / thử lại. `header`: khối cuộn cùng danh sách trên thẻ đầu (mẹo an toàn +
+// tiêu đề khối khi chưa lọc — GroupBrowser).
 import type { PublicGroup } from '@hp/core';
 import { FlashList } from '@shopify/flash-list';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWindowDimensions, View } from 'react-native';
 import { Button, EmptyState, ErrorState, GroupCard, SERVICE, SkeletonGroupCard, StaggerItem, Text, useTheme } from '@/ui';
@@ -23,6 +25,8 @@ export type GroupFeedProps = {
   fetchNextPage: () => void;
   refetch: () => void;
   onCreate: () => void;
+  /** Khối cuộn cùng danh sách, trên thẻ đầu tiên. */
+  header?: ReactNode;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -79,6 +83,7 @@ export function GroupFeed(p: GroupFeedProps) {
       onEndReachedThreshold={threshold}
       refreshing={p.isRefetching && !p.isFetchingNextPage}
       onRefresh={p.refetch}
+      ListHeaderComponent={p.header ? <View>{p.header}</View> : null}
       ListFooterComponent={footer}
       // Chừa chỗ cho nút Tạo nổi (Fab) ở cuối danh sách.
       contentContainerStyle={{ paddingTop: space[2], paddingBottom: space[8] * 3 }}

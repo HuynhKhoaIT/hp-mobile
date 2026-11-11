@@ -1,7 +1,8 @@
 'use client';
 
-// Composer — ô nhập đáy khung chat (giống apps/mobile/src/ui/Composer.tsx): nút ảnh · ô chữ nhiều dòng tự cao (tới ~5 dòng,
-// rồi cuộn trong ô) · nút gửi tròn. Enter gửi, Shift + Enter xuống dòng (đang gõ bộ gõ tiếng Việt / Trung → không gửi).
+// Composer — ô nhập đáy khung chat (style Stitch, giống apps/mobile/src/ui/Composer.tsx): thanh nền surface viền trên +
+// shadow-bar · nút ảnh · ô chữ viên thuốc (nền surface-2 viền border) nhiều dòng tự cao (tới ~5 dòng, rồi cuộn trong ô) ·
+// nút gửi tròn nền accent (cam, icon on-accent, shadow-fab khi gửi được). Enter gửi, Shift + Enter xuống dòng (đang gõ bộ gõ tiếng Việt / Trung → không gửi).
 // Nút gửi chỉ bật khi có chữ; vượt giới hạn ký tự → báo đỏ dưới ô (không cắt chữ). `error`: lỗi nội dung (có SĐT, từ thô
 // tục) — giữ nguyên chữ để sửa. `disabledText` (đã chặn…) thay cả thanh bằng một dòng giải thích + hành động phụ.
 import { ImagePlus, SendHorizontal } from 'lucide-react';
@@ -57,8 +58,8 @@ export function Composer({ value, onChange, onSend, onPickImage, maxLength, erro
   };
 
   return (
-    <div className="flex flex-col gap-1 border-t border-border bg-surface px-2 py-2 pb-safe">
-      <div className="flex items-end gap-1">
+    <div className="flex flex-col gap-1 border-t border-border bg-surface px-2 py-2 pb-safe shadow-bar">
+      <div className="flex items-end gap-1.5">
         {onPickImage ? (
           <>
             <Button
@@ -102,22 +103,24 @@ export function Composer({ value, onChange, onSend, onPickImage, maxLength, erro
           aria-describedby={tooLong || error ? `${errorId} ${hintId}` : hintId}
           aria-invalid={tooLong || !!error || undefined}
           className={cn(
-            'max-h-32 min-h-11 flex-1 resize-none overflow-y-auto rounded-xl border bg-surface-2 px-3 py-2 text-md text-fg outline-none placeholder:text-disabled',
+            'max-h-32 min-h-11 flex-1 resize-none overflow-y-auto rounded-xl border bg-surface-2 px-4 py-2 text-md text-fg outline-none placeholder:text-disabled',
             'focus-visible:ring-3 focus-visible:ring-ring/30',
-            tooLong || error ? 'border-danger' : 'border-transparent focus-visible:border-primary',
+            tooLong || error ? 'border-danger' : 'border-border focus-visible:border-primary',
           )}
         />
-        <Button
+        <button
           type="button"
-          size="icon"
-          className="rounded-full"
           aria-label={t('chat.thread.send')}
           title={t('chat.thread.send')}
           disabled={!canSend}
           onClick={send}
+          className={cn(
+            'inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent outline-none transition focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-95 motion-reduce:active:scale-100',
+            canSend ? 'shadow-fab hover:opacity-90' : 'opacity-50',
+          )}
         >
-          <SendHorizontal strokeWidth={1.75} />
-        </Button>
+          <SendHorizontal strokeWidth={1.75} className="size-5" aria-hidden />
+        </button>
       </div>
       <p id={hintId} className="sr-only">
         {t('web.chat.composer_hint')}

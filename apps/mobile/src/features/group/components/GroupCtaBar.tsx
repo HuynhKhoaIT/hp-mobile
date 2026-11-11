@@ -4,13 +4,15 @@
 //   bị từ chối: dòng giải thích · chủ nhóm: "Bạn là chủ nhóm" + "Chat nhóm" | "Huỷ nhóm" (nguy hiểm).
 // "Chat nhóm" (config.detail.ctas có 'chat') là hành động chính của thành viên; vẫn mở được sau giờ hẹn.
 // Nhóm đủ người / đã tới giờ / đã huỷ → nút tắt kèm nhãn. Hành động khó hoàn tác xác nhận bằng ConfirmSheet.
+// Style Stitch (thanh "Xác nhận đặt chỗ"): StickyCta elevated (nền surface tràn mép + shadow-bar); người chưa tham gia, nhóm
+// còn chỗ: chi phí / người (đậm, primary) + "Còn N chỗ" bên trái, nút Tham gia / Xin tham gia bên phải (gần ngón cái).
 import type { PublicGroup } from '@hp/core';
 import { type GroupDisplayStatus, groupDisplayStatus, type GroupViewerRole, GROUP_RULES } from '@hp/shared';
 import { CircleCheck, Crown, type LucideIcon } from 'lucide-react-native';
 import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { BottomSheet, Button, ConfirmSheet, Icon, Input, Notice, Row, StickyCta, Text } from '@/ui';
+import { BottomSheet, Button, ConfirmSheet, Icon, Input, Notice, Row, StickyCta, Text, Ticker, useGroupTexts } from '@/ui';
 import { useGroupActions } from '../hooks';
 import { GroupChatButton } from './GroupChatButton';
 
@@ -29,6 +31,7 @@ export type GroupCtaBarProps = {
 
 export function GroupCtaBar({ group, role, loading, chat }: GroupCtaBarProps) {
   const { t } = useTranslation('group');
+  const texts = useGroupTexts();
   const actions = useGroupActions(group);
   const status = groupDisplayStatus(group);
   const [sheet, setSheet] = useState<Sheet>(null);
@@ -70,12 +73,25 @@ export function GroupCtaBar({ group, role, loading, chat }: GroupCtaBarProps) {
   } else if (status === 'open') {
     body = (
       <>
-        <Button
-          label={t(group.requires_approval ? 'action.request' : 'action.join')}
-          fullWidth
-          loading={actions.joining}
-          onPress={group.requires_approval ? () => actions.openRequest(() => setSheet('note')) : actions.join}
-        />
+        <Row gap={3} align="center">
+          <View className="w-2/5">
+            <Text variant="label" weight="bold" tone="primary" numberOfLines={2}>
+              {texts.fee(group)}
+            </Text>
+            <View className="flex-row items-center gap-1.5">
+              <View className="size-2 rounded-full bg-success" />
+              <Ticker text={texts.seats(group)} variant="caption" weight="medium" />
+            </View>
+          </View>
+          <View className="flex-1">
+            <Button
+              label={t(group.requires_approval ? 'action.request' : 'action.join')}
+              fullWidth
+              loading={actions.joining}
+              onPress={group.requires_approval ? () => actions.openRequest(() => setSheet('note')) : actions.join}
+            />
+          </View>
+        </Row>
         <Text variant="caption" tone="muted" className="text-center">
           {t(group.requires_approval ? 'detail.approval_hint' : 'detail.instant_hint')}
         </Text>
@@ -87,7 +103,7 @@ export function GroupCtaBar({ group, role, loading, chat }: GroupCtaBarProps) {
 
   return (
     <>
-      <StickyCta>{body}</StickyCta>
+      <StickyCta elevated>{body}</StickyCta>
 
       <BottomSheet open={sheet === 'note'} onClose={close} title={t('action.note_title')}>
         <Input

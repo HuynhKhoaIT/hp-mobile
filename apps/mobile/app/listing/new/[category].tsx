@@ -1,6 +1,6 @@
 // Screen type: Form
 // Form "Đăng nhanh" 3 bước cho một danh mục (mọi tính năng Listing, khác nhau ở config.ts + ATTRIBUTE_FIELDS).
-// Cần đăng nhập + hồ sơ (khu mặc định = profile.site). Danh mục sai → về bước chọn loại tin.
+// Cần đăng nhập + hồ sơ (khu mặc định = profile.site; SĐT để nhắc số nào hiện qua "Hiện số"). Danh mục sai → về bước chọn loại tin.
 import { useMyProfile } from '@hp/core/react';
 import { LISTING_CATEGORIES, type ListingCategory } from '@hp/shared';
 import { Redirect, useLocalSearchParams } from 'expo-router';
@@ -44,6 +44,7 @@ export default function NewListingScreen() {
         userId={me.data.id}
         defaultSite={me.data.site}
         lang={getLocale()}
+        phone={me.data.phone}
       />
     </Screen>
   );

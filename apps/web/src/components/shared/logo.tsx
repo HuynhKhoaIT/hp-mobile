@@ -1,18 +1,11 @@
-// Logo: biểu tượng (ô primary bo góc + ghim vị trí on-primary + chấm accent = "quanh khu làm việc") và chữ tên app.
+// Logo: biểu tượng (LogoMark, logo-mark.tsx) và chữ tên app.
 // Không dùng logo / nhận diện Hòa Phát (ứng dụng cộng đồng, độc lập).
 import { APP_NAME } from '@hp/shared';
-import { MapPin } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { LogoMark } from './logo-mark';
 
-export function LogoMark() {
-  return (
-    <span aria-hidden className="relative flex size-8 shrink-0 items-center justify-center rounded-md bg-primary shadow-card">
-      <MapPin strokeWidth={2.25} className="size-5 text-on-primary" />
-      <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-accent ring-2 ring-surface" />
-    </span>
-  );
-}
+export { LogoMark };
 
 export async function Logo() {
   const t = await getTranslations('web.header');

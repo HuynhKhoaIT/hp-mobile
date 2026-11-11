@@ -7,6 +7,9 @@
 // (hỏi lại). DB guard vẫn quyết định; lỗi → toast.
 // Tin đã đóng / đã bán / hết hạn: viền nét đứt, tiêu đề + giá màu muted (vẫn ≥ 4,5:1), ảnh mờ 80% — chữ không mờ.
 // Vùng mở tin (ảnh + chữ) là một nút riêng, ⋮ và các nút nhanh là nút anh em → trình đọc màn hình tới được từng nút.
+// Đồ thất lạc (style Stitch L2 "Đồ thất lạc của tôi"): nhãn Mất đồ / Nhặt được dưới tiêu đề; đang đăng → nút chính
+// "Đã nhận lại đồ" / "Đã trả cho chủ" (ReturnedSheet → mark_listing_returned) + Sửa, Đóng tin vào menu ⋮; đã trả lại →
+// badge "Đã trả lại" thay "Đã đóng", không còn Mở lại.
 import type { MyListing } from '@hp/core';
 import { featureOfCategory } from '@hp/shared';
 import {
@@ -18,6 +21,7 @@ import {
   Eye,
   type LucideIcon,
   MoreVertical,
+  PackageCheck,
   Pencil,
   RotateCcw,
   Send,
@@ -27,12 +31,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { formatDate } from '@/lib/format';
-import { LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
+import { isReturned, LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
 import { Badge, BottomSheet, Button, type ButtonVariant, Card, Col, Icon, IconButton, ListingCover, Skeleton, Text } from '@/ui';
 import { ownerActions, useOwnerListingActions } from '../hooks';
 import { openEditListing, openListing } from '../navigation';
+import { ReturnedSheet, returnedLabelKeys } from './ReturnedSheet';
 
-export type MyListingQuickAction = 'edit' | 'resubmit' | 'renew' | 'sold' | 'close' | 'reopen';
+export type MyListingQuickAction = 'edit' | 'resubmit' | 'renew' | 'sold' | 'close' | 'reopen' | 'returned';
 
 const QUICK: Record<MyListingQuickAction, { label: string; icon: LucideIcon; a11y?: string }> = {
   edit: { label: 'manage.edit', icon: Pencil },
@@ -42,6 +47,8 @@ const QUICK: Record<MyListingQuickAction, { label: string; icon: LucideIcon; a11
   sold: { label: 'manage.sold_confirm', icon: CheckCircle2, a11y: 'manage.mark_sold' },
   close: { label: 'manage.mark_closed', icon: Archive },
   reopen: { label: 'manage.reopen', icon: RotateCcw },
+  // Chữ theo loại tin (mất / nhặt) — MyListingRow truyền labelKey của returnedLabelKeys.
+  returned: { label: 'lost_found.mark_returned', icon: PackageCheck },
 };
 
 type QuickRow = { primary?: { action: MyListingQuickAction; variant: Extract<ButtonVariant, 'primary' | 'accent'> }; secondary: MyListingQuickAction[] };
@@ -50,6 +57,11 @@ type QuickRow = { primary?: { action: MyListingQuickAction; variant: Extract<But
 function canSellOf(listing: MyListing, markSold: boolean) {
   const feature = featureOfCategory(listing.category);
   return markSold && (feature === 'pass' || feature === 'room');
+}
+
+/** Đồ thất lạc đang đăng, chưa trả lại → được "Đã nhận lại đồ" (RPC mark_listing_returned; DB vẫn quyết định). */
+function canMarkReturnedOf(listing: MyListing, expired: boolean) {
+  return featureOfCategory(listing.category) === 'lostFound' && listing.status === 'active' && !expired && !isReturned(listing);
 }
 
 /**
@@ -62,6 +74,8 @@ function quickRowOf(listing: MyListing): QuickRow {
   if (a.resubmit) return { primary: { action: 'resubmit', variant: 'primary' }, secondary: ['edit'] };
   if (listing.status === 'draft' || listing.status === 'pending_review') return { primary: { action: 'edit', variant: 'primary' }, secondary: [] };
   if (a.expired) return { primary: a.renew ? { action: 'renew', variant: 'accent' } : undefined, secondary: ['edit'] };
+  if (canMarkReturnedOf(listing, a.expired)) return { primary: { action: 'returned', variant: 'primary' }, secondary: ['edit'] };
+  if (isReturned(listing)) return { secondary: ['edit'] };
   if (listing.status === 'active') {
     const end: MyListingQuickAction[] = canSellOf(listing, a.markSold) ? ['sold'] : a.close ? ['close'] : [];
     return { primary: a.renew ? { action: 'renew', variant: 'accent' } : undefined, secondary: ['edit', ...end] };
@@ -80,6 +94,8 @@ export function MyListingRow({ listing, onMore, onAction }: MyListingRowProps) {
   const price = usePriceText()(listing);
   const a = ownerActions(listing);
   const status = a.expired ? 'expired' : listing.status;
+  const returned = isReturned(listing);
+  const lostFound = featureOfCategory(listing.category) === 'lostFound';
   const inactive = status === 'sold' || status === 'closed' || status === 'expired';
   const review = listing.status === 'pending_review' || listing.status === 'rejected';
   const rejected = listing.status === 'rejected';
@@ -108,13 +124,25 @@ export function MyListingRow({ listing, onMore, onAction }: MyListingRowProps) {
           <View className="size-24 overflow-hidden rounded-md border border-border">
             <ListingCover listing={listing} className={['size-full', inactive && 'opacity-80'].filter(Boolean).join(' ')} />
             <View className="absolute left-1.5 right-1.5 top-1.5">
-              <Badge overlay label={t(`common:status.${status}`)} tone={LISTING_STATUS_TONE[status]} numberOfLines={1} />
+              <Badge
+                overlay
+                label={returned ? t('lost_found.returned_badge') : t(`common:status.${status}`)}
+                tone={returned ? 'success' : LISTING_STATUS_TONE[status]}
+                numberOfLines={1}
+              />
             </View>
           </View>
           <View className="flex-1 gap-1">
             <Text variant="label" weight="semibold" tone={inactive ? 'muted' : 'default'} numberOfLines={2}>
               {listing.title}
             </Text>
+            {lostFound ? (
+              <Badge
+                label={t(listing.category === 'found' ? 'lost_found.kind_found' : 'lost_found.kind_lost')}
+                tone={listing.category === 'found' ? 'success' : 'danger'}
+                numberOfLines={1}
+              />
+            ) : null}
             {price ? (
               <Text variant="price" tone={inactive ? 'muted' : 'primary'} numberOfLines={1}>
                 {price}
@@ -151,7 +179,13 @@ export function MyListingRow({ listing, onMore, onAction }: MyListingRowProps) {
         <View className="mt-3 flex-row gap-2 border-t border-border pt-2.5">
           {quick.primary ? (
             <View className="flex-1">
-              <QuickButton action={quick.primary.action} variant={quick.primary.variant} fill onPress={onAction} />
+              <QuickButton
+                action={quick.primary.action}
+                variant={quick.primary.variant}
+                labelKey={quick.primary.action === 'returned' ? returnedLabelKeys(listing.category).action : undefined}
+                fill
+                onPress={onAction}
+              />
             </View>
           ) : null}
           {quick.secondary.map((action) =>
@@ -172,12 +206,15 @@ export function MyListingRow({ listing, onMore, onAction }: MyListingRowProps) {
 function QuickButton({
   action,
   variant,
+  labelKey,
   fill = false,
   bare = false,
   onPress,
 }: {
   action: MyListingQuickAction;
   variant: ButtonVariant;
+  /** Đè chữ mặc định của QUICK (vd "Đã trả cho chủ" cho tin nhặt được). */
+  labelKey?: string;
   fill?: boolean;
   /** Bỏ icon (hàng đủ 3 nút). */
   bare?: boolean;
@@ -190,7 +227,7 @@ function QuickButton({
       size="sm"
       variant={variant}
       icon={bare ? undefined : q.icon}
-      label={t(q.label)}
+      label={t(labelKey ?? q.label)}
       accessibilityLabel={q.a11y ? t(q.a11y) : undefined}
       fullWidth={fill}
       onPress={() => onPress(action)}
@@ -221,7 +258,7 @@ export function MyListingRowSkeleton() {
 
 // ── Menu ⋮ + xác nhận ────────────────────────────────────────────────────────────
 
-type SheetView = 'menu' | 'sold' | 'delete';
+type SheetView = 'menu' | 'sold' | 'delete' | 'returned';
 type SheetState = { listing: MyListing; view: SheetView } | null;
 
 /**
@@ -237,6 +274,8 @@ export function useMyListingActions() {
         return openEditListing(listing.id);
       case 'sold':
         return setState({ listing, view: 'sold' });
+      case 'returned':
+        return setState({ listing, view: 'returned' });
       case 'resubmit':
         return run.resubmit(listing.id);
       case 'renew':
@@ -261,8 +300,12 @@ export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyL
   if (!state) return <BottomSheet open={false} onClose={onClose} />;
 
   const { listing, view } = state;
+  // Sheet riêng (thẻ món đồ + nhắc đối chiếu) — style Stitch "Popup xác minh nhận lại đồ".
+  if (view === 'returned') return <ReturnedSheet listing={listing} open onClose={onClose} />;
   const a = ownerActions(listing);
   const canSell = canSellOf(listing, a.markSold);
+  const canReturn = canMarkReturnedOf(listing, a.expired);
+  const canReopen = a.reopen && !isReturned(listing);
   const act = (fn: (id: string) => void) => () => {
     fn(listing.id);
     onClose();
@@ -291,8 +334,17 @@ export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyL
           {a.resubmit ? <Button label={t('manage.resubmit')} icon={Send} fullWidth onPress={act(run.resubmit)} /> : null}
           <Button label={t('manage.edit')} icon={Pencil} variant="outline" fullWidth onPress={act((id) => openEditListing(id))} />
           {canSell ? <Button label={t('manage.mark_sold')} icon={CheckCircle2} variant="outline" fullWidth onPress={() => onView('sold')} /> : null}
+          {canReturn ? (
+            <Button
+              label={t(returnedLabelKeys(listing.category).action)}
+              icon={PackageCheck}
+              variant="outline"
+              fullWidth
+              onPress={() => onView('returned')}
+            />
+          ) : null}
           {a.close ? <Button label={t('manage.mark_closed')} icon={Archive} variant="outline" fullWidth onPress={act(run.close)} /> : null}
-          {a.reopen ? <Button label={t('manage.reopen')} icon={RotateCcw} variant="outline" fullWidth onPress={act(run.reopen)} /> : null}
+          {canReopen ? <Button label={t('manage.reopen')} icon={RotateCcw} variant="outline" fullWidth onPress={act(run.reopen)} /> : null}
           {a.renew ? <Button label={t('manage.renew')} icon={CalendarClock} variant="outline" fullWidth onPress={act(run.renew)} /> : null}
           <Button label={t('manage.delete')} icon={Trash2} variant="ghost" fullWidth onPress={() => onView('delete')} />
         </Col>

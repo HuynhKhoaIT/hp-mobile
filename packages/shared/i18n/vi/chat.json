@@ -13,7 +13,13 @@
     "deleted_user": "Người dùng",
     "listing_gone": "Tin không còn hiển thị",
     "muted": "Đã tắt thông báo",
-    "unread": "{{count}} tin chưa đọc"
+    "unread": "{{count}} tin chưa đọc",
+    "subtitle": "Trò chuyện với người bán, chủ trọ và nhóm đi chung",
+    "filter_label": "Lọc cuộc trò chuyện",
+    "filter_all": "Tất cả",
+    "filter_unread": "Chưa đọc",
+    "filter_empty": "Không có cuộc trò chuyện nào ở mục này",
+    "filter_reset": "Xem tất cả"
   },
   "thread": {
     "placeholder": "Nhập tin nhắn…",

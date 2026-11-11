@@ -18,6 +18,10 @@
   "list": {
     "title_ride": "Rides home",
     "title_sport": "Find a game",
+    "subtitle_ride": "Ride home or to your shift together — split fuel with coworkers",
+    "subtitle_sport": "Find more players for football, badminton, pickleball after your shift",
+    "upcoming_ride": "Upcoming rides",
+    "upcoming_sport": "Upcoming games",
     "search_placeholder_ride": "Search destination, route…",
     "search_placeholder_sport": "Search venue, sport…",
     "empty_title_ride": "No rides yet",
@@ -59,6 +63,10 @@
   "detail": {
     "title_ride": "Ride details",
     "title_sport": "Game details",
+    "place_title_ride": "Route",
+    "place_title_sport": "Venue",
+    "tip_ride": "Meet in a busy place and check the plate and driver before getting in. Don't transfer money to strangers in advance.",
+    "tip_sport": "Meet at the venue in a busy place. Split the court fee on the spot; don't transfer money to strangers in advance.",
     "from": "From",
     "to": "To",
     "venue": "Venue",
@@ -133,6 +141,11 @@
   "form": {
     "title_ride": "Create a ride",
     "title_sport": "Create a game",
+    "subtitle_ride": "Got empty seats? Take coworkers along and split the fuel",
+    "subtitle_sport": "Short of players? Invite more people after your shift",
+    "section_seats_ride": "Seats & cost",
+    "section_seats_sport": "Players & cost",
+    "section_about": "Title & notes",
     "sub_kind_label_ride": "Vehicle",
     "sub_kind_label_sport": "Sport",
     "origin_label": "From",

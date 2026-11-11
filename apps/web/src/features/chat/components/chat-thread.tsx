@@ -1,7 +1,9 @@
 'use client';
 
-// Khung chat (giống ChatThread của app): header + thẻ tin ngữ cảnh → tin nhắn cũ ở trên, mới nhất ở đáy (phân cách theo
-// ngày, gộp tin liên tiếp cùng người trong 5 phút) → ô nhập + nút ảnh. Realtime (tin mới, đang gõ) qua @hp/core/react.
+// Khung chat (style Stitch "Khung Chat trực tiếp", giống ChatThread của app): header xanh + thẻ tin / nhóm ngữ cảnh → tin
+// nhắn cũ ở trên, mới nhất ở đáy (phân cách theo ngày bằng viên thuốc, gộp tin liên tiếp cùng người trong 5 phút; tin
+// người kia có avatar ở tin cuối chuỗi, cả chat 1-1) → ô nhập + nút ảnh + nút gửi cam. Không có tin hệ thống / vị trí /
+// trả lời nhanh / ghi âm của Stitch (chat không có các loại tin đó). Realtime (tin mới, đang gõ) qua @hp/core/react.
 // Mở khung / có tin mới của người kia khi tab đang hiện → đánh dấu đã đọc. Lần đầu chat trên trình duyệt → hướng dẫn an
 // toàn. Tuỳ chọn: tắt thông báo, báo cáo người dùng, chặn / bỏ chặn. "Xem tin cũ hơn" giữ nguyên vị trí đang đọc.
 // Chat nhóm: tên + avatar người gửi trên tin của người khác (useConversationMembers), không chặn / báo cáo người dùng /
@@ -167,15 +169,19 @@ function Thread({ conversationId }: { conversationId: string }) {
     const firstOfRun =
       newDay || older.sender_id !== item.sender_id || Date.parse(item.created_at) - Date.parse(older.created_at) > GROUP_MS;
     const member = isGroup && !mine && item.sender_id ? memberById.get(item.sender_id) : undefined;
-    const senderInfo =
-      isGroup && !mine
+    // Nhóm: tên + avatar người gửi; 1-1: chỉ avatar người kia (tên đã ở header).
+    const senderInfo = mine
+      ? undefined
+      : isGroup
         ? {
             name: member?.display_name || t('chat.inbox.deleted_user'),
             avatar: member?.avatar_url ?? null,
             showName: firstOfRun,
             showAvatar: lastOfRun,
           }
-        : undefined;
+        : c
+          ? { name: c.other_name || t('chat.inbox.deleted_user'), avatar: c.other_avatar_url ?? null, showName: false, showAvatar: lastOfRun }
+          : undefined;
     const status = mine
       ? messageStatus(item, { latestMine: item.id === latestMineId, otherReadAt: c?.other_last_read_at ?? null })
       : undefined;
@@ -185,7 +191,9 @@ function Thread({ conversationId }: { conversationId: string }) {
       <Fragment key={item.id}>
         {newDay ? (
           <li className="flex justify-center py-3" aria-hidden>
-            <span className="rounded-full bg-surface-2 px-3 py-1 text-xs text-muted">{dayLabel(item.created_at)}</span>
+            <span className="rounded-full border border-border bg-surface-2 px-3 py-1 text-sm font-medium text-muted">
+              {dayLabel(item.created_at)}
+            </span>
           </li>
         ) : null}
         <li className={lastOfRun ? 'pb-3' : 'pb-1'}>

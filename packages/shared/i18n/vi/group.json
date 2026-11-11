@@ -18,6 +18,10 @@
   "list": {
     "title_ride": "Ghép xe về quê",
     "title_sport": "Ghép trận",
+    "subtitle_ride": "Đi chung về quê, đi ca — chia tiền xăng với đồng nghiệp",
+    "subtitle_sport": "Rủ thêm người đá bóng, đánh cầu, pickleball sau ca",
+    "upcoming_ride": "Chuyến sắp khởi hành",
+    "upcoming_sport": "Kèo sắp diễn ra",
     "search_placeholder_ride": "Tìm điểm đến, tuyến đường…",
     "search_placeholder_sport": "Tìm sân, môn…",
     "empty_title_ride": "Chưa có chuyến nào",
@@ -59,6 +63,10 @@
   "detail": {
     "title_ride": "Chi tiết chuyến",
     "title_sport": "Chi tiết kèo",
+    "place_title_ride": "Lộ trình",
+    "place_title_sport": "Sân chơi",
+    "tip_ride": "Hẹn đón ở nơi đông người, kiểm tra biển số và người lái trước khi lên xe. Không chuyển khoản trước cho người lạ.",
+    "tip_sport": "Hẹn ở sân, nơi đông người. Tiền sân chia tại chỗ, không chuyển khoản trước cho người lạ.",
     "from": "Điểm đi",
     "to": "Điểm đến",
     "venue": "Sân",
@@ -133,6 +141,11 @@
   "form": {
     "title_ride": "Tạo chuyến ghép xe",
     "title_sport": "Tạo kèo",
+    "subtitle_ride": "Xe còn chỗ trống? Rủ đồng nghiệp đi cùng, chia tiền xăng",
+    "subtitle_sport": "Thiếu người? Rủ thêm anh em ra sân sau ca",
+    "section_seats_ride": "Chỗ trống & chi phí",
+    "section_seats_sport": "Người chơi & chi phí",
+    "section_about": "Tiêu đề & ghi chú",
     "sub_kind_label_ride": "Loại xe",
     "sub_kind_label_sport": "Môn",
     "origin_label": "Điểm đi",

@@ -6,7 +6,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { asLocale } from '@/features/listing/display';
 import { getPostFormContext } from '@/features/listing/queries';
-import { GroupForm } from './group-form';
+import { GroupForm, GroupFormHero } from './group-form';
 
 export async function CreateGroupView({ kind }: { kind: GroupKind }) {
   const ctx = await getPostFormContext();
@@ -25,11 +25,19 @@ export async function CreateGroupView({ kind }: { kind: GroupKind }) {
   return <GroupForm kind={kind} defaultOrigin={siteName} site={ctx.data.profile.site ?? null} lang={locale} />;
 }
 
-export function GroupFormSkeleton() {
+/**
+ * Khung chờ đúng hình form: header xanh (biết kind → header thật; loading.tsx không có params → dải xanh trống cùng cỡ)
+ * → thẻ chip loại → các khối tiêu đề vạch + thẻ ô nhập.
+ */
+export function GroupFormSkeleton({ kind }: { kind?: GroupKind }) {
   return (
     <div className="flex flex-col gap-6">
-      <Skeleton className="h-8 w-56" />
-      <div className="flex flex-col gap-5 rounded-lg bg-surface p-6 shadow-card">
+      {kind ? (
+        <GroupFormHero kind={kind} />
+      ) : (
+        <div aria-hidden className="-mx-4 -mt-6 h-24 rounded-b-xl bg-primary sm:mx-0 sm:mt-0 sm:h-28 sm:rounded-xl" />
+      )}
+      <div className="flex flex-col gap-5 rounded-lg border border-border bg-surface p-4 shadow-card sm:p-6">
         <div className="flex flex-wrap gap-2">
           {Array.from({ length: 3 }, (_, i) => (
             <Skeleton key={i} className="h-11 w-28 rounded-full" />

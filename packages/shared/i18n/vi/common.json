@@ -211,6 +211,8 @@
     "empty_body": "Tin nhắn mới, kết quả duyệt tin và nhắc lịch sẽ hiện ở đây.",
     "login_body": "Đăng nhập để nhận thông báo về tin nhắn và tin đăng của bạn.",
     "unread": "Chưa đọc",
+    "needs_reply": "Cần phản hồi",
+    "review_request": "Xem và duyệt yêu cầu",
     "prefs": {
       "title": "Thông báo đẩy",
       "subtitle": "Chọn loại thông báo hiện trên màn hình khoá. Danh sách trong app vẫn đủ.",

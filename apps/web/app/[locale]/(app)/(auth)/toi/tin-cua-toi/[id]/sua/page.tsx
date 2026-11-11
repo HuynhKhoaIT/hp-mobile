@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Page({ params }: PageProps<'/[locale]/toi/tin-cua-toi/[id]/sua'>) {
   return (
-    <section className="mx-auto w-full max-w-4xl px-4 py-6">
+    <section className="mx-auto w-full max-w-3xl pb-6 sm:px-4 sm:pt-6">
       <Suspense fallback={<ListingFormSkeleton />}>
         <EditListingView params={params} />
       </Suspense>

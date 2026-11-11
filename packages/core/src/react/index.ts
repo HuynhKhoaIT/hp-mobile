@@ -37,6 +37,7 @@ export {
   useUploadListingImage,
 } from './listing-hooks';
 export {
+  type InboxFilter,
   type SendChatMessageVars,
   useBlockedIds,
   useChatImageUrls,
@@ -45,6 +46,7 @@ export {
   useConversations,
   useDiscardMessage,
   useGroupConversationId,
+  useInboxFilter,
   useInboxRealtime,
   useMarkConversationRead,
   useMessages,

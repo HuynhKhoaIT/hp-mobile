@@ -2,9 +2,12 @@
 // DB (trigger guard, renew_listing) mới quyết định; thao tác sai trả lỗi (forbidden / too_early) và hiện toast.
 // Khớp app (hợp đồng tuần 4): Sửa · Đánh dấu đã bán (chỉ pass đồ / trọ) · Đóng tin · Mở lại (đã bán / đã đóng)
 // · Gửi duyệt lại (bị từ chối → DB chuyển pending_review, lý do `resubmit`) · Gia hạn (≤ 3 ngày cuối hoặc đã hết hạn) · Xoá.
+// Đồ thất lạc (Stitch L2 "Đồ thất lạc của tôi", khớp app MyListingRow): đang đăng, chưa trả → "Đã nhận lại đồ" / "Đã trả cho
+// chủ" (mark_listing_returned) là nút nhanh chính; đã trả lại → không còn Mở lại.
 import type { MyListing, MyListingsTab } from '@hp/core';
 import { featureOfCategory, type ListingStatus } from '@hp/shared';
 import type { BadgeTone } from '@/components/shared/badge';
+import { isReturned } from './display';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 export const RENEW_WINDOW_DAYS = 3;
@@ -12,7 +15,7 @@ export const RENEW_WINDOW_DAYS = 3;
 /** Tab "Tin của tôi" (listMyListings): Chờ duyệt gồm cả bị từ chối; Đã đóng gồm đã bán / đã đóng / hết hạn. */
 export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
 
-export type ManageAction = 'edit' | 'sold' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
+export type ManageAction = 'edit' | 'sold' | 'returned' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
 
 /** active quá expires_at (cron chưa kịp đổi) coi như hết hạn. */
 export function ownerStatus(l: Pick<MyListing, 'status' | 'expires_at'>, now: number): ListingStatus {
@@ -33,14 +36,16 @@ export function canMarkSold(l: Pick<MyListing, 'category'>): boolean {
   return feature === 'pass' || feature === 'room';
 }
 
-export function manageActions(l: Pick<MyListing, 'status' | 'expires_at' | 'category'>, now: number): ManageAction[] {
+export function manageActions(l: Pick<MyListing, 'status' | 'expires_at' | 'category' | 'attributes'>, now: number): ManageAction[] {
   const status = ownerStatus(l, now);
+  const returned = featureOfCategory(l.category) === 'lostFound' && isReturned(l);
   const out: ManageAction[] = ['edit'];
   if (status === 'active') {
     if (canMarkSold(l)) out.push('sold');
+    if (featureOfCategory(l.category) === 'lostFound' && !returned) out.push('returned');
     out.push('close');
   }
-  if (status === 'sold' || status === 'closed') out.push('reopen');
+  if ((status === 'sold' || status === 'closed') && !returned) out.push('reopen');
   if (status === 'rejected') out.push('resubmit');
   if (canRenew(l, now)) out.push('renew');
   out.push('delete');
@@ -90,6 +95,11 @@ export function quickActions(status: ListingStatus, actions: readonly ManageActi
       add('edit', 'primary');
       break;
     case 'active':
+      if (actions.includes('returned')) {
+        add('returned', 'primary');
+        add('edit', 'outline');
+        break;
+      }
       add('renew', 'accent');
       add('edit', 'outline');
       if (actions.includes('sold')) add('sold', 'outline');

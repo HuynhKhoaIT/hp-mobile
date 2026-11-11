@@ -13,7 +13,13 @@
     "deleted_user": "用户",
     "listing_gone": "信息已不再显示",
     "muted": "已关闭通知",
-    "unread": "{{count}} 条未读"
+    "unread": "{{count}} 条未读",
+    "subtitle": "与卖家、房东以及拼车、约球群组聊天",
+    "filter_label": "筛选会话",
+    "filter_all": "全部",
+    "filter_unread": "未读",
+    "filter_empty": "此分类下没有会话",
+    "filter_reset": "查看全部"
   },
   "thread": {
     "placeholder": "输入消息…",

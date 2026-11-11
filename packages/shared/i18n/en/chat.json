@@ -13,7 +13,13 @@
     "deleted_user": "User",
     "listing_gone": "Listing no longer available",
     "muted": "Notifications off",
-    "unread": "{{count}} unread"
+    "unread": "{{count}} unread",
+    "subtitle": "Chat with sellers, landlords and your ride or match groups",
+    "filter_label": "Filter conversations",
+    "filter_all": "All",
+    "filter_unread": "Unread",
+    "filter_empty": "No conversations in this filter",
+    "filter_reset": "Show all"
   },
   "thread": {
     "placeholder": "Type a message…",
