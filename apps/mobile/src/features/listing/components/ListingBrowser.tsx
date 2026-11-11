@@ -25,8 +25,6 @@ import {
   ALL,
   DEFAULT_SORT,
   DISTANCE_OPTIONS_KM,
-  isFreeQuickFilter,
-  isPriceQuickFilter,
   type ListingBrowserApi,
   type ListingPreset,
   useListingBrowser,
@@ -35,6 +33,7 @@ import {
 import type { ListingFeatureConfig, ListingFilterKey } from '../types';
 import { ListingBanner } from './ListingBanner';
 import { ListingFeed } from './ListingFeed';
+import { QuickFilterChips } from './QuickFilterChips';
 
 export type ListingBrowserProps = {
   config: ListingFeatureConfig;
@@ -179,36 +178,7 @@ export function ListingBrowser({
         className="-mx-4 grow-0"
         contentContainerClassName="gap-2 px-4 py-1"
       >
-        {quick.map((f) =>
-          isFreeQuickFilter(f) ? (
-            <Chip
-              key="free_only"
-              size="sm"
-              dot={config.color ?? 'accent'}
-              label={t(f.labelKey)}
-              selected={browser.freeOnly}
-              onPress={browser.toggleFreeOnly}
-            />
-          ) : isPriceQuickFilter(f) ? (
-            <Chip
-              key={`price_max:${f.priceMax}`}
-              size="sm"
-              dot={config.color ?? 'accent'}
-              label={t(f.labelKey)}
-              selected={browser.priceMax === f.priceMax}
-              onPress={() => browser.togglePriceMax(f.priceMax)}
-            />
-          ) : (
-            <Chip
-              key={`${f.key}:${String(f.value)}`}
-              size="sm"
-              dot={config.color ?? 'accent'}
-              label={typeof f.value === 'boolean' ? t(`attr.${f.key}`) : t(`attr_value.${f.key}.${f.value}`)}
-              selected={browser.attributes[f.key] === f.value}
-              onPress={() => browser.toggleAttribute(f.key, f.value)}
-            />
-          ),
-        )}
+        <QuickFilterChips config={config} browser={browser} />
       </ScrollView>
     ) : null;
 

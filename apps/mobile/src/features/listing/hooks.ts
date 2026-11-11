@@ -23,6 +23,7 @@ import {
   LISTING_CATEGORIES,
   type ListingCategory,
   type ListingFeature,
+  type ListingFilters,
   type ListingSort,
   type Locale,
   LOCALES,
@@ -104,59 +105,118 @@ export function useListingPreset(params: { shortcut?: string; categories?: strin
 }
 
 /**
+ * State bộ lọc của danh sách (một object — để mini-app nâng lên store dùng chung giữa trang chủ và màn Bộ lọc).
+ * `customPrice`: khoảng giá tự nhập ở màn Bộ lọc của mini-app (loại trừ với `priceRange` / `priceMax`).
+ */
+export type ListingBrowserState = {
+  input: string;
+  query: string;
+  category: ListingCategory | typeof ALL;
+  site: string;
+  /** Khoảng cách tới khu tối đa (mét, dạng chuỗi cho FilterBar); ALL = không lọc. */
+  distance: string;
+  preset: ListingPreset | null;
+  /** Chip lọc nhanh đang bật: khoá thông số → giá trị (search_listings p_attributes, ghép với thuộc tính đặt sẵn). */
+  attributes: Readonly<Record<string, string | boolean>>;
+  /** Chip giá tối đa đang bật (VND, search_listings p_price_max); null = không lọc giá. */
+  priceMax: number | null;
+  /** Khoảng giá đang chọn (key trong config.priceRanges); ALL = mọi mức giá. */
+  priceRange: string;
+  customPrice: { min: number | null; max: number | null } | null;
+  /** Chỉ đồ cho tặng (search_listings p_free_only). */
+  freeOnly: boolean;
+  sort: ListingSort;
+};
+
+export type ListingBrowserInitial = { site?: string; query?: string; preset?: ListingPreset };
+
+/** State ban đầu: bộ lọc đặt sẵn chỉ là một category con của tính năng (vd "Đồ bảo hộ") → chọn luôn chip đó. */
+export function initialBrowserState(config: ListingFeatureConfig, initial: ListingBrowserInitial = {}): ListingBrowserState {
+  const single = initial.preset?.categories?.length === 1 && !initial.preset.attributes ? initial.preset.categories[0] : undefined;
+  const asChip = single && config.categories.includes(single) ? single : undefined;
+  return {
+    input: initial.query ?? '',
+    query: initial.query?.trim() ?? '',
+    category: asChip ?? ALL,
+    site: initial.site ?? ALL,
+    distance: ALL,
+    preset: asChip ? null : (initial.preset ?? null),
+    attributes: {},
+    priceMax: null,
+    priceRange: ALL,
+    customPrice: null,
+    freeOnly: false,
+    sort: DEFAULT_SORT,
+  };
+}
+
+/** Bộ lọc gửi useListingList từ state (dùng chung danh sách + mini-app). */
+export function browserFilters(config: ListingFeatureConfig, s: ListingBrowserState): ListingFilters {
+  const custom = s.customPrice;
+  return {
+    // 'all' không giới hạn category trừ khi chọn chip hoặc có bộ lọc đặt sẵn.
+    ...(s.category !== ALL
+      ? { categories: [s.category] }
+      : s.preset?.categories?.length
+        ? { categories: [...s.preset.categories] }
+        : config.key === 'all'
+          ? {}
+          : { categories: [...config.categories] }),
+    ...(s.preset?.attributes || Object.keys(s.attributes).length > 0 ? { attributes: { ...s.preset?.attributes, ...s.attributes } } : {}),
+    ...(s.query ? { query: s.query } : {}),
+    ...(s.site !== ALL ? { site: s.site } : {}),
+    ...(s.distance !== ALL ? { maxDistanceM: Number(s.distance) } : {}),
+    ...(s.priceMax !== null
+      ? { priceMax: s.priceMax }
+      : custom
+        ? { ...(custom.min !== null ? { priceMin: custom.min } : {}), ...(custom.max !== null ? { priceMax: custom.max } : {}) }
+        : priceBounds(config, s.priceRange)),
+    ...(s.freeOnly ? { freeOnly: true } : {}),
+    // Mặc định không gửi → key danh sách mặc định giữ nguyên (cache dùng chung với Hub / web).
+    ...(s.sort !== DEFAULT_SORT ? { sort: s.sort } : {}),
+  };
+}
+
+/** Có khoảng giá tự nhập (ít nhất một đầu). */
+const hasCustomPrice = (s: ListingBrowserState) => !!s.customPrice && (s.customPrice.min !== null || s.customPrice.max !== null);
+
+/**
+ * Số bộ lọc đang bật (chip "N bộ lọc" của mini-app): từ khoá, danh mục, mỗi thông số, khu, khoảng cách, giá, cho tặng,
+ * sắp xếp khác mặc định, bộ lọc đặt sẵn. 0 = không lọc.
+ */
+export function activeFilterCount(s: ListingBrowserState): number {
+  const price = s.priceMax !== null || s.priceRange !== ALL || hasCustomPrice(s);
+  const flags = [!!s.query, s.category !== ALL, s.site !== ALL, s.distance !== ALL, !!s.preset, price, s.freeOnly, s.sort !== DEFAULT_SORT];
+  return flags.filter(Boolean).length + Object.keys(s.attributes).length;
+}
+
+/**
+ * Nơi giữ state bộ lọc ngoài component (mini-app: store theo phiên mở mini-app, dùng chung trang chủ + màn Bộ lọc).
+ * Không truyền → state cục bộ của màn (danh sách tính năng, Khám phá, Tìm kiếm — như cũ).
+ */
+export type ListingBrowserStore = {
+  state: ListingBrowserState;
+  update: (fn: (prev: ListingBrowserState) => ListingBrowserState) => void;
+};
+
+/**
  * State màn danh sách: từ khoá (gõ / đã tìm), category con, khu, khoảng cách, chip lọc nhanh theo thông số
  * (config.quickFilters — bật / tắt; cùng khoá thì chip sau thay chip trước), chip giá tối đa (priceMax — VND, bật / tắt),
  * khoảng giá (config.priceRanges — loại trừ với chip giá tối đa), "Cho tặng" (freeOnly), sắp xếp (mặc định mới nhất),
- * bộ lọc đặt sẵn → useListingList (cursor — đổi sắp xếp là đổi key, phân trang lại từ đầu; staleTime 60s). `clearAll` bỏ mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event
- * `search` một lần cho mỗi bộ lọc.
+ * bộ lọc đặt sẵn → useListingList (cursor — đổi sắp xếp là đổi key, phân trang lại từ đầu; staleTime 60s). `clearAll` bỏ
+ * mọi bộ lọc + từ khoá. Tìm có từ khoá → ghi log_search (số kết quả trang đầu) + event `search` một lần cho mỗi bộ lọc.
+ * `store` (mini-app) → state nằm ngoài màn, nhiều màn cùng đọc / sửa; không có → state cục bộ (như cũ).
  */
-export function useListingBrowser(
-  config: ListingFeatureConfig,
-  initial: { site?: string; query?: string; preset?: ListingPreset } = {},
-) {
+export function useListingBrowser(config: ListingFeatureConfig, initial: ListingBrowserInitial = {}, store?: ListingBrowserStore) {
   const client = useSupabase();
-  // Bộ lọc đặt sẵn chỉ là một category con của tính năng (vd "Đồ bảo hộ") → chọn luôn chip đó, không cần chip riêng.
-  const single = initial.preset?.categories?.length === 1 && !initial.preset.attributes ? initial.preset.categories[0] : undefined;
-  const asChip = single && config.categories.includes(single) ? single : undefined;
-  const [input, setInput] = useState(initial.query ?? '');
-  const [query, setQuery] = useState(initial.query?.trim() ?? '');
-  const [category, setCategory] = useState<ListingCategory | typeof ALL>(asChip ?? ALL);
-  const [site, setSite] = useState<string>(initial.site ?? ALL);
-  /** Khoảng cách tới khu tối đa (mét, dạng chuỗi cho FilterBar); ALL = không lọc. */
-  const [distance, setDistance] = useState<string>(ALL);
-  const [preset, setPreset] = useState<ListingPreset | null>(asChip ? null : (initial.preset ?? null));
-  /** Chip lọc nhanh đang bật: khoá thông số → giá trị (search_listings p_attributes, ghép với thuộc tính đặt sẵn). */
-  const [attributes, setAttributes] = useState<Readonly<Record<string, string | boolean>>>({});
-  /** Chip giá tối đa đang bật (VND, search_listings p_price_max); null = không lọc giá. */
-  const [priceMax, setPriceMax] = useState<number | null>(null);
-  /** Khoảng giá đang chọn (key trong config.priceRanges); ALL = mọi mức giá. */
-  const [priceRange, setPriceRange] = useState<string>(ALL);
-  /** Chỉ đồ cho tặng (search_listings p_free_only). */
-  const [freeOnly, setFreeOnly] = useState(false);
-  const [sort, setSort] = useState<ListingSort>(DEFAULT_SORT);
+  const [local, setLocal] = useState<ListingBrowserState>(() => initialBrowserState(config, initial));
+  const s = store ? store.state : local;
+  const update = store ? store.update : setLocal;
+  const patch = (next: Partial<ListingBrowserState>) => update((prev) => ({ ...prev, ...next }));
 
-  const filters = useMemo(
-    () => ({
-      // 'all' không giới hạn category trừ khi chọn chip hoặc có bộ lọc đặt sẵn.
-      ...(category !== ALL
-        ? { categories: [category] }
-        : preset?.categories?.length
-          ? { categories: [...preset.categories] }
-          : config.key === 'all'
-            ? {}
-            : { categories: [...config.categories] }),
-      ...(preset?.attributes || Object.keys(attributes).length > 0 ? { attributes: { ...preset?.attributes, ...attributes } } : {}),
-      ...(query ? { query } : {}),
-      ...(site !== ALL ? { site } : {}),
-      ...(distance !== ALL ? { maxDistanceM: Number(distance) } : {}),
-      ...(priceMax !== null ? { priceMax } : priceBounds(config, priceRange)),
-      ...(freeOnly ? { freeOnly: true } : {}),
-      // Mặc định không gửi → key danh sách mặc định giữ nguyên (cache dùng chung với Hub / web).
-      ...(sort !== DEFAULT_SORT ? { sort } : {}),
-    }),
-    [category, config, preset, query, site, distance, attributes, priceMax, priceRange, freeOnly, sort],
-  );
+  const filters = useMemo(() => browserFilters(config, s), [config, s]);
   const list = useListingList(filters);
+  const { query, category } = s;
 
   // log_search: sau khi trang đầu của một lần tìm có từ khoá về xong.
   const logged = useRef<string | null>(null);
@@ -171,85 +231,66 @@ export function useListingBrowser(
     track('search', { feature: config.key, category: category !== ALL ? category : null, results });
   }, [client, query, category, filters, firstPage, config.key]);
 
+  const filterCount = activeFilterCount(s);
+
   return {
     ...list,
-    input,
-    setInput,
+    /** State bộ lọc hiện tại (mini-app: chép làm bản nháp ở màn Bộ lọc). */
+    state: s,
+    input: s.input,
+    setInput: (input: string) => patch({ input }),
     /** Tìm theo chữ đang gõ (bàn phím "Tìm"). */
-    submit: (text: string) => setQuery(text.trim()),
+    submit: (text: string) => patch({ query: text.trim() }),
     query,
     category,
-    setCategory,
-    site,
-    setSite,
-    distance,
-    setDistance,
-    preset,
-    clearPreset: () => setPreset(null),
-    attributes,
+    setCategory: (value: ListingCategory | typeof ALL) => patch({ category: value }),
+    site: s.site,
+    setSite: (site: string) => patch({ site }),
+    distance: s.distance,
+    setDistance: (distance: string) => patch({ distance }),
+    preset: s.preset,
+    clearPreset: () => patch({ preset: null }),
+    attributes: s.attributes,
     /** Bật / tắt một chip lọc nhanh (cùng khoá: thay giá trị). */
     toggleAttribute: (key: string, value: string | boolean) =>
-      setAttributes((prev) => {
-        const next = { ...prev };
-        if (prev[key] === value) delete next[key];
+      update((prev) => {
+        const next = { ...prev.attributes };
+        if (prev.attributes[key] === value) delete next[key];
         else next[key] = value;
-        return next;
+        return { ...prev, attributes: next };
       }),
-    priceMax,
+    priceMax: s.priceMax,
     /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá); bỏ khoảng giá đang chọn. */
-    togglePriceMax: (value: number) => {
-      setPriceRange(ALL);
-      setPriceMax((prev) => (prev === value ? null : value));
-    },
-    priceRange,
+    togglePriceMax: (value: number) =>
+      update((prev) => ({ ...prev, priceRange: ALL, customPrice: null, priceMax: prev.priceMax === value ? null : value })),
+    priceRange: s.priceRange,
     /** Chọn khoảng giá (ALL = mọi mức giá); bỏ chip giá tối đa đang bật. */
-    setPriceRange: (key: string) => {
-      setPriceMax(null);
-      setPriceRange(key);
-    },
-    freeOnly,
-    toggleFreeOnly: () => setFreeOnly((prev) => !prev),
-    sort,
-    setSort,
+    setPriceRange: (key: string) => patch({ priceMax: null, customPrice: null, priceRange: key }),
+    freeOnly: s.freeOnly,
+    toggleFreeOnly: () => update((prev) => ({ ...prev, freeOnly: !prev.freeOnly })),
+    sort: s.sort,
+    setSort: (sort: ListingSort) => patch({ sort }),
     /** Thao tác cho khối `header` (FeatureHome). */
     api: {
-      selectCategory: setCategory,
-      showFree: () => setFreeOnly(true),
-      selectSite: setSite,
+      selectCategory: (value: ListingCategory) => patch({ category: value }),
+      showFree: () => patch({ freeOnly: true }),
+      selectSite: (site: string) => patch({ site }),
     } satisfies ListingBrowserApi,
     /** Bộ lọc gửi useListingList — đổi → danh sách cuộn về đầu. */
     filters,
     /** Bỏ mọi bộ lọc + từ khoá (chip "Xoá lọc"). */
-    clearAll: () => {
-      setInput('');
-      setQuery('');
-      setCategory(ALL);
-      setSite(ALL);
-      setDistance(ALL);
-      setPreset(null);
-      setAttributes({});
-      setPriceMax(null);
-      setPriceRange(ALL);
-      setFreeOnly(false);
-      setSort(DEFAULT_SORT);
-    },
+    clearAll: () => update(() => initialBrowserState(config)),
+    /** Số bộ lọc đang bật (0 = không lọc). */
+    filterCount,
     /**
      * Đang lọc (từ khoá / category / khu / khoảng cách / lọc nhanh / giá / cho tặng / sắp xếp khác mặc định / đặt sẵn) →
      * rỗng là "không tìm thấy", không phải "chưa có tin"; khối header (trang chủ riêng) ẩn.
      */
-    isFiltered:
-      !!query ||
-      category !== ALL ||
-      site !== ALL ||
-      distance !== ALL ||
-      !!preset ||
-      Object.keys(attributes).length > 0 ||
-      priceMax !== null ||
-      priceRange !== ALL ||
-      freeOnly ||
-      sort !== DEFAULT_SORT,
+    isFiltered: filterCount > 0,
   };
 }
+
+export type ListingBrowserResult = ReturnType<typeof useListingBrowser>;
 
 /** Đăng tin: bắt đăng nhập trước → bước chọn loại tin (đặt sẵn tính năng khi gọi từ danh sách của tính năng đó). */
 export function usePostListing(feature?: ListingFeatureConfig['key']) {

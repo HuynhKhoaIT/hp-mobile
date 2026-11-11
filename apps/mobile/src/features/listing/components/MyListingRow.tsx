@@ -64,7 +64,7 @@ function rateLabelKey(category: MyListing['category']) {
 type QuickRow = { primary?: { action: MyListingQuickAction; variant: Extract<ButtonVariant, 'primary' | 'accent'> }; secondary: MyListingQuickAction[] };
 
 /** "Đã bán" có nghĩa với đồ pass và phòng trọ; việc làm / đồ thất lạc dùng "Đóng tin". */
-function canSellOf(listing: MyListing, markSold: boolean) {
+export function canSellOf(listing: Pick<MyListing, 'category'>, markSold: boolean) {
   const feature = featureOfCategory(listing.category);
   return markSold && (feature === 'pass' || feature === 'room');
 }

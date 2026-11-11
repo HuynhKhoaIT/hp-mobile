@@ -2,7 +2,7 @@
 // Thư viện giao diện: mọi component + variant của @/ui. Chỉ mở khi __DEV__. Thêm component mới → thêm mục ở đây.
 // Có sẵn bộ chuyển sáng / tối và ngôn ngữ để rà màn ở cả 3 ngôn ngữ, 2 giao diện.
 import type { PublicGroup, PublicListing } from '@hp/core';
-import { LOCALES, type ListingCategory, type Locale } from '@hp/shared';
+import { APP_NAME, LISTING_SORTS, LOCALES, type ListingCategory, type ListingSort, type Locale } from '@hp/shared';
 import { Redirect } from 'expo-router';
 import {
   Baby,
@@ -24,6 +24,8 @@ import {
   Search,
   Share2,
   ShieldCheck,
+  ShoppingBag,
+  Store,
   Smartphone,
   Sofa,
   Sparkles,
@@ -77,6 +79,8 @@ import {
   LogoMark,
   MenuItem,
   MessageBubble,
+  MiniAppHeader,
+  RadioOption,
   Notice,
   NotificationBell,
   ReportSheet,
@@ -237,6 +241,8 @@ export default function UiGalleryScreen() {
   const [saved, setSaved] = useState(false);
   const [tile, setTile] = useState<FeatureKey>('pass');
   const [tab, setTab] = useState<'home' | 'explore' | 'post' | 'messages'>('home');
+  const [sort, setSort] = useState<ListingSort>('newest');
+  const [recent, setRecent] = useState(['Máy hàn', 'Wave Alpha', 'Tủ lạnh mini']);
   const [photos, setPhotos] = useState<ImagePickerItem[]>(SAMPLE_PHOTOS);
   const [unread, setUnread] = useState(3);
   const [siteSheet, setSiteSheet] = useState(false);
@@ -501,9 +507,77 @@ export default function UiGalleryScreen() {
         </View>
       </Section>
 
+      <Section title="TabBarItem action (mini-app: nút Đăng không phải tab)">
+        <View className="mt-6 flex-row border-t border-border bg-surface px-1 pt-1 shadow-bar">
+          <TabBarItem label={t('listing:mini_app.tabs.home.pass')} icon={Store} focused onPress={() => undefined} />
+          <TabBarItem label={t('listing:mini_app.tabs.saved')} icon={Heart} focused={false} onPress={() => undefined} />
+          <TabBarItem label={t('listing:mini_app.tabs.post')} icon={Plus} accent action focused={false} onPress={() => toast.show(t('nav.post'))} />
+          <TabBarItem label={t('listing:mini_app.tabs.chat')} icon={MessageCircle} badge="2" focused={false} onPress={() => undefined} />
+        </View>
+      </Section>
+
+      <Section title="MiniAppHeader (home · tab + badge + eyebrow)">
+        <MiniAppHeader
+          back={{ label: t('listing:mini_app.back_super', { app: APP_NAME }), onPress: () => toast.show(t('actions.back')) }}
+          right={<IconButton icon={Heart} variant="glass" accessibilityLabel={t('listing:mini_app.tabs.saved')} onPress={() => undefined} />}
+          icon={ShoppingBag}
+          title={t('listing:mini_app.title.pass')}
+          tag={t('listing:mini_app.badge')}
+          subtitle={t('listing:mini_app.subtitle.pass')}
+          aside={<SiteChip label="Dung Quất" onPress={() => undefined} accessibilityLabel={t('home.site_label')} />}
+        >
+          <SearchBar variant="elevated" onPress={() => undefined} placeholder={t('listing:list.search_placeholder', { feature: t('feature.pass') })} />
+        </MiniAppHeader>
+        <MiniAppHeader
+          back={{ label: t('listing:mini_app.tabs.home.pass'), onPress: () => undefined }}
+          eyebrow={t('listing:mini_app.title.pass')}
+          title={t('listing:mini_app.manage.title')}
+          badge={t('listing:mini_app.manage.active_count', { count: 3 })}
+        />
+      </Section>
+
+      <Section title="Chip onRemove · RadioOption">
+        <View className="flex-row flex-wrap gap-2">
+          {recent.map((q) => (
+            <Chip
+              key={q}
+              size="sm"
+              label={q}
+              onPress={() => toast.show(q)}
+              onRemove={() => setRecent((r) => r.filter((x) => x !== q))}
+              removeAccessibilityLabel={t('listing:mini_app.filter.recent_remove_a11y', { query: q })}
+            />
+          ))}
+          <Chip label={t('listing:mini_app.filter.recent_clear')} onPress={() => undefined} onRemove={() => undefined} removeAccessibilityLabel={t('actions.close')} disabled />
+        </View>
+        <View accessibilityRole="radiogroup" className="gap-2">
+          {LISTING_SORTS.map((s) => (
+            <RadioOption key={s} label={t(`listing:sort.${s}`)} selected={sort === s} onPress={() => setSort(s)} />
+          ))}
+          <RadioOption label={t('listing:mini_app.manage.sort_views')} selected={false} disabled onPress={() => undefined} />
+        </View>
+      </Section>
+
       <Section title="BannerCarousel">
         <View className="-mx-4">
           <BannerCarousel slides={slides} onPress={(slide) => toast.show(slide.title)} />
+        </View>
+        {/* Slide chữ có eyebrow + icon (khối "An tâm trao tay" của mini-app). */}
+        <View className="-mx-4">
+          <BannerCarousel
+            slides={[
+              {
+                id: 'safe',
+                eyebrow: t('listing:mini_app.home.safe_badge'),
+                title: t('listing:mini_app.home.safe_title'),
+                subtitle: t('listing:mini_app.home.safe_body'),
+                ctaLabel: t('listing:mini_app.home.safe_cta'),
+                icon: ShieldCheck,
+                tone: 'primary',
+              },
+            ]}
+            onPress={(slide) => toast.show(slide.title)}
+          />
         </View>
         <View className="-mx-4">
           <BannerCarousel slides={slides.slice(1, 2)} />

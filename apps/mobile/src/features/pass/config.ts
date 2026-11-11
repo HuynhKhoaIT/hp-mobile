@@ -1,10 +1,12 @@
 // Pass đồ — chỉ là config cho engine features/listing (quy tắc vàng).
 // Stitch L1: lọc nhanh theo tình trạng / xe máy; thẻ có nhãn tình trạng · loại đồ; mẹo hẹn xem đồ nơi đông người.
 // Stitch L2 (form): thẻ danh mục có icon; loại đồ + tình trạng lên bước Thông tin chính; mẹo chụp ảnh.
-// Trang chủ riêng (chợ đồ cũ trong super app): lưới 10 danh mục → banner app_pass → Gần {khu} · Cho tặng · Xe cộ / Điện tử /
-// Điện lạnh mới đăng → "Tất cả tin Pass đồ" có lọc khoảng giá, sắp xếp, chip "Cho tặng".
+// Mini-app "Chợ Pass Đồ" (Stitch "Sub-App Chợ Pass"): bấm Pass đồ ở super app mở mini/pass có thanh tab riêng — trang chủ
+// chợ (6 ô danh mục + Cho tặng + Tất cả mục → banner app_pass hoặc khối "An tâm trao tay" → lưới tin mới), Đã lưu, Chat,
+// Quản lý tin, Bộ lọc (khoảng cách tới khu < 2 / 5 / 10 km). Không còn dải tin trên trang chủ (Stitch không có) — engine
+// `home.rails` vẫn giữ cho tính năng khác.
 import { LISTING_FEATURES, PASS_PRICE_RANGES } from '@hp/shared';
-import { Baby, Bike, Dumbbell, HardHat, Package, Refrigerator, Shirt, Smartphone, Sofa, Wrench } from 'lucide-react-native';
+import { Baby, Bike, Dumbbell, HardHat, Package, Refrigerator, Shirt, ShoppingBag, Smartphone, Sofa, Wrench } from 'lucide-react-native';
 import type { ListingFeatureConfig } from '@/features/listing/types';
 
 export const passConfig: ListingFeatureConfig = {
@@ -21,11 +23,13 @@ export const passConfig: ListingFeatureConfig = {
     { key: 'condition', value: 'like_new' },
     { key: 'vehicle_type', value: 'motorbike' },
   ],
-  // Đồ cần nhìn ảnh → lưới 2 cột. Mỗi danh mục có đúng một khoá "loại" → thẻ hiện tình trạng · loại đồ.
+  // Đồ cần nhìn ảnh → lưới 2 cột. Mỗi danh mục có đúng một khoá "loại" → thẻ hiện tình trạng · loại đồ. Tim lưu tin trên
+  // thẻ (Stitch Chợ Pass — tab Đã lưu của mini-app).
   card: {
     variant: 'grid',
     estimatedHeight: 300,
     display: {
+      bookmark: true,
       facts: [
         'condition',
         'vehicle_type',
@@ -54,15 +58,15 @@ export const passConfig: ListingFeatureConfig = {
     pass_ppe: HardHat,
     pass_other: Package,
   },
-  home: {
+  // Mốc "Khoảng cách tới khu" ở màn Bộ lọc của mini-app.
+  distanceOptionsKm: [2, 5, 10],
+  miniApp: {
+    titleKey: 'listing:mini_app.title.pass',
+    subtitleKey: 'listing:mini_app.subtitle.pass',
+    homeTabKey: 'listing:mini_app.tabs.home.pass',
+    icon: ShoppingBag,
     bannerPlacement: 'app_pass',
-    rails: [
-      { key: 'near', kind: 'near' },
-      { key: 'free', kind: 'free' },
-      { key: 'vehicle', kind: 'category', category: 'pass_vehicle' },
-      { key: 'electronics', kind: 'category', category: 'pass_electronics' },
-      { key: 'appliance', kind: 'category', category: 'pass_appliance' },
-    ],
+    homeCategoryCount: 6,
   },
   form: {
     photos: 'recommended',

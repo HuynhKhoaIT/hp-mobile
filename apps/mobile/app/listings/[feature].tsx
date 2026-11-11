@@ -5,6 +5,7 @@
 // `?categories=a,b` ("Dành cho bạn") đặt sẵn bộ lọc (chip bỏ được). Nút Đăng → chọn danh mục của tính năng.
 // Tính năng có config.home (Pass đồ) → trang chủ riêng (FeatureHome: danh mục, banner, dải tin "Gần {khu của Hub}"…) trên
 // "Tất cả tin …" khi chưa lọc.
+// Tính năng có mini-app (config.miniApp — Pass đồ → Chợ Pass Đồ) → chuyển sang mini/[feature] (giữ bộ lọc đặt sẵn).
 import { Redirect, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Plus } from 'lucide-react-native';
@@ -14,7 +15,7 @@ import { ListingBrowser } from '@/features/listing/components/ListingBrowser';
 import { useHomeSite } from '@/features/home/hooks';
 import { FeatureHome } from '@/features/listing/components/FeatureHome';
 import { useListingPreset, usePostListing } from '@/features/listing/hooks';
-import { backOrHome } from '@/features/listing/navigation';
+import { backOrHome, miniAppHref } from '@/features/listing/navigation';
 import { Fab, Screen, useScheme } from '@/ui';
 
 export default function ListingListRoute() {
@@ -33,6 +34,7 @@ export default function ListingListRoute() {
   // Khu đang chọn của Hub → dải "Gần {khu}" của trang chủ riêng (cùng nguồn với Hub).
   const homeSite = useHomeSite();
   if (!config) return <Redirect href="/" />;
+  if (config.miniApp && config.slug !== 'all') return <Redirect href={miniAppHref(config.slug, { site, shortcut, categories })} />;
 
   return (
     <Screen>

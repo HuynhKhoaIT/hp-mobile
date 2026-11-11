@@ -6,7 +6,9 @@
 // `appearance` 'solid' (hàng trạng thái "Tin của tôi", style Stitch): chọn → nền primary chữ on-primary; chưa chọn → nền
 // surface viền border chữ muted. `count`: số đếm trong pill sau chữ (text-xs đậm; pill on-primary/20 khi chọn solid,
 // surface-2 khi chưa chọn).
-import type { LucideIcon } from 'lucide-react-native';
+// `onRemove` (lịch sử tìm kiếm ở màn Bộ lọc mini-app): chip có nút × riêng ở cuối — chạm chữ chạy `onPress`, chạm × chạy
+// `onRemove` (hai nút anh em, trình đọc màn hình tới được từng nút; nhãn × bắt buộc qua `removeAccessibilityLabel`).
+import { type LucideIcon, X } from 'lucide-react-native';
 import { Pressable, type PressableProps, View } from 'react-native';
 import { Icon } from './Icon';
 import { SERVICE, type ServiceKey } from './service';
@@ -24,6 +26,9 @@ export type ChipProps = Omit<PressableProps, 'children'> & {
   dot?: ServiceKey | 'accent';
   /** Icon sau chữ (vd ChevronDown khi chip mở danh sách chọn, X khi bỏ lọc). */
   trailingIcon?: LucideIcon;
+  /** Nút × riêng ở cuối chip (vd xoá một từ khoá khỏi lịch sử). */
+  onRemove?: () => void;
+  removeAccessibilityLabel?: string;
   className?: string;
 };
 
@@ -49,12 +54,41 @@ export function Chip({
   count,
   dot,
   trailingIcon,
+  onRemove,
+  removeAccessibilityLabel,
   disabled,
   className,
   ...rest
 }: ChipProps) {
   const { tone, box, pill } = chipLook(selected, !!disabled, appearance);
   const sizing = size === 'sm' ? 'min-h-10 gap-2 px-3.5 active:bg-surface-2' : 'min-h-11 gap-1 px-4 active:opacity-80';
+  if (onRemove) {
+    return (
+      <View className={['flex-row items-center rounded-full border', box, className].filter(Boolean).join(' ')}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ selected, disabled: !!disabled }}
+          disabled={disabled}
+          hitSlop={size === 'sm' ? 4 : undefined}
+          className={['flex-row items-center justify-center rounded-full pr-1', size === 'sm' ? 'min-h-10 pl-3.5 active:bg-surface-2' : 'min-h-11 pl-4 active:opacity-80'].join(' ')}
+          {...rest}
+        >
+          <Text variant={size === 'sm' ? 'caption' : 'label'} weight="medium" tone={tone}>
+            {label}
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={removeAccessibilityLabel}
+          onPress={onRemove}
+          hitSlop={6}
+          className={['items-center justify-center rounded-full pr-2.5 pl-1 active:opacity-70', size === 'sm' ? 'min-h-10' : 'min-h-11'].join(' ')}
+        >
+          <Icon icon={X} tone="muted" size={16} />
+        </Pressable>
+      </View>
+    );
+  }
   return (
     <Pressable
       accessibilityRole="button"

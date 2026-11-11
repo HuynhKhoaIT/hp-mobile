@@ -72,3 +72,48 @@ export function openSavedListings() {
 export function openSearch() {
   router.push('/search');
 }
+
+// ── Mini-app (config.miniApp — vd Chợ Pass Đồ): route mini/[feature] có thanh tab riêng ─────────────────────────────
+
+/** Tab của mini-app (`index` = trang chủ chợ; `filter` = màn Bộ lọc, không có ô trên thanh tab). */
+export type MiniAppTab = 'index' | 'saved' | 'chat' | 'manage' | 'filter';
+
+type MiniSlug = Exclude<ListingFeatureConfig['slug'], 'all'>;
+
+/** Bộ lọc đặt sẵn khi mở mini-app (giống openListingList): khu, chip "Tìm nhanh", nhóm category. */
+export type MiniAppParams = { site?: string; shortcut?: string; categories?: string };
+
+/** Href trang chủ mini-app (kèm bộ lọc đặt sẵn) — dùng cả cho Redirect từ `listings/[feature]` và link web. */
+export function miniAppHref(slug: MiniSlug, params: MiniAppParams = {}) {
+  const extra = Object.fromEntries(Object.entries(params).filter(([, v]) => !!v)) as Record<string, string>;
+  return { pathname: '/mini/[feature]', params: { feature: slug, ...extra } } as const;
+}
+
+/** Mở mini-app của tính năng (Hub, link web, banner). */
+export function openMiniApp(slug: MiniSlug, params: { site?: string; shortcut?: string; categories?: readonly ListingCategory[] } = {}) {
+  const { categories, ...rest } = params;
+  router.push(miniAppHref(slug, { ...rest, ...(categories?.length ? { categories: categories.join(',') } : {}) }));
+}
+
+/** Chuyển tab trong mini-app đang mở. */
+export function openMiniTab(slug: MiniSlug, tab: MiniAppTab) {
+  const params = { feature: slug };
+  switch (tab) {
+    case 'index':
+      return router.navigate({ pathname: '/mini/[feature]', params });
+    case 'saved':
+      return router.navigate({ pathname: '/mini/[feature]/saved', params });
+    case 'chat':
+      return router.navigate({ pathname: '/mini/[feature]/chat', params });
+    case 'manage':
+      return router.navigate({ pathname: '/mini/[feature]/manage', params });
+    case 'filter':
+      return router.navigate({ pathname: '/mini/[feature]/filter', params });
+  }
+}
+
+/** Rời mini-app về super app (gỡ cả route mini-app khỏi stack gốc); mở thẳng từ link (không có màn trước) → Hub. */
+export function leaveMiniApp() {
+  if (router.canDismiss()) router.dismiss();
+  else router.replace('/');
+}

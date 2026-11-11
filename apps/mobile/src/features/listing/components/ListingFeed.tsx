@@ -2,6 +2,8 @@
 // → lỗi có Thử lại → lưới / hàng theo config.card.variant; kéo để làm mới; chân danh sách: đang tải / hết tin / thử lại.
 // Điểm nhấn thẻ (config.card.display): config tính năng của từng tin khi có `configOf` (danh sách trộn), không thì `config`;
 // `display.bookmark` → thẻ có nút tim lưu tin (ListingCardItem).
+// `headerAlways` (trang chủ mini-app): khối `header` (ô tìm, chip lọc…) luôn hiện — skeleton / lỗi / rỗng nằm dưới header
+// trong cùng danh sách (ListEmptyComponent), không thay cả màn. `footer`: khối cuối danh sách (vd dòng miễn trừ).
 import type { PublicListing } from '@hp/core';
 import type { ListingCategory } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
@@ -45,6 +47,15 @@ export type ListingFeedProps = {
   header?: ReactNode;
   /** Đổi giá trị (vd chữ ký bộ lọc) → dựng lại danh sách, cuộn về đầu (dữ liệu đã có trong cache không còn giữ vị trí cũ). */
   listKey?: string;
+  /** `header` hiện cả khi đang tải / lỗi / rỗng (trạng thái nằm dưới header). */
+  headerAlways?: boolean;
+  /** Khối cuối danh sách, sau chân "đang tải / hết tin". */
+  footer?: ReactNode;
+  /**
+   * Lề ngang 16 nằm trong danh sách (màn đặt Screen edgeToEdge): khối tràn mép trong `header` (-mx-4, vd header xanh cuộn
+   * theo danh sách) chạm mép màn thay vì bị ScrollView cắt; không lề trên (header xanh sát dải trạng thái).
+   */
+  gutter?: boolean;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -57,19 +68,23 @@ export function ListingFeed(p: ListingFeedProps) {
   const grid = p.config.card.variant === 'grid';
   const columns = grid ? 2 : 1;
 
-  if (p.isLoading) return <SkeletonListingCard count={6} layout={p.config.card.variant} columns={columns} />;
-  if (p.isError && p.items.length === 0) return <ErrorState code={p.errorCode} onRetry={p.refetch} />;
-  if (p.items.length === 0) {
-    if (p.empty) return <EmptyState {...p.empty} />;
-    return (
+  const state: ReactNode = p.isLoading ? (
+    <SkeletonListingCard count={6} layout={p.config.card.variant} columns={columns} />
+  ) : p.isError && p.items.length === 0 ? (
+    <ErrorState code={p.errorCode} onRetry={p.refetch} />
+  ) : p.items.length === 0 ? (
+    p.empty ? (
+      <EmptyState {...p.empty} />
+    ) : (
       <EmptyState
         icon={p.config.color ? SERVICE[p.config.color].icon : undefined}
         title={t(p.isFiltered ? 'list.empty_search_title' : 'list.empty_title')}
         description={t(p.isFiltered ? 'list.empty_search_body' : 'list.empty_body')}
         action={{ label: t('list.post_cta'), onPress: p.onPost }}
       />
-    );
-  }
+    )
+  ) : null;
+  if (state && !(p.headerAlways && p.header)) return state;
 
   // FlashList v2 tự đo item (không còn estimatedItemSize): chiều cao ước lượng trong config dùng để đổi
   // "còn 5 item" thành ngưỡng onEndReached (đơn vị = chiều cao màn hình).
@@ -79,7 +94,7 @@ export function ListingFeed(p: ListingFeedProps) {
     if (p.hasNextPage && !p.isFetchingNextPage && !p.isFetchNextPageError) p.fetchNextPage();
   };
 
-  const footer = p.isFetchingNextPage ? (
+  const more = state ? null : p.isFetchingNextPage ? (
     <View className="pb-3">
       <SkeletonListingCard count={columns} layout={p.config.card.variant} columns={columns} />
     </View>
@@ -92,11 +107,18 @@ export function ListingFeed(p: ListingFeedProps) {
       {t('list.end')}
     </Text>
   ) : null;
+  const footer =
+    more || p.footer ? (
+      <>
+        {more}
+        {p.footer}
+      </>
+    ) : null;
 
   return (
     <FlashList
       key={p.listKey}
-      data={p.items}
+      data={state ? [] : p.items}
       numColumns={columns}
       keyExtractor={(item) => item.id}
       renderItem={({ item, index }) => (
@@ -114,9 +136,10 @@ export function ListingFeed(p: ListingFeedProps) {
       refreshing={p.isRefetching && !p.isFetchingNextPage}
       onRefresh={p.refetch}
       ListHeaderComponent={p.header ? <View className="pb-3">{p.header}</View> : null}
+      ListEmptyComponent={state ? <View>{state}</View> : null}
       ListFooterComponent={footer}
       // Chừa chỗ cho nút Đăng nổi (Fab) ở cuối danh sách.
-      contentContainerStyle={{ paddingTop: space[2], paddingBottom: space[8] * 3 }}
+      contentContainerStyle={{ paddingBottom: space[8] * 3, ...(p.gutter ? { paddingHorizontal: space[4] } : { paddingTop: space[2] }) }}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
     />

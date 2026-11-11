@@ -7,8 +7,10 @@
 // Chấm vị trí dưới banner gap-1.5: hiện tại w-5 primary, còn lại w-1.5 border; co giãn motion.fast.
 // Tự chuyển 5 giây (chuyển cảnh motion.base), dừng khi chạm / kéo (chạy lại 5 giây sau khi thả), khi màn không hiển thị
 // (`active`), khi bấm nút dừng; tắt hẳn khi Reduce Motion. Mỗi slide đọc "Banner 1 / 3: tiêu đề. phụ đề".
+// Slide chữ có thể thêm `eyebrow` (nhãn viên in hoa trên tiêu đề, vd "AN TÂM TRAO TAY" ở trang chủ mini-app) và `icon`
+// (vòng tròn size-16 góc phải dưới, nền on-primary/15 — tone primary / accent).
 import { aspect } from '@hp/tokens';
-import { Pause, Play } from 'lucide-react-native';
+import { type LucideIcon, Pause, Play } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent, Pressable, useWindowDimensions, View } from 'react-native';
@@ -31,6 +33,10 @@ export type BannerSlide = {
   tone: BannerTone;
   /** false: slide chỉ để đọc (không có link) — không phải nút. */
   linked?: boolean;
+  /** Nhãn viên in hoa trên tiêu đề (slide chữ). */
+  eyebrow?: string | null;
+  /** Icon trang trí góc phải dưới (slide chữ tone primary / accent). */
+  icon?: LucideIcon;
 };
 
 export type BannerCarouselProps = {
@@ -220,9 +226,20 @@ function Slide({
         <View className="absolute bottom-4 right-4 opacity-90">
           <Icon icon={SERVICE[s.service].icon} service={s.service} size={64} />
         </View>
+      ) : slide.icon ? (
+        <View className="absolute bottom-4 right-4 size-16 items-center justify-center rounded-full border border-on-primary/20 bg-on-primary/15">
+          <Icon icon={slide.icon} tone={s.text} size={32} />
+        </View>
       ) : null}
-      <View className={`flex-1 justify-between gap-3 p-5 ${s.service ? 'pr-20' : ''}`}>
+      <View className={`flex-1 justify-between gap-3 p-5 ${s.service ? 'pr-20' : slide.icon ? 'pr-24' : ''}`}>
         <View className="gap-1">
+          {slide.eyebrow ? (
+            <View className={`mb-1 self-start rounded-full px-2.5 py-0.5 ${s.service ? 'bg-surface' : 'bg-on-primary/15'}`}>
+              <Text variant="micro" weight="bold" tone={s.text} className="uppercase" maxFontSizeMultiplier={1.3}>
+                {slide.eyebrow}
+              </Text>
+            </View>
+          ) : null}
           <Text variant="titleLg" weight="bold" tone={s.text} numberOfLines={2}>
             {slide.title}
           </Text>

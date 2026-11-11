@@ -7,6 +7,8 @@
 // chạm — ngoài khung cha). Nút Đăng "thở" chậm khi chưa mở (useAmbientLoop 'glow', t.motion.ambient.glow 2,8s/chu kỳ):
 // quầng cam shadow-fab phía sau sáng dần + phóng ≤ 1.04 rồi tắt; đang mở (xoay 45°) → tắt quầng.
 // Reduce Motion → không nảy / xoay / thở (tắt hẳn).
+// Mini-app (thanh tab riêng của Chợ Pass): `action` = nút Đăng KHÔNG phải route (bấm → hành động, không bao giờ "đang mở"),
+// chèn ở vị trí `action.index` giữa các tab; `focusAlias` = route ẩn (không icon, vd màn Bộ lọc) tô sáng tab khác (Trang chủ).
 import type { BottomTabBarProps } from 'expo-router/js-tabs';
 import type { LucideIcon } from 'lucide-react-native';
 import { useEffect } from 'react';
@@ -25,37 +27,69 @@ export type TabBarProps = BottomTabBarProps & {
   accent?: string;
   /** Tên route → chữ trên chấm đỏ (vd số hội thoại chưa đọc "3", "99+"); null / thiếu → không hiện. */
   badges?: Record<string, string | null | undefined>;
+  /** Nút Đăng không phải route (mini-app): chèn ở vị trí `index` trong các ô đang hiện. */
+  action?: TabBarAction;
+  /** Route đang mở → route được tô sáng (route không có icon, vd màn Bộ lọc → Trang chủ). */
+  focusAlias?: Record<string, string>;
+  /** Nhãn đọc màn hình của cả thanh (vd "Điều hướng Chợ Pass Đồ"). */
+  accessibilityLabel?: string;
 };
 
-export function TabBar({ state, descriptors, emitter, navigateToTab, insets, icons, accent, badges }: TabBarProps) {
+export type TabBarAction = { index: number; label: string; icon: LucideIcon; onPress: () => void };
+
+export function TabBar({
+  state,
+  descriptors,
+  emitter,
+  navigateToTab,
+  insets,
+  icons,
+  accent,
+  badges,
+  action,
+  focusAlias,
+  accessibilityLabel,
+}: TabBarProps) {
+  const current = state.routes[state.index]?.name ?? '';
+  const focusedName = focusAlias?.[current] ?? current;
+  const items = state.routes.flatMap((route) => {
+    const icon = icons[route.name];
+    if (!icon) return [];
+    const focused = route.name === focusedName;
+    const options = descriptors[route.key]?.options;
+    const label = typeof options?.title === 'string' ? options.title : route.name;
+    const onPress = () => {
+      const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+      // So với route đang mở (không phải ô tô sáng): đang ở route ẩn (vd Bộ lọc) → bấm tab được tô sáng vẫn chuyển về tab đó.
+      if (route.name !== current && !event.defaultPrevented) navigateToTab(route.key);
+    };
+    return [
+      <TabBarItem
+        key={route.key}
+        label={label}
+        icon={icon}
+        focused={focused}
+        accent={route.name === accent}
+        badge={badges?.[route.name] ?? null}
+        onPress={onPress}
+      />,
+    ];
+  });
+  if (action) {
+    items.splice(
+      Math.min(action.index, items.length),
+      0,
+      <TabBarItem key="action" label={action.label} icon={action.icon} focused={false} accent action onPress={action.onPress} />,
+    );
+  }
   return (
     <View
       accessibilityRole="tablist"
+      accessibilityLabel={accessibilityLabel}
       className="flex-row border-t border-border bg-surface px-1 pt-1 shadow-bar"
       style={{ paddingBottom: Math.max(insets.bottom, 4) }}
     >
-      {state.routes.map((route, index) => {
-        const icon = icons[route.name];
-        if (!icon) return null;
-        const focused = index === state.index;
-        const options = descriptors[route.key]?.options;
-        const label = typeof options?.title === 'string' ? options.title : route.name;
-        const onPress = () => {
-          const event = emitter.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-          if (!focused && !event.defaultPrevented) navigateToTab(route.key);
-        };
-        return (
-          <TabBarItem
-            key={route.key}
-            label={label}
-            icon={icon}
-            focused={focused}
-            accent={route.name === accent}
-            badge={badges?.[route.name] ?? null}
-            onPress={onPress}
-          />
-        );
-      })}
+      {items}
     </View>
   );
 }
@@ -66,12 +100,14 @@ export type TabBarItemProps = {
   focused: boolean;
   /** Nút Đăng (nền accent, nổi trên thanh, thở chậm khi chưa mở). */
   accent?: boolean;
+  /** Ô là nút hành động (không phải tab): vai trò button, không có trạng thái chọn. */
+  action?: boolean;
   badge?: string | null;
   onPress: () => void;
 };
 
 /** Một ô của TabBar (xuất riêng để trưng bày ở ui-gallery). */
-export function TabBarItem({ label, icon, focused, accent = false, badge = null, onPress }: TabBarItemProps) {
+export function TabBarItem({ label, icon, focused, accent = false, action = false, badge = null, onPress }: TabBarItemProps) {
   const { motion } = useTheme();
   const reduced = useReducedMotion();
   const scale = useSharedValue(1);
@@ -99,8 +135,8 @@ export function TabBarItem({ label, icon, focused, accent = false, badge = null,
 
   return (
     <Pressable
-      accessibilityRole="tab"
-      accessibilityState={{ selected: focused }}
+      accessibilityRole={action ? 'button' : 'tab'}
+      accessibilityState={action ? undefined : { selected: focused }}
       accessibilityLabel={badge ? `${label}, ${badge}` : label}
       onPress={onPress}
       className="min-h-14 flex-1 items-center justify-end gap-0.5 py-1"

@@ -1,6 +1,7 @@
 // Screen — khung mọi màn hình: nền bg, chừa vùng an toàn, padding ngang 16 (p-4). scroll=true cho màn nội dung dài.
 // Màn danh sách dùng FlashList bên trong Screen (scroll=false), không ScrollView bọc list.
-// Hub: `statusBar="primary"` tô dải trạng thái màu primary (header xanh tràn lên vùng an toàn), `onScroll` nhận
+// Hub: `statusBar="primary"` tô dải trạng thái màu primary (header xanh tràn lên vùng an toàn; màn không scroll — vd trang
+// chủ mini-app có header cuộn trong FlashList — cũng giữ dải primary cố định), `onScroll` nhận
 // handler Reanimated (header thu gọn), `stickyHeaderIndices` giữ ô tìm kiếm trên cùng, `onRefresh` kéo xuống làm mới.
 import type { ComponentProps, ReactNode } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
@@ -133,6 +134,8 @@ function ScreenBody({
 
   return (
     <View className={['flex-1 bg-bg', padding, className].filter(Boolean).join(' ')} style={{ ...safe, paddingBottom: bottom }}>
+      {/* Header xanh cuộn theo danh sách (trang chủ mini-app): dải trạng thái giữ màu primary khi header đã cuộn đi. */}
+      {statusBar === 'primary' ? <View className="absolute inset-x-0 top-0 bg-primary" style={{ height: insets.top }} /> : null}
       {children}
     </View>
   );
