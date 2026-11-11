@@ -1,4 +1,5 @@
-// Trang chủ mini của một tính năng Listing (config.home — Pass đồ "Trang chủ riêng", cùng thứ tự khối với app). Trang danh
+// Trang chủ mini của một tính năng Listing (config.home — kiểu dải "Trang chủ riêng", cùng thứ tự khối với app; Pass đồ nay
+// dùng mini-app — components/mini-app — engine này giữ cho tính năng khác). Trang danh
 // sách hiện khối này khi CHƯA lọc / sắp xếp, giữa header xanh (ô tìm) và mục "Tất cả tin {tính năng}":
 //   1 lưới danh mục (config.categories theo thứ tự hiển thị, icon config.categoryIcons, nhãn listing.category_short) → link
 //     ?category=<mã> (chạy khi tắt JS);

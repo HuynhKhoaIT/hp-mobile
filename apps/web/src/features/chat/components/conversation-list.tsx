@@ -10,11 +10,15 @@
 // "{người gửi}: …". Hiện ngay khi được nhận vào nhóm, kể cả chưa có tin.
 // Khách (proxy đã chặn, phòng khi phiên hết hạn giữa chừng) → mời đăng nhập (SignInPrompt dùng chung). Loading / lỗi + thử lại / trống + CTA;
 // lọc không có kết quả → "Xem tất cả". Không có tìm kiếm / "Đã đọc tất cả" của Stitch (chưa có RPC tương ứng).
+// Mini-app (/pass-do/tin-nhan): `lockFeature` khoá hộp thư vào một dịch vụ (không chip lọc; đang ít hơn một màn mà server còn
+// trang → tự tải trang kế, như useInboxFilter), `bare` bỏ header xanh (trang có header mini-app riêng); thẻ vẫn mở
+// /tin-nhan/[id]. Hộp thư rỗng → CTA về trang `emptyHref` (trang chủ mini-app).
 import type { ConversationSummary } from '@hp/core';
 import { useConversations, useSession, useUnreadConversationCount } from '@hp/core/react';
-import { formatDate, formatNumber, formatRelative, unreadBadge } from '@hp/shared';
+import { type Feature, formatDate, formatNumber, formatRelative, unreadBadge } from '@hp/shared';
 import { BadgeCheck, BellOff, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useMemo } from 'react';
 import { ClientOnly } from '@/components/shared/client-only';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
@@ -39,23 +43,44 @@ import {
 import { ConversationListSkeleton, ConversationRowSkeleton } from './chat-skeletons';
 import { GroupChatIcon } from './group-chat-icon';
 
-export function ConversationList({ selectedId }: { selectedId: string | null }) {
+type Lock = { feature: Feature; emptyHref: string };
+
+export function ConversationList({
+  selectedId,
+  lockFeature,
+  emptyHref,
+  bare = false,
+}: {
+  selectedId: string | null;
+  /** Chỉ hội thoại của một dịch vụ (mini-app), không chip lọc. */
+  lockFeature?: Feature;
+  /** CTA của hộp thư rỗng khi khoá dịch vụ (mặc định /tin). */
+  emptyHref?: string;
+  /** Không header xanh (trang tự có header). */
+  bare?: boolean;
+}) {
   const t = useTranslations('chat');
+  const lock = lockFeature ? { feature: lockFeature, emptyHref: emptyHref ?? '/tin' } : undefined;
   return (
     <div className="flex flex-1 flex-col bg-bg">
-      <div className="relative overflow-hidden bg-primary text-on-primary max-sm:rounded-b-xl">
-        <HeaderDecor />
-        <div className="relative flex flex-col gap-1 px-4 pt-4 pb-5">
-          <h1 className="text-xl font-bold">{t('title')}</h1>
-          <p className="text-sm opacity-90">{t('inbox.subtitle')}</p>
+      {bare ? null : (
+        <div className="relative overflow-hidden bg-primary text-on-primary max-sm:rounded-b-xl">
+          <HeaderDecor />
+          <div className="relative flex flex-col gap-1 px-4 pt-4 pb-5">
+            <h1 className="text-xl font-bold">{t('title')}</h1>
+            <p className="text-sm opacity-90">{t('inbox.subtitle')}</p>
+          </div>
         </div>
-      </div>
+      )}
       <ClientOnly fallback={<ConversationListSkeleton />}>
-        <ConversationItems selectedId={selectedId} />
+        <ConversationItems selectedId={selectedId} lock={lock} />
       </ClientOnly>
     </div>
   );
 }
+
+/** Đang khoá dịch vụ mà ít hơn một màn kết quả và server còn trang → tải trang kế (giống useInboxFilter). */
+const LOCK_MIN_VISIBLE = 8;
 
 /** Ô icon + màu của dịch vụ (lấy từ config tính năng — giống ô icon trên thẻ tin / thẻ nhóm). */
 function serviceLook(c: ConversationSummary) {
@@ -65,13 +90,24 @@ function serviceLook(c: ConversationSummary) {
   return LISTING_FEATURE_CONFIGS[feature];
 }
 
-function ConversationItems({ selectedId }: { selectedId: string | null }) {
+function ConversationItems({ selectedId, lock }: { selectedId: string | null; lock?: Lock }) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
   const session = useSession();
   const conversations = useConversations();
   const unread = useUnreadConversationCount();
   const inbox = useInboxFilter(conversations);
+  const { items, hasNextPage, isFetchingNextPage, fetchNextPage } = conversations;
+  const lockedFeature = lock?.feature;
+  const locked = useMemo(
+    () => (lockedFeature ? items.filter((c) => conversationFeature(c) === lockedFeature) : null),
+    [items, lockedFeature],
+  );
+  const short = !!locked && locked.length < LOCK_MIN_VISIBLE;
+  useEffect(() => {
+    if (short && hasNextPage && !isFetchingNextPage) void fetchNextPage();
+  }, [short, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const visible = locked ?? inbox.visible;
 
   if (session.isLoading || (session.userId && conversations.isPending)) return <ConversationListSkeleton />;
   if (!session.userId) {
@@ -92,7 +128,7 @@ function ConversationItems({ selectedId }: { selectedId: string | null }) {
         description={t('chat.inbox.empty_body')}
         action={
           <Button asChild>
-            <Link href="/tin">{t('chat.inbox.empty_cta')}</Link>
+            <Link href={lock?.emptyHref ?? '/tin'}>{t('chat.inbox.empty_cta')}</Link>
           </Button>
         }
       />
@@ -107,44 +143,46 @@ function ConversationItems({ selectedId }: { selectedId: string | null }) {
 
   return (
     <div className="flex flex-col gap-3 px-4 pt-3 pb-4 lg:px-3">
-      <div role="group" aria-label={t('chat.inbox.filter_label')} className="no-scrollbar -mx-4 overflow-x-auto px-4 lg:-mx-3 lg:px-3">
-        <ul className="flex gap-2 py-0.5">
-          {options.map((o) => {
-            const selected = o.value === inbox.filter;
-            return (
-              <li key={o.value} className="flex">
-                <button
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => inbox.setFilter(o.value)}
-                  className={cn(
-                    'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
-                    selected
-                      ? 'border-primary bg-primary text-on-primary'
-                      : 'border-border bg-surface text-muted hover:bg-surface-2 hover:text-fg',
-                  )}
-                >
-                  {o.label}
-                  {o.count !== undefined ? (
-                    <span
-                      className={cn(
-                        'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold',
-                        selected ? 'bg-on-primary/20' : 'bg-surface-2 text-fg',
-                      )}
-                    >
-                      {formatNumber(o.count, locale)}
-                    </span>
-                  ) : null}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {lock ? null : (
+        <div role="group" aria-label={t('chat.inbox.filter_label')} className="no-scrollbar -mx-4 overflow-x-auto px-4 lg:-mx-3 lg:px-3">
+          <ul className="flex gap-2 py-0.5">
+            {options.map((o) => {
+              const selected = o.value === inbox.filter;
+              return (
+                <li key={o.value} className="flex">
+                  <button
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => inbox.setFilter(o.value)}
+                    className={cn(
+                      'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',
+                      selected
+                        ? 'border-primary bg-primary text-on-primary'
+                        : 'border-border bg-surface text-muted hover:bg-surface-2 hover:text-fg',
+                    )}
+                  >
+                    {o.label}
+                    {o.count !== undefined ? (
+                      <span
+                        className={cn(
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold',
+                          selected ? 'bg-on-primary/20' : 'bg-surface-2 text-fg',
+                        )}
+                      >
+                        {formatNumber(o.count, locale)}
+                      </span>
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
-      {inbox.visible.length > 0 ? (
+      {visible.length > 0 ? (
         <ul className="flex flex-col gap-3">
-          {inbox.visible.map((c) => (
+          {visible.map((c) => (
             <li key={c.id}>
               <ConversationRow conversation={c} selected={c.id === selectedId} />
             </li>
@@ -155,6 +193,17 @@ function ConversationItems({ selectedId }: { selectedId: string | null }) {
           <ConversationRowSkeleton />
           <ConversationRowSkeleton />
         </div>
+      ) : lock ? (
+        <EmptyState
+          icon={MessageCircle}
+          title={t('chat.inbox.empty_title')}
+          description={t('chat.inbox.empty_body')}
+          action={
+            <Button asChild>
+              <Link href={lock.emptyHref}>{t('chat.inbox.empty_cta')}</Link>
+            </Button>
+          }
+        />
       ) : (
         <EmptyState
           icon={MessageCircle}
@@ -167,7 +216,7 @@ function ConversationItems({ selectedId }: { selectedId: string | null }) {
         />
       )}
 
-      {conversations.hasNextPage && inbox.visible.length > 0 ? (
+      {conversations.hasNextPage && visible.length > 0 ? (
         <div className="flex justify-center">
           <Button
             type="button"

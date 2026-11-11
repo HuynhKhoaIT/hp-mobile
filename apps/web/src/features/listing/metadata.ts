@@ -1,15 +1,18 @@
 // generateMetadata của trang danh sách và chi tiết tin (.claude/rules/web-seo-public.md): title, description,
 // canonical + hreflang (vi / en / zh / x-default), Open Graph. robots: trang lọc sâu (> 2 tham số) hoặc biến thể giá / cho
-// tặng / sắp xếp (?price=, ?free=, ?sort=) → noindex.
+// tặng / sắp xếp / giá nhập tay (?price=, ?free=, ?sort=, ?price_min=, ?price_max= của mini-app) → noindex.
+// Trang con mini-app (/pass-do/bo-loc, /da-luu, /tin-nhan, /quan-ly): miniAppMetadata — tiêu đề + canonical, luôn noindex
+// (trang tiện ích / riêng tư, không có nội dung tin riêng).
 // Toàn site đang noindex ở layout gốc tới khi ra mắt (tuần 11) — trang không ghi đè thành index.
 import type { PublicListing } from '@hp/core';
-import { APP_NAME, priceLabel } from '@hp/shared';
+import { APP_NAME, type ListingFeature, priceLabel } from '@hp/shared';
 import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { absoluteUrl, localeAlternates } from '@/i18n/alternates';
 import { listingImageUrl } from '@/lib/images';
 import { asLocale, priceText } from './display';
-import { activeFilterCount, filterQuery, parseListFilters } from './filters';
+import { activeFilterCount, filterQuery, hasCustomPrice, parseListFilters } from './filters';
+import { LISTING_FEATURE_CONFIGS } from './features';
 import { getPublicSites } from './queries';
 import { type ListScope, scopeInfo } from './scope';
 
@@ -35,7 +38,8 @@ export async function listMetadata(scope: ListScope, searchParams: Promise<RawPa
   // Canonical giữ category + khu (trang có nội dung riêng), bỏ từ khoá tìm kiếm, giá, cho tặng, thứ tự.
   const canonicalPath = withQuery(path, filterQuery({ category: filters.category, site: siteName ? filters.site : null }));
   // Biến thể giá / cho tặng / thứ tự: cùng nội dung với trang gốc sắp lại → không index (canonical về trang gốc).
-  const variant = filters.sort !== 'newest' || filters.priceRange !== null || filters.freeOnly;
+  const variant =
+    filters.sort !== 'newest' || filters.priceRange !== null || filters.freeOnly || hasCustomPrice(filters, filterOptions);
 
   return {
     title,
@@ -77,5 +81,27 @@ export async function listingMetadata(listing: PublicListing): Promise<Metadata>
       ...(cover ? { images: [{ url: listingImageUrl(cover, 'full'), alt: listing.title }] } : {}),
     },
     twitter: { card: cover ? 'summary_large_image' : 'summary' },
+  };
+}
+
+/** Tiêu đề từng trang con của mini-app. */
+const MINI_APP_PAGE_TITLE = {
+  filter: 'listing.mini_app.filter.title',
+  saved: 'listing.mini_app.saved.title',
+  chat: 'listing.mini_app.tabs.chat',
+  manage: 'listing.mini_app.manage.title',
+} as const;
+
+/** Trang con của mini-app: "{trang} – {tên mini-app}" + canonical (không tham số), noindex. */
+export async function miniAppMetadata(feature: ListingFeature, page: keyof typeof MINI_APP_PAGE_TITLE): Promise<Metadata> {
+  const cfg = LISTING_FEATURE_CONFIGS[feature];
+  if (!cfg.miniApp) return { robots: { index: false, follow: true } };
+  const locale = asLocale(await getLocale());
+  const t = await getTranslations();
+  const path = cfg.miniApp.paths[page];
+  return {
+    title: `${t(MINI_APP_PAGE_TITLE[page])} – ${t(cfg.miniApp.titleKey)}`,
+    alternates: localeAlternates(path, locale),
+    robots: { index: false, follow: true },
   };
 }

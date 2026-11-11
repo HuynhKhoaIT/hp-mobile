@@ -9,10 +9,13 @@
 // tối đa (`?price_max=1000000`), `banner` (khối mời đăng tin đầu danh sách).
 // Chợ Pass đồ ("Trang chủ riêng", khớp app): `priceRanges` (?price=<khoá>), `sortable` (?sort=), chip "Cho tặng" (?free=1),
 // `home` (trang chủ mini khi chưa lọc: lưới danh mục → banner → các dải → "Tất cả tin").
+// Mini-app "Chợ Pass Đồ" (Stitch pass_home / saved / manage / filter): `miniApp` (điều hướng, header, trang con riêng) +
+// `customPrice` (ô giá tối thiểu / tối đa ở trang bộ lọc).
 import type { ListingFeaturePath } from '@hp/core';
 import type { ListingCategory, ListingFeature, ListingPriceRange } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react';
 import type { BadgeTone } from '@/components/shared/badge';
+import type { MiniAppPaths } from './mini-app-routes';
 
 /** Điểm nhấn thẻ tin theo tính năng — giống `ListingCardDisplay` của app (apps/mobile/src/ui/ListingCard.tsx). */
 export type ListingCardDisplay = {
@@ -74,6 +77,28 @@ export type ListingFeatureHome = {
 };
 
 /**
+ * Mini-app trong super app (Chợ Pass Đồ — Stitch "pass_home / saved / manage / filter"): tính năng có điều hướng riêng
+ * (thanh dưới trên điện thoại / dải tab trên desktop: Trang chủ · Đã lưu · Đăng tin · Chat · Quản lý tin), header riêng
+ * (← {APP_NAME} Super App, ô icon túi + tên + nhãn MINI-APP, chọn khu, ô tìm) và các trang con `paths`
+ * (mini-app-routes.ts — đường dẫn cũng phải có trong MINI_APP_BASES để proxy.ts chặn trang cần đăng nhập).
+ * Trang chủ mini-app (chưa lọc): "Điểm nóng" (chip khu) → lưới `homeCategoryCount` danh mục đầu + "Cho tặng" + "Tất cả mục"
+ * (→ trang bộ lọc) → banner `bannerPlacement` (rỗng → khối "An tâm trao tay") → chip nhanh → "Tin mới đăng quanh bạn".
+ */
+export type ListingMiniApp = {
+  /** Key i18n tên mini-app (header, tiêu đề trang con) — vd listing.mini_app.title.pass. */
+  titleKey: string;
+  /** Key i18n dòng phụ dưới tên. */
+  subtitleKey: string;
+  /** Key i18n nhãn tab trang chủ (thanh dưới, nút quay lại của trang con) — vd listing.mini_app.tabs.home.pass. */
+  homeTabKey: string;
+  /** Vị trí banner (bảng banners, vd `web_pass`); thiếu / rỗng → khối "An tâm trao tay". */
+  bannerPlacement?: string;
+  /** Số danh mục đầu (config.categories) hiện ở lưới trang chủ — còn lại qua "Tất cả mục". */
+  homeCategoryCount: number;
+  paths: MiniAppPaths;
+};
+
+/**
  * Khối mời đăng tin đầu danh sách (khi chưa lọc) — mỗi nút tới /dang-tin chọn sẵn tính năng + danh mục. Giống
  * `ListingListBanner` của app: 'actions' (thẻ chữ + các nút chia đều — đồ thất lạc) · 'strip' (dải mỏng chữ + một nút — trọ).
  */
@@ -118,6 +143,10 @@ export type ListingFeatureConfig = {
   priceRanges?: readonly ListingPriceRange[];
   /** Có ô "Sắp xếp" (?sort=price_asc | price_desc; mặc định mới nhất — không ghi lên URL). */
   sortable?: boolean;
-  /** Trang chủ mini khi chưa lọc (thiếu = danh sách thường). */
+  /** Trang chủ mini khi chưa lọc (thiếu = danh sách thường). Bị `miniApp` thay thế nếu có cả hai. */
   home?: ListingFeatureHome;
+  /** Ô nhập giá tối thiểu / tối đa tuỳ ý ở trang bộ lọc (?price_min= / ?price_max=) — trang đó không cache, noindex. */
+  customPrice?: boolean;
+  /** Chạy dạng mini-app (điều hướng + header + trang con riêng). */
+  miniApp?: ListingMiniApp;
 };

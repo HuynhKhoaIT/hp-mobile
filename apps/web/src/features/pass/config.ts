@@ -1,11 +1,15 @@
 // Pass đồ — /pass-do. Chỉ khác biệt so với tính năng Listing khác; logic chung ở features/listing.
 // Chợ đồ cũ kiểu Chợ Tốt ("Trang chủ riêng", khớp app): 10 danh mục có icon, lọc giá theo khoảng (?price=), sắp xếp (?sort=),
-// chip "Cho tặng" (?free=1); chưa lọc → trang chủ mini (lưới danh mục → banner web_pass → dải gần khu / cho tặng / theo danh
-// mục → "Tất cả tin Pass đồ").
+// chip "Cho tặng" (?free=1).
+// Mini-app "Chợ Pass Đồ" (Stitch pass_home / saved / manage / filter): điều hướng riêng (Chợ Pass · Đã lưu · Đăng tin · Chat ·
+// Quản lý tin), trang chủ mini-app (6 danh mục đầu + Cho tặng + Tất cả mục → banner web_pass hoặc "An tâm trao tay" → tin mới)
+// thay cho trang chủ mini kiểu dải (`home.rails` — Stitch không có dải; engine FeatureHome vẫn giữ cho tính năng khác), trang
+// bộ lọc có khoảng cách (< 2 / 5 / 10 km) và ô giá tối thiểu / tối đa.
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { LISTING_FEATURES, PASS_PRICE_RANGES } from '@hp/shared';
 import { Baby, Bike, Dumbbell, HardHat, Package, Refrigerator, Shirt, Smartphone, Sofa, Wrench } from 'lucide-react';
 import type { ListingFeatureConfig } from '@/features/listing/feature-config';
+import { miniAppPaths } from '@/features/listing/mini-app-routes';
 
 /** Khoá "loại đồ" của từng danh mục (mỗi tin chỉ có một) — lên đầu bước Thông tin chính + nhãn thẻ. */
 const TYPE_KEYS = [
@@ -54,14 +58,14 @@ export const passConfig: ListingFeatureConfig = {
     pass_other: Package,
   },
   form: { primaryAttributes: [...TYPE_KEYS, 'condition'], photosTipKey: 'listing.form.photos_tip.pass' },
-  home: {
+  distanceFilterKm: [2, 5, 10],
+  customPrice: true,
+  miniApp: {
+    titleKey: 'listing.mini_app.title.pass',
+    subtitleKey: 'listing.mini_app.subtitle.pass',
+    homeTabKey: 'listing.mini_app.tabs.home.pass',
     bannerPlacement: 'web_pass',
-    rails: [
-      { key: 'near', kind: 'near' },
-      { key: 'free', kind: 'free' },
-      { key: 'vehicle', kind: 'category', category: 'pass_vehicle' },
-      { key: 'electronics', kind: 'category', category: 'pass_electronics' },
-      { key: 'appliance', kind: 'category', category: 'pass_appliance' },
-    ],
+    homeCategoryCount: 6,
+    paths: miniAppPaths(LISTING_FEATURE_PATHS.pass),
   },
 };

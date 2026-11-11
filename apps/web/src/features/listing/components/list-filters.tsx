@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
+import type { ListingFeatureConfig } from '../feature-config';
 import { LISTING_FEATURE_CONFIGS, LISTING_FEATURE_ORDER } from '../features';
 import {
   attributeQuery,
@@ -35,7 +36,8 @@ import { FilterSelect, SiteSelect } from './site-select';
 
 const RING = 'outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
 
-function Chip({
+/** Chip lọc dạng link (chạy khi tắt JS) — dùng chung danh sách và trang chủ mini-app. */
+export function FilterChip({
   href,
   selected,
   children,
@@ -88,6 +90,7 @@ export function ListSearchForm({
   return (
     <form action={action} role="search" className="flex flex-col gap-2 lg:flex-row">
       {filters.category ? <input type="hidden" name="category" value={filters.category} /> : null}
+      {filters.priceMin ? <input type="hidden" name="price_min" value={filters.priceMin} /> : null}
       {filters.priceMax ? <input type="hidden" name="price_max" value={filters.priceMax} /> : null}
       {filters.freeOnly ? <input type="hidden" name="free" value="1" /> : null}
       {Object.entries(attributeQuery(filters.attributes)).map(([key, value]) => (
@@ -177,16 +180,18 @@ export function ListChips({
   // Đổi chip danh mục giữ từ khoá / khu / khoảng cách / giá / cho tặng / thứ tự; sang trang tính năng khác (/tin) chỉ giữ từ
   // khoá / khu / khoảng cách (giá, cho tặng, thứ tự là bộ lọc riêng tính năng).
   const keep = { query: filters.query, site: filters.site, distanceKm: filters.distanceKm };
-  const keepInFeature = { ...keep, priceMax: filters.priceMax, priceRange: filters.priceRange, freeOnly: filters.freeOnly, sort: filters.sort };
+  const keepInFeature = {
+    ...keep,
+    priceMin: filters.priceMin,
+    priceMax: filters.priceMax,
+    priceRange: filters.priceRange,
+    freeOnly: filters.freeOnly,
+    sort: filters.sort,
+  };
   const quick = cfg?.quickFilters ?? [];
   const isQuick = (key: string) => quick.some((q) => isAttributeQuickFilter(q) && q.key === key);
   /** Chữ của một thuộc tính: enum → tên giá trị ("Ca đêm"), bool → tên thuộc tính ("Có gác") / "…: Không". */
-  const attributeLabel = (key: string, value: string | boolean) =>
-    typeof value === 'boolean'
-      ? value
-        ? t(`listing.attr.${key}`)
-        : `${t(`listing.attr.${key}`)}: ${t('listing.attr_value.bool.no')}`
-      : t(`listing.attr_value.${key}.${value}`);
+  const attributeLabel = (key: string, value: string | boolean) => attributeLabelOf(t, key, value);
   const categoryLabel = (c: ListingCategory) => {
     const key = cfg?.card?.categoryBadge?.[c]?.labelKey;
     return key ? t(key) : t(`common.category.${c}`);
@@ -214,17 +219,17 @@ export function ListChips({
             </li>
           ) : null}
           <li>
-            <Chip
+            <FilterChip
               href={{ pathname: path, query: filterQuery({ ...keepInFeature, attributes: attributesFor(filters.attributes, categories) }) }}
               selected={!filters.category}
             >
               {t('listing.list.filter_all')}
-            </Chip>
+            </FilterChip>
           </li>
           {feature
             ? categories.map((c) => (
                 <li key={c}>
-                  <Chip
+                  <FilterChip
                     href={{
                       pathname: path,
                       query: filterQuery({ ...keepInFeature, category: c, attributes: attributesFor(filters.attributes, [c]) }),
@@ -232,17 +237,17 @@ export function ListChips({
                     selected={filters.category === c}
                   >
                     {categoryLabel(c)}
-                  </Chip>
+                  </FilterChip>
                 </li>
               ))
             : LISTING_FEATURE_ORDER.map((f) => {
                 const fc = LISTING_FEATURE_CONFIGS[f];
                 return (
                   <li key={f}>
-                    <Chip href={{ pathname: fc.path, query: filterQuery(keep) }} selected={false}>
+                    <FilterChip href={{ pathname: fc.path, query: filterQuery(keep) }} selected={false}>
                       <fc.Icon aria-hidden strokeWidth={1.75} className={cn('size-5', fc.tone.fg)} />
                       {t(`common.feature.${f}`)}
-                    </Chip>
+                    </FilterChip>
                   </li>
                 );
               })}
@@ -252,46 +257,7 @@ export function ListChips({
       {quick.length > 0 && cfg ? (
         <nav aria-label={t('listing.list.quick_filters')} className="no-scrollbar -mx-4 overflow-x-auto px-4">
           <ul className="flex gap-2 py-1">
-            {quick.map((q) => {
-              if (isPriceQuickFilter(q)) {
-                const on = filters.priceMax === q.priceMax;
-                return (
-                  <li key={`price_max:${q.priceMax}`}>
-                    <Chip href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax }) }} selected={on} pressed={on}>
-                      <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
-                      {t(q.labelKey)}
-                    </Chip>
-                  </li>
-                );
-              }
-              if (isFreeQuickFilter(q)) {
-                const on = filters.freeOnly;
-                return (
-                  <li key="free">
-                    <Chip href={{ pathname: path, query: filterQuery({ ...filters, freeOnly: !on }) }} selected={on} pressed={on}>
-                      <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
-                      {t(q.labelKey)}
-                    </Chip>
-                  </li>
-                );
-              }
-              const on = filters.attributes[q.key] === q.value;
-              const next: Record<string, string | boolean> = { ...filters.attributes };
-              if (on) delete next[q.key];
-              else next[q.key] = q.value;
-              return (
-                <li key={`${q.key}:${String(q.value)}`}>
-                  <Chip
-                    href={{ pathname: path, query: filterQuery({ ...filters, attributes: attributesFor(next, filters.category ? [filters.category] : categories) }) }}
-                    selected={on}
-                    pressed={on}
-                  >
-                    <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
-                    {attributeLabel(q.key, q.value)}
-                  </Chip>
-                </li>
-              );
-            })}
+            <QuickFilterChips path={path} cfg={cfg} categories={categories} filters={filters} />
           </ul>
         </nav>
       ) : null}
@@ -331,4 +297,73 @@ export function ListChips({
       ) : null}
     </div>
   );
+}
+
+type Translator = ReturnType<typeof useTranslations>;
+
+/** Chữ của một thuộc tính: enum → tên giá trị ("Ca đêm"), bool → tên thuộc tính ("Có gác") / "…: Không". */
+function attributeLabelOf(t: Translator, key: string, value: string | boolean): string {
+  return typeof value === 'boolean'
+    ? value
+      ? t(`listing.attr.${key}`)
+      : `${t(`listing.attr.${key}`)}: ${t('listing.attr_value.bool.no')}`
+    : t(`listing.attr_value.${key}.${value}`);
+}
+
+/**
+ * Các <li> chip lọc nhanh của tính năng (config.quickFilters — bật / tắt, giữ bộ lọc khác): theo thông số, giá tối đa, "Cho
+ * tặng". Dùng trong hàng chip của danh sách (ListChips) và hàng chip trang chủ mini-app.
+ */
+export function QuickFilterChips({
+  path,
+  cfg,
+  categories,
+  filters,
+}: {
+  path: string;
+  cfg: ListingFeatureConfig;
+  categories: readonly ListingCategory[];
+  filters: ListFilterState;
+}) {
+  const t = useTranslations();
+  return (cfg.quickFilters ?? []).map((q) => {
+    if (isPriceQuickFilter(q)) {
+      const on = filters.priceMax === q.priceMax;
+      return (
+        <li key={`price_max:${q.priceMax}`}>
+          <FilterChip href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax }) }} selected={on} pressed={on}>
+            <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
+            {t(q.labelKey)}
+          </FilterChip>
+        </li>
+      );
+    }
+    if (isFreeQuickFilter(q)) {
+      const on = filters.freeOnly;
+      return (
+        <li key="free">
+          <FilterChip href={{ pathname: path, query: filterQuery({ ...filters, freeOnly: !on }) }} selected={on} pressed={on}>
+            <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
+            {t(q.labelKey)}
+          </FilterChip>
+        </li>
+      );
+    }
+    const on = filters.attributes[q.key] === q.value;
+    const next: Record<string, string | boolean> = { ...filters.attributes };
+    if (on) delete next[q.key];
+    else next[q.key] = q.value;
+    return (
+      <li key={`${q.key}:${String(q.value)}`}>
+        <FilterChip
+          href={{ pathname: path, query: filterQuery({ ...filters, attributes: attributesFor(next, filters.category ? [filters.category] : categories) }) }}
+          selected={on}
+          pressed={on}
+        >
+          <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
+          {attributeLabelOf(t, q.key, q.value)}
+        </FilterChip>
+      </li>
+    );
+  });
 }

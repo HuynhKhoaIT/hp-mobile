@@ -27,7 +27,7 @@ export function BarHeading({
   tone = 'accent',
   className,
 }: {
-  as?: 'h2' | 'h3';
+  as?: 'h1' | 'h2' | 'h3';
   id?: string;
   children: ReactNode;
   tone?: 'accent' | 'primary';

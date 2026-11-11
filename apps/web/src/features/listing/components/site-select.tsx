@@ -14,6 +14,7 @@ export function FilterSelect({
   label,
   anyLabel,
   className,
+  selectClassName,
 }: {
   /** Tên tham số URL. */
   name: string;
@@ -23,6 +24,8 @@ export function FilterSelect({
   /** Lựa chọn "tất cả" (giá trị rỗng → bỏ tham số). */
   anyLabel: string;
   className?: string;
+  /** Ghi đè kiểu ô chọn (vd viên thuốc trên header mini-app). */
+  selectClassName?: string;
 }) {
   const id = useId();
   return (
@@ -35,7 +38,10 @@ export function FilterSelect({
         name={name}
         defaultValue={value ?? ''}
         onChange={(e) => e.currentTarget.form?.requestSubmit()}
-        className="min-h-12 w-full appearance-none rounded-sm border border-border bg-surface pr-10 pl-3 text-md text-fg outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/30"
+        className={cn(
+          'min-h-12 w-full appearance-none rounded-sm border border-border bg-surface pr-10 pl-3 text-md text-fg outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-ring/30',
+          selectClassName,
+        )}
       >
         <option value="">{anyLabel}</option>
         {options.map((o) => (
@@ -62,6 +68,7 @@ export function SiteSelect({
   label: string;
   anyLabel: string;
   className?: string;
+  selectClassName?: string;
 }) {
   return <FilterSelect name="site" options={sites.map((s) => ({ value: s.code, label: s.name }))} {...rest} />;
 }

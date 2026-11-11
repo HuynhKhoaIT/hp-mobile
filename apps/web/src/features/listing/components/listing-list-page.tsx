@@ -5,32 +5,34 @@
 //   2 chip danh mục / tính năng + chip lọc nhanh theo thông số (config.quickFilters) + "Xoá lọc" (ListChips).
 //   3 khi chưa lọc: khối mời đăng tin (config.banner — đồ thất lạc "Báo nhặt được / Đăng tin tìm đồ", trọ "Bạn là chủ trọ?")
 //     → mẹo an toàn riêng tính năng (config.tipKey) → tiêu đề có vạch cam ("Tin mới đăng" / "Kết quả cho …") → lưới.
-// Tính năng có config.home (Pass đồ) và chưa lọc / sắp xếp → trang chủ mini (cùng thứ tự với app): header + ô tìm → lưới danh
+// Tính năng có config.home và chưa lọc / sắp xếp → trang chủ mini (cùng thứ tự với app): header + ô tìm → lưới danh
 // mục → banner → các dải (FeatureHome) → mẹo an toàn → "Tất cả tin {tính năng}" (chip lọc + lưới + Xem thêm). Có lọc → như trên.
+// Tính năng có config.miniApp (Chợ Pass Đồ) → MiniAppList: header + điều hướng riêng của mini-app, trang chủ mini-app khi chưa
+// lọc, danh sách đã lọc trong cùng khung khi có lọc (mini-app-list.tsx). Cùng dữ liệu / cache / SEO với danh sách thường.
 // Render (Cache Components):
 // - Fallback của <Suspense> = trang đầu KHÔNG lọc (dữ liệu cache 300s) → nằm trong static shell: HTML có tin thật ngay cả khi
 //   tắt JS hoặc với bot chỉ đọc HTML (không phải skeleton).
 // - Phần đọc searchParams (bộ lọc, H1 theo khu, kết quả lọc) chạy theo request trong <Suspense> và thay fallback khi xong.
 //   Không lọc → nội dung giống hệt fallback. Có từ khoá → không cache + ghi từ khoá (log_search) sau khi trả trang (after()).
+//   Giá nhập tay (mini-app, ?price_min= / ?price_max= ngoài mốc chip) → không cache (hasCustomPrice).
 // - "Xem thêm" đọc trang tiếp ở trình duyệt với đúng bộ lọc + thứ tự (cursor mờ của searchListings).
-import { Compass, Inbox, SearchX } from 'lucide-react';
+import { Compass } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { after } from 'next/server';
 import { Suspense } from 'react';
-import { EmptyState } from '@/components/shared/empty-state';
 import { HeaderDecor } from '@/components/shared/header-decor';
-import { Button } from '@/components/ui/button';
-import { getPathname, Link } from '@/i18n/navigation';
+import { getPathname } from '@/i18n/navigation';
 import { asLocale } from '../display';
-import { filterQuery, isFiltered, type ListFilterState, NO_FILTERS, parseListFilters, searchFiltersOf } from '../filters';
-import { getListPage, getPublicSites, LIST_PAGE_SIZE, logSearchTerm } from '../queries';
+import { hasCustomPrice, isFiltered, type ListFilterState, NO_FILTERS, parseListFilters, searchFiltersOf } from '../filters';
+import { getListPage, getPublicSites, logSearchTerm } from '../queries';
 import { LISTING_FEATURE_CONFIGS } from '../features';
+import { isMiniApp } from '../mini-app';
 import { type ListScope, scopeInfo } from '../scope';
 import { FeatureHome } from './feature-home';
 import { ListChips, ListSearchForm } from './list-filters';
+import { ListResults } from './list-results';
 import { ListingBanner } from './listing-banner';
-import { ListingGrid } from './listing-grid';
-import { LoadMore } from './load-more';
+import { MiniAppList } from './mini-app/mini-app-list';
 import { PostListingButton } from './post-listing-button';
 import { BarHeading, SafetyTip } from './safety-tip';
 
@@ -61,7 +63,14 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
   const listCategories = filters.category ? [filters.category] : categories;
 
   const [{ page, now }, sites] = await Promise.all([
-    getListPage({ categories: listCategories, site: filters.site, query: filters.query, attributes: filters.attributes, ...extra }),
+    getListPage({
+      categories: listCategories,
+      site: filters.site,
+      query: filters.query,
+      attributes: filters.attributes,
+      ...extra,
+      fresh: hasCustomPrice(filters, filterOptions),
+    }),
     getPublicSites(),
   ]);
   if (filters.query) {
@@ -74,6 +83,21 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
   const filtered = isFiltered(filters);
 
   const cfg = feature ? LISTING_FEATURE_CONFIGS[feature] : null;
+  if (isMiniApp(cfg)) {
+    return (
+      <MiniAppList
+        cfg={cfg}
+        filters={filters}
+        sites={sites}
+        locale={locale}
+        page={page}
+        now={now}
+        heading={heading}
+        listCategories={listCategories}
+        extra={extra}
+      />
+    );
+  }
   const HeroIcon = cfg?.Icon ?? Compass;
   // Trang chủ mini (config.home) chỉ khi chưa lọc / sắp xếp.
   const showHome = !!cfg?.home && !filtered;
@@ -134,43 +158,18 @@ async function ListBody({ scope, filters }: { scope: ListScope; filters: ListFil
           {/* Trang chủ mini: chip lọc (danh mục, tình trạng, Cho tặng…) thuộc mục "Tất cả tin". */}
           {showHome ? chips : null}
 
-          {page.items.length === 0 ? (
-            filtered ? (
-              <EmptyState
-                icon={SearchX}
-                title={t('listing.list.empty_search_title')}
-                description={t('listing.list.empty_search_body')}
-                action={
-                  <Button asChild variant="outline">
-                    <Link href={path}>{t('listing.list.clear_filters')}</Link>
-                  </Button>
-                }
-              />
-            ) : (
-              <EmptyState
-                icon={Inbox}
-                title={t('listing.list.empty_title')}
-                description={t('listing.list.empty_body')}
-                action={<PostListingButton feature={feature} />}
-              />
-            )
-          ) : (
-            <div className="flex flex-col gap-3">
-              <ListingGrid items={page.items} now={now} layout={cardLayout} prioritizeFirst={!showHome} />
-              <LoadMore
-                // Đổi bộ lọc / thứ tự (điều hướng mềm) → bỏ trang đã tải + cursor cũ (cursor theo giá khác cursor theo ngày).
-                key={new URLSearchParams(filterQuery(filters)).toString()}
-                categories={listCategories}
-                query={filters.query}
-                site={filters.site}
-                attributes={filters.attributes}
-                {...extra}
-                pageSize={LIST_PAGE_SIZE}
-                initialCursor={page.nextCursor}
-                layout={cardLayout}
-              />
-            </div>
-          )}
+          <ListResults
+            items={page.items}
+            nextCursor={page.nextCursor}
+            now={now}
+            filters={filters}
+            extra={extra}
+            categories={listCategories}
+            path={path}
+            feature={feature}
+            layout={cardLayout}
+            prioritizeFirst={!showHome}
+          />
         </section>
       </div>
     </>
