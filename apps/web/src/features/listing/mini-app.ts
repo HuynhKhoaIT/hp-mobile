@@ -6,7 +6,7 @@ import { miniAppBaseOf } from './mini-app-routes';
 
 export type MiniAppConfig = ListingFeatureConfig & { miniApp: ListingMiniApp };
 
-/** Tab của mini-app (thứ tự hiển thị). `post` là nút Đăng tin nổi giữa — không bao giờ "đang mở" trong mini-app. */
+/** Tab của mini-app (thứ tự hiển thị). `post` là nút Đăng tin nổi giữa (đang mở khi ở trang đăng tin của mini-app). */
 export const MINI_APP_TABS = ['home', 'saved', 'post', 'chat', 'manage'] as const;
 export type MiniAppTab = (typeof MINI_APP_TABS)[number];
 
@@ -28,5 +28,6 @@ export function miniAppTabOf(cfg: MiniAppConfig, pathname: string): MiniAppTab |
   if (under(paths.saved)) return 'saved';
   if (under(paths.chat)) return 'chat';
   if (under(paths.manage)) return 'manage';
+  if (under(paths.post)) return 'post';
   return null;
 }

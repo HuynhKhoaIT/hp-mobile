@@ -149,6 +149,7 @@ export function MyListingMenu({
   title,
   actions,
   returnable,
+  editHref: editLink,
   className,
 }: {
   id: string;
@@ -156,6 +157,8 @@ export function MyListingMenu({
   actions: ManageAction[];
   /** Đồ thất lạc: dữ liệu cho hộp "Đã nhận lại đồ". */
   returnable?: ReturnedListing;
+  /** Trang sửa (mini-app: /pass-do/quan-ly/[id]/sua); thiếu → /toi/tin-cua-toi/[id]/sua. */
+  editHref?: string;
   className?: string;
 }) {
   const t = useTranslations('listing.manage');
@@ -180,7 +183,7 @@ export function MyListingMenu({
         <DropdownMenuContent align="end">
           {actions.includes('edit') ? (
             <DropdownMenuItem asChild>
-              <Link href={editHref(id)}>
+              <Link href={editLink ?? editHref(id)}>
                 <Pencil strokeWidth={1.75} aria-hidden />
                 {t('edit')}
               </Link>

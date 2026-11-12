@@ -4,8 +4,11 @@
 //   header mini-app (MiniAppHomeHeader) → "Khu:" chip các khu (?site= — "Điểm nóng" của Stitch) → lưới danh mục 4 cột:
 //   `homeCategoryCount` danh mục đầu (icon nền màu dịch vụ nhạt + tên ngắn, ?category=) + "Cho tặng" (?free=1) + "Tất cả mục"
 //   (→ trang bộ lọc /pass-do/bo-loc — đủ 10 danh mục + loại đồ cụ thể) → banner `web_pass` (bảng banners; rỗng → khối "An tâm
-//   trao tay": huy hiệu xác minh → /toi/huy-hieu) → chip nhanh (Tất cả · Gần {khu đầu} · chip lọc nhanh của config, gồm Cho
-//   tặng) → "Tin mới đăng quanh bạn" + "Lọc thêm" (→ trang bộ lọc, giữ tham số) → lưới 2 cột + Xem thêm.
+//   trao tay": huy hiệu xác minh → /toi/huy-hieu) → chip nhanh (Tất cả · Gần {khu đầu} · chip lọc nhanh của config TRỪ "Cho
+//   tặng" — đã có ô "Cho tặng" trong lưới danh mục ngay trên, không lặp) → "Tin mới đăng quanh bạn" + "Lọc thêm" (→ trang bộ
+//   lọc, giữ tham số) → lưới 2 cột + Xem thêm → đoạn giới thiệu SEO (web.listing.<tính năng>.description — chữ thật, cuối
+//   trang; H1 = tên mini-app + tiêu đề SEO dạng sr-only, xem mini-app-header.tsx).
+// Danh sách rỗng → "Đăng tin" mở trang đăng của mini-app (paths.post), không rời mini-app.
 // Đang lọc / tìm: cùng header → hàng chip danh mục + lọc nhanh + "Xoá lọc" (ListChips) → H1 kết quả ("Pass đồ gần {khu}" /
 //   "Kết quả cho …") + "Lọc thêm (n)" → lưới. Có từ khoá → ghi "Tìm gần đây" ở trình duyệt.
 // Dòng miễn trừ "không thuộc Tập đoàn Hòa Phát": footer / MobileDisclaimer của layout (app).
@@ -20,7 +23,15 @@ import { BannerCarousel } from '@/features/home/components/banner-carousel';
 import { getBanners } from '@/features/home/queries';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { activeFilterCount, filterQuery, isFiltered, type ListFilterState, NO_FILTERS, type searchFiltersOf } from '../../filters';
+import {
+  activeFilterCount,
+  filterQuery,
+  isFiltered,
+  isFreeQuickFilter,
+  type ListFilterState,
+  NO_FILTERS,
+  type searchFiltersOf,
+} from '../../filters';
 import type { MiniAppConfig } from '../../mini-app';
 import { FilterChip, ListChips, QuickFilterChips } from '../list-filters';
 import { ListResults } from '../list-results';
@@ -60,6 +71,8 @@ export async function MiniAppList({
   const filtered = isFiltered(filters);
   const { paths } = cfg.miniApp;
   const count = activeFilterCount(filters) + (filters.sort !== 'newest' ? 1 : 0);
+  // Hàng chip trang chủ: bỏ "Cho tặng" (đã là ô trong lưới danh mục).
+  const homeChipCfg = { ...cfg, quickFilters: (cfg.quickFilters ?? []).filter((q) => !isFreeQuickFilter(q)) };
 
   return (
     <>
@@ -89,7 +102,7 @@ export async function MiniAppList({
                     </FilterChip>
                   </li>
                 ) : null}
-                <QuickFilterChips path={cfg.path} cfg={cfg} categories={cfg.categories} filters={NO_FILTERS} />
+                <QuickFilterChips path={cfg.path} cfg={homeChipCfg} categories={cfg.categories} filters={NO_FILTERS} />
               </ul>
             </nav>
           </>
@@ -130,8 +143,11 @@ export async function MiniAppList({
             feature={cfg.feature}
             layout={cfg.cardLayout}
             prioritizeFirst={filtered}
+            postHref={paths.post}
           />
         </section>
+
+        {filtered ? null : <p className="text-sm text-muted">{t(`web.listing.${cfg.feature}.description`)}</p>}
       </div>
     </>
   );

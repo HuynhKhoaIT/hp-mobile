@@ -1,5 +1,6 @@
 // Android App Links. APP_ANDROID_SHA256 nhận nhiều vân tay cách nhau dấu phẩy (khoá upload + khoá Play App Signing).
-// Thiếu package / vân tay → 404 (không công bố file sai).
+// Thiếu package / vân tay → 404 (không công bố file sai). File này chỉ xác nhận tên miền cho app — đường dẫn app mở (/tin/*,
+// /nhom/*, /pass-do/*…) khai báo ở intent filter (autoVerify) của app, không ở đây; danh sách iOS: apple-app-site-association.
 export function GET() {
   const packageName = process.env.APP_ANDROID_PACKAGE;
   const fingerprints = (process.env.APP_ANDROID_SHA256 ?? '').split(',').map((v) => v.trim()).filter(Boolean);

@@ -1,16 +1,18 @@
 // Header của mini-app (Stitch pass_home / saved / manage / filter) — dải xanh primary bo đáy (bo xl từ 640px), hoạ tiết
 // HeaderDecor, chữ on-primary; ngay dưới là dải tab desktop (MiniAppTabStrip, từ 640px).
-// - MiniAppHomeHeader (trang chủ /pass-do, cả khi đang lọc): viên "← {APP_NAME} Super App" (về Hub) │ Đã lưu + chuông (chỉ
-//   điện thoại — từ 640px header chung + dải tab đã có) → ô icon túi nền cam + tên mini-app + nhãn MINI-APP + dòng phụ │ chọn
-//   khu (viên thuốc, ?site=) → ô tìm (?q=). Một form GET tới trang chủ mini-app: chạy khi tắt JS (đổi khu có JS thì gửi ngay);
-//   giữ các bộ lọc khác đang dùng qua input ẩn. Tên mini-app là <h1> khi chưa lọc; đang lọc thì H1 là tiêu đề kết quả
+// - MiniAppHomeHeader (trang chủ /pass-do, cả khi đang lọc): viên "← {APP_NAME} Super App" (về Hub) │ Đã lưu (tim — cùng icon
+//   tab Đã lưu) + chuông (chỉ điện thoại — từ 640px header chung + dải tab đã có); hàng link này nằm NGOÀI form tìm → ô icon
+//   túi nền cam + tên mini-app + nhãn MINI-APP + dòng phụ │ chọn khu (viên thuốc, ?site=) → ô tìm (?q=). Form GET
+//   (role="search") tới trang chủ mini-app: chạy khi tắt JS (đổi khu có JS thì gửi ngay); giữ các bộ lọc khác đang dùng qua
+//   input ẩn. Tên mini-app là <h1> khi chưa lọc — kèm tiêu đề SEO của danh sách dạng sr-only (web.listing.<tính năng>.title:
+//   H1 có từ khoá cho máy tìm kiếm / trình đọc màn hình, mắt thường vẫn thấy thương hiệu); đang lọc thì H1 là tiêu đề kết quả
 //   ("Pass đồ gần {khu}", "Kết quả cho …") — `titleAs`.
 // - MiniAppPageHeader (trang con): viên "← {Chợ Pass}" (về trang chủ mini-app) + phần phụ bên phải (`aside`, vd "Đặt lại") →
 //   dòng nhỏ (eyebrow) + <h1> + phần phụ cạnh tiêu đề (`titleAside`, vd số tin) → `children` (vd ô tìm).
 // Khác Stitch (cố ý): không nút camera / quét QR trong ô tìm, không "1.400+ tin mới" — chưa có dữ liệu / tính năng.
 import type { Site } from '@hp/core';
 import { APP_NAME, type Locale } from '@hp/shared';
-import { ArrowLeft, Bookmark, Search, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Heart, Search, ShoppingBag } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { HeaderDecor } from '@/components/shared/header-decor';
@@ -61,14 +63,7 @@ export async function MiniAppHomeHeader({
     <>
       <div className={PANEL}>
         <HeaderDecor />
-        <form
-          action={getPathname({ href: cfg.path, locale })}
-          role="search"
-          className="relative flex flex-col gap-4 px-4 pt-3 pb-5 sm:p-6"
-        >
-          {keep.map(([key, value]) => (
-            <input key={key} type="hidden" name={key} value={value} />
-          ))}
+        <div className="relative flex flex-col gap-4 px-4 pt-3 pb-5 sm:p-6">
           <div className="flex items-center gap-2">
             <BackPill
               href="/"
@@ -77,56 +72,70 @@ export async function MiniAppHomeHeader({
             />
             <div className="ml-auto flex shrink-0 items-center gap-2 sm:hidden">
               <Link href={miniApp.paths.saved} aria-label={t('listing.mini_app.tabs.saved')} className={ROUND}>
-                <Bookmark aria-hidden strokeWidth={1.75} className="size-6" />
+                <Heart aria-hidden strokeWidth={1.75} className="size-6" />
               </Link>
               <NotificationBell variant="onPrimary" />
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent text-on-accent shadow-card">
-              <ShoppingBag strokeWidth={2} className="size-6" />
-            </span>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <Title className="text-2xl leading-tight font-bold">{t(miniApp.titleKey)}</Title>
-                <span className="rounded-sm bg-on-primary/15 px-2 py-0.5 text-xs font-bold tracking-wide">
-                  {t('listing.mini_app.badge')}
-                </span>
-              </div>
-              <p className="text-sm text-on-primary/90">{t(miniApp.subtitleKey)}</p>
-            </div>
-            {sites.length > 0 ? (
-              <SiteSelect
-                key={`site:${filters.site ?? ''}`}
-                sites={sites}
-                value={filters.site}
-                label={t('listing.mini_app.home.site_pick')}
-                anyLabel={t('listing.list.site_any')}
-                className="w-full sm:w-56"
-                selectClassName="rounded-full border-transparent font-semibold shadow-card"
-              />
-            ) : null}
-          </div>
+          <form action={getPathname({ href: cfg.path, locale })} role="search" className="flex flex-col gap-4">
+            {keep.map(([key, value]) => (
+              <input key={key} type="hidden" name={key} value={value} />
+            ))}
 
-          <div className="flex gap-2">
-            <label className="relative block flex-1">
-              <span className="sr-only">{t('listing.list.search_placeholder', { feature: featureName })}</span>
-              <Search aria-hidden strokeWidth={1.75} className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" />
-              <Input
-                name="q"
-                type="search"
-                defaultValue={filters.query}
-                placeholder={t('listing.list.search_placeholder', { feature: featureName })}
-                maxLength={100}
-                className="rounded-full border-transparent pl-11 shadow-card focus-visible:ring-on-primary/60"
-              />
-            </label>
-            <Button type="submit" size="lg" variant="outline" className="rounded-full border-transparent font-semibold text-primary shadow-card">
-              {t('listing.list.search_submit')}
-            </Button>
-          </div>
-        </form>
+            <div className="flex flex-wrap items-center gap-3">
+              <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-md bg-accent text-on-accent shadow-card">
+                <ShoppingBag strokeWidth={2} className="size-6" />
+              </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <Title className="text-2xl leading-tight font-bold">
+                    {t(miniApp.titleKey)}
+                    {Title === 'h1' ? (
+                      <>
+                        {' '}
+                        <span className="sr-only">{t(`web.listing.${cfg.feature}.title`)}</span>
+                      </>
+                    ) : null}
+                  </Title>
+                  <span className="rounded-sm bg-on-primary/15 px-2 py-0.5 text-xs font-bold tracking-wide">
+                    {t('listing.mini_app.badge')}
+                  </span>
+                </div>
+                <p className="text-sm text-on-primary/90">{t(miniApp.subtitleKey)}</p>
+              </div>
+              {sites.length > 0 ? (
+                <SiteSelect
+                  key={`site:${filters.site ?? ''}`}
+                  sites={sites}
+                  value={filters.site}
+                  label={t('listing.mini_app.home.site_pick')}
+                  anyLabel={t('listing.list.site_any')}
+                  className="w-full sm:w-56"
+                  selectClassName="rounded-full border-transparent font-semibold shadow-card"
+                />
+              ) : null}
+            </div>
+
+            <div className="flex gap-2">
+              <label className="relative block flex-1">
+                <span className="sr-only">{t('listing.list.search_placeholder', { feature: featureName })}</span>
+                <Search aria-hidden strokeWidth={1.75} className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" />
+                <Input
+                  name="q"
+                  type="search"
+                  defaultValue={filters.query}
+                  placeholder={t('listing.list.search_placeholder', { feature: featureName })}
+                  maxLength={100}
+                  className="rounded-full border-transparent pl-11 shadow-card focus-visible:ring-on-primary/60"
+                />
+              </label>
+              <Button type="submit" size="lg" variant="outline" className="rounded-full border-transparent font-semibold text-primary shadow-card">
+                {t('listing.list.search_submit')}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
       <MiniAppTabStrip feature={cfg.feature} />
     </>

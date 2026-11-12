@@ -6,7 +6,8 @@
 //   cam nổi giữa (BottomNavBar).
 // - MiniAppTabStrip: từ 640px — dải tab dưới header mini-app (header chung của site vẫn giữ): viên thuốc, tab đang mở nền
 //   primary-light chữ primary; "Đăng tin" là nút cam cuối dải.
-// "Đăng tin" → /dang-tin?feature=<tính năng> (chọn sẵn tính năng; khách → proxy.ts chuyển /dang-nhap rồi quay lại).
+// "Đăng tin" → trang đăng tin của mini-app (paths.post, vd /pass-do/dang-tin): form chỉ có danh mục của tính năng, đăng
+// xong về "Quản lý tin" — không rời mini-app (khách → proxy.ts chuyển /dang-nhap rồi quay lại).
 // Số trên tab Chat = số hội thoại CHƯA ĐỌC thuộc tính năng (conversationFeature) trong các trang hộp thư đã tải
 // (useConversations — chỉ khi đã đăng nhập); hội thoại cũ ngoài trang đầu chưa tính (giống hộp thư lọc theo dịch vụ).
 import { conversationFeature } from '@hp/core';
@@ -38,10 +39,10 @@ function useMiniAppItems(cfg: MiniAppConfig): BottomNavItem[] {
     { key: 'saved', href: paths.saved, label: t('listing.mini_app.tabs.saved'), Icon: Heart, active: current === 'saved' },
     {
       key: 'post',
-      href: { pathname: '/dang-tin', query: { feature: cfg.feature } },
+      href: paths.post,
       label: t('listing.mini_app.tabs.post'),
       Icon: Plus,
-      active: false,
+      active: current === 'post',
       isPost: true,
     },
     {

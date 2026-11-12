@@ -1,7 +1,7 @@
 'use client';
 
 // Header khung chat (style Stitch "Khung Chat trực tiếp", giống ThreadHeader của app): dải xanh primary + hoạ tiết
-// HeaderDecor — quay lại hộp thư (nút trong mờ, khi một cột: < 1024px) · avatar viền on-primary/30 (dấu xác minh khi có
+// HeaderDecor — quay lại hộp thư (nút trong mờ, khi một cột: < 1024px; trong mini-app — `inboxHref` — luôn hiện) · avatar viền on-primary/30 (dấu xác minh khi có
 // huy hiệu) + tên đậm (dòng phụ "Đang nhập…" khi người kia gõ / "Đã xác minh") · menu tuỳ chọn (nút trong mờ).
 // Dưới đó, nền surface: thẻ tin ngữ cảnh (ảnh, tiêu đề, giá, nhãn đã bán / ẩn, "Xem tin") → bấm mở /tin/[slug]; tin đã gỡ
 // / không còn hiển thị → thẻ mờ, không bấm.
@@ -33,6 +33,7 @@ const GLASS =
 
 export function ThreadHeader({
   conversation: c,
+  inboxHref,
   isTyping,
   isBlocked,
   onToggleMute,
@@ -40,6 +41,8 @@ export function ThreadHeader({
   onToggleBlock,
 }: {
   conversation: ConversationSummary | undefined;
+  /** Hộp thư để quay lại khi khung chat không nằm cạnh cột hộp thư (mini-app); thiếu → /tin-nhan, ẩn từ 1024px. */
+  inboxHref?: string;
   isTyping: boolean;
   isBlocked: boolean;
   onToggleMute: () => void;
@@ -63,7 +66,7 @@ export function ThreadHeader({
       <div className="relative overflow-hidden bg-primary text-on-primary shadow-card">
         <HeaderDecor />
         <div className="relative flex min-h-16 items-center gap-2.5 px-3 py-2 lg:px-4">
-          <Link href="/tin-nhan" aria-label={t('common.actions.back')} className={cn(GLASS, 'lg:hidden')}>
+          <Link href={inboxHref ?? '/tin-nhan'} aria-label={t('common.actions.back')} className={cn(GLASS, !inboxHref && 'lg:hidden')}>
             <ChevronLeft strokeWidth={1.75} className="size-6" aria-hidden />
           </Link>
           {c ? (

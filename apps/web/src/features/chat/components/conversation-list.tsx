@@ -11,8 +11,9 @@
 // Khách (proxy đã chặn, phòng khi phiên hết hạn giữa chừng) → mời đăng nhập (SignInPrompt dùng chung). Loading / lỗi + thử lại / trống + CTA;
 // lọc không có kết quả → "Xem tất cả". Không có tìm kiếm / "Đã đọc tất cả" của Stitch (chưa có RPC tương ứng).
 // Mini-app (/pass-do/tin-nhan): `lockFeature` khoá hộp thư vào một dịch vụ (không chip lọc; đang ít hơn một màn mà server còn
-// trang → tự tải trang kế, như useInboxFilter), `bare` bỏ header xanh (trang có header mini-app riêng); thẻ vẫn mở
-// /tin-nhan/[id]. Hộp thư rỗng → CTA về trang `emptyHref` (trang chủ mini-app).
+// trang → tự tải trang kế, như useInboxFilter), `bare` bỏ header xanh (trang có header mini-app riêng); thẻ mở khung chat
+// trong mini-app (`threadBase`/[id], vd /pass-do/tin-nhan/[id] — quay lại về hộp thư mini-app). Hộp thư rỗng → CTA về trang
+// `emptyHref` (trang chủ mini-app).
 import type { ConversationSummary } from '@hp/core';
 import { useConversations, useSession, useUnreadConversationCount } from '@hp/core/react';
 import { type Feature, formatDate, formatNumber, formatRelative, unreadBadge } from '@hp/shared';
@@ -29,6 +30,7 @@ import { Button } from '@/components/ui/button';
 import { GROUP_FEATURE_CONFIGS } from '@/features/group/features';
 import { asLocale } from '@/features/listing/display';
 import { LISTING_FEATURE_CONFIGS } from '@/features/listing/features';
+import { miniAppThreadPath } from '@/features/listing/mini-app-routes';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -43,12 +45,13 @@ import {
 import { ConversationListSkeleton, ConversationRowSkeleton } from './chat-skeletons';
 import { GroupChatIcon } from './group-chat-icon';
 
-type Lock = { feature: Feature; emptyHref: string };
+type Lock = { feature: Feature; emptyHref: string; threadBase?: string };
 
 export function ConversationList({
   selectedId,
   lockFeature,
   emptyHref,
+  threadBase,
   bare = false,
 }: {
   selectedId: string | null;
@@ -56,11 +59,13 @@ export function ConversationList({
   lockFeature?: Feature;
   /** CTA của hộp thư rỗng khi khoá dịch vụ (mặc định /tin). */
   emptyHref?: string;
+  /** Gốc đường dẫn khung chat khi khoá dịch vụ (mini-app, vd /pass-do/tin-nhan); thiếu → /tin-nhan/[id]. */
+  threadBase?: string;
   /** Không header xanh (trang tự có header). */
   bare?: boolean;
 }) {
   const t = useTranslations('chat');
-  const lock = lockFeature ? { feature: lockFeature, emptyHref: emptyHref ?? '/tin' } : undefined;
+  const lock = lockFeature ? { feature: lockFeature, emptyHref: emptyHref ?? '/tin', threadBase } : undefined;
   return (
     <div className="flex flex-1 flex-col bg-bg">
       {bare ? null : (
@@ -184,7 +189,11 @@ function ConversationItems({ selectedId, lock }: { selectedId: string | null; lo
         <ul className="flex flex-col gap-3">
           {visible.map((c) => (
             <li key={c.id}>
-              <ConversationRow conversation={c} selected={c.id === selectedId} />
+              <ConversationRow
+                conversation={c}
+                selected={c.id === selectedId}
+                href={lock?.threadBase ? miniAppThreadPath(lock.threadBase, c.id) : conversationHref(c.id)}
+              />
             </li>
           ))}
         </ul>
@@ -247,7 +256,7 @@ function ConversationItems({ selectedId, lock }: { selectedId: string | null; lo
   );
 }
 
-function ConversationRow({ conversation: c, selected }: { conversation: ConversationSummary; selected: boolean }) {
+function ConversationRow({ conversation: c, selected, href }: { conversation: ConversationSummary; selected: boolean; href: string }) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
   const preview = usePreviewText();
@@ -268,7 +277,7 @@ function ConversationRow({ conversation: c, selected }: { conversation: Conversa
 
   return (
     <Link
-      href={conversationHref(c.id)}
+      href={href}
       aria-current={selected ? 'page' : undefined}
       className={cn(
         'flex min-h-20 items-center gap-3 rounded-lg border p-3 shadow-card outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50',

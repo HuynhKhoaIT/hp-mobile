@@ -15,6 +15,8 @@
 // Mini-app (config.customPrice — trang bộ lọc Chợ Pass): ô giá tối thiểu / tối đa tuỳ ý `?price_min=300000&price_max=2500000`
 // (số nguyên VND ≥ 0, tối thiểu > tối đa → bỏ tối thiểu). Không phải tập hữu hạn → trang đầu KHÔNG cache (hasCustomPrice →
 // getListPage `fresh`) và noindex (metadata.ts). Tính năng không bật customPrice: price_max vẫn chỉ nhận mốc chip giá.
+// "Cho tặng" loại trừ giá: tin cho tặng không có giá → `?free=1` cùng giá / khoảng giá luôn rỗng. URL có cả hai → Cho tặng
+// thắng (bỏ giá); chip lọc nhanh: bật Cho tặng bỏ giá, bật chip giá bỏ Cho tặng (list-filters.tsx).
 import {
   ATTRIBUTE_FIELDS,
   type AttributeField,
@@ -86,8 +88,8 @@ type FilterableField = Extract<AttributeField, { kind: 'enum' | 'bool' }>;
 /** Tham số đã dùng cho bộ lọc chung — thuộc tính không được trùng tên. */
 const RESERVED = new Set(['category', 'q', 'site', 'distance', 'price_min', 'price_max', 'price', 'free', 'sort', 'tab', 'next']);
 
-/** Trần ô giá tuỳ ý (VND) — chặn số vô lý trên URL. */
-const PRICE_INPUT_MAX = 100_000_000_000;
+/** Trần ô giá tuỳ ý (VND) — chặn số vô lý trên URL (ô nhập ở trang bộ lọc cũng chặn ở mức này). */
+export const PRICE_INPUT_MAX = 100_000_000_000;
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
@@ -210,6 +212,8 @@ export function parseListFilters(
     options.sortable && rawSort && (LISTING_SORTS as readonly string[]).includes(rawSort) ? (rawSort as ListingSort) : 'newest';
   const rawFree = first(raw.free);
   const freeOnly = !!options.freeOnly && (rawFree === '1' || rawFree === 'true');
+  // Cho tặng loại trừ giá (xem đầu file).
+  const price = freeOnly ? { priceMin: null, priceMax: null, priceRange: null } : { priceMin, priceMax, priceRange };
 
   const attributes: Record<string, string | boolean> = {};
   for (const field of filterableFields(category ? [category] : allowed)) {
@@ -222,9 +226,7 @@ export function parseListFilters(
     query: q.success ? (q.data.query ?? '') : '',
     site: s.success ? (s.data.site ?? null) : null,
     distanceKm,
-    priceMin,
-    priceMax,
-    priceRange,
+    ...price,
     freeOnly,
     sort,
     attributes,

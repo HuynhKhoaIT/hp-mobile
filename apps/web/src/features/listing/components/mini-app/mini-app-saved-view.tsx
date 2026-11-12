@@ -5,9 +5,10 @@
 // mất ngay, optimistic của useToggleBookmark; lỗi → thẻ trở lại + toast). Khung tĩnh render skeleton (ClientOnly).
 // Chip tại chỗ: Tất cả · Đang bán · Ngừng bán (đã bán / đã đóng / hết hạn) kèm số. Thẻ ngang: ảnh vuông + nhãn danh mục nổi
 // │ tiêu đề 2 dòng + tim (bỏ lưu) │ giá │ khu · thời gian đăng │ nhãn "Công nhân đã xác minh" khi chủ tin có huy hiệu worker;
-// dải dưới: "Chat ngay" (mở / lấy lại hội thoại → /tin-nhan/[id]; ẩn với tin của mình). Tin ngừng bán: viền đứt, ảnh xám +
+// dải dưới: "Chat ngay" (mở / lấy lại hội thoại → khung chat trong mini-app /pass-do/tin-nhan/[id]; ẩn với tin của mình). Tin ngừng bán: viền đứt, ảnh xám +
 // nhãn trạng thái đè, chữ muted, dải dưới "Món này đã có người chốt" + "Tìm món tương tự" (→ trang chủ mini-app ?category=).
 // Cuối trang: mẹo mua đồ an toàn. Khách (phiên hết hạn giữa chừng — proxy đã chặn) → SignInPrompt.
+// MiniAppSavedCount: số tin đã lưu của tính năng cạnh tiêu đề header ("Tin đã lưu (6)" của Stitch) — cùng query, cùng cách lọc.
 // Khác Stitch (cố ý): không nhắc "đã hạ giá / thợ khác hẹn xem", chip "Đã giảm giá", nhãn "-200K", giá gạch, "Giảm giá 12
 // phút trước", "Trả giá" / "Gọi Zalo", ghi chú hẹn xem, nút "Tạo chuông" — chưa có dữ liệu / tính năng.
 import type { PublicListing } from '@hp/core';
@@ -43,6 +44,30 @@ const isOnSale = (l: PublicListing) => l.status === 'active' && !l.is_expired;
 const CARD = 'flex flex-col overflow-hidden rounded-lg border bg-surface shadow-card';
 const THUMB = 'relative size-24 shrink-0 overflow-hidden rounded-md bg-surface-2 sm:size-28';
 
+/** Tin đã lưu thuộc danh mục của tính năng, bỏ ngay thẻ vừa bỏ lưu (optimistic qua danh sách id). */
+function featureSaved(list: PublicListing[] | undefined, ids: Set<string> | undefined, categories: readonly string[]): PublicListing[] {
+  return (list ?? []).filter((l) => categories.includes(l.category) && (ids ? ids.has(l.id) : true));
+}
+
+export function MiniAppSavedCount({ feature }: { feature: ListingFeature }) {
+  return (
+    <ClientOnly fallback={null}>
+      <SavedCount feature={feature} />
+    </ClientOnly>
+  );
+}
+
+function SavedCount({ feature }: { feature: ListingFeature }) {
+  const t = useTranslations('listing.mini_app.saved');
+  const session = useSession();
+  const enabled = !!session.userId;
+  const saved = useSavedListings({ enabled });
+  const ids = useBookmarkedListingIds({ enabled });
+  if (!saved.data) return null;
+  const count = featureSaved(saved.data, ids.data, LISTING_FEATURE_CONFIGS[feature].categories).length;
+  return <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-on-accent">{t('count', { count })}</span>;
+}
+
 export function MiniAppSavedView({ feature }: { feature: ListingFeature }) {
   return (
     <ClientOnly fallback={<SavedSkeleton />}>
@@ -65,8 +90,7 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
   if (!session.userId) return <SignInPrompt />;
   if (saved.isError && !saved.data) return <ErrorState code={saved.error.code} onRetry={() => void saved.refetch()} />;
 
-  // Danh mục của tính năng + bỏ ngay thẻ vừa bỏ lưu (optimistic qua danh sách id).
-  const mine = (saved.data ?? []).filter((l) => cfg.categories.includes(l.category) && (ids.data ? ids.data.has(l.id) : true));
+  const mine = featureSaved(saved.data, ids.data, cfg.categories);
   const counts: Record<SavedTab, number> = {
     all: mine.length,
     active: mine.filter(isOnSale).length,
@@ -133,7 +157,7 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {visible.map((l) => (
             <li key={l.id} className="flex flex-col *:flex-1">
-              <SavedRow listing={l} now={now} viewerId={session.userId} featurePath={cfg.path} />
+              <SavedRow listing={l} now={now} viewerId={session.userId} featurePath={cfg.path} chatBase={cfg.miniApp?.paths.chat} />
             </li>
           ))}
         </ul>
@@ -148,12 +172,15 @@ function SavedRow({
   now,
   viewerId,
   featurePath,
+  chatBase,
 }: {
   listing: PublicListing;
   now: number;
   viewerId: string | null;
   /** Trang chủ mini-app ("Tìm món tương tự" → ?category=). */
   featurePath: string;
+  /** Hộp thư mini-app — "Chat ngay" mở khung chat trong mini-app. */
+  chatBase?: string;
 }) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
@@ -223,7 +250,7 @@ function SavedRow({
         {onSale ? (
           <>
             <span className="flex-1" />
-            {viewerId && viewerId === l.owner_id ? null : <ChatButton listingId={l.id} />}
+            {viewerId && viewerId === l.owner_id ? null : <ChatButton listingId={l.id} chatBase={chatBase} />}
           </>
         ) : (
           <>
@@ -270,9 +297,9 @@ function UnsaveButton({ listingId, title }: { listingId: string; title: string }
   );
 }
 
-function ChatButton({ listingId }: { listingId: string }) {
+function ChatButton({ listingId, chatBase }: { listingId: string; chatBase?: string }) {
   const t = useTranslations();
-  const { open, isPending } = useOpenConversation();
+  const { open, isPending } = useOpenConversation(chatBase);
   return (
     <Button type="button" size="sm" disabled={isPending} onClick={() => open(listingId)} className="font-semibold">
       <MessageCircle aria-hidden strokeWidth={1.75} />

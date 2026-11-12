@@ -8,9 +8,13 @@
 // → Khoảng giá (ô tối thiểu / tối đa ?price_min= / ?price_max= + khoảng đặt sẵn ?price= + "Cho tặng" ?free=1) → Tình trạng
 // (?condition=; ẩn khi danh mục không có trường tình trạng) → Sắp xếp (?sort=) → thanh "Áp dụng" dính đáy (trên thanh điều
 // hướng dưới của điện thoại) kèm số bộ lọc đang chọn.
-// Có JS: kiểm giá (tối thiểu ≤ tối đa — báo lỗi tại ô, không gửi), chọn khoảng đặt sẵn thì xoá ô nhập và ngược lại, gửi thì
-// bỏ tham số rỗng (URL gọn) + ghi "Tìm gần đây" rồi điều hướng mềm. Thuộc tính đang lọc không có ô ở đây (vd chip nhanh
-// "Xe máy" khi chưa chọn danh mục) giữ qua input ẩn.
+// Có JS: kiểm giá (tối thiểu ≤ tối đa — báo lỗi tại ô, không gửi), chọn khoảng đặt sẵn thì xoá ô nhập và ngược lại; "Cho
+// tặng" loại trừ giá (bật Cho tặng → xoá ô giá + khoảng giá; nhập giá / chọn khoảng → tắt Cho tặng — tin cho tặng không có
+// giá, gộp hai thứ luôn ra rỗng; tắt JS thì parseListFilters cho Cho tặng thắng); ô giá chỉ nhận số, tối đa PRICE_INPUT_MAX;
+// bấm một mục "Tìm gần đây" → điền ô tìm và gửi luôn; gửi thì bỏ tham số rỗng (URL gọn) + ghi "Tìm gần đây" rồi điều hướng
+// mềm. Thuộc tính đang lọc không có ô ở đây (vd chip nhanh "Xe máy" khi chưa chọn danh mục) giữ qua input ẩn — nhưng đổi danh
+// mục (kể cả "Tất cả danh mục") thì bỏ mọi "loại đồ" (categoryTypeField của mọi danh mục) + thuộc tính không thuộc danh mục
+// mới, để không gửi bộ lọc vô hình.
 // Khác Stitch (cố ý): không "Thợ cơ khí" gợi ý, "Tự định vị" (web không đọc vị trí máy), công tắc xác thực thẻ / video test /
 // hẹn cổng không cọc / bán gấp, sắp xếp "Gần tôi nhất" / "Xem nhiều nhất", khối "Tin phù hợp hàng đầu" và số kết quả trên
 // nút Áp dụng — chưa có dữ liệu / RPC.
@@ -25,9 +29,11 @@ import { cn } from '@/lib/utils';
 import { LISTING_FEATURE_CONFIGS } from '../../features';
 import {
   activeFilterCount,
+  attributesFor,
   categoryTypeField,
   filterOptionsOf,
   type ListFilterState,
+  PRICE_INPUT_MAX,
   parsePriceInput,
 } from '../../filters';
 import { rememberSearch, useRecentSearches } from '../../recent-searches';
@@ -107,7 +113,11 @@ function countFilled(form: HTMLFormElement): number {
   return n;
 }
 
-const digitsOnly = (v: string) => v.replace(/\D/g, '').slice(0, 12);
+/** Chỉ chữ số, bỏ số 0 đầu, chặn ở PRICE_INPUT_MAX (giá trị lớn nhất parsePriceInput nhận). */
+function priceDigits(v: string): string {
+  const digits = v.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  return digits && Number(digits) > PRICE_INPUT_MAX ? String(PRICE_INPUT_MAX) : digits;
+}
 
 export function MiniAppFilterForm({
   feature,
@@ -135,12 +145,25 @@ export function MiniAppFilterForm({
   const [priceMin, setPriceMin] = useState(initial.priceMin ? String(initial.priceMin) : '');
   const [priceMax, setPriceMax] = useState(initial.priceMax ? String(initial.priceMax) : '');
   const [priceError, setPriceError] = useState(false);
+  const [freeOnly, setFreeOnly] = useState(initial.freeOnly);
   const [count, setCount] = useState(activeFilterCount(initial) + (initial.sort !== 'newest' ? 1 : 0));
 
   const typeField = category ? categoryTypeField(category) : null;
   const hasCondition = category ? ATTRIBUTE_FIELDS[category].some((f) => f.key === 'condition') : true;
-  // Thuộc tính đang lọc không có ô ở form này → giữ qua input ẩn.
-  const keptAttributes = Object.entries(initial.attributes).filter(([key]) => key !== 'condition' && key !== typeField?.key);
+  // Thuộc tính đang lọc không có ô ở form này → giữ qua input ẩn. Đổi danh mục → bỏ mọi "loại đồ" + thuộc tính không còn
+  // thuộc danh mục mới (không gửi bộ lọc vô hình).
+  const categoryChanged = category !== (initial.category ?? '');
+  const typeKeys = new Set(cfg.categories.map((c) => categoryTypeField(c)?.key).filter(Boolean));
+  const baseAttributes = categoryChanged ? attributesFor(initial.attributes, category ? [category] : cfg.categories) : initial.attributes;
+  const keptAttributes = Object.entries(baseAttributes).filter(
+    ([key]) => key !== 'condition' && key !== typeField?.key && !(categoryChanged && typeKeys.has(key)),
+  );
+  const clearPrice = () => {
+    setPriceMin('');
+    setPriceMax('');
+    setPriceRange('');
+    setPriceError(false);
+  };
 
   const recount = (form: HTMLFormElement) => {
     // Sau khi React cập nhật DOM (đổi danh mục thay hàng "loại đồ").
@@ -172,7 +195,7 @@ export function MiniAppFilterForm({
   const pickRecent = (query: string) => {
     if (!qRef.current) return;
     qRef.current.value = query;
-    qRef.current.focus();
+    qRef.current.form?.requestSubmit();
   };
 
   return (
@@ -299,7 +322,10 @@ export function MiniAppFilterForm({
                 onChange={(v) => {
                   setPriceMin(v);
                   setPriceError(false);
-                  if (v) setPriceRange('');
+                  if (v) {
+                    setPriceRange('');
+                    setFreeOnly(false);
+                  }
                 }}
               />
               <span aria-hidden className="pb-3 text-muted">
@@ -314,7 +340,10 @@ export function MiniAppFilterForm({
                 onChange={(v) => {
                   setPriceMax(v);
                   setPriceError(false);
-                  if (v) setPriceRange('');
+                  if (v) {
+                    setPriceRange('');
+                    setFreeOnly(false);
+                  }
                 }}
               />
             </div>
@@ -336,6 +365,7 @@ export function MiniAppFilterForm({
                 setPriceMin('');
                 setPriceMax('');
                 setPriceError(false);
+                setFreeOnly(false);
               }
             }}
             choices={[
@@ -346,7 +376,18 @@ export function MiniAppFilterForm({
         ) : null}
         {options.freeOnly ? (
           <label className={cn(CHIP, 'self-start')}>
-            <input type="checkbox" name="free" value="1" defaultChecked={initial.freeOnly} className="sr-only" />
+            <input
+              type="checkbox"
+              name="free"
+              value="1"
+              checked={freeOnly}
+              onChange={(e) => {
+                const on = e.currentTarget.checked;
+                setFreeOnly(on);
+                if (on) clearPrice();
+              }}
+              className="sr-only"
+            />
             <Gift aria-hidden strokeWidth={1.75} className="size-5 text-success" />
             {t('listing.list.quick_free')}
           </label>
@@ -429,7 +470,7 @@ function PriceInput({
         inputMode="numeric"
         autoComplete="off"
         value={value}
-        onChange={(e) => onChange(digitsOnly(e.currentTarget.value))}
+        onChange={(e) => onChange(priceDigits(e.currentTarget.value))}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? errorId : undefined}
       />

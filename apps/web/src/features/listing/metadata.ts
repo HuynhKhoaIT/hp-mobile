@@ -2,7 +2,7 @@
 // canonical + hreflang (vi / en / zh / x-default), Open Graph. robots: trang lọc sâu (> 2 tham số) hoặc biến thể giá / cho
 // tặng / sắp xếp / giá nhập tay (?price=, ?free=, ?sort=, ?price_min=, ?price_max= của mini-app) → noindex.
 // Trang con mini-app (/pass-do/bo-loc, /da-luu, /tin-nhan, /quan-ly): miniAppMetadata — tiêu đề + canonical, luôn noindex
-// (trang tiện ích / riêng tư, không có nội dung tin riêng).
+// (trang tiện ích / riêng tư, không có nội dung tin riêng). /quan-ly/[id]/sua, /tin-nhan/[id]: miniAppPrivateMetadata.
 // Toàn site đang noindex ở layout gốc tới khi ra mắt (tuần 11) — trang không ghi đè thành index.
 import type { PublicListing } from '@hp/core';
 import { APP_NAME, type ListingFeature, priceLabel } from '@hp/shared';
@@ -90,6 +90,7 @@ const MINI_APP_PAGE_TITLE = {
   saved: 'listing.mini_app.saved.title',
   chat: 'listing.mini_app.tabs.chat',
   manage: 'listing.mini_app.manage.title',
+  post: 'listing.form.title_new',
 } as const;
 
 /** Trang con của mini-app: "{trang} – {tên mini-app}" + canonical (không tham số), noindex. */
@@ -103,5 +104,16 @@ export async function miniAppMetadata(feature: ListingFeature, page: keyof typeo
     title: `${t(MINI_APP_PAGE_TITLE[page])} – ${t(cfg.miniApp.titleKey)}`,
     alternates: localeAlternates(path, locale),
     robots: { index: false, follow: true },
+  };
+}
+
+/** Trang riêng theo id trong mini-app (sửa tin, khung chat): "{trang} – {tên mini-app}", không canonical, noindex nofollow. */
+export async function miniAppPrivateMetadata(feature: ListingFeature, page: 'edit' | 'thread'): Promise<Metadata> {
+  const cfg = LISTING_FEATURE_CONFIGS[feature];
+  const t = await getTranslations();
+  const pageTitle = t(page === 'edit' ? 'listing.form.title_edit' : 'chat.title');
+  return {
+    title: cfg.miniApp ? `${pageTitle} – ${t(cfg.miniApp.titleKey)}` : pageTitle,
+    robots: { index: false, follow: false },
   };
 }

@@ -1,5 +1,5 @@
 // Khối kết quả của trang danh sách (dùng chung danh sách thường và trang chủ mini-app): rỗng (đang lọc → "Xoá lọc"; chưa
-// lọc → mời đăng tin) │ lưới trang đầu (server render — tắt JS vẫn đọc được) + "Xem thêm" (trang sau ở trình duyệt, cùng bộ
+// lọc → mời đăng tin — `postHref`: trang đăng của mini-app, mặc định /dang-tin?feature=) │ lưới trang đầu (server render — tắt JS vẫn đọc được) + "Xem thêm" (trang sau ở trình duyệt, cùng bộ
 // lọc + thứ tự; đổi bộ lọc → key mới, bỏ trang đã tải + cursor cũ).
 import type { PublicListing } from '@hp/core';
 import type { ListingCategory, ListingFeature } from '@hp/shared';
@@ -25,6 +25,7 @@ export async function ListResults({
   feature,
   layout,
   prioritizeFirst,
+  postHref,
 }: {
   items: PublicListing[];
   nextCursor: string | null;
@@ -38,6 +39,8 @@ export async function ListResults({
   feature: ListingFeature | null;
   layout: 'grid' | 'row';
   prioritizeFirst: boolean;
+  /** CTA "Đăng tin" của danh sách rỗng (mini-app: paths.post); thiếu → /dang-tin?feature=. */
+  postHref?: string;
 }) {
   const t = await getTranslations();
   if (items.length === 0) {
@@ -57,7 +60,7 @@ export async function ListResults({
         icon={Inbox}
         title={t('listing.list.empty_title')}
         description={t('listing.list.empty_body')}
-        action={<PostListingButton feature={feature} />}
+        action={<PostListingButton feature={feature} href={postHref} />}
       />
     );
   }

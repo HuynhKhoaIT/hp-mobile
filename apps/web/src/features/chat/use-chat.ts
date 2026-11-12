@@ -13,6 +13,7 @@ import { useToast } from '@/components/shared/toast';
 import { useErrorText } from '@/features/auth/components/use-error-text';
 import { asLocale, priceText } from '@/features/listing/display';
 import { prepareListingImage } from '@/features/listing/listing-image';
+import { miniAppThreadPath } from '@/features/listing/mini-app-routes';
 import { useRouter } from '@/i18n/navigation';
 
 export type MessageStatus = 'sending' | 'sent' | 'seen' | 'failed';
@@ -62,7 +63,8 @@ export function useChatSafety() {
 // ── Mở hội thoại từ chi tiết tin ────────────────────────────────────────────────────────────────────────────
 
 /** CTA "Nhắn tin": mở (hoặc lấy lại) hội thoại với chủ tin rồi vào khung chat. Lỗi (tin của mình, bị chặn…) → toast. */
-export function useOpenConversation() {
+/** Mở / lấy lại hội thoại về tin rồi chuyển tới khung chat. `threadBase` (mini-app, vd /pass-do/tin-nhan) → khung chat trong mini-app. */
+export function useOpenConversation(threadBase?: string) {
   const { mutate, isPending } = useStartConversation();
   const router = useRouter();
   const toast = useToast();
@@ -72,11 +74,12 @@ export function useOpenConversation() {
       mutate(
         { listingId },
         {
-          onSuccess: (conversationId) => router.push(conversationHref(conversationId)),
+          onSuccess: (conversationId) =>
+            router.push(threadBase ? miniAppThreadPath(threadBase, conversationId) : conversationHref(conversationId)),
           onError: (e) => toast.show(errorText(e.code), 'error'),
         },
       ),
-    [mutate, router, toast, errorText],
+    [mutate, router, toast, errorText, threadBase],
   );
   return { open, isPending };
 }

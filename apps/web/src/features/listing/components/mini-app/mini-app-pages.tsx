@@ -4,10 +4,22 @@
 // - MiniAppSavedPage (/…/da-luu), MiniAppChatPage (/…/tin-nhan), MiniAppManagePage (/…/quan-ly?tab=): cần đăng nhập
 //   (proxy.ts — MINI_APP_PRIVATE_PATHS), noindex; dữ liệu riêng đọc ở trình duyệt qua hook @hp/core/react (khung tĩnh =
 //   skeleton). Tab của "Quản lý tin" đọc searchParams trong <Suspense>.
+// - MiniAppPostPage (/…/dang-tin): form "Đăng nhanh" dùng chung, khoá tính năng (chỉ danh mục của nó) — header xanh của
+//   form thay header mini-app (từ 640px vẫn có dải tab mini-app phía trên); huỷ về trang chủ mini-app, đăng xong về "Quản lý
+//   tin". Cần đăng nhập, noindex.
+// - MiniAppEditPage (/…/quan-ly/[id]/sua): cùng form ở chế độ sửa, `scope` của mini-app (huỷ / xong → "Quản lý tin" của
+//   mini-app, "Đăng tin khác" → trang đăng của mini-app); tin thuộc tính năng khác → 404. Cần đăng nhập, noindex.
+// - MiniAppThreadPage (/…/tin-nhan/[id]): khung chat dùng chung (ChatThread) trong khung mini-app — nút quay lại về hộp thư
+//   của mini-app; < 640px phủ toàn màn hình như /tin-nhan/[id], từ 640px nằm dưới dải tab mini-app. Cần đăng nhập, noindex.
 import type { ListingFeature } from '@hp/shared';
+import { SearchX } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
+import { EmptyState } from '@/components/shared/empty-state';
+import { Button } from '@/components/ui/button';
+import { ThreadSkeleton } from '@/features/chat/components/chat-skeletons';
 import { ConversationList } from '@/features/chat/components/conversation-list';
+import { ThreadFromParams } from '@/features/chat/components/thread-from-params';
 import { getPathname, Link } from '@/i18n/navigation';
 import { asLocale } from '../../display';
 import { LISTING_FEATURE_CONFIGS } from '../../features';
@@ -16,10 +28,13 @@ import { parseFeatureTab } from '../../manage';
 import { isMiniApp, type MiniAppConfig } from '../../mini-app';
 import { getPublicSites } from '../../queries';
 import { scopeInfo } from '../../scope';
+import type { ListingFormScope } from '../listing-form/listing-form';
+import { EditListingView, ListingFormSkeleton, PostListingView } from '../post-listing-view';
 import { MINI_APP_HEADER_ACTION, MiniAppPageHeader } from './mini-app-header';
 import { MiniAppFilterForm } from './mini-app-filter-form';
 import { MiniAppManageCount, MiniAppManageView } from './mini-app-manage-view';
-import { MiniAppSavedView } from './mini-app-saved-view';
+import { MiniAppTabStrip } from './mini-app-nav';
+import { MiniAppSavedCount, MiniAppSavedView } from './mini-app-saved-view';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -30,6 +45,12 @@ function miniAppOf(feature: ListingFeature): MiniAppConfig {
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   if (!isMiniApp(cfg)) throw new Error(`${feature} is not a mini-app`);
   return cfg;
+}
+
+/** Form đăng / sửa tin trong mini-app: khoá tính năng + đường về của mini-app. */
+function formScopeOf(cfg: MiniAppConfig): ListingFormScope {
+  const { paths } = cfg.miniApp;
+  return { feature: cfg.feature, homeHref: paths.home, manageHref: paths.manage, postHref: paths.post };
 }
 
 // ── Bộ lọc & tìm kiếm ─────────────────────────────────────────────────────────────────────────────────────────
@@ -85,7 +106,12 @@ export async function MiniAppSavedPage({ feature }: { feature: ListingFeature })
   const t = await getTranslations();
   return (
     <section className={FRAME}>
-      <MiniAppPageHeader cfg={cfg} eyebrow={t(cfg.miniApp.titleKey)} title={t('listing.mini_app.saved.title')} />
+      <MiniAppPageHeader
+        cfg={cfg}
+        eyebrow={t(cfg.miniApp.titleKey)}
+        title={t('listing.mini_app.saved.title')}
+        titleAside={<MiniAppSavedCount feature={feature} />}
+      />
       <div className={BODY}>
         <MiniAppSavedView feature={feature} />
       </div>
@@ -102,7 +128,21 @@ export async function MiniAppChatPage({ feature }: { feature: ListingFeature }) 
     <section className={FRAME}>
       <MiniAppPageHeader cfg={cfg} eyebrow={t(cfg.miniApp.titleKey)} title={t('listing.mini_app.tabs.chat')} />
       <div className="flex flex-col sm:overflow-hidden sm:rounded-lg sm:border sm:border-border">
-        <ConversationList selectedId={null} lockFeature={feature} emptyHref={cfg.path} bare />
+        <ConversationList selectedId={null} lockFeature={feature} emptyHref={cfg.path} threadBase={cfg.miniApp.paths.chat} bare />
+      </div>
+    </section>
+  );
+}
+
+export function MiniAppThreadPage({ feature, params }: { feature: ListingFeature; params: Promise<{ conversationId: string }> }) {
+  const { miniApp } = miniAppOf(feature);
+  return (
+    <section className={FRAME}>
+      <MiniAppTabStrip feature={feature} />
+      <div className="flex flex-col bg-surface max-sm:fixed max-sm:inset-0 max-sm:z-50 sm:h-chat-panel sm:overflow-hidden sm:rounded-lg sm:border sm:border-border">
+        <Suspense fallback={<ThreadSkeleton />}>
+          <ThreadFromParams params={params} inboxHref={miniApp.paths.chat} />
+        </Suspense>
       </div>
     </section>
   );
@@ -133,4 +173,53 @@ export async function MiniAppManagePage({ feature, searchParams }: { feature: Li
 async function ManageFromParams({ feature, searchParams }: { feature: ListingFeature; searchParams: Promise<RawParams> }) {
   const tab = parseFeatureTab((await searchParams).tab);
   return <MiniAppManageView feature={feature} tab={tab} />;
+}
+
+// ── Đăng tin ──────────────────────────────────────────────────────────────────────────────────────────────────
+
+const FORM_FRAME = 'mx-auto flex w-full max-w-3xl flex-col gap-4 pb-6 sm:px-4 sm:pt-6';
+
+export function MiniAppPostPage({ feature, searchParams }: { feature: ListingFeature; searchParams: Promise<RawParams> }) {
+  const cfg = miniAppOf(feature);
+  return (
+    <section className={FORM_FRAME}>
+      <MiniAppTabStrip feature={feature} />
+      <Suspense fallback={<ListingFormSkeleton />}>
+        <PostListingView searchParams={searchParams} scope={formScopeOf(cfg)} />
+      </Suspense>
+    </section>
+  );
+}
+
+// ── Sửa tin ───────────────────────────────────────────────────────────────────────────────────────────────────
+
+export function MiniAppEditPage({ feature, params }: { feature: ListingFeature; params: Promise<{ id: string }> }) {
+  const cfg = miniAppOf(feature);
+  return (
+    <section className={FORM_FRAME}>
+      <MiniAppTabStrip feature={feature} />
+      <Suspense fallback={<ListingFormSkeleton />}>
+        <EditListingView params={params} scope={formScopeOf(cfg)} />
+      </Suspense>
+    </section>
+  );
+}
+
+/** not-found của trang sửa tin trong mini-app: tin không có / không phải của tôi / thuộc tính năng khác → về "Quản lý tin". */
+export async function MiniAppEditNotFound({ feature }: { feature: ListingFeature }) {
+  const cfg = miniAppOf(feature);
+  const t = await getTranslations();
+  return (
+    <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-12">
+      <EmptyState
+        icon={SearchX}
+        title={t('listing.detail.not_found_title')}
+        action={
+          <Button asChild>
+            <Link href={cfg.miniApp.paths.manage}>{t('listing.mini_app.manage.title')}</Link>
+          </Button>
+        }
+      />
+    </section>
+  );
 }
