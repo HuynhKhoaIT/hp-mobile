@@ -3,6 +3,7 @@
 // features/group không import feature khác: route lấy config ở đây rồi truyền vào component của engine.
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { featureOfCategory, GROUP_KINDS, type GroupKind, type ListingCategory, type ListingFeature } from '@hp/shared';
+import type { AppThemeKey } from '@/ui';
 import type { GroupFeatureConfig } from './group/types';
 import { jobConfig } from './job/config';
 import { allListingsConfig } from './listing/config';
@@ -65,6 +66,15 @@ export function miniAppWebPage(path: string): MiniAppWebPage | null {
     return { feature, slug, page: MINI_APP_WEB_PAGES[sub] ?? 'index' };
   }
   return null;
+}
+
+/**
+ * Màu mini-app (appThemes) theo tham số `mini` của màn mở chồng từ mini-app (chi tiết tin, chat, đăng / sửa tin) — route bọc
+ * AppThemeProvider để màn đó giữ màu mini-app. Không phải mini-app / thiếu → null (màu super app).
+ */
+export function miniThemeOf(mini: string | undefined): AppThemeKey | null {
+  if (!mini || !hasMiniApp(mini)) return null;
+  return LISTING_CONFIGS_BY_SLUG[mini]?.color ?? null;
 }
 
 export function configOfCategory(category: ListingCategory): ListingFeatureConfig {

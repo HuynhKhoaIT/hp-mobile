@@ -1,6 +1,6 @@
 // Không phải màn hình: Expo Router gọi hàm này cho mọi link hệ thống mở app (Universal / App Link, scheme hoaphat://).
 // Link web tiếng Anh / Trung có tiền tố `/en/tin/{slug}`, `/zh/nhom/{slug}` còn route app chỉ có `tin/[slug]`,
-// `nhom/[slug]` → bỏ tiền tố; ngôn ngữ app vẫn theo cài đặt của người dùng. Link mini-app (`/pass-do`, `/en/pass-do/da-luu`…)
+// `nhom/[slug]` → bỏ tiền tố; ngôn ngữ app vẫn theo cài đặt của người dùng. Link mini-app (`/pass-do`, `/tro`, `/en/pass-do/da-luu`…)
 // → route `mini/[feature][/<tab>]` (trang con web → tab: miniAppWebPage), giữ `?site=`, `?category=` (→ `categories`),
 // `?shortcut=` làm bộ lọc đặt sẵn; `/pass-do/dang-tin` → luồng đăng của mini-app. Link khác giữ nguyên.
 // File này chạy ngoài cây provider: chỉ xử lý chuỗi, không import @/core (registry config thuần — không gọi server).

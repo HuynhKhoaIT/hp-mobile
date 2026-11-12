@@ -11,6 +11,9 @@
 // Back Android: tab khác → trang chủ mini-app (backBehavior firstRoute); trang chủ → rời mini-app (Stack gốc).
 // Realtime hộp thư: useInboxRealtime ở layout tab của super app (vẫn mount bên dưới); mở thẳng từ link thì số chưa đọc
 // làm mới theo staleTime.
+// Màu riêng của mini-app (appThemes[config.color] — Chợ Pass cam đất, Nhà trọ emerald): AppThemeProvider bọc các tab + thanh
+// tab (tab đang mở, nút / chữ primary, header gradient). Header gradient đậm ở cả hai giao diện → chữ thanh trạng thái sáng.
+// Icon tab trang chủ: config.miniApp.homeTabIcon (mặc định Store).
 import { unreadBadge } from '@hp/shared';
 import { Redirect, useGlobalSearchParams, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
@@ -22,9 +25,8 @@ import { LISTING_CONFIGS_BY_SLUG } from '@/features/configs';
 import { useHomeSite } from '@/features/home/hooks';
 import { useListingPreset, usePostListing } from '@/features/listing/hooks';
 import { isMiniAppConfig, type MiniAppFeatureConfig, MiniAppContext, useMiniSession } from '@/features/listing/miniApp';
-import { TabBar, useScheme } from '@/ui';
+import { AppThemeProvider, TabBar } from '@/ui';
 
-const ICONS = { index: Store, saved: Heart, chat: MessagesSquare, manage: Archive };
 /** Vị trí nút Đăng tin giữa các ô (sau Trang chủ, Đã lưu). */
 const POST_INDEX = 2;
 
@@ -38,7 +40,6 @@ export default function MiniAppLayout() {
 
 function MiniAppShell({ config }: { config: MiniAppFeatureConfig }) {
   const { t } = useTranslation('listing');
-  const scheme = useScheme();
   const focused = useIsFocused();
   const params = useGlobalSearchParams<{ site?: string; shortcut?: string; categories?: string }>();
   const preset = useListingPreset({ shortcut: params.shortcut, categories: params.categories });
@@ -46,6 +47,7 @@ function MiniAppShell({ config }: { config: MiniAppFeatureConfig }) {
   const homeSite = useHomeSite();
   const unread = useFeatureUnreadCount(config.key);
   const post = usePostListing(config.key, { mini: true });
+  const icons = { index: config.miniApp.homeTabIcon ?? Store, saved: Heart, chat: MessagesSquare, manage: Archive };
 
   return (
     <MiniAppContext.Provider
@@ -58,13 +60,14 @@ function MiniAppShell({ config }: { config: MiniAppFeatureConfig }) {
         changeSite: homeSite.change,
       }}
     >
+      <AppThemeProvider theme={config.color}>
       <Tabs
         backBehavior="firstRoute"
         screenOptions={{ headerShown: false }}
         tabBar={(props) => (
           <TabBar
             {...props}
-            icons={ICONS}
+            icons={icons}
             badges={{ chat: unreadBadge(unread) }}
             focusAlias={{ filter: 'index' }}
             action={{ index: POST_INDEX, label: t('mini_app.tabs.post'), icon: Plus, onPress: post }}
@@ -78,8 +81,9 @@ function MiniAppShell({ config }: { config: MiniAppFeatureConfig }) {
         <Tabs.Screen name="manage" options={{ title: t('mini_app.tabs.manage') }} />
         <Tabs.Screen name="filter" options={{ title: t('mini_app.filter.title') }} />
       </Tabs>
-      {/* Header xanh ở mọi tab: chữ / icon thanh trạng thái tương phản với primary. */}
-      {focused ? <StatusBar style={scheme === 'dark' ? 'dark' : 'light'} /> : null}
+      </AppThemeProvider>
+      {/* Header gradient đậm ở mọi tab (cả giao diện tối): chữ / icon thanh trạng thái sáng. */}
+      {focused ? <StatusBar style="light" /> : null}
     </MiniAppContext.Provider>
   );
 }

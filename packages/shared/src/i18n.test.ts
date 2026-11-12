@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { GROUP_STATUSES, LISTING_CATEGORIES, LISTING_FEATURES, LISTING_STATUSES } from './enums.ts';
 import { ATTRIBUTE_FIELDS } from './schemas/listing/fields.ts';
-import { LISTING_SORTS, PASS_PRICE_RANGES } from './schemas/listing/sort.ts';
+import { LISTING_SORTS, PASS_PRICE_RANGES, ROOM_PRICE_RANGES } from './schemas/listing/sort.ts';
 
 const load = (locale: string, ns = 'common') =>
   JSON.parse(readFileSync(join(import.meta.dirname, '..', 'i18n', locale, `${ns}.json`), 'utf8')) as Record<
@@ -30,7 +30,7 @@ for (const locale of ['vi', 'en', 'zh']) {
       }
     }
     for (const s of LISTING_SORTS) assert.ok(at(l, `sort.${s}`), `${locale}: thiếu sort.${s}`);
-    for (const r of PASS_PRICE_RANGES) assert.ok(at(l, `price_range.${r.key}`), `${locale}: thiếu price_range.${r.key}`);
+    for (const r of [...PASS_PRICE_RANGES, ...ROOM_PRICE_RANGES]) assert.ok(at(l, `price_range.${r.key}`), `${locale}: thiếu price_range.${r.key}`);
   });
 }
 

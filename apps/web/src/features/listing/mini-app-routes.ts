@@ -1,4 +1,4 @@
-// Đường dẫn của mini-app trong super app (Chợ Pass Đồ — /pass-do). Thuần, không React / lucide: dùng được cả ở proxy.ts
+// Đường dẫn của mini-app trong super app (Chợ Pass Đồ — /pass-do, Nhà Trọ — /tro). Thuần, không React / lucide: dùng được cả ở proxy.ts
 // (chặn trang cần đăng nhập), robots.ts và config tính năng. Trang chủ mini-app giữ nguyên đường dẫn danh sách (/pass-do —
 // SEO, link chia sẻ, deep link app không đổi); trang con là đoạn tiếng Việt cố định dưới nó:
 //   /bo-loc (bộ lọc & tìm kiếm — công khai) · /da-luu (tin đã lưu) · /tin-nhan (chat) · /quan-ly (quản lý tin) · /dang-tin
@@ -30,7 +30,7 @@ export const miniAppEditPath = (manage: string, id: string) => `${manage}/${id}/
 export const miniAppThreadPath = (chat: string, id: string) => `${chat}/${id}`;
 
 /** Tính năng đang chạy dạng mini-app (đường dẫn gốc). */
-export const MINI_APP_BASES: readonly ListingFeaturePath[] = [LISTING_FEATURE_PATHS.pass];
+export const MINI_APP_BASES: readonly ListingFeaturePath[] = [LISTING_FEATURE_PATHS.pass, LISTING_FEATURE_PATHS.room];
 
 /** Trang con cần đăng nhập (proxy.ts) và không cho thu thập (robots.ts). */
 export const MINI_APP_PRIVATE_PATHS: readonly string[] = MINI_APP_BASES.flatMap((base) => {

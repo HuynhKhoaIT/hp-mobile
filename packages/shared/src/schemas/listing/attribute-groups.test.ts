@@ -5,20 +5,32 @@ import { groupAttributeRows } from './attribute-groups.ts';
 
 const row = (key: string) => ({ field: { key }, value: 1 });
 
-test('groupAttributeRows: trọ tách Chi phí / Nội quy, còn lại ở lưới chung theo thứ tự gốc', () => {
-  const rows = ['area_m2', 'electricity_price', 'water_price', 'has_loft', 'curfew', 'max_people'].map(row);
+test('groupAttributeRows: trọ tách Chi phí / Tiện nghi / Nội quy, còn lại ở lưới chung theo thứ tự gốc', () => {
+  const rows = ['area_m2', 'electricity_price', 'water_price', 'deposit_months', 'has_loft', 'has_ac', 'curfew', 'max_people'].map(row);
   const { general, groups } = groupAttributeRows('room_rent', rows);
   assert.deepEqual(
     general.map((r) => r.field.key),
-    ['area_m2', 'has_loft'],
+    ['area_m2'],
   );
   assert.deepEqual(
     groups.map((g) => [g.key, g.rows.map((r) => r.field.key)]),
     [
-      ['costs', ['electricity_price', 'water_price']],
+      ['costs', ['electricity_price', 'water_price', 'deposit_months']],
+      ['amenities', ['has_loft', 'has_ac']],
       ['rules', ['curfew', 'max_people']],
     ],
   );
+});
+
+test('groupAttributeRows: loại trọ mới (nguyên căn, căn hộ / KTX) dùng cùng nhóm với phòng trọ', () => {
+  const rows = ['wifi_price', 'private_wc'].map(row);
+  for (const category of ['room_house', 'room_apartment'] as const) {
+    const { groups } = groupAttributeRows(category, rows);
+    assert.deepEqual(
+      groups.map((g) => g.key),
+      ['costs', 'amenities'],
+    );
+  }
 });
 
 test('groupAttributeRows: khối không có giá trị bị bỏ; việc làm có khối chữ Yêu cầu', () => {

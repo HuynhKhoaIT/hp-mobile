@@ -41,7 +41,7 @@ import { formatDate } from '@/lib/format';
 import { listingShareUrl } from '@/lib/urls';
 import { toast } from '@/ui';
 import { useOpenConversation } from '@/features/chat/hooks';
-import { LISTING_ROUTE_SLUG, openPostForm, openPostPicker } from './navigation';
+import { LISTING_ROUTE_SLUG, type MiniSlug, openPostForm, openPostPicker } from './navigation';
 import type { ListingFeatureConfig, ListingQuickFilter } from './types';
 
 /** Giá trị chip "Tất cả" / "Mọi khu" / "Mọi khoảng cách" (không lọc). Mã category / site không bao giờ rỗng. */
@@ -313,9 +313,12 @@ export function usePostListing(feature?: ListingFeatureConfig['key'], opts: { mi
   return () => requireAuth(() => openPostPicker(preset, { mini }));
 }
 
-/** Đăng tin vào thẳng một danh mục (khối mời đăng tin — config.banner): bắt đăng nhập trước → form bước 1. */
+/**
+ * Đăng tin vào thẳng một danh mục (khối mời đăng tin — config.banner, khối mời chủ trọ của mini-app): bắt đăng nhập trước →
+ * form bước 1. `mini`: luồng đăng của mini-app (xong về "Quản lý tin" của mini-app, giữ màu mini-app).
+ */
 export function usePostListingIn() {
-  return (category: ListingCategory) => requireAuth(() => openPostForm(category));
+  return (category: ListingCategory, opts: { mini?: MiniSlug } = {}) => requireAuth(() => openPostForm(category, opts));
 }
 
 /** Nhắn tin với người đăng: khách → đăng nhập; mở (hoặc lấy lại) hội thoại rồi vào màn chat (features/chat). */
@@ -529,3 +532,18 @@ export function useListingMatches(listing: Pick<PublicListing, 'id'>, enabled: b
   return useLostFoundMatches(listing.id, { enabled });
 }
 
+
+/**
+ * Mở ứng dụng bản đồ của máy tại toạ độ công khai của tin (đã làm tròn ~300 m ở view — không lộ vị trí chính xác): iOS Apple
+ * Maps (`maps:`), Android `geo:`; không mở được → Google Maps trên web. Khối "Vị trí & khoảng cách" ở chi tiết.
+ */
+export function useOpenMap() {
+  const errorText = useErrorText();
+  return (point: { lat: number; lng: number }) => {
+    const q = `${point.lat},${point.lng}`;
+    const native = Platform.OS === 'ios' ? `maps:?q=${q}` : `geo:${q}?q=${q}`;
+    Linking.openURL(native)
+      .catch(() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${q}`))
+      .catch(() => toast.show(errorText('unknown'), 'danger'));
+  };
+}

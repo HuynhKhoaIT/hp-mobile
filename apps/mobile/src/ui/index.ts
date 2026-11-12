@@ -19,6 +19,8 @@ export { EmptyState, type EmptyStateProps } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export { Fab, type FabProps } from './Fab';
 export { FilterBar, type FilterBarProps, type FilterOption } from './FilterBar';
+export { GradientPromo, type GradientPromoProps } from './GradientPromo';
+export { GradientSurface, type GradientSurfaceProps } from './GradientSurface';
 export { GROUP_STATUS_TONE, GroupCard, type GroupCardProps, SkeletonGroupCard, SkeletonGroupDetail, useGroupTexts } from './GroupCard';
 export { Header, type HeaderProps } from './Header';
 export {
@@ -39,7 +41,14 @@ export { ImageGallery, type ImageGalleryProps } from './ImageGallery';
 export { ImagePicker, type ImagePickerItem, type ImagePickerItemStatus, type ImagePickerProps } from './ImagePicker';
 export { Input, type InputProps } from './Input';
 export { Col, Divider, Row, Spacer, type SpaceStep } from './Layout';
-export { ListingCard, type ListingCardDisplay, type ListingCardLayout, type ListingCardProps, ListingCover } from './ListingCard';
+export {
+  ListingCard,
+  type ListingCardDisplay,
+  type ListingCardLayout,
+  type ListingCardProps,
+  type ListingCardVariant,
+  ListingCover,
+} from './ListingCard';
 export { LogoMark } from './LogoMark';
 export { MenuItem, type MenuItemProps } from './MenuItem';
 export { MiniAppHeader, type MiniAppHeaderProps } from './MiniAppHeader';
@@ -70,4 +79,15 @@ export { Ticker, type TickerProps } from './Ticker';
 export { Text, type TextProps, type TextTone, type TextVariant, type TextWeight } from './Text';
 export { toast, ToastHost, type ToastTone } from './Toast';
 export { ToggleRow, type ToggleRowProps } from './ToggleRow';
-export { useReducedMotion, useScheme, useTheme, type Scheme, type Theme } from './theme';
+export {
+  type AppThemeKey,
+  AppThemeProvider,
+  type AppThemeProviderProps,
+  OnGradientScope,
+  useAppThemeKey,
+  useReducedMotion,
+  useScheme,
+  useTheme,
+  type Scheme,
+  type Theme,
+} from './theme';

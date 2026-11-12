@@ -1,4 +1,5 @@
-// Trang con của mini-app (dùng chung mọi tính năng có config.miniApp — route chỉ truyền `feature`):
+// Trang con của mini-app (dùng chung mọi tính năng có config.miniApp — route chỉ truyền `feature`). Khung mỗi trang gắn
+// data-app-theme (config.miniApp.theme) → header gradient, dải tab, form, khung chat theo màu mini-app.
 // - MiniAppFilterPage (/…/bo-loc, công khai): header (← trang chủ, "Bộ lọc & tìm kiếm", "Đặt lại") + form GET. Khung tĩnh có
 //   form trống (fallback của <Suspense>, khu cache theo giờ); phần đọc searchParams (điền sẵn bộ lọc đang dùng) theo request.
 // - MiniAppSavedPage (/…/da-luu), MiniAppChatPage (/…/tin-nhan), MiniAppManagePage (/…/quan-ly?tab=): cần đăng nhập
@@ -59,7 +60,7 @@ export async function MiniAppFilterPage({ feature, searchParams }: { feature: Li
   const cfg = miniAppOf(feature);
   const t = await getTranslations();
   return (
-    <section className={FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FRAME}>
       <MiniAppPageHeader
         cfg={cfg}
         title={t('listing.mini_app.filter.title')}
@@ -105,7 +106,7 @@ export async function MiniAppSavedPage({ feature }: { feature: ListingFeature })
   const cfg = miniAppOf(feature);
   const t = await getTranslations();
   return (
-    <section className={FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FRAME}>
       <MiniAppPageHeader
         cfg={cfg}
         eyebrow={t(cfg.miniApp.titleKey)}
@@ -125,7 +126,7 @@ export async function MiniAppChatPage({ feature }: { feature: ListingFeature }) 
   const cfg = miniAppOf(feature);
   const t = await getTranslations();
   return (
-    <section className={FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FRAME}>
       <MiniAppPageHeader cfg={cfg} eyebrow={t(cfg.miniApp.titleKey)} title={t('listing.mini_app.tabs.chat')} />
       <div className="flex flex-col sm:overflow-hidden sm:rounded-lg sm:border sm:border-border">
         <ConversationList selectedId={null} lockFeature={feature} emptyHref={cfg.path} threadBase={cfg.miniApp.paths.chat} bare />
@@ -137,7 +138,7 @@ export async function MiniAppChatPage({ feature }: { feature: ListingFeature }) 
 export function MiniAppThreadPage({ feature, params }: { feature: ListingFeature; params: Promise<{ conversationId: string }> }) {
   const { miniApp } = miniAppOf(feature);
   return (
-    <section className={FRAME}>
+    <section data-app-theme={miniApp.theme} className={FRAME}>
       <MiniAppTabStrip feature={feature} />
       <div className="flex flex-col bg-surface max-sm:fixed max-sm:inset-0 max-sm:z-50 sm:h-chat-panel sm:overflow-hidden sm:rounded-lg sm:border sm:border-border">
         <Suspense fallback={<ThreadSkeleton />}>
@@ -154,7 +155,7 @@ export async function MiniAppManagePage({ feature, searchParams }: { feature: Li
   const cfg = miniAppOf(feature);
   const t = await getTranslations();
   return (
-    <section className={FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FRAME}>
       <MiniAppPageHeader
         cfg={cfg}
         eyebrow={t(cfg.miniApp.titleKey)}
@@ -182,7 +183,7 @@ const FORM_FRAME = 'mx-auto flex w-full max-w-3xl flex-col gap-4 pb-6 sm:px-4 sm
 export function MiniAppPostPage({ feature, searchParams }: { feature: ListingFeature; searchParams: Promise<RawParams> }) {
   const cfg = miniAppOf(feature);
   return (
-    <section className={FORM_FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FORM_FRAME}>
       <MiniAppTabStrip feature={feature} />
       <Suspense fallback={<ListingFormSkeleton />}>
         <PostListingView searchParams={searchParams} scope={formScopeOf(cfg)} />
@@ -196,7 +197,7 @@ export function MiniAppPostPage({ feature, searchParams }: { feature: ListingFea
 export function MiniAppEditPage({ feature, params }: { feature: ListingFeature; params: Promise<{ id: string }> }) {
   const cfg = miniAppOf(feature);
   return (
-    <section className={FORM_FRAME}>
+    <section data-app-theme={cfg.miniApp.theme} className={FORM_FRAME}>
       <MiniAppTabStrip feature={feature} />
       <Suspense fallback={<ListingFormSkeleton />}>
         <EditListingView params={params} scope={formScopeOf(cfg)} />
@@ -210,7 +211,7 @@ export async function MiniAppEditNotFound({ feature }: { feature: ListingFeature
   const cfg = miniAppOf(feature);
   const t = await getTranslations();
   return (
-    <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-12">
+    <section data-app-theme={cfg.miniApp.theme} className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-12">
       <EmptyState
         icon={SearchX}
         title={t('listing.detail.not_found_title')}

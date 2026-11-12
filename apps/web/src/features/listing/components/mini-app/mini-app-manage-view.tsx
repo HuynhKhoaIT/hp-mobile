@@ -298,7 +298,7 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
 
   const stats: { key: string; label: string; value: number | undefined; tone: string }[] = [
     { key: 'active', label: t('listing.mini_app.manage.stat_active'), value: summary.data?.active, tone: 'text-primary' },
-    { key: 'sold', label: t('listing.mini_app.manage.stat_sold'), value: summary.data?.sold, tone: 'text-service-pass' },
+    { key: 'sold', label: t('listing.mini_app.manage.stat_sold'), value: summary.data?.sold, tone: cfg.tone.fg },
     { key: 'views', label: t('listing.mini_app.manage.stat_views'), value: summary.data?.views, tone: 'text-primary' },
   ];
 

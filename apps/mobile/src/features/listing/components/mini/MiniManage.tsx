@@ -37,7 +37,7 @@ import {
   useTheme,
 } from '@/ui';
 import { usePostListing } from '../../hooks';
-import { useMiniApp } from '../../miniApp';
+import { useMiniApp, useMiniT } from '../../miniApp';
 import { ListingActionsSheet, MyListingRowSkeleton, useMyListingActions } from '../MyListingRow';
 import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniManageRow } from './MiniManageRow';
@@ -54,6 +54,7 @@ function visibleRows(items: MyListing[], query: string, sort: ManageSort) {
 
 export function MiniManage({ tab: requestedTab, requestKey }: { tab?: FeatureListingsTab; requestKey?: string } = {}) {
   const { t } = useTranslation('listing');
+  const mt = useMiniT();
   const { config } = useMiniApp();
   const session = useSession();
   const signedIn = !!session.userId;
@@ -68,15 +69,15 @@ export function MiniManage({ tab: requestedTab, requestKey }: { tab?: FeatureLis
         <MyListingRowSkeleton />
       </Col>
     );
-  } else if (!signedIn) body = <SignInPrompt description={t('mini_app.manage.signed_out_body')} />;
+  } else if (!signedIn) body = <SignInPrompt description={mt('manage.signed_out_body')} />;
   else body = <ManageList summary={summary} requestedTab={requestedTab} requestKey={requestKey} />;
 
   return (
     <>
       <MiniTabHeader
         eyebrow={t(config.miniApp.titleKey)}
-        title={t('mini_app.manage.title')}
-        badge={signedIn && active !== undefined ? t('mini_app.manage.active_count', { count: active }) : undefined}
+        title={mt('manage.title')}
+        badge={signedIn && active !== undefined ? mt('manage.active_count', { count: active }) : undefined}
       />
       {body}
     </>
@@ -95,6 +96,7 @@ function ManageList({
   requestKey?: string;
 }) {
   const { t } = useTranslation('listing');
+  const mt = useMiniT();
   const { space } = useTheme();
   const { config, sites } = useMiniApp();
   const [tab, setTab] = useState<FeatureListingsTab>(requestedTab ?? 'active');
@@ -130,13 +132,13 @@ function ManageList({
         onChange={setTab}
         options={FEATURE_LISTINGS_TABS.map((value) => ({
           value,
-          label: t(`mini_app.manage.tab_${value}`),
+          label: mt(`manage.tab_${value}`),
           count: summary.data?.[value],
         }))}
       />
       <View className="flex-row items-center gap-2">
         <View className="flex-1">
-          <SearchBar value={query} onChangeText={setQuery} onSubmit={setQuery} placeholder={t('mini_app.manage.search_placeholder')} />
+          <SearchBar value={query} onChangeText={setQuery} onSubmit={setQuery} placeholder={mt('manage.search_placeholder')} />
         </View>
         <Select
           trigger="chip"
@@ -145,7 +147,7 @@ function ManageList({
           neutralValue="newest"
           options={[
             { value: 'newest', label: t('sort.newest') },
-            { value: 'views', label: t('mini_app.manage.sort_views') },
+            { value: 'views', label: mt('manage.sort_views') },
           ]}
           onChange={setSort}
         />
@@ -178,8 +180,8 @@ function ManageList({
   ) : rows.length === 0 && !list.hasNextPage ? (
     <EmptyState
       icon={Package}
-      title={t(`mini_app.manage.empty_${tab}_title`)}
-      description={t(`mini_app.manage.empty_${tab}_body`)}
+      title={mt(`manage.empty_${tab}_title`)}
+      description={mt(`manage.empty_${tab}_body`)}
       action={{ label: t('list.post_cta'), onPress: post }}
     />
   ) : null;
@@ -229,6 +231,7 @@ function ManageList({
 /** Thẻ hồ sơ: avatar + tên + huy hiệu + đánh giá + khu làm việc (profile.site) → 3 số liệu của tính năng → mẹo đăng tin. */
 function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListingsSummary> }) {
   const { t, i18n } = useTranslation('listing');
+  const mt = useMiniT();
   const { sites } = useMiniApp();
   const me = useMyProfile();
   const profile = me.data;
@@ -297,16 +300,16 @@ function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListing
           size="md"
           className="rounded-lg bg-surface-2 py-3"
           items={[
-            { value: formatNumber(s.active), label: t('mini_app.manage.stat_active'), tone: 'primary' },
-            { value: formatNumber(s.sold), label: t('mini_app.manage.stat_sold') },
-            { value: formatNumber(s.views), label: t('mini_app.manage.stat_views'), tone: 'primary' },
+            { value: formatNumber(s.active), label: mt('manage.stat_active'), tone: 'primary' },
+            { value: formatNumber(s.sold), label: mt('manage.stat_sold') },
+            { value: formatNumber(s.views), label: mt('manage.stat_views'), tone: 'primary' },
           ]}
         />
       ) : (
         <ErrorState compact code={summary.error?.code} onRetry={() => void summary.refetch()} />
       )}
 
-      <Notice tone="warning" icon={Zap} text={t('mini_app.manage.tip')} />
+      <Notice tone="warning" icon={Zap} text={mt('manage.tip')} />
     </Card>
   );
 }

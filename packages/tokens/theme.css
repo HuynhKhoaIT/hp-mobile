@@ -18,16 +18,18 @@
   --color-on-accent: #FFFFFF;
   --color-service-pass: #D9692E;
   --color-service-pass-soft: #FDF0E6;
-  --color-service-room: #7C5CC4;
-  --color-service-room-soft: #F2EEFB;
-  --color-service-job: #2E9461;
-  --color-service-job-soft: #E8F5EE;
+  --color-service-room: #047857;
+  --color-service-room-soft: #E7F6EF;
+  --color-service-job: #4F46E5;
+  --color-service-job-soft: #EEF0FF;
   --color-service-ride: #1B8A86;
   --color-service-ride-soft: #E4F4F3;
   --color-service-sport: #D2555A;
   --color-service-sport-soft: #FCECEC;
   --color-service-lost-found: #A87A00;
   --color-service-lost-found-soft: #FBF3D9;
+  --color-app-from: #0B4A9C;
+  --color-app-to: #1E6FD9;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -102,10 +104,10 @@
   --color-on-accent: #FFFFFF;
   --color-service-pass: #F0A070;
   --color-service-pass-soft: #3A2A20;
-  --color-service-room: #B39DEB;
-  --color-service-room-soft: #2C2640;
-  --color-service-job: #6CC79A;
-  --color-service-job-soft: #1E3229;
+  --color-service-room: #34D399;
+  --color-service-room-soft: #0F2E24;
+  --color-service-job: #A5B4FC;
+  --color-service-job-soft: #1E1F45;
   --color-service-ride: #5FC4BF;
   --color-service-ride-soft: #1A3332;
   --color-service-sport: #EE8A8D;
@@ -113,4 +115,90 @@
   --color-service-lost-found: #E6BE55;
   --color-service-lost-found-soft: #3A3220;
   --color-shimmer: rgba(148,163,184,0.14);
+}
+
+/* Mini-app (Chợ Pass, Nhà trọ, …): khung gắn data-app-theme="<key>" — màu chủ đạo riêng (appThemes). */
+[data-app-theme='pass'] {
+  --color-primary: #C2410C;
+  --color-primary-light: #FFF1E8;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #9A3412;
+  --color-app-to: #C2410C;
+}
+[data-app-theme='room'] {
+  --color-primary: #047857;
+  --color-primary-light: #E7F6EF;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #065F46;
+  --color-app-to: #059669;
+}
+[data-app-theme='job'] {
+  --color-primary: #4338CA;
+  --color-primary-light: #EEF0FF;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #312E81;
+  --color-app-to: #4F46E5;
+}
+[data-app-theme='ride'] {
+  --color-primary: #0F766E;
+  --color-primary-light: #E6F6F4;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #134E4A;
+  --color-app-to: #0D9488;
+}
+[data-app-theme='sport'] {
+  --color-primary: #BE123C;
+  --color-primary-light: #FFEEF1;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #9F1239;
+  --color-app-to: #E11D48;
+}
+[data-app-theme='lost-found'] {
+  --color-primary: #B45309;
+  --color-primary-light: #FFF6E0;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #92400E;
+  --color-app-to: #D97706;
+}
+.dark [data-app-theme='pass'] {
+  --color-primary: #FB923C;
+  --color-primary-light: #3A2414;
+  --color-on-primary: #0B1120;
+  --color-app-from: #7C2D12;
+  --color-app-to: #9A3412;
+}
+.dark [data-app-theme='room'] {
+  --color-primary: #34D399;
+  --color-primary-light: #0F2E24;
+  --color-on-primary: #0B1120;
+  --color-app-from: #064E3B;
+  --color-app-to: #065F46;
+}
+.dark [data-app-theme='job'] {
+  --color-primary: #818CF8;
+  --color-primary-light: #1E1F45;
+  --color-on-primary: #0B1120;
+  --color-app-from: #1E1B4B;
+  --color-app-to: #312E81;
+}
+.dark [data-app-theme='ride'] {
+  --color-primary: #2DD4BF;
+  --color-primary-light: #0F2E2C;
+  --color-on-primary: #0B1120;
+  --color-app-from: #134E4A;
+  --color-app-to: #115E59;
+}
+.dark [data-app-theme='sport'] {
+  --color-primary: #FB7185;
+  --color-primary-light: #3A1620;
+  --color-on-primary: #0B1120;
+  --color-app-from: #881337;
+  --color-app-to: #9F1239;
+}
+.dark [data-app-theme='lost-found'] {
+  --color-primary: #FBBF24;
+  --color-primary-light: #3A2A10;
+  --color-on-primary: #0B1120;
+  --color-app-from: #78350F;
+  --color-app-to: #92400E;
 }

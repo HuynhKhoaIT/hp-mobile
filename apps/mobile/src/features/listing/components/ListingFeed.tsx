@@ -4,6 +4,8 @@
 // `display.bookmark` → thẻ có nút tim lưu tin (ListingCardItem).
 // `headerAlways` (trang chủ mini-app): khối `header` (ô tìm, chip lọc…) luôn hiện — skeleton / lỗi / rỗng nằm dưới header
 // trong cùng danh sách (ListEmptyComponent), không thay cả màn. `footer`: khối cuối danh sách (vd dòng miễn trừ).
+// `layout`: thay config.card.variant (vd trang chủ mini-app Nhà trọ: hàng một cột); `renderCard`: thẻ riêng cho một vị trí
+// (vd thẻ nổi bật đầu danh sách — trả null → thẻ thường); `mini`: mở chi tiết trong mini-app (giữ màu mini-app).
 import type { PublicListing } from '@hp/core';
 import type { ListingCategory } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
@@ -15,13 +17,14 @@ import {
   EmptyState,
   type EmptyStateProps,
   ErrorState,
+  type ListingCardLayout,
   SERVICE,
   SkeletonListingCard,
   StaggerItem,
   Text,
   useTheme,
 } from '@/ui';
-import { openListing } from '../navigation';
+import { type MiniSlug, openListing } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 import { ListingCardItem } from './ListingCardItem';
 
@@ -56,6 +59,12 @@ export type ListingFeedProps = {
    * theo danh sách) chạm mép màn thay vì bị ScrollView cắt; không lề trên (header xanh sát dải trạng thái).
    */
   gutter?: boolean;
+  /** Bố cục thẻ thay config.card.variant. */
+  layout?: ListingCardLayout;
+  /** Thẻ riêng theo vị trí (null → thẻ thường). */
+  renderCard?: (item: PublicListing, index: number) => ReactNode | null;
+  /** Mở chi tiết từ mini-app (tham số `mini` — màu + nút chủ tin ở lại mini-app). */
+  mini?: MiniSlug;
 };
 
 /** Số item còn lại thì tải trang tiếp (.claude/rules/mobile-performance.md). */
@@ -65,11 +74,12 @@ export function ListingFeed(p: ListingFeedProps) {
   const { t } = useTranslation('listing');
   const { height } = useWindowDimensions();
   const { space } = useTheme();
-  const grid = p.config.card.variant === 'grid';
+  const variant = p.layout ?? p.config.card.variant;
+  const grid = variant === 'grid';
   const columns = grid ? 2 : 1;
 
   const state: ReactNode = p.isLoading ? (
-    <SkeletonListingCard count={6} layout={p.config.card.variant} columns={columns} />
+    <SkeletonListingCard count={6} layout={variant} columns={columns} />
   ) : p.isError && p.items.length === 0 ? (
     <ErrorState code={p.errorCode} onRetry={p.refetch} />
   ) : p.items.length === 0 ? (
@@ -96,7 +106,7 @@ export function ListingFeed(p: ListingFeedProps) {
 
   const more = state ? null : p.isFetchingNextPage ? (
     <View className="pb-3">
-      <SkeletonListingCard count={columns} layout={p.config.card.variant} columns={columns} />
+      <SkeletonListingCard count={columns} layout={variant} columns={columns} />
     </View>
   ) : p.isFetchNextPageError ? (
     <View className="items-center py-4">
@@ -123,12 +133,14 @@ export function ListingFeed(p: ListingFeedProps) {
       keyExtractor={(item) => item.id}
       renderItem={({ item, index }) => (
         <StaggerItem index={index} className={grid ? (index % 2 === 0 ? 'pb-3 pr-1.5' : 'pb-3 pl-1.5') : 'pb-3'}>
-          <ListingCardItem
-            listing={item}
-            layout={p.config.card.variant}
-            display={(p.configOf?.(item.category) ?? p.config).card.display}
-            onPress={() => openListing(item.id)}
-          />
+          {p.renderCard?.(item, index) ?? (
+            <ListingCardItem
+              listing={item}
+              layout={variant}
+              display={(p.configOf?.(item.category) ?? p.config).card.display}
+              onPress={() => openListing(item.id, { mini: p.mini })}
+            />
+          )}
         </StaggerItem>
       )}
       onEndReached={loadMore}

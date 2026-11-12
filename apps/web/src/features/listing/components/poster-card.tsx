@@ -13,7 +13,16 @@ import { Link } from '@/i18n/navigation';
 import { profileAvatarUrl } from '@/lib/images';
 import { BarHeading } from './safety-tip';
 
-export function PosterCard({ listing, locale }: { listing: PublicListing; locale: Locale }) {
+export function PosterCard({
+  listing,
+  locale,
+  title,
+}: {
+  listing: PublicListing;
+  locale: Locale;
+  /** Tiêu đề khối (config.detail.posterTitleKey — vd "Thông tin chủ trọ"); thiếu → "Người đăng". */
+  title?: string;
+}) {
   const t = useTranslations();
   const avatar = profileAvatarUrl(listing.owner_avatar_url);
   const name = listing.owner_name ?? '';
@@ -30,7 +39,7 @@ export function PosterCard({ listing, locale }: { listing: PublicListing; locale
   return (
     <section aria-labelledby="poster-heading" className="flex flex-col gap-2">
       <BarHeading id="poster-heading" tone="primary">
-        {t('listing.detail.posted_by')}
+        {title ?? t('listing.detail.posted_by')}
       </BarHeading>
       <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-card">
         <div className="flex items-center gap-3">

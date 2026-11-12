@@ -55,7 +55,7 @@ function refineListing(v: Checked, ctx: z.RefinementCtx) {
     }
   }
   // Trọ cần ≥ LISTING_IMAGES.roomMin ảnh khi đăng (nháp thì chưa) — trigger trg_listings_images_min kiểm lại ở DB.
-  if (v.status === 'active' && v.images && (v.category === 'room_rent' || v.category === 'room_share')
+  if (v.status === 'active' && v.images && featureOfCategory(v.category) === 'room'
       && v.images.length < LISTING_IMAGES.roomMin) {
     ctx.addIssue({ code: 'custom', path: ['images'], message: 'images_min' });
   }

@@ -119,7 +119,17 @@
     "sport_type": "Môn",
     "tool_type": "Loại dụng cụ",
     "baby_type": "Loại đồ",
-    "age_range": "Độ tuổi"
+    "age_range": "Độ tuổi",
+    "wifi_price": "Wifi",
+    "trash_price": "Vệ sinh, rác",
+    "deposit_months": "Tiền cọc",
+    "has_ac": "Điều hoà",
+    "private_wc": "WC riêng",
+    "has_kitchen": "Bếp riêng",
+    "has_wifi": "Có wifi",
+    "has_camera": "Camera an ninh",
+    "free_hours": "Giờ giấc tự do",
+    "no_landlord": "Không chung chủ"
   },
   "attr_value": {
     "condition": {
@@ -224,7 +234,8 @@
     "months_other": "{{count}} tháng",
     "people_one": "{{count}} người",
     "people_other": "{{count}} người",
-    "per_kwh": "{{price}}/kWh"
+    "per_kwh": "{{price}}/kWh",
+    "per_month": "{{price}}/tháng"
   },
   "owner_badge": {
     "phone": "Đã xác minh SĐT",
@@ -321,7 +332,9 @@
       "pass_sport": "Giày đá bóng, vợt, dụng cụ tập…",
       "pass_tools": "Máy khoan, đồ nghề sửa xe, đồ điện…",
       "pass_baby": "Xe đẩy, đồ sơ sinh, đồ chơi…",
-      "pass_other": "Sách, nhạc cụ, cây cảnh…"
+      "pass_other": "Sách, nhạc cụ, cây cảnh…",
+      "room_house": "Cho tổ thợ, gia đình",
+      "room_apartment": "Căn hộ mini, ký túc xá, dịch vụ trọn gói"
     },
     "photos_tip": {
       "pass": "Ảnh rõ nét, đủ các mặt giúp đồ bán nhanh hơn.",
@@ -487,7 +500,8 @@
     "costs": "Chi phí",
     "rules": "Nội quy",
     "contact": "Người phụ trách",
-    "requirements": "Yêu cầu"
+    "requirements": "Yêu cầu",
+    "amenities": "Tiện nghi"
   },
   "availability": {
     "pass": "Còn hàng",
@@ -512,7 +526,9 @@
     "job_main": "Việc chính",
     "job_parttime": "Làm thêm",
     "lost": "Làm mất",
-    "found": "Nhặt được"
+    "found": "Nhặt được",
+    "room_house": "Nguyên căn",
+    "room_apartment": "Căn hộ / KTX"
   },
   "sort": {
     "label": "Sắp xếp",
@@ -526,7 +542,11 @@
     "under_500k": "Dưới 500 nghìn",
     "500k_2m": "500 nghìn – 2 triệu",
     "2m_5m": "2 – 5 triệu",
-    "over_5m": "Trên 5 triệu"
+    "over_5m": "Trên 5 triệu",
+    "under_1m": "Dưới 1 triệu",
+    "1m_2m": "1 – 2 triệu",
+    "2m_3m": "2 – 3 triệu",
+    "over_3m": "Trên 3 triệu"
   },
   "feature_home": {
     "categories_title": "Danh mục",
@@ -543,14 +563,17 @@
     "back_super": "{{app}} Super App",
     "back_super_a11y": "Quay lại {{app}}",
     "title": {
-      "pass": "Chợ Pass Đồ"
+      "pass": "Chợ Pass Đồ",
+      "room": "Nhà Trọ Dung Quất"
     },
     "subtitle": {
-      "pass": "Cộng đồng thợ & công nhân mua bán tiện ích"
+      "pass": "Cộng đồng thợ & công nhân mua bán tiện ích",
+      "room": "Tìm phòng trọ, nhà nguyên căn, ở ghép gần nhà máy"
     },
     "tabs": {
       "home": {
-        "pass": "Chợ Pass"
+        "pass": "Chợ Pass",
+        "room": "Tìm trọ"
       },
       "saved": "Đã lưu",
       "post": "Đăng tin",
@@ -654,6 +677,67 @@
       "apply": "Áp dụng",
       "active_count_one": "{{count}} bộ lọc",
       "active_count_other": "{{count}} bộ lọc"
+    },
+    "room": {
+      "badge": "Nhà trọ KKT",
+      "near_label": "Gần bạn",
+      "categories_title": "Danh mục tìm kiếm",
+      "tile_ac": "Phòng máy lạnh",
+      "tile_ac_hint": "Có điều hoà",
+      "tile_near": "Gần cổng KKT",
+      "tile_near_hint": "< 2 km đi ca",
+      "trust_title": "Thuê trọ an tâm",
+      "trust_body": "Xem phòng tận nơi trước khi đặt cọc. Không chuyển tiền cho người chưa gặp.",
+      "list_title": "Phòng trọ giá tốt ca kíp",
+      "list_subtitle": "Mới đăng quanh khu làm việc của bạn",
+      "landlord_eyebrow": "Dành cho chủ nhà trọ",
+      "landlord_title": "Chủ trọ có phòng trống cần cho thuê?",
+      "landlord_body": "Đăng tin miễn phí cho anh em công nhân, kỹ sư quanh khu tìm tới.",
+      "landlord_cta": "Đăng tin phòng",
+      "photos": "{{count}} ảnh",
+      "call": "Gọi",
+      "chat": "Nhắn tin",
+      "detail": "Chi tiết",
+      "saved": {
+        "tab_active": "Còn trống ({{count}})",
+        "tab_inactive": "Đã cho thuê ({{count}})",
+        "sold_badge": "Đã cho thuê",
+        "inactive_hint": "Phòng này đã có người thuê",
+        "find_similar": "Tìm phòng tương tự",
+        "tip_title": "Mẹo thuê trọ an toàn",
+        "tip_body": "Xem phòng tận nơi, đọc kỹ hợp đồng; không chuyển cọc trước khi gặp chủ trọ."
+      },
+      "manage": {
+        "active_count_one": "{{count}} phòng đang cho thuê",
+        "active_count_other": "{{count}} phòng đang cho thuê",
+        "tab_active": "Đang cho thuê",
+        "tab_sold": "Đã cho thuê",
+        "stat_sold": "Đã cho thuê",
+        "mark_sold": "Đã cho thuê",
+        "search_placeholder": "Tìm theo tiêu đề, mã tin…",
+        "empty_active_title": "Chưa có phòng đang cho thuê",
+        "empty_active_body": "Đăng phòng đầu tiên — cần ít nhất 3 ảnh, giá thuê và diện tích.",
+        "empty_sold_title": "Chưa có phòng nào cho thuê",
+        "empty_sold_body": "Bấm \"Đã cho thuê\" khi đã có người thuê để không bị hỏi thêm."
+      },
+      "filter": {
+        "category_title": "Loại phòng"
+      }
+    },
+    "room_detail": {
+      "title": "Chi tiết phòng trọ",
+      "vacant": "Đang cho thuê",
+      "updated": "Cập nhật {{time}}",
+      "deposit": "Cọc {{count}} tháng",
+      "costs_title": "Bảng chi phí sinh hoạt",
+      "free": "Miễn phí",
+      "distance_title": "Vị trí & khoảng cách",
+      "distance_value": "{{distance}} · ~{{minutes}} phút xe máy",
+      "map_cta": "Xem bản đồ & chỉ đường",
+      "amenities_title": "Tiện nghi",
+      "landlord_title": "Thông tin chủ trọ",
+      "rules_title": "Mô tả & nội quy",
+      "contact_cta": "Liên hệ hẹn xem phòng"
     }
   }
 }

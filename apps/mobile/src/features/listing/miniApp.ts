@@ -8,6 +8,7 @@
 // Lịch sử tìm kiếm: 8 từ khoá gần nhất mỗi tính năng, persist MMKV (chỉ trên máy).
 import type { ListingFeature } from '@hp/shared';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { kv, storage } from '@/core/storage';
@@ -46,6 +47,24 @@ export function useMiniApp(): MiniAppContextValue {
   const value = useContext(MiniAppContext);
   if (!value) throw new Error('useMiniApp must be used inside mini/[feature] layout');
   return value;
+}
+
+/**
+ * Chữ của các tab mini-app dùng chung (Đã lưu, Quản lý tin, Bộ lọc…): `key` = '<khối>.<key>' (vd 'saved.tab_active').
+ * Có key riêng `listing:mini_app.<slug>.<khối>.<key>` (vd Nhà trọ "Còn trống" thay "Đang bán") → dùng; không thì
+ * `listing:mini_app.<khối>.<key>`. Ngoài mini-app (không có ngữ cảnh) → key chung.
+ */
+export function useMiniT() {
+  const { t, i18n } = useTranslation('listing');
+  const slug = useContext(MiniAppContext)?.config.slug;
+  return useCallback(
+    (key: string, opts?: Record<string, unknown>): string => {
+      const own = slug ? `mini_app.${slug}.${key}` : null;
+      if (own && i18n.exists(`listing:${own}`, opts)) return t(own, opts);
+      return t(`mini_app.${key}`, opts);
+    },
+    [t, i18n, slug],
+  );
 }
 
 // ── Phiên bộ lọc ─────────────────────────────────────────────────────────────────

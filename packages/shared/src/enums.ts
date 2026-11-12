@@ -10,6 +10,7 @@ export const LISTING_CATEGORIES = [
   'job_main', 'job_parttime',
   'lost', 'found',
   'pass_appliance', 'pass_fashion', 'pass_sport', 'pass_tools', 'pass_baby', 'pass_other',
+  'room_house', 'room_apartment',
 ] as const;
 export type ListingCategory = (typeof LISTING_CATEGORIES)[number];
 
@@ -52,7 +53,7 @@ export const LISTING_FEATURES = {
     'pass_electronics', 'pass_vehicle', 'pass_appliance', 'pass_home', 'pass_fashion',
     'pass_sport', 'pass_tools', 'pass_baby', 'pass_ppe', 'pass_other',
   ],
-  room: ['room_rent', 'room_share'],
+  room: ['room_rent', 'room_share', 'room_house', 'room_apartment'],
   job: ['job_main', 'job_parttime'],
   lostFound: ['lost', 'found'],
 } as const satisfies Record<string, readonly ListingCategory[]>;

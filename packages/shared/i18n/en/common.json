@@ -31,7 +31,9 @@
     "pass_sport": "Sports gear",
     "pass_tools": "Tools & equipment",
     "pass_baby": "Mom & baby",
-    "pass_other": "Other items"
+    "pass_other": "Other items",
+    "room_house": "Whole house",
+    "room_apartment": "Apartment / dormitory"
   },
   "feature": {
     "pass": "Buy & sell",

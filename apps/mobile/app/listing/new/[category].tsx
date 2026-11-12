@@ -8,16 +8,16 @@ import { LISTING_CATEGORIES, type ListingCategory } from '@hp/shared';
 import { Redirect, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getLocale } from '@/core/i18n';
-import { configOfCategory, LISTING_CONFIGS_BY_SLUG } from '@/features/configs';
+import { configOfCategory, LISTING_CONFIGS_BY_SLUG, miniThemeOf } from '@/features/configs';
 import { ListingForm } from '@/features/listing/form/ListingForm';
 import { ListingFormSkeleton } from '@/features/listing/form/ListingFormSkeleton';
 import { isMiniSlug } from '@/features/listing/navigation';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
-import { ErrorState, Header, Screen } from '@/ui';
+import { AppThemeProvider, ErrorState, Header, Screen } from '@/ui';
 
 const isCategory = (v: string | undefined): v is ListingCategory => !!v && (LISTING_CATEGORIES as readonly string[]).includes(v);
 
-export default function NewListingScreen() {
+function NewListingScreenBody() {
   const { t } = useTranslation('listing');
   const { category, mini } = useLocalSearchParams<{ category: string; mini?: string }>();
   const me = useMyProfile();
@@ -56,5 +56,15 @@ export default function NewListingScreen() {
         mini={miniSlug}
       />
     </Screen>
+  );
+}
+
+/** Mở từ mini-app (`?mini=<slug>`) → giữ màu của mini-app (AppThemeProvider); ngoài mini-app không bọc gì. */
+export default function NewListingScreen() {
+  const { mini } = useLocalSearchParams<{ mini?: string }>();
+  return (
+    <AppThemeProvider theme={miniThemeOf(mini)}>
+      <NewListingScreenBody />
+    </AppThemeProvider>
   );
 }

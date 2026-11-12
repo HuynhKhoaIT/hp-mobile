@@ -65,8 +65,7 @@ export const passConfig: ListingFeatureConfig = {
     subtitleKey: 'listing:mini_app.subtitle.pass',
     homeTabKey: 'listing:mini_app.tabs.home.pass',
     icon: ShoppingBag,
-    bannerPlacement: 'app_pass',
-    homeCategoryCount: 6,
+    home: { layout: 'market', bannerPlacement: 'app_pass', categoryCount: 6 },
   },
   form: {
     photos: 'recommended',

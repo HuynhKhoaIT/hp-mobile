@@ -19,16 +19,18 @@ const light = {
   "--color-on-accent": "255 255 255",
   "--color-service-pass": "217 105 46",
   "--color-service-pass-soft": "253 240 230",
-  "--color-service-room": "124 92 196",
-  "--color-service-room-soft": "242 238 251",
-  "--color-service-job": "46 148 97",
-  "--color-service-job-soft": "232 245 238",
+  "--color-service-room": "4 120 87",
+  "--color-service-room-soft": "231 246 239",
+  "--color-service-job": "79 70 229",
+  "--color-service-job-soft": "238 240 255",
   "--color-service-ride": "27 138 134",
   "--color-service-ride-soft": "228 244 243",
   "--color-service-sport": "210 85 90",
   "--color-service-sport-soft": "252 236 236",
   "--color-service-lost-found": "168 122 0",
-  "--color-service-lost-found-soft": "251 243 217"
+  "--color-service-lost-found-soft": "251 243 217",
+  "--color-app-from": "11 74 156",
+  "--color-app-to": "30 111 217"
 };
 
 const dark = {
@@ -49,16 +51,18 @@ const dark = {
   "--color-on-accent": "255 255 255",
   "--color-service-pass": "240 160 112",
   "--color-service-pass-soft": "58 42 32",
-  "--color-service-room": "179 157 235",
-  "--color-service-room-soft": "44 38 64",
-  "--color-service-job": "108 199 154",
-  "--color-service-job-soft": "30 50 41",
+  "--color-service-room": "52 211 153",
+  "--color-service-room-soft": "15 46 36",
+  "--color-service-job": "165 180 252",
+  "--color-service-job-soft": "30 31 69",
   "--color-service-ride": "95 196 191",
   "--color-service-ride-soft": "26 51 50",
   "--color-service-sport": "238 138 141",
   "--color-service-sport-soft": "58 34 36",
   "--color-service-lost-found": "230 190 85",
-  "--color-service-lost-found-soft": "58 50 32"
+  "--color-service-lost-found-soft": "58 50 32",
+  "--color-app-from": "11 74 156",
+  "--color-app-to": "30 111 217"
 };
 
 module.exports = {
@@ -93,7 +97,9 @@ module.exports = {
       "service-sport": "rgb(var(--color-service-sport) / <alpha-value>)",
       "service-sport-soft": "rgb(var(--color-service-sport-soft) / <alpha-value>)",
       "service-lost-found": "rgb(var(--color-service-lost-found) / <alpha-value>)",
-      "service-lost-found-soft": "rgb(var(--color-service-lost-found-soft) / <alpha-value>)"
+      "service-lost-found-soft": "rgb(var(--color-service-lost-found-soft) / <alpha-value>)",
+      "app-from": "rgb(var(--color-app-from) / <alpha-value>)",
+      "app-to": "rgb(var(--color-app-to) / <alpha-value>)"
     },
     "borderRadius": {
       "none": "0px",

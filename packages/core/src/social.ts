@@ -12,6 +12,21 @@ export async function listSites(client: Client): Promise<Result<Site[]>> {
   );
 }
 
+/** Khu đang hoạt động kèm toạ độ (view site_locations — migration 20261113110000): khoảng cách tin trọ → từng khu. */
+export type SiteLocation = { code: string; name: string; lat: number; lng: number };
+
+export async function listSiteLocations(client: Client): Promise<Result<SiteLocation[]>> {
+  const res = fromSupabase(
+    await client.from('site_locations').select('code, name, lat, lng').order('sort_order').order('name'),
+  );
+  if (res.error) return res;
+  return ok(
+    (res.data ?? []).flatMap((s) =>
+      s.code && s.name && s.lat !== null && s.lng !== null ? [{ code: s.code, name: s.name, lat: s.lat, lng: s.lng }] : [],
+    ),
+  );
+}
+
 // ── notifications ──────────────────────────────────────────────────────────────
 export type Notification = Tables<'notifications'>;
 export type Page<T> = { items: T[]; nextCursor: string | null };

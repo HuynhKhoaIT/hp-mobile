@@ -26,8 +26,9 @@ export const useChatSafety = create<{ seen: boolean; markSeen: () => void }>()(
   }),
 );
 
-export function openConversation(id: string, opts: { replace?: boolean } = {}) {
-  const href = { pathname: '/chat/[conversationId]', params: { conversationId: id } } as const;
+/** Màn chat. `mini`: mở từ mini-app (slug, vd 'room') → màn chat giữ màu mini-app, "Xem tin" mở chi tiết trong mini-app. */
+export function openConversation(id: string, opts: { replace?: boolean; mini?: string } = {}) {
+  const href = { pathname: '/chat/[conversationId]', params: { conversationId: id, ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
   if (opts.replace) router.replace(href);
   else router.push(href);
 }
@@ -40,13 +41,13 @@ export function openConversation(id: string, opts: { replace?: boolean } = {}) {
 export function useOpenConversation() {
   const start = useStartConversation();
   const errorText = useErrorText();
-  const open = (listing: { id: string; category: string }) =>
+  const open = (listing: { id: string; category: string }, opts: { mini?: string } = {}) =>
     requireAuth(() => {
       track('contact', { channel: 'chat', listing_id: listing.id, category: listing.category });
       start.mutate(
         { listingId: listing.id },
         {
-          onSuccess: (conversationId) => openConversation(conversationId),
+          onSuccess: (conversationId) => openConversation(conversationId, { mini: opts.mini }),
           onError: (e) => toast.show(errorText(e.code), 'danger'),
         },
       );

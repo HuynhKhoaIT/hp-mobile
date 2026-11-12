@@ -5,6 +5,7 @@ export * from './locales';
 export * from './constants';
 export * from './enums';
 export * from './format';
+export * from './geo';
 export * from './slug';
 export * from './phone';
 export * from './schemas/auth';

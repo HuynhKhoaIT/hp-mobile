@@ -16,7 +16,8 @@ type Owner = Pick<
   'owner_id' | 'owner_name' | 'owner_avatar_url' | 'owner_since' | 'owner_rating_avg' | 'owner_rating_count' | 'owner_badges'
 >;
 
-export function OwnerCard({ listing }: { listing: Owner }) {
+/** `title`: tiêu đề khối riêng (config.detail.texts.owner — vd "Thông tin chủ trọ"); mặc định "Người đăng". */
+export function OwnerCard({ listing, title }: { listing: Owner; title?: string }) {
   const { t, i18n } = useTranslation('listing');
   const name = listing.owner_name ?? '';
   const rating =
@@ -28,7 +29,7 @@ export function OwnerCard({ listing }: { listing: Owner }) {
 
   return (
     <View className="gap-2">
-      <SectionHeader title={t('detail.posted_by')} bar="primary" />
+      <SectionHeader title={title ?? t('detail.posted_by')} bar="primary" />
       <Card className="gap-3">
         <View className="flex-row items-center gap-3">
           <View>

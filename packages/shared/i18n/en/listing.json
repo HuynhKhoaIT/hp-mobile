@@ -119,7 +119,17 @@
     "sport_type": "Sport",
     "tool_type": "Tool type",
     "baby_type": "Item type",
-    "age_range": "Age range"
+    "age_range": "Age range",
+    "wifi_price": "Wi-Fi",
+    "trash_price": "Cleaning & trash",
+    "deposit_months": "Deposit",
+    "has_ac": "Air conditioning",
+    "private_wc": "Private bathroom",
+    "has_kitchen": "Private kitchen",
+    "has_wifi": "Wi-Fi",
+    "has_camera": "Security camera",
+    "free_hours": "No curfew",
+    "no_landlord": "Landlord lives elsewhere"
   },
   "attr_value": {
     "condition": {
@@ -224,7 +234,8 @@
     "months_other": "{{count}} months",
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",
-    "per_kwh": "{{price}}/kWh"
+    "per_kwh": "{{price}}/kWh",
+    "per_month": "{{price}}/month"
   },
   "owner_badge": {
     "phone": "Verified phone",
@@ -321,7 +332,9 @@
       "pass_sport": "Football boots, rackets, gym gear…",
       "pass_tools": "Drills, motorbike repair kits, electrical tools…",
       "pass_baby": "Strollers, newborn clothes, toys…",
-      "pass_other": "Books, instruments, plants…"
+      "pass_other": "Books, instruments, plants…",
+      "room_house": "For work crews and families",
+      "room_apartment": "Mini apartments, dorms, all-inclusive"
     },
     "photos_tip": {
       "pass": "Clear photos from every side help it sell faster.",
@@ -487,7 +500,8 @@
     "costs": "Costs",
     "rules": "House rules",
     "contact": "Contact person",
-    "requirements": "Requirements"
+    "requirements": "Requirements",
+    "amenities": "Amenities"
   },
   "availability": {
     "pass": "Available",
@@ -512,7 +526,9 @@
     "job_main": "Full-time",
     "job_parttime": "Part-time",
     "lost": "Lost",
-    "found": "Found"
+    "found": "Found",
+    "room_house": "Whole house",
+    "room_apartment": "Apartment"
   },
   "sort": {
     "label": "Sort",
@@ -526,7 +542,11 @@
     "under_500k": "Under 500k",
     "500k_2m": "500k – 2M",
     "2m_5m": "2M – 5M",
-    "over_5m": "Over 5M"
+    "over_5m": "Over 5M",
+    "under_1m": "Under 1M",
+    "1m_2m": "1M – 2M",
+    "2m_3m": "2M – 3M",
+    "over_3m": "Over 3M"
   },
   "feature_home": {
     "categories_title": "Categories",
@@ -543,14 +563,17 @@
     "back_super": "{{app}} Super App",
     "back_super_a11y": "Back to {{app}}",
     "title": {
-      "pass": "Pass Market"
+      "pass": "Pass Market",
+      "room": "Dung Quat Rooms"
     },
     "subtitle": {
-      "pass": "Buy and sell between workers around the sites"
+      "pass": "Buy and sell between workers around the sites",
+      "room": "Find rooms, whole houses and roommates near the factories"
     },
     "tabs": {
       "home": {
-        "pass": "Market"
+        "pass": "Market",
+        "room": "Rooms"
       },
       "saved": "Saved",
       "post": "Post",
@@ -654,6 +677,67 @@
       "apply": "Apply",
       "active_count_one": "{{count}} filter",
       "active_count_other": "{{count}} filters"
+    },
+    "room": {
+      "badge": "Rooms",
+      "near_label": "Near you",
+      "categories_title": "Browse by type",
+      "tile_ac": "Air-conditioned",
+      "tile_ac_hint": "Has AC",
+      "tile_near": "Near the gates",
+      "tile_near_hint": "< 2 km to work",
+      "trust_title": "Rent with peace of mind",
+      "trust_body": "View the room in person before paying a deposit. Never send money to someone you have not met.",
+      "list_title": "Good-value rooms for shift workers",
+      "list_subtitle": "Newly posted around your workplace",
+      "landlord_eyebrow": "For landlords",
+      "landlord_title": "Have an empty room to rent out?",
+      "landlord_body": "Post for free and reach workers and engineers around the sites.",
+      "landlord_cta": "Post a room",
+      "photos": "{{count}} photos",
+      "call": "Call",
+      "chat": "Message",
+      "detail": "Details",
+      "saved": {
+        "tab_active": "Available ({{count}})",
+        "tab_inactive": "Rented ({{count}})",
+        "sold_badge": "Rented",
+        "inactive_hint": "This room has been rented",
+        "find_similar": "Find similar rooms",
+        "tip_title": "Safe renting tips",
+        "tip_body": "Visit the room in person and read the contract; never pay a deposit before meeting the landlord."
+      },
+      "manage": {
+        "active_count_one": "{{count}} room listed",
+        "active_count_other": "{{count}} rooms listed",
+        "tab_active": "Listed",
+        "tab_sold": "Rented",
+        "stat_sold": "Rented",
+        "mark_sold": "Mark rented",
+        "search_placeholder": "Search by title or code…",
+        "empty_active_title": "No rooms listed",
+        "empty_active_body": "Post your first room — at least 3 photos, rent and area.",
+        "empty_sold_title": "No rented rooms yet",
+        "empty_sold_body": "Tap \"Mark rented\" once the room is taken so people stop asking."
+      },
+      "filter": {
+        "category_title": "Room type"
+      }
+    },
+    "room_detail": {
+      "title": "Room details",
+      "vacant": "Available",
+      "updated": "Updated {{time}}",
+      "deposit": "{{count}}-month deposit",
+      "costs_title": "Monthly costs",
+      "free": "Free",
+      "distance_title": "Location & distance",
+      "distance_value": "{{distance}} · ~{{minutes}} min by motorbike",
+      "map_cta": "View map & directions",
+      "amenities_title": "Amenities",
+      "landlord_title": "Landlord",
+      "rules_title": "Description & house rules",
+      "contact_cta": "Contact to view the room"
     }
   }
 }

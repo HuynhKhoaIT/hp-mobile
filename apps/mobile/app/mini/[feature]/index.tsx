@@ -22,7 +22,7 @@ export default function MiniHomeScreen() {
     }, []),
   );
   return (
-    <Screen tab edgeToEdge statusBar="primary">
+    <Screen tab edgeToEdge statusBar="app">
       <MiniHome active={focused} />
     </Screen>
   );

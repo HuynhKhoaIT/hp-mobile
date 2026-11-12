@@ -1,12 +1,13 @@
 'use client';
 
-// Trang "Bộ lọc & tìm kiếm" của mini-app (/pass-do/bo-loc — Stitch filter). Một form GET tới trang chủ mini-app (/pass-do?…):
+// Trang "Bộ lọc & tìm kiếm" của mini-app (/pass-do/bo-loc, /tro/bo-loc — Stitch filter). Một form GET tới trang chủ mini-app (/pass-do?…):
 // tắt JS vẫn lọc được (lựa chọn là radio / checkbox gốc của trình duyệt, kiểu viên thuốc qua `has-checked:`).
 // Khối: Tìm (ô từ khoá + "Tìm gần đây" — chỉ trình duyệt, localStorage, tối đa 8, xoá từng mục / xoá hết) → Danh mục (Tất cả
 // + 10 danh mục, chọn 1) + "Loại đồ cụ thể" (giá trị enum của trường loại đồ của danh mục đang chọn — categoryTypeField;
 // không JS: hiện theo ?category= lúc mở trang) → Vị trí (khu, ?site=) + Khoảng cách tới khu (Toàn bộ / < N km, ?distance=)
 // → Khoảng giá (ô tối thiểu / tối đa ?price_min= / ?price_max= + khoảng đặt sẵn ?price= + "Cho tặng" ?free=1) → Tình trạng
-// (?condition=; ẩn khi danh mục không có trường tình trạng) → Sắp xếp (?sort=) → thanh "Áp dụng" dính đáy (trên thanh điều
+// (?condition=; ẩn khi không danh mục nào đang xét có trường tình trạng) → Tiện nghi (config.miniApp.filter.toggles — Nhà Trọ:
+// ô bật / tắt ?has_ac=1…) → Sắp xếp (?sort=) → thanh "Áp dụng" dính đáy (trên thanh điều
 // hướng dưới của điện thoại) kèm số bộ lọc đang chọn.
 // Có JS: kiểm giá (tối thiểu ≤ tối đa — báo lỗi tại ô, không gửi), chọn khoảng đặt sẵn thì xoá ô nhập và ngược lại; "Cho
 // tặng" loại trừ giá (bật Cho tặng → xoá ô giá + khoảng giá; nhập giá / chọn khoảng → tắt Cho tặng — tin cho tặng không có
@@ -19,7 +20,7 @@
 // hẹn cổng không cọc / bán gấp, sắp xếp "Gần tôi nhất" / "Xem nhiều nhất", khối "Tin phù hợp hàng đầu" và số kết quả trên
 // nút Áp dụng — chưa có dữ liệu / RPC.
 import { ATTRIBUTE_FIELDS, CONDITIONS, type ListingCategory, type ListingFeature, LISTING_SORTS } from '@hp/shared';
-import { Gift, History, LayoutGrid, type LucideIcon, MapPin, Search, ShieldCheck, SlidersHorizontal, Wallet, X } from 'lucide-react';
+import { Gift, History, LayoutGrid, ListChecks, type LucideIcon, MapPin, Search, ShieldCheck, SlidersHorizontal, Wallet, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type FormEvent, type ReactNode, type Ref, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ import {
   activeFilterCount,
   attributesFor,
   categoryTypeField,
+  filterableFields,
   filterOptionsOf,
   type ListFilterState,
   PRICE_INPUT_MAX,
@@ -149,14 +151,20 @@ export function MiniAppFilterForm({
   const [count, setCount] = useState(activeFilterCount(initial) + (initial.sort !== 'newest' ? 1 : 0));
 
   const typeField = category ? categoryTypeField(category) : null;
-  const hasCondition = category ? ATTRIBUTE_FIELDS[category].some((f) => f.key === 'condition') : true;
+  const scopeCategories = category ? [category] : cfg.categories;
+  const hasCondition = scopeCategories.some((c) => ATTRIBUTE_FIELDS[c].some((f) => f.key === 'condition'));
+  const filterCfg = cfg.miniApp?.filter;
+  // Khối bật / tắt thông số bool (Nhà Trọ: tiện nghi) — chỉ khoá lọc được của danh mục đang xét.
+  const boolKeys = new Set(filterableFields(scopeCategories).filter((f) => f.kind === 'bool').map((f) => f.key));
+  const toggleKeys = (filterCfg?.toggles?.keys ?? []).filter((k) => boolKeys.has(k));
+  const locationHintKey = filterCfg?.locationHintKey === undefined ? 'listing.mini_app.filter.location_hint' : filterCfg.locationHintKey;
   // Thuộc tính đang lọc không có ô ở form này → giữ qua input ẩn. Đổi danh mục → bỏ mọi "loại đồ" + thuộc tính không còn
   // thuộc danh mục mới (không gửi bộ lọc vô hình).
   const categoryChanged = category !== (initial.category ?? '');
   const typeKeys = new Set(cfg.categories.map((c) => categoryTypeField(c)?.key).filter(Boolean));
   const baseAttributes = categoryChanged ? attributesFor(initial.attributes, category ? [category] : cfg.categories) : initial.attributes;
   const keptAttributes = Object.entries(baseAttributes).filter(
-    ([key]) => key !== 'condition' && key !== typeField?.key && !(categoryChanged && typeKeys.has(key)),
+    ([key]) => key !== 'condition' && key !== typeField?.key && !toggleKeys.includes(key) && !(categoryChanged && typeKeys.has(key)),
   );
   const clearPrice = () => {
     setPriceMin('');
@@ -259,7 +267,7 @@ export function MiniAppFilterForm({
         ) : null}
       </section>
 
-      <Section icon={LayoutGrid} title={t('listing.mini_app.filter.category_title')}>
+      <Section icon={LayoutGrid} title={t(filterCfg?.categoryTitleKey ?? 'listing.mini_app.filter.category_title')}>
         <RadioChips
           name="category"
           legend={t('listing.mini_app.filter.category_big')}
@@ -285,7 +293,7 @@ export function MiniAppFilterForm({
         ) : null}
       </Section>
 
-      <Section icon={MapPin} title={t('listing.mini_app.filter.location_title')} hint={t('listing.mini_app.filter.location_hint')}>
+      <Section icon={MapPin} title={t('listing.mini_app.filter.location_title')} hint={locationHintKey ? t(locationHintKey) : undefined}>
         {sites.length > 0 ? (
           <RadioChips
             name="site"
@@ -393,6 +401,28 @@ export function MiniAppFilterForm({
           </label>
         ) : null}
       </Section>
+
+      {filterCfg?.toggles && toggleKeys.length > 0 ? (
+        <Section icon={ListChecks} title={t(filterCfg.toggles.titleKey)}>
+          <fieldset>
+            <legend className="sr-only">{t(filterCfg.toggles.titleKey)}</legend>
+            <div className="flex flex-wrap gap-2">
+              {toggleKeys.map((key) => (
+                <label key={key} className={CHIP}>
+                  <input
+                    type="checkbox"
+                    name={key}
+                    value="1"
+                    defaultChecked={initial.attributes[key] === true}
+                    className="sr-only"
+                  />
+                  {t(`listing.attr.${key}`)}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </Section>
+      ) : null}
 
       {hasCondition ? (
         <Section icon={ShieldCheck} title={t('listing.mini_app.filter.condition_title')}>

@@ -10,7 +10,9 @@
 // bước Thông tin chính), `form.hiddenAttributes`, `form.photosTipKey` / `form.privacyNotice` (bước Ảnh), gợi ý chữ riêng.
 // Trang chủ riêng của tính năng (Pass đồ kiểu "chợ đồ cũ"): `home` (lưới danh mục + banner + dải tin trước danh sách đầy đủ),
 // filter 'price' (khoảng giá đặt sẵn `priceRanges`) + 'sort', chip lọc nhanh "Cho tặng" (`freeOnly`).
-// Mini-app (Chợ Pass Đồ, Stitch "Sub-App Chợ Pass"): `miniApp` — route mini/[feature] có thanh tab riêng.
+// Mini-app (Chợ Pass Đồ, Stitch "Sub-App Chợ Pass"; Nhà trọ, Stitch "Nhà Trọ Dung Quất"): `miniApp` — route mini/[feature]
+// có thanh tab riêng + màu riêng; `miniApp.home.layout` chọn bố cục trang chủ ('market' | 'directory'). Chi tiết phòng trọ
+// (Stitch "Chi tiết phòng trọ"): `detail.sections` (chi phí, khoảng cách tới khu, tiện nghi, nội quy) + `detail.priceNote`.
 import type { ListingCategory, ListingFeature, ListingPriceRange, PriceType } from '@hp/shared';
 import type { LucideIcon } from 'lucide-react-native';
 import type { ListingCardDisplay, ListingCardLayout, ServiceKey } from '@/ui';
@@ -79,9 +81,64 @@ export type ListingFeatureHomeConfig = {
 };
 
 /**
- * Mini-app riêng của tính năng (Pass đồ → "Chợ Pass Đồ"): bấm tính năng ở super app mở `mini/[feature]` có thanh tab
- * riêng (Trang chủ chợ · Đã lưu · [Đăng tin] · Chat · Quản lý tin) thay cho danh sách `listings/[feature]`. Engine:
- * features/listing/miniApp.ts + components/mini. Không khai báo → tính năng vẫn mở danh sách như cũ.
+ * Ô thêm ở lưới danh mục trang chủ mini-app 'directory' (Nhà trọ: "Phòng máy lạnh", "Gần cổng KKT") — bấm → bộ lọc:
+ * thông số (p_attributes — bool / enum của ATTRIBUTE_FIELDS) hoặc khoảng cách tới khu (km → maxDistanceM).
+ */
+export type ListingMiniHomeTile = {
+  key: string;
+  labelKey: string;
+  hintKey: string;
+  icon: LucideIcon;
+  filter: { attributes: Readonly<Record<string, string | boolean>> } | { distanceKm: number };
+};
+
+/**
+ * Bố cục trang chủ mini-app:
+ * 'market' (Chợ Pass Đồ, Stitch "Sub-App Chợ Pass"): header (MINI-APP, tim, chip khu) → dải khu → thẻ danh mục 4 cột
+ *   (`categoryCount` ô + Cho tặng + Tất cả mục) → banner `bannerPlacement` (chưa có → "An tâm trao tay") → chip nhanh →
+ *   lưới 2 cột tin mới.
+ * 'directory' (Nhà trọ, Stitch "Nhà Trọ Dung Quất"): header (nhãn `badgeKey`, chuông, thanh "Gần bạn: {khu}", ô tìm + nút
+ *   Bộ lọc) → lưới 3 cột ô danh mục (category_short + form.category_hint) + `extraTiles` → chip nhanh → khối tin cậy
+ *   (`trust`) → "list" (thẻ nổi bật đầu tiên — ảnh lớn, tiện nghi `card.highlights`, nút Gọi / Nhắn tin — rồi thẻ hàng) →
+ *   khối mời đăng (`promo`, mở thẳng form `promo.category`).
+ */
+export type ListingMiniHomeConfig =
+  | {
+      layout: 'market';
+      /** banners.placement của trang chủ (vd 'app_pass'); placement chưa có banner → khối "An tâm trao tay". */
+      bannerPlacement: string;
+      /** Số ô danh mục trước "Cho tặng" + "Tất cả mục" (lưới 4 cột → 6 = 2 hàng). */
+      categoryCount: number;
+    }
+  | {
+      layout: 'directory';
+      /** Nhãn viên phải header (vd "Nhà trọ KKT"). */
+      badgeKey: string;
+      /** Chữ đậm trước tên khu ở thanh chọn khu (vd "Gần bạn"). */
+      nearLabelKey: string;
+      categoriesTitleKey: string;
+      extraTiles?: readonly ListingMiniHomeTile[];
+      trust: { titleKey: string; bodyKey: string };
+      list: { titleKey: string; subtitleKey: string };
+      /** Thẻ nổi bật: đếm ảnh (`{{count}} ảnh`), nút Gọi / Nhắn tin, khoá bool hiện viên tiện nghi. */
+      featured: { photosKey: string; callKey: string; chatKey: string; highlights: readonly string[] };
+      promo?: {
+        eyebrowKey: string;
+        titleKey: string;
+        bodyKey: string;
+        ctaKey: string;
+        category: ListingCategory;
+        icon?: LucideIcon;
+        ctaIcon?: LucideIcon;
+      };
+    };
+
+/**
+ * Mini-app riêng của tính năng (Pass đồ → "Chợ Pass Đồ", Tìm trọ → "Nhà Trọ Dung Quất"): bấm tính năng ở super app mở
+ * `mini/[feature]` có thanh tab riêng (Trang chủ · Đã lưu · [Đăng tin] · Chat · Quản lý tin) thay cho danh sách
+ * `listings/[feature]`, màu chủ đạo riêng (appThemes[config.color] — AppThemeProvider). Engine: features/listing/miniApp.ts
+ * + components/mini. Chữ riêng của từng mini-app cho các tab dùng chung: key `listing:mini_app.<slug>.<khối>.<key>` (có thì
+ * thay `mini_app.<khối>.<key>` — useMiniT). Không khai báo → tính năng vẫn mở danh sách như cũ.
  */
 export type ListingMiniAppConfig = {
   /** Key i18n tên mini-app (vd 'listing:mini_app.title.pass' — "Chợ Pass Đồ"). */
@@ -90,12 +147,11 @@ export type ListingMiniAppConfig = {
   subtitleKey: string;
   /** Key i18n nhãn tab trang chủ + nút quay về trang chủ ở các tab khác (vd "Chợ Pass"). */
   homeTabKey: string;
-  /** Icon ô vuông trước tên mini-app ở header (nền accent). */
+  /** Icon ô vuông trước tên mini-app ở header (nền accent) — bố cục 'market'. */
   icon: LucideIcon;
-  /** banners.placement của trang chủ mini-app (vd 'app_pass'); placement chưa có banner nào → khối "An tâm trao tay". */
-  bannerPlacement: string;
-  /** Số ô danh mục hiện trước ô "Cho tặng" + "Tất cả mục" ở lưới trang chủ (lưới 4 cột → 6 = 2 hàng). */
-  homeCategoryCount: number;
+  /** Icon tab trang chủ (mặc định Store). */
+  homeTabIcon?: LucideIcon;
+  home: ListingMiniHomeConfig;
 };
 
 /**
@@ -110,15 +166,40 @@ export type ListingListBanner = {
   actions: readonly { labelKey: string; category: ListingCategory; icon?: LucideIcon }[];
 };
 
+/**
+ * Khối riêng của chi tiết theo ATTRIBUTE_GROUPS (@hp/shared) — style Stitch "Chi tiết phòng trọ":
+ * costs: "Bảng chi phí sinh hoạt" ô 2 cột (giá 0 → "Miễn phí"; khoá có trong `priceNote` lên dòng dưới giá) ·
+ * distance: "Vị trí & khoảng cách" (địa chỉ + 3 khu gần nhất — distanceM từ toạ độ đã làm tròn của tin tới site_locations,
+ *   ~phút xe máy — + nút mở bản đồ) · amenities: lưới tiện nghi đang có (icon + nhãn, bool true) · rules: nội quy gộp vào
+ *   thẻ mô tả ("Mô tả & nội quy").
+ */
+export type ListingDetailSection = 'costs' | 'distance' | 'amenities' | 'rules';
+
 /** Khối thêm ở màn chi tiết. */
 export type ListingDetailConfig = {
   /** "Tin có thể khớp" (useLostFoundMatches) + "Đã nhận lại đồ" (attributes.returned + đóng tin) — đồ thất lạc. */
   lostFound?: boolean;
   /**
    * Nút chính của thanh liên hệ dính đáy: 'chat' (mặc định — Nhắn tin nền primary, Hiện số / Gọi viền) hoặc 'call'
-   * (Hiện số / Gọi là nút chính — trọ, đồ thất lạc cần gọi nhanh). Số chỉ lộ qua reveal_contact sau đăng nhập.
+   * (Hiện số / Gọi là nút chính — đồ thất lạc cần gọi nhanh). Số chỉ lộ qua reveal_contact sau đăng nhập.
    */
   primaryCta?: 'chat' | 'call';
+  /** Key i18n nhãn nút chính (thay `contact.primary.<cta>_<feature>`), vd "Liên hệ hẹn xem phòng". */
+  primaryCtaKey?: string;
+  /** Key i18n tiêu đề header màn chi tiết (thay `detail.title`), vd "Chi tiết phòng trọ". */
+  titleKey?: string;
+  /** Khối riêng theo nhóm thông số (thứ tự hiển thị cố định của engine). Không khai báo → lưới thông số chung như cũ. */
+  sections?: readonly ListingDetailSection[];
+  /** Dòng phụ dưới giá từ một thông số số (vd tiền cọc: `{ key: 'deposit_months', labelKey: '…deposit' }` → "Cọc 1 tháng"). */
+  priceNote?: { key: string; labelKey: string };
+  /** Key i18n nhãn "đang hiện" trên ảnh (thay `availability.<feature>`), vd "Đang cho thuê". */
+  availabilityKey?: string;
+  /**
+   * Chữ riêng của chi tiết (key i18n): tiêu đề khối (`costs` · `distance` · `amenities` · `owner` · `rules` — thiếu → nhãn
+   * chung attr_group.* / detail.*), `distanceValue` ("{{distance}} · ~{{minutes}} phút xe máy" — thiếu → chỉ khoảng cách),
+   * `mapCta` (nút mở bản đồ — thiếu → không có nút), `updated` ("Cập nhật {{time}}" theo updated_at thay "Đăng …").
+   */
+  texts?: Partial<Record<'costs' | 'distance' | 'distanceValue' | 'mapCta' | 'amenities' | 'owner' | 'rules' | 'updated', string>>;
 };
 
 export type ListingFeatureConfig = {

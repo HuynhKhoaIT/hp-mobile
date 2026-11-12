@@ -31,7 +31,9 @@
     "pass_sport": "Đồ thể thao",
     "pass_tools": "Dụng cụ, đồ nghề",
     "pass_baby": "Mẹ và bé",
-    "pass_other": "Đồ khác"
+    "pass_other": "Đồ khác",
+    "room_house": "Nhà nguyên căn",
+    "room_apartment": "Căn hộ, ký túc xá"
   },
   "feature": {
     "pass": "Pass đồ",

@@ -6,7 +6,7 @@ import { Screen } from '@/ui';
 
 export default function MiniFilterScreen() {
   return (
-    <Screen tab keyboard statusBar="primary">
+    <Screen tab keyboard statusBar="app">
       <MiniFilter />
     </Screen>
   );

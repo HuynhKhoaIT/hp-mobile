@@ -18,9 +18,14 @@
 // "Đã xác minh" (người đăng có huy hiệu); trọ: giá phủ góc dưới ảnh trên nền surface/90 (không có token scrim / gradient tối
 // nên dùng nền đặc); "Mã tin #A1B2C3 · Đăng …" trên tiêu đề; "Hết hạn {ngày} · lượt xem" cuối thẻ; thông số chia khối có tiêu
 // đề (AttributeSections — trọ Chi phí / Nội quy, việc Người phụ trách / Yêu cầu); thanh liên hệ [Gọi] [Nhắn tin] [nút chính].
+// config.detail (Stitch "Chi tiết phòng trọ" — trọ): nhãn tình trạng riêng ("Đang cho thuê"), nhãn huy hiệu chủ trọ trên ảnh,
+// chip khu + "Cập nhật {time}" thay dòng mã tin (mã tin còn cho trình đọc màn hình), "Cọc N tháng" dưới giá, tiêu đề khối
+// người đăng, nhãn nút chính ("Liên hệ hẹn xem phòng"), và `sections` thay khối thông số + mô tả (listing-detail-sections.tsx:
+// chi phí 2×2, vị trí & khoảng cách tới các khu — từ toạ độ đã làm tròn ~300 m, tiện nghi, thông tin, mô tả & nội quy).
+// Tin của tính năng mini-app: <article data-app-theme> → màu mini-app (trọ ngọc lục bảo) cho cả trang chi tiết.
 import { listingDisplayStatus, type PublicListing } from '@hp/core';
 import { featureOfCategory, formatDate, formatDistance, formatRelative, priceLabel, readAttributes } from '@hp/shared';
-import { ChevronLeft, Info, MapPin } from 'lucide-react';
+import { ChevronLeft, Clock, Info, MapPin } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Badge } from '@/components/shared/badge';
 import { JsonLd } from '@/components/shared/json-ld';
@@ -29,10 +34,12 @@ import { Link } from '@/i18n/navigation';
 import { attributeText, asLocale, cardFacts, isReturned, priceText } from '../display';
 import { configOfCategory } from '../features';
 import { listingJsonLd } from '../json-ld';
+import { appThemeOf } from '../mini-app';
 import { getSimilarListings } from '../queries';
 import { AttributeSections, HIDDEN_ATTRIBUTES } from './attribute-grid';
 import { BookmarkButton } from './bookmark-button';
 import { ListingActions } from './listing-actions';
+import { ListingDetailSections } from './listing-detail-sections';
 import { ListingGallery } from './listing-gallery';
 import { ListingGrid } from './listing-grid';
 import { ListingPlaceholder } from './listing-placeholder';
@@ -57,11 +64,21 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
   const facts = cardFacts(listing, cfg.card?.facts, t, locale);
   const cut = price.lastIndexOf('/');
   const feature = featureOfCategory(listing.category);
+  // Khác biệt theo tính năng (config.detail — trọ: khối chi phí / khoảng cách / tiện nghi / nội quy, nhãn "Đang cho thuê"…).
+  const detail = cfg.detail;
+  const sections = detail?.sections;
+  const mainSections = sections?.filter((s) => s.kind !== 'description') ?? [];
+  const descriptionSection = sections?.find((s) => s.kind === 'description');
+  const ownerBadge = detail?.ownerBadge && listing.owner_badges.includes(detail.ownerBadge) ? detail.ownerBadge : null;
+  const priceNoteValue = detail?.priceNote ? attributes.find((r) => r.field.key === detail.priceNote?.attribute)?.value : undefined;
   // Nhãn tình trạng trên ảnh: chữ + tone (không chỉ màu). Đồ thất lạc đang hiện theo category (Đang tìm / Chờ chủ nhận).
   const status = returned
     ? { label: t('listing.lost_found.returned_badge'), tone: 'success' as const }
     : active
-      ? { label: t(`listing.availability.${feature === 'lostFound' ? listing.category : feature}`), tone: 'success' as const }
+      ? {
+          label: t(detail?.activeStatusKey ?? `listing.availability.${feature === 'lostFound' ? listing.category : feature}`),
+          tone: 'success' as const,
+        }
       : { label: t(`common.status.${displayStatus}`), tone: 'danger' as const };
   // Cùng quy tắc với PosterCard: có huy hiệu (đã dịch được) = đã xác minh.
   const verified = listing.owner_badges.some((b) => t.has(`listing.owner_badge.${b}`));
@@ -71,7 +88,9 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
 
   return (
     <TranslationProvider listingId={listing.id}>
-      <article className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 max-lg:pb-28">
+      {/* Tin của tính năng chạy dạng mini-app (Nhà Trọ, Chợ Pass): cả trang theo màu mini-app (data-app-theme); header /
+          thanh dưới của super app giữ nguyên vì trang nằm ngoài cây đường dẫn mini-app. */}
+      <article data-app-theme={appThemeOf(cfg)} className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 max-lg:pb-28">
         {jsonLd ? <JsonLd data={jsonLd} /> : null}
         <nav>
           <Link
@@ -104,7 +123,11 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                   <Badge overlay tone={status.tone}>
                     {status.label}
                   </Badge>
-                  {verified ? (
+                  {ownerBadge ? (
+                    <Badge overlay tone="primary">
+                      {t(`listing.owner_badge.${ownerBadge}`)}
+                    </Badge>
+                  ) : verified ? (
                     <Badge overlay tone="primary">
                       {t('common.profile.verified')}
                     </Badge>
@@ -132,7 +155,18 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                   </Badge>
                 ) : null}
               </div>
-              <p className="text-sm text-muted">
+              {detail?.updatedLine ? (
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+                  {listing.site_name ? <Badge tone="primary">{listing.site_name}</Badge> : null}
+                  <span className="inline-flex items-center gap-1">
+                    <Clock aria-hidden strokeWidth={1.75} className="size-4" />
+                    <time dateTime={listing.updated_at}>
+                      {t(detail.updatedLine.key, { time: formatRelative(listing.updated_at, locale, new Date(now)) })}
+                    </time>
+                  </span>
+                </p>
+              ) : null}
+              <p className={detail?.updatedLine ? 'sr-only' : 'text-sm text-muted'}>
                 {listing.short_id ? (
                   <>
                     {t('listing.detail.code', { code: listing.short_id.toUpperCase() })}
@@ -163,6 +197,9 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                     </>
                   ) : null}
                 </p>
+              ) : null}
+              {detail?.priceNote && typeof priceNoteValue === 'number' && priceNoteValue > 0 ? (
+                <p className="-mt-2 text-sm text-muted">{t(detail.priceNote.key, { count: priceNoteValue })}</p>
               ) : null}
               {facts.length > 0 ? (
                 <ul className="flex flex-wrap gap-1.5">
@@ -207,7 +244,7 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
             <SafetyTip className="order-3" title={t('listing.tip.title')} text={t(cfg.tipKey ?? 'listing.detail.safety_tip')} />
 
             <div className="order-5">
-              <PosterCard listing={listing} locale={locale} />
+              <PosterCard listing={listing} locale={locale} title={detail?.posterTitleKey ? t(detail.posterTitleKey) : undefined} />
             </div>
             <div className="order-6">
               <ListingActions
@@ -218,12 +255,17 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
                 category={listing.category}
                 active={active}
                 primaryCta={cfg.primaryCta}
+                primaryLabel={detail?.primaryLabelKey ? t(detail.primaryLabelKey) : undefined}
               />
             </div>
           </div>
 
           <div className="contents lg:col-span-7 lg:row-start-2 lg:flex lg:flex-col lg:gap-6">
-            {attributes.length > 0 ? (
+            {detail && sections ? (
+              <div className="order-4 flex flex-col gap-6">
+                <ListingDetailSections listing={listing} detail={detail} sections={mainSections} rows={attributes} />
+              </div>
+            ) : attributes.length > 0 ? (
               <div className="order-4 flex flex-col gap-6">
                 <AttributeSections
                   category={listing.category}
@@ -237,25 +279,30 @@ export async function ListingDetail({ listing, now }: { listing: PublicListing; 
               </div>
             ) : null}
 
-            <section aria-labelledby="description-heading" className="order-7 flex flex-col gap-2">
-              <BarHeading id="description-heading" tone="primary">
-                {t('listing.detail.description')}
-              </BarHeading>
-              {listing.description?.trim() ? (
-                <TranslatableText
-                  as="p"
-                  field="description"
-                  original={listing.description}
-                  lang={listing.lang}
-                  className="rounded-lg border border-border bg-surface p-4 text-md whitespace-pre-line text-fg shadow-card"
-                />
-              ) : (
-                <p className="rounded-lg border border-border bg-surface p-4 text-md text-muted shadow-card">
-                  {t('listing.detail.no_description')}
-                </p>
-              )}
-            </section>
-
+            {detail && descriptionSection ? (
+              <div className="order-7 flex flex-col gap-6">
+                <ListingDetailSections listing={listing} detail={detail} sections={[descriptionSection]} rows={attributes} />
+              </div>
+            ) : (
+              <section aria-labelledby="description-heading" className="order-7 flex flex-col gap-2">
+                <BarHeading id="description-heading" tone="primary">
+                  {t('listing.detail.description')}
+                </BarHeading>
+                {listing.description?.trim() ? (
+                  <TranslatableText
+                    as="p"
+                    field="description"
+                    original={listing.description}
+                    lang={listing.lang}
+                    className="rounded-lg border border-border bg-surface p-4 text-md whitespace-pre-line text-fg shadow-card"
+                  />
+                ) : (
+                  <p className="rounded-lg border border-border bg-surface p-4 text-md text-muted shadow-card">
+                    {t('listing.detail.no_description')}
+                  </p>
+                )}
+              </section>
+            )}
           </div>
         </div>
 

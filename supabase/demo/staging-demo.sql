@@ -191,6 +191,15 @@ begin
         'Pass sách học tiếng Trung HSK 1–3', 'Bán đàn guitar acoustic cho người mới', 'Thanh lý chậu cây cảnh mini', 'Pass bộ ấm chén uống trà',
         'Bán vali kéo size 24', 'Thanh lý sách truyện cũ', 'Bán bộ cần câu cá', 'Pass gương treo tường',
         'Used books, 10 for 50k', '出售二手吉他']
+      -- Loại trọ mới (migration 20261113090000).
+      when 'room_house' then array[
+        'Cho thuê nhà nguyên căn 2 phòng ngủ gần Hòa Phát', 'Nhà cấp 4 nguyên căn cho tổ thợ 5 người', 'Nhà nguyên căn có sân để xe, gần chợ Bình Đông',
+        'Cho thuê nhà mặt đường Võ Văn Kiệt, 3 phòng', 'Nhà nguyên căn cho gia đình công nhân, có bếp', 'Nhà 2 tầng nguyên căn gần cảng Dung Quất',
+        'Cho thuê nhà vườn yên tĩnh, đi làm 10 phút', 'Nhà nguyên căn mới sơn, điện nước giá dân', 'Whole house for rent, 2 bedrooms, near VSIP', '整套出租 两室一厅 近和发']
+      when 'room_apartment' then array[
+        'Ký túc xá công nhân giường tầng, bao điện nước', 'Căn hộ mini có máy lạnh gần cổng 2', 'KTX nam sạch sẽ, có tủ khoá riêng',
+        'Căn hộ dịch vụ trọn gói cho kỹ sư', 'Ký túc xá nữ có bảo vệ 24/7', 'Căn hộ 1 phòng ngủ full nội thất gần VSIP',
+        'KTX ca kíp yên tĩnh, có máy giặt chung', 'Căn hộ studio mới, wifi miễn phí', 'Dormitory bed for workers, utilities included', '员工宿舍 床位出租 含水电']
     end;
 
     for i in 1..50 loop
@@ -202,7 +211,11 @@ begin
       v_idx := lpad((1 + (i - 1) % 10)::text, 2, '0');
       v_images := case when v_cat || '/' || v_idx in ('lost/02', 'lost/07', 'found/03') then '{}'
                        else array['demo/' || v_cat || '/' || v_idx || '.webp'] end;
-      if v_cat in ('room_rent', 'room_share') then
+      if v_cat in ('room_house', 'room_apartment') then
+        -- Loại trọ mới chưa có bộ ảnh riêng: dùng lại ảnh phòng trọ CC0.
+        v_images := array['demo/room_rent/' || v_idx || '.webp'];
+      end if;
+      if v_cat in ('room_rent', 'room_share', 'room_house', 'room_apartment') then
         v_images := v_images || array['demo/room/extra-' || (1 + i % 4) || '.webp', 'demo/room/extra-' || (1 + (i + 1) % 4) || '.webp'];
       end if;
       -- Danh mục mới chưa có bộ ảnh riêng: điện lạnh dùng lại ảnh CC0 tủ lạnh / máy giặt / quạt; còn lại để trống (thẻ hiện ảnh chờ).
@@ -284,15 +297,22 @@ begin
         when v_cat = 'pass_other' then
           v_price := (20 + floor(random() * 50) * 10) * 1000;
           v_attrs := jsonb_build_object('condition', (array['new', 'like_new', 'used'])[1 + floor(random() * 3)::int]);
-        when v_cat in ('room_rent', 'room_share') then
-          v_price := (800 + floor(random() * 25) * 100) * 1000;
+        when v_cat in ('room_rent', 'room_share', 'room_house', 'room_apartment') then
+          v_price := case v_cat when 'room_house' then (2500 + floor(random() * 30) * 100) * 1000
+                                when 'room_apartment' then (500 + floor(random() * 20) * 100) * 1000
+                                else (800 + floor(random() * 25) * 100) * 1000 end;
           v_attrs := jsonb_build_object('area_m2', 12 + floor(random() * 30)::int,
                                         'electricity_price', (array[3500, 3800, 4000])[1 + floor(random() * 3)::int],
                                         'water_price', (array[15000, 20000, 100000])[1 + floor(random() * 3)::int],
                                         'has_loft', random() < 0.5,
                                         'has_parking', random() < 0.8,
                                         'curfew', (array['', '22:00', '23:00'])[1 + floor(random() * 3)::int],
-                                        'max_people', 1 + floor(random() * 4)::int);
+                                        'max_people', 1 + floor(random() * 4)::int)
+                     -- Tiện nghi (2026-11-12) theo số thứ tự tin, không gọi random() để dữ liệu các danh mục sau giữ nguyên.
+                     || jsonb_build_object('has_ac', i % 3 <> 0, 'private_wc', i % 4 <> 0, 'has_kitchen', i % 2 = 0,
+                                           'has_wifi', i % 5 <> 0, 'has_camera', i % 3 = 1, 'free_hours', i % 2 = 1,
+                                           'no_landlord', i % 4 = 2, 'deposit_months', 1 + i % 2,
+                                           'wifi_price', (array[0, 50000, 100000])[1 + i % 3], 'trash_price', (array[10000, 20000])[1 + i % 2]);
         when v_cat in ('job_main', 'job_parttime') then
           v_price := null;
           v_price_type := 'negotiable';

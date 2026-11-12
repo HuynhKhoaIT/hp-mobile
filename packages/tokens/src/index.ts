@@ -55,16 +55,16 @@ export type ColorToken = keyof (typeof colors)['light'];
 export const serviceColors = {
   light: {
     pass: { fg: '#D9692E', soft: '#FDF0E6' },      // cam đất
-    room: { fg: '#7C5CC4', soft: '#F2EEFB' },      // tím oải hương
-    job: { fg: '#2E9461', soft: '#E8F5EE' },       // xanh lá dịu
+    room: { fg: '#047857', soft: '#E7F6EF' },      // emerald (2026-11-12: theo màu mini-app Nhà trọ)
+    job: { fg: '#4F46E5', soft: '#EEF0FF' },       // xanh chàm (2026-11-12: tách khỏi emerald của Nhà trọ)
     ride: { fg: '#1B8A86', soft: '#E4F4F3' },      // xanh ngọc
     sport: { fg: '#D2555A', soft: '#FCECEC' },     // đỏ san hô
     lostFound: { fg: '#A87A00', soft: '#FBF3D9' }, // vàng mật ong
   },
   dark: {
     pass: { fg: '#F0A070', soft: '#3A2A20' },
-    room: { fg: '#B39DEB', soft: '#2C2640' },
-    job: { fg: '#6CC79A', soft: '#1E3229' },
+    room: { fg: '#34D399', soft: '#0F2E24' },
+    job: { fg: '#A5B4FC', soft: '#1E1F45' },
     ride: { fg: '#5FC4BF', soft: '#1A3332' },
     sport: { fg: '#EE8A8D', soft: '#3A2224' },
     lostFound: { fg: '#E6BE55', soft: '#3A3220' },
@@ -76,6 +76,55 @@ export type ServiceKey = keyof (typeof serviceColors)['light'];
 export const gradients = {
   brand: ['#0B4A9C', '#1E6FD9'],
 } as const;
+
+/**
+ * Màu chủ đạo riêng của từng mini-app (chốt 2026-11-12): header (gradient from → to, chữ trắng), nút chính, tab đang mở,
+ * chữ nhấn. Trong khung mini-app các biến --color-primary / --color-primary-light / --color-on-primary / --color-app-from /
+ * --color-app-to bị ghi đè bằng bảng này (web: thuộc tính [data-app-theme=<key>] — theme.css; app: vars(appThemeVars(...))
+ * của NativeWind) nên component dùng bg-primary / text-primary / from-app-from tự đổi màu, không viết lại component.
+ * Light: primary trên nền trắng ≥ 4,5:1 và chữ trắng trên primary ≥ 4,5:1. Dark: primary sáng (chữ / icon trên nền tối),
+ * onPrimary tối; gradient header đậm để chữ trắng đọc được.
+ */
+export const appThemes = {
+  light: {
+    pass: { primary: '#C2410C', primaryLight: '#FFF1E8', onPrimary: '#FFFFFF', gradient: ['#9A3412', '#C2410C'] },
+    room: { primary: '#047857', primaryLight: '#E7F6EF', onPrimary: '#FFFFFF', gradient: ['#065F46', '#059669'] },
+    job: { primary: '#4338CA', primaryLight: '#EEF0FF', onPrimary: '#FFFFFF', gradient: ['#312E81', '#4F46E5'] },
+    ride: { primary: '#0F766E', primaryLight: '#E6F6F4', onPrimary: '#FFFFFF', gradient: ['#134E4A', '#0D9488'] },
+    sport: { primary: '#BE123C', primaryLight: '#FFEEF1', onPrimary: '#FFFFFF', gradient: ['#9F1239', '#E11D48'] },
+    lostFound: { primary: '#B45309', primaryLight: '#FFF6E0', onPrimary: '#FFFFFF', gradient: ['#92400E', '#D97706'] },
+  },
+  dark: {
+    pass: { primary: '#FB923C', primaryLight: '#3A2414', onPrimary: '#0B1120', gradient: ['#7C2D12', '#9A3412'] },
+    room: { primary: '#34D399', primaryLight: '#0F2E24', onPrimary: '#0B1120', gradient: ['#064E3B', '#065F46'] },
+    job: { primary: '#818CF8', primaryLight: '#1E1F45', onPrimary: '#0B1120', gradient: ['#1E1B4B', '#312E81'] },
+    ride: { primary: '#2DD4BF', primaryLight: '#0F2E2C', onPrimary: '#0B1120', gradient: ['#134E4A', '#115E59'] },
+    sport: { primary: '#FB7185', primaryLight: '#3A1620', onPrimary: '#0B1120', gradient: ['#881337', '#9F1239'] },
+    lostFound: { primary: '#FBBF24', primaryLight: '#3A2A10', onPrimary: '#0B1120', gradient: ['#78350F', '#92400E'] },
+  },
+} as const satisfies Record<'light' | 'dark', Record<string, { primary: string; primaryLight: string; onPrimary: string; gradient: readonly [string, string] }>>;
+export type AppThemeKey = keyof (typeof appThemes)['light'];
+
+/** "#RRGGBB" → "R G B" (biến màu dạng kênh của preset NativeWind: rgb(var(--x) / <alpha-value>)). */
+export function rgbChannels(hex: string): string {
+  const n = Number.parseInt(hex.slice(1), 16);
+  return `${(n >> 16) & 255} ${(n >> 8) & 255} ${n & 255}`;
+}
+
+/**
+ * Biến màu của mini-app cho NativeWind: `<View style={vars(appThemeVars(scheme, 'room'))}>` → mọi bg-primary /
+ * text-primary / from-app-from bên trong theo màu Nhà trọ. Cùng tên biến với theme.css của web.
+ */
+export function appThemeVars(scheme: 'light' | 'dark', key: AppThemeKey): Record<string, string> {
+  const t = appThemes[scheme][key];
+  return {
+    '--color-primary': rgbChannels(t.primary),
+    '--color-primary-light': rgbChannels(t.primaryLight),
+    '--color-on-primary': rgbChannels(t.onPrimary),
+    '--color-app-from': rgbChannels(t.gradient[0]),
+    '--color-app-to': rgbChannels(t.gradient[1]),
+  };
+}
 
 /** Thang 4. Padding màn hình = 4 (16), khoảng cách card = 3 (12). */
 export const space = { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32 } as const;
@@ -154,5 +203,5 @@ export const hitTarget = { primary: 48, secondary: 44 } as const;
 /** Kích thước icon Lucide. */
 export const icon = { button: 20, tab: 24, strokeWidth: 1.75 } as const;
 
-export const tokens = { colors, serviceColors, gradients, space, radius, font, shadow, shimmer, motion, aspect, hitTarget, icon } as const;
+export const tokens = { colors, serviceColors, gradients, appThemes, space, radius, font, shadow, shimmer, motion, aspect, hitTarget, icon } as const;
 export type Tokens = typeof tokens;

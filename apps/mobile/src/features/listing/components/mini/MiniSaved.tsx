@@ -37,7 +37,7 @@ import {
   useTheme,
 } from '@/ui';
 import { useContactListing, useIsOwner, useListingBookmark } from '../../hooks';
-import { useMiniApp, useMiniFilterState } from '../../miniApp';
+import { useMiniApp, useMiniFilterState, useMiniT } from '../../miniApp';
 import { openListing, openMiniTab } from '../../navigation';
 import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniTabHeader } from './MiniHeader';
@@ -48,7 +48,7 @@ type SavedTab = 'all' | 'active' | 'inactive';
 const isLive = (l: Pick<PublicListing, 'status' | 'is_expired'>) => l.status === 'active' && !l.is_expired;
 
 export function MiniSaved() {
-  const { t } = useTranslation('listing');
+  const mt = useMiniT();
   const { space, colors } = useTheme();
   const { config } = useMiniApp();
   const filters = useMiniFilterState();
@@ -82,9 +82,9 @@ export function MiniSaved() {
     body = (
       <EmptyState
         icon={Heart}
-        title={t('mini_app.saved.empty_title')}
-        description={t('mini_app.saved.empty_body')}
-        action={{ label: t('mini_app.saved.empty_cta'), onPress: goHome }}
+        title={mt('saved.empty_title')}
+        description={mt('saved.empty_body')}
+        action={{ label: mt('saved.empty_cta'), onPress: goHome }}
       />
     );
   } else {
@@ -97,9 +97,9 @@ export function MiniSaved() {
             value={tab}
             onChange={setTab}
             options={[
-              { value: 'all', label: t('mini_app.saved.tab_all', { count: items.length }) },
-              { value: 'active', label: t('mini_app.saved.tab_active', { count: live.length }) },
-              { value: 'inactive', label: t('mini_app.saved.tab_inactive', { count: items.length - live.length }) },
+              { value: 'all', label: mt('saved.tab_all', { count: items.length }) },
+              { value: 'active', label: mt('saved.tab_active', { count: live.length }) },
+              { value: 'inactive', label: mt('saved.tab_inactive', { count: items.length - live.length }) },
             ]}
           />
         </View>
@@ -126,13 +126,13 @@ export function MiniSaved() {
             <EmptyState
               compact
               icon={Heart}
-              title={t('mini_app.saved.empty_title')}
-              action={{ label: t('mini_app.saved.tab_all', { count: items.length }), onPress: () => setTab('all') }}
+              title={mt('saved.empty_title')}
+              action={{ label: mt('saved.tab_all', { count: items.length }), onPress: () => setTab('all') }}
             />
           }
           ListFooterComponent={
             <View className="gap-4 pt-1">
-              <Notice variant="bordered" tone="warning" icon={ShieldCheck} title={t('mini_app.saved.tip_title')} text={t('mini_app.saved.tip_body')} />
+              <Notice variant="bordered" tone="warning" icon={ShieldCheck} title={mt('saved.tip_title')} text={mt('saved.tip_body')} />
               <MiniDisclaimer />
             </View>
           }
@@ -143,7 +143,7 @@ export function MiniSaved() {
 
   return (
     <>
-      <MiniTabHeader title={t('mini_app.saved.title')} badge={items.length > 0 ? String(items.length) : undefined} />
+      <MiniTabHeader title={mt('saved.title')} badge={items.length > 0 ? String(items.length) : undefined} />
       {body}
     </>
   );
@@ -151,16 +151,18 @@ export function MiniSaved() {
 
 function SavedRow({ listing, onSimilar }: { listing: PublicListing; onSimilar: (category: ListingCategory) => void }) {
   const { t } = useTranslation('listing');
+  const mt = useMiniT();
+  const { config } = useMiniApp();
   const price = usePriceText()(listing);
   const site = useSiteText()(listing);
   const bookmark = useListingBookmark(listing.id);
   const isOwner = useIsOwner(listing);
   const contact = useContactListing();
   const live = isLive(listing);
-  const status = listing.status === 'sold' ? t('mini_app.saved.sold_badge') : t(`common:status.${listing.is_expired ? 'expired' : listing.status}`);
+  const status = listing.status === 'sold' ? mt('saved.sold_badge') : t(`common:status.${listing.is_expired ? 'expired' : listing.status}`);
   const meta = [site, formatRelative(listing.created_at)].filter(Boolean).join(' · ');
   const worker = listing.owner_badges.includes('worker');
-  const remove = t('mini_app.saved.remove_a11y', { title: listing.title });
+  const remove = mt('saved.remove_a11y', { title: listing.title });
   const note = listing.description?.trim().split('\n')[0] ?? '';
 
   return (
@@ -169,7 +171,7 @@ function SavedRow({ listing, onSimilar }: { listing: PublicListing; onSimilar: (
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={[listing.title, live ? null : status, price, meta].filter(Boolean).join(', ')}
-          onPress={() => openListing(listing.id)}
+          onPress={() => openListing(listing.id, { mini: config.slug })}
           className="flex-row items-start gap-3 pr-10 active:opacity-80"
         >
           <View className="size-28 overflow-hidden rounded-md border border-border">
@@ -217,16 +219,16 @@ function SavedRow({ listing, onSimilar }: { listing: PublicListing; onSimilar: (
               {note}
             </Text>
             {isOwner ? null : (
-              <Button size="sm" icon={MessageCircle} label={t('mini_app.saved.chat')} loading={contact.isPending} onPress={() => contact.open(listing)} />
+              <Button size="sm" icon={MessageCircle} label={mt('saved.chat')} loading={contact.isPending} onPress={() => contact.open(listing, { mini: config.slug })} />
             )}
           </>
         ) : (
           <>
             <Icon icon={Search} tone="muted" size={16} />
             <Text variant="caption" tone="muted" className="flex-1">
-              {t('mini_app.saved.inactive_hint')}
+              {mt('saved.inactive_hint')}
             </Text>
-            <Button size="sm" variant="ghost" label={t('mini_app.saved.find_similar')} onPress={() => onSimilar(listing.category)} />
+            <Button size="sm" variant="ghost" label={mt('saved.find_similar')} onPress={() => onSimilar(listing.category)} />
           </>
         )}
       </View>

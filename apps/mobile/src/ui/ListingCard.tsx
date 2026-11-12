@@ -15,11 +15,17 @@
 // ở features/listing). Nút tim là anh em của Card (không lồng trong Pressable của thẻ) để trình đọc màn hình bấm riêng được.
 // Đồ thất lạc đã trả lại: ảnh mờ + tiêu đề gạch ngang chữ muted (kèm badge "Đã trả lại" — không chỉ bằng màu).
 // ListingCover dùng lại ở chi tiết (ô giữ chỗ cỡ lớn khi tin chưa có ảnh).
+// layout 'featured' (thẻ nổi bật đầu danh sách trang chủ mini-app Nhà trọ, style Stitch "Phòng trọ giá tốt ca kíp"): ảnh 4:3
+// tràn mép + badge góc trái trên + `coverLabel` góc trái dưới (vd "5 ảnh") + tim góc phải trên → giá lớn primary + viên
+// thông số nền primary-light ("22 m² • Có gác") → tiêu đề 2 dòng → dòng khu → tối đa 4 viên tiện nghi
+// (`display.highlights` — thông số bool đang có) → `footer` (vd nút Gọi / Nhắn tin). Vùng bấm mở tin (ảnh + thân) và
+// `footer` là hai vùng riêng (nút trong footer bấm / đọc màn hình được riêng, không lồng trong nút thẻ).
 import { listingCover, type PublicListing } from '@hp/core';
 import { featureOfCategory, type ListingCategory } from '@hp/shared';
 import { BadgeCheck, MapPin } from 'lucide-react-native';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { formatRelative } from '@/lib/format';
 import { listingImageUrl, profileAvatarUrl } from '@/lib/images';
 import { attributeString, isReturned, useCardFacts, usePriceText, useSiteText } from '@/lib/listing';
@@ -34,6 +40,8 @@ import { Text } from './Text';
 import { useTheme } from './theme';
 
 export type ListingCardLayout = 'grid' | 'row';
+/** Bố cục một thẻ: lưới / hàng (config.card.variant) hoặc thẻ nổi bật ('featured' — đặt cho từng thẻ, không phải bố cục danh sách). */
+export type ListingCardVariant = ListingCardLayout | 'featured';
 
 /** Điểm nhấn của thẻ theo tính năng (config.card.display) — xem chú thích đầu file. */
 export type ListingCardDisplay = {
@@ -51,6 +59,8 @@ export type ListingCardDisplay = {
   owner?: boolean;
   /** Nút lưu tin trên thẻ — feature truyền prop `bookmark` khi bật (thẻ chỉ hiển thị). */
   bookmark?: boolean;
+  /** Thẻ 'featured': khoá thông số bool hiện thành viên tiện nghi khi true (tối đa 4), vd trọ WC riêng · Wifi · Camera. */
+  highlights?: readonly string[];
 };
 
 /** Trạng thái + thao tác của nút tim trên thẻ (useListingBookmark của features/listing). */
@@ -58,7 +68,7 @@ export type ListingCardBookmark = Pick<BookmarkButtonProps, 'saved' | 'onToggle'
 
 export type ListingCardProps = {
   listing: PublicListing;
-  layout?: ListingCardLayout;
+  layout?: ListingCardVariant;
   onPress?: () => void;
   /** Bề rộng / vị trí trong lưới hoặc hàng ngang (vd `w-44`). */
   className?: string;
@@ -68,6 +78,10 @@ export type ListingCardProps = {
   display?: ListingCardDisplay;
   /** Có → nút tim lưu tin ở góc phải trên (không truyền cho tin của chính mình). */
   bookmark?: ListingCardBookmark;
+  /** Thẻ 'featured': nhãn góc trái dưới ảnh (vd "5 ảnh"). */
+  coverLabel?: string;
+  /** Thẻ 'featured': hàng nút cuối thẻ (vùng bấm riêng). */
+  footer?: ReactNode;
 };
 
 const join = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -113,7 +127,20 @@ export function ListingCover({
   );
 }
 
-export function ListingCard({ listing, layout = 'grid', onPress, className, imagePriority, display, bookmark }: ListingCardProps) {
+export function ListingCard(props: ListingCardProps) {
+  if (props.layout === 'featured') return <FeaturedListingCard {...props} />;
+  return <StandardListingCard {...props} layout={props.layout} />;
+}
+
+function StandardListingCard({
+  listing,
+  layout = 'grid',
+  onPress,
+  className,
+  imagePriority,
+  display,
+  bookmark,
+}: ListingCardProps & { layout?: ListingCardLayout }) {
   const { t, i18n } = useTranslation();
   const priceText = usePriceText();
   const siteText = useSiteText();
@@ -244,6 +271,93 @@ export function ListingCard({ listing, layout = 'grid', onPress, className, imag
           size="button"
         />
       </View>
+    </View>
+  );
+}
+
+/** Thẻ nổi bật (layout 'featured') — xem chú thích đầu file. */
+function FeaturedListingCard({ listing, onPress, className, imagePriority, display, bookmark, coverLabel, footer }: ListingCardProps) {
+  const { t, i18n } = useTranslation();
+  const priceText = usePriceText();
+  const siteText = useSiteText();
+  const cardFacts = useCardFacts();
+  const price = priceText(listing);
+  const site = attributeString(listing, display?.placeKey) ?? siteText(listing);
+  const meta = [site, formatRelative(listing.created_at)].filter(Boolean).join(' · ');
+  const facts = cardFacts(listing, display?.facts, 2);
+  const highlights = cardFacts(listing, display?.highlights, 4);
+  const categoryBadge = display?.categoryBadge?.[listing.category];
+  const category = categoryBadge?.labelKey ? t(categoryBadge.labelKey) : t(`common:category.${listing.category}`);
+  const verified = listing.owner_badges.some((b) => i18n.exists(`listing:owner_badge.${b}`));
+  const cut = price.lastIndexOf('/');
+  const a11y = [category, verified ? t('common:profile.verified') : null, listing.title, price, ...facts, meta, ...highlights, coverLabel];
+
+  return (
+    <View className={join('relative rounded-lg border border-border bg-surface shadow-card', className)}>
+      <Pressable accessibilityRole="button" accessibilityLabel={a11y.filter(Boolean).join(', ')} onPress={onPress} className="active:opacity-90">
+        <View>
+          <ListingCover listing={listing} priority={imagePriority} className="aspect-card w-full rounded-t-lg" />
+          <View pointerEvents="none" className={join('absolute left-2 top-2 flex-row flex-wrap gap-1', bookmark ? 'right-12' : 'right-2')}>
+            <Badge overlay label={category} tone={categoryBadge?.tone} numberOfLines={1} />
+            {verified ? <Badge overlay label={t('common:profile.verified')} tone="success" numberOfLines={1} /> : null}
+          </View>
+          {coverLabel ? (
+            <View pointerEvents="none" className="absolute bottom-2 left-2">
+              <Badge overlay label={coverLabel} numberOfLines={1} />
+            </View>
+          ) : null}
+        </View>
+        <View className="gap-1.5 p-3">
+          <View className="flex-row flex-wrap items-center justify-between gap-2">
+            {price ? (
+              <Text variant="title" weight="bold" tone="primary" className="shrink">
+                {cut > 0 ? price.slice(0, cut) : price}
+                {cut > 0 ? (
+                  <Text variant="caption" tone="muted" weight="semibold">
+                    {'​'}
+                    {price.slice(cut)}
+                  </Text>
+                ) : null}
+              </Text>
+            ) : null}
+            {facts.length > 0 ? (
+              <View className="rounded-sm bg-primary-light px-2 py-0.5">
+                <Text variant="caption" weight="semibold" tone="primary" numberOfLines={1}>
+                  {facts.join(' • ')}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          <Text variant="label" weight="bold" numberOfLines={2}>
+            {listing.title}
+          </Text>
+          {meta ? (
+            <View className="flex-row items-center gap-1">
+              {site ? <Icon icon={MapPin} tone="primary" size={14} /> : null}
+              <Text variant="caption" tone="muted" numberOfLines={1} className="flex-1">
+                {meta}
+              </Text>
+            </View>
+          ) : null}
+          {highlights.length > 0 ? (
+            <View className="mt-1 flex-row flex-wrap gap-1.5 border-t border-border pt-2">
+              {highlights.map((h) => (
+                <View key={h} className="rounded-sm border border-primary/15 bg-primary-light px-2 py-0.5">
+                  <Text variant="caption" tone="primary" numberOfLines={1}>
+                    {h}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </View>
+      </Pressable>
+      {footer ? <View className="px-3 pb-3">{footer}</View> : null}
+      {bookmark ? (
+        <View className="absolute right-1 top-1">
+          <BookmarkButton saved={bookmark.saved} onToggle={bookmark.onToggle} labels={bookmark.labels} variant="filled" size="button" />
+        </View>
+      ) : null}
     </View>
   );
 }

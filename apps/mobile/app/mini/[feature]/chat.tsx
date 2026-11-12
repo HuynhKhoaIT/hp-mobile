@@ -14,10 +14,11 @@ export default function MiniChatScreen() {
   const { t } = useTranslation(['chat', 'listing']);
   const { config } = useMiniApp();
   return (
-    <Screen tab statusBar="primary">
+    <Screen tab statusBar="app">
       <MiniTabHeader title={t('title')} />
       <InboxList
         feature={config.key}
+        mini={config.slug}
         emptyAction={{ label: t('listing:mini_app.saved.empty_cta'), onPress: () => openMiniTab(config.slug, 'index') }}
         footer={<MiniDisclaimer />}
       />

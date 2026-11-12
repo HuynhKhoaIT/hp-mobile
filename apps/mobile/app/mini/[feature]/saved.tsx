@@ -6,7 +6,7 @@ import { Screen } from '@/ui';
 
 export default function MiniSavedScreen() {
   return (
-    <Screen tab statusBar="primary">
+    <Screen tab statusBar="app">
       <MiniSaved />
     </Screen>
   );

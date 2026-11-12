@@ -3,6 +3,7 @@
 // Hub: `statusBar="primary"` tô dải trạng thái màu primary (header xanh tràn lên vùng an toàn; màn không scroll — vd trang
 // chủ mini-app có header cuộn trong FlashList — cũng giữ dải primary cố định), `onScroll` nhận
 // handler Reanimated (header thu gọn), `stickyHeaderIndices` giữ ô tìm kiếm trên cùng, `onRefresh` kéo xuống làm mới.
+// Mini-app: `statusBar="app"` — dải trạng thái màu đầu gradient của mini-app (bg-app-from, header GradientSurface).
 import type { ComponentProps, ReactNode } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { KeyboardAvoidingView, KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -24,8 +25,8 @@ export type ScreenProps = {
   keyboard?: boolean;
   /** Màn trong tab: thanh tab đã chừa vùng an toàn đáy → không cộng thêm. */
   tab?: boolean;
-  /** Màu dải trạng thái (vùng an toàn trên). 'primary': màn có header xanh (Hub). */
-  statusBar?: 'bg' | 'primary';
+  /** Màu dải trạng thái (vùng an toàn trên). 'primary': màn có header xanh (Hub). 'app': header gradient của mini-app. */
+  statusBar?: 'bg' | 'primary' | 'app';
   /** Handler cuộn của Reanimated (useAnimatedScrollHandler) — chỉ khi scroll. */
   onScroll?: ComponentProps<typeof AnimatedScrollView>['onScroll'];
   /** Chỉ số con trực tiếp dính trên cùng khi cuộn (vd ô tìm kiếm của Hub). */
@@ -70,12 +71,14 @@ function ScreenBody({
   const padding = edgeToEdge ? '' : 'px-4';
   const safe = { paddingTop: insets.top };
 
-  if (scroll && (onScroll || statusBar === 'primary' || onRefresh)) {
-    const onPrimary = statusBar === 'primary';
+  const strip = statusBar === 'app' ? 'bg-app-from' : statusBar === 'primary' ? 'bg-primary' : 'bg-bg';
+
+  if (scroll && (onScroll || statusBar !== 'bg' || onRefresh)) {
+    const onPrimary = statusBar !== 'bg';
     return (
       <View className="flex-1 bg-bg">
         {/* Dải trạng thái cố định: nội dung cuộn bên dưới, header dính không chui vào vùng tai thỏ. */}
-        <View className={onPrimary ? 'bg-primary' : 'bg-bg'} style={{ height: insets.top }} />
+        <View className={strip} style={{ height: insets.top }} />
         <AnimatedScrollView
           className="flex-1"
           contentContainerClassName={[padding, 'pb-8', className].filter(Boolean).join(' ')}
@@ -90,7 +93,7 @@ function ScreenBody({
                 refreshing={!!refreshing}
                 onRefresh={onRefresh}
                 // iOS: vòng quay hiện trên nền xanh của header → màu chữ trên primary; Android: nút tròn nền surface.
-                tintColor={onPrimary ? t.colors.onPrimary : t.colors.primary}
+                tintColor={statusBar === 'app' ? t.colors.onAccent : onPrimary ? t.colors.onPrimary : t.colors.primary}
                 colors={[t.colors.primary]}
                 progressBackgroundColor={t.colors.surface}
               />
@@ -135,7 +138,7 @@ function ScreenBody({
   return (
     <View className={['flex-1 bg-bg', padding, className].filter(Boolean).join(' ')} style={{ ...safe, paddingBottom: bottom }}>
       {/* Header xanh cuộn theo danh sách (trang chủ mini-app): dải trạng thái giữ màu primary khi header đã cuộn đi. */}
-      {statusBar === 'primary' ? <View className="absolute inset-x-0 top-0 bg-primary" style={{ height: insets.top }} /> : null}
+      {statusBar !== 'bg' ? <View className={`absolute inset-x-0 top-0 ${strip}`} style={{ height: insets.top }} /> : null}
       {children}
     </View>
   );

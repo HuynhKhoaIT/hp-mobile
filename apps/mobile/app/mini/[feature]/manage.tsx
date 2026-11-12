@@ -13,7 +13,7 @@ const isTab = (v: string | undefined): v is FeatureListingsTab => !!v && (FEATUR
 export default function MiniManageScreen() {
   const { tab, at } = useLocalSearchParams<{ tab?: string; at?: string }>();
   return (
-    <Screen tab statusBar="primary">
+    <Screen tab statusBar="app">
       <MiniManage tab={isTab(tab) ? tab : undefined} requestKey={at} />
     </Screen>
   );

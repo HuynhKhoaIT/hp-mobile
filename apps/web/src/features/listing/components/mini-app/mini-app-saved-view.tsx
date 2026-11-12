@@ -98,7 +98,9 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
   };
   const visible = tab === 'all' ? mine : mine.filter((l) => (tab === 'active' ? isOnSale(l) : !isOnSale(l)));
   const now = saved.dataUpdatedAt;
-  const tip = <SafetyTip title={t('listing.mini_app.saved.tip_title')} text={t('listing.mini_app.saved.tip_body')} />;
+  // Mẹo riêng mini-app (Chợ Pass: "Mẹo mua đồ pass an toàn") hoặc mẹo an toàn của tính năng.
+  const savedTip = cfg.miniApp?.savedTip ?? { titleKey: 'listing.tip.title', bodyKey: cfg.tipKey ?? 'listing.detail.safety_tip' };
+  const tip = <SafetyTip title={t(savedTip.titleKey)} text={t(savedTip.bodyKey)} />;
 
   if (mine.length === 0) {
     return (

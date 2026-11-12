@@ -31,3 +31,11 @@ export function miniAppTabOf(cfg: MiniAppConfig, pathname: string): MiniAppTab |
   if (under(paths.post)) return 'post';
   return null;
 }
+
+/**
+ * Giá trị `data-app-theme` cho khung của một tính năng (trang mini-app, chi tiết tin thuộc mini-app): màu chủ đạo riêng
+ * (theme.css của @hp/tokens ghi đè --color-primary / --color-primary-light / --color-on-primary / --color-app-from / -to).
+ * undefined = tính năng không chạy dạng mini-app → giữ màu super app.
+ */
+export const appThemeOf = (cfg: ListingFeatureConfig | null | undefined): MiniAppConfig['miniApp']['theme'] | undefined =>
+  cfg?.miniApp?.theme;
