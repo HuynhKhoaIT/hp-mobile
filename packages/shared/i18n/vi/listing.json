@@ -586,7 +586,9 @@
       "tip_body": "Hẹn giao dịch trực tiếp tại cổng nhà máy hoặc ký túc xá vào giờ giao ca. Kiểm tra món đồ tận tay, không chuyển cọc qua mạng.",
       "empty_title": "Chưa lưu tin nào",
       "empty_body": "Bấm ♡ trên tin để lưu lại và xem sau.",
-      "empty_cta": "Xem tin mới"
+      "empty_cta": "Xem tin mới",
+      "count_one": "{{count}} tin",
+      "count_other": "{{count}} tin"
     },
     "manage": {
       "title": "Quản lý tin đăng",

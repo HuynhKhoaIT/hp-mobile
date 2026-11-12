@@ -586,7 +586,9 @@
       "tip_body": "在交班时间约在工厂门口或宿舍当面交易，当面检查物品，不要在网上先付定金。",
       "empty_title": "还没有收藏",
       "empty_body": "点信息上的 ♡ 收藏，稍后再看。",
-      "empty_cta": "看看新发布"
+      "empty_cta": "看看新发布",
+      "count_one": "{{count}} 条",
+      "count_other": "{{count}} 条"
     },
     "manage": {
       "title": "管理我的发布",

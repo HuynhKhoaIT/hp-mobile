@@ -586,7 +586,9 @@
       "tip_body": "Meet at a factory gate or dorm at shift change. Check the item in person and never send a deposit online.",
       "empty_title": "No saved listings yet",
       "empty_body": "Tap ♡ on a listing to keep it for later.",
-      "empty_cta": "Browse new listings"
+      "empty_cta": "Browse new listings",
+      "count_one": "{{count}} saved",
+      "count_other": "{{count}} saved"
     },
     "manage": {
       "title": "Manage listings",
