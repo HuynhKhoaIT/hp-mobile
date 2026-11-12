@@ -39,6 +39,7 @@ import {
 import { useContactListing, useIsOwner, useListingBookmark } from '../../hooks';
 import { useMiniApp, useMiniFilterState } from '../../miniApp';
 import { openListing, openMiniTab } from '../../navigation';
+import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniTabHeader } from './MiniHeader';
 
 type SavedTab = 'all' | 'active' | 'inactive';
@@ -130,8 +131,9 @@ export function MiniSaved() {
             />
           }
           ListFooterComponent={
-            <View className="pt-1">
+            <View className="gap-4 pt-1">
               <Notice variant="bordered" tone="warning" icon={ShieldCheck} title={t('mini_app.saved.tip_title')} text={t('mini_app.saved.tip_body')} />
+              <MiniDisclaimer />
             </View>
           }
         />

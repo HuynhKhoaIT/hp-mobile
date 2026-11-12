@@ -41,7 +41,7 @@ import { formatDate } from '@/lib/format';
 import { listingShareUrl } from '@/lib/urls';
 import { toast } from '@/ui';
 import { useOpenConversation } from '@/features/chat/hooks';
-import { openPostForm, openPostPicker } from './navigation';
+import { LISTING_ROUTE_SLUG, openPostForm, openPostPicker } from './navigation';
 import type { ListingFeatureConfig, ListingQuickFilter } from './types';
 
 /** Giá trị chip "Tất cả" / "Mọi khu" / "Mọi khoảng cách" (không lọc). Mã category / site không bao giờ rỗng. */
@@ -94,14 +94,18 @@ const isCategory = (v: string): v is ListingCategory => (LISTING_CATEGORIES as r
  */
 export function useListingPreset(params: { shortcut?: string; categories?: string }): ListingPreset | undefined {
   const { t } = useTranslation();
-  return useMemo(() => {
-    const shortcut = params.shortcut ? HOME_SHORTCUTS.find((s) => s.id === params.shortcut) : undefined;
-    if (shortcut) return { label: t(`home.shortcut.${shortcut.id}`), categories: shortcut.categories, attributes: shortcut.attributes };
-    const categories = (params.categories ?? '').split(',').filter(isCategory);
-    if (categories.length === 0) return undefined;
-    const features = [...new Set(categories.map(featureOfCategory))];
-    return { label: features.map((f) => t(`feature.${f}`)).join(' · '), categories };
-  }, [params.categories, params.shortcut, t]);
+  const { shortcut, categories } = params;
+  return useMemo(() => listingPresetOf({ shortcut, categories }, t), [shortcut, categories, t]);
+}
+
+/** Như useListingPreset, ngoài hook (link banner trong mini-app); `t` của namespace common. */
+export function listingPresetOf(params: { shortcut?: string; categories?: string }, t: (key: string) => string): ListingPreset | undefined {
+  const shortcut = params.shortcut ? HOME_SHORTCUTS.find((s) => s.id === params.shortcut) : undefined;
+  if (shortcut) return { label: t(`home.shortcut.${shortcut.id}`), categories: shortcut.categories, attributes: shortcut.attributes };
+  const categories = (params.categories ?? '').split(',').filter(isCategory);
+  if (categories.length === 0) return undefined;
+  const features = [...new Set(categories.map(featureOfCategory))];
+  return { label: features.map((f) => t(`feature.${f}`)).join(' · '), categories };
 }
 
 /**
@@ -176,6 +180,12 @@ export function browserFilters(config: ListingFeatureConfig, s: ListingBrowserSt
     ...(s.sort !== DEFAULT_SORT ? { sort: s.sort } : {}),
   };
 }
+
+/**
+ * Bỏ mọi lọc giá (chip giá tối đa, khoảng giá, giá tự nhập). "Cho tặng" và lọc giá loại trừ nhau: bật bên này thì bỏ bên kia
+ * (trang chủ, danh sách, màn Bộ lọc của mini-app).
+ */
+export const NO_PRICE = { priceMax: null, priceRange: ALL, customPrice: null } as const satisfies Partial<ListingBrowserState>;
 
 /** Có khoảng giá tự nhập (ít nhất một đầu). */
 const hasCustomPrice = (s: ListingBrowserState) => !!s.customPrice && (s.customPrice.min !== null || s.customPrice.max !== null);
@@ -260,20 +270,21 @@ export function useListingBrowser(config: ListingFeatureConfig, initial: Listing
         return { ...prev, attributes: next };
       }),
     priceMax: s.priceMax,
-    /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá); bỏ khoảng giá đang chọn. */
+    /** Bật / tắt chip giá tối đa (bấm lại đúng mốc đang bật → bỏ lọc giá); bỏ khoảng giá đang chọn và "Cho tặng". */
     togglePriceMax: (value: number) =>
-      update((prev) => ({ ...prev, priceRange: ALL, customPrice: null, priceMax: prev.priceMax === value ? null : value })),
+      update((prev) => ({ ...prev, ...NO_PRICE, freeOnly: false, priceMax: prev.priceMax === value ? null : value })),
     priceRange: s.priceRange,
-    /** Chọn khoảng giá (ALL = mọi mức giá); bỏ chip giá tối đa đang bật. */
-    setPriceRange: (key: string) => patch({ priceMax: null, customPrice: null, priceRange: key }),
+    /** Chọn khoảng giá (ALL = mọi mức giá); bỏ chip giá tối đa đang bật (và "Cho tặng" khi chọn một khoảng). */
+    setPriceRange: (key: string) => patch({ ...NO_PRICE, priceRange: key, ...(key !== ALL ? { freeOnly: false } : {}) }),
     freeOnly: s.freeOnly,
-    toggleFreeOnly: () => update((prev) => ({ ...prev, freeOnly: !prev.freeOnly })),
+    /** Bật / tắt "Cho tặng" — bật thì bỏ lọc giá (đồ 0đ mâu thuẫn với khoảng giá). */
+    toggleFreeOnly: () => update((prev) => (prev.freeOnly ? { ...prev, freeOnly: false } : { ...prev, ...NO_PRICE, freeOnly: true })),
     sort: s.sort,
     setSort: (sort: ListingSort) => patch({ sort }),
     /** Thao tác cho khối `header` (FeatureHome). */
     api: {
       selectCategory: (value: ListingCategory) => patch({ category: value }),
-      showFree: () => patch({ freeOnly: true }),
+      showFree: () => patch({ ...NO_PRICE, freeOnly: true }),
       selectSite: (site: string) => patch({ site }),
     } satisfies ListingBrowserApi,
     /** Bộ lọc gửi useListingList — đổi → danh sách cuộn về đầu. */
@@ -292,10 +303,14 @@ export function useListingBrowser(config: ListingFeatureConfig, initial: Listing
 
 export type ListingBrowserResult = ReturnType<typeof useListingBrowser>;
 
-/** Đăng tin: bắt đăng nhập trước → bước chọn loại tin (đặt sẵn tính năng khi gọi từ danh sách của tính năng đó). */
-export function usePostListing(feature?: ListingFeatureConfig['key']) {
+/**
+ * Đăng tin: bắt đăng nhập trước → bước chọn loại tin (đặt sẵn tính năng khi gọi từ danh sách của tính năng đó).
+ * `mini`: gọi trong mini-app → luồng đăng ở lại mini-app (chỉ danh mục của tính năng, xong về "Quản lý tin").
+ */
+export function usePostListing(feature?: ListingFeatureConfig['key'], opts: { mini?: boolean } = {}) {
   const preset: ListingFeature | undefined = feature === 'all' ? undefined : feature;
-  return () => requireAuth(() => openPostPicker(preset));
+  const mini = opts.mini && preset ? LISTING_ROUTE_SLUG[preset] : undefined;
+  return () => requireAuth(() => openPostPicker(preset, { mini }));
 }
 
 /** Đăng tin vào thẳng một danh mục (khối mời đăng tin — config.banner): bắt đăng nhập trước → form bước 1. */

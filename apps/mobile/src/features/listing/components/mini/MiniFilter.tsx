@@ -1,10 +1,12 @@
 // Màn "Bộ lọc & tìm kiếm" của mini-app (style Stitch "Bộ lọc & Tìm kiếm"), tab ẩn — thanh tab vẫn hiện (ô trang chủ sáng):
 //   header (← trang chủ mini-app, tiêu đề, "Đặt lại") + ô tìm + nút Tìm + lịch sử tìm (8 từ khoá gần nhất / tính năng,
 //   MMKV; chạm → tìm luôn, × xoá một, "Xoá hết").
+//   Bộ lọc đặt sẵn (chip "Tìm nhanh" của Hub / ?categories= — chip đang chọn, × bỏ; chọn danh mục / "Tất cả" cũng bỏ).
 //   Danh mục lớn (chọn 1: Tất cả + config.categories) → loại đồ cụ thể = giá trị enum của khoá "loại" (ô enum đầu tiên,
 //   khác `condition`, trong ATTRIBUTE_FIELDS của danh mục) → p_attributes. Vị trí: khu (Tất cả khu + sites) + khoảng cách
 //   tới khu (Toàn bộ / < 2 / 5 / 10 km — config.distanceOptionsKm → maxDistanceM). Khoảng giá: ô Tối thiểu / Tối đa (VND,
-//   tối thiểu < tối đa — sai thì báo và khoá "Áp dụng") + chip khoảng giá config.priceRanges + chip "Cho tặng" (freeOnly).
+//   tối thiểu < tối đa — sai thì báo và khoá "Áp dụng") + chip khoảng giá config.priceRanges + chip "Cho tặng" (freeOnly —
+//   loại trừ với lọc giá: chọn bên này bỏ bên kia, NO_PRICE).
 //   Tình trạng (CONDITIONS — khi danh mục của tính năng có trường condition). Sắp xếp (LISTING_SORTS, nút radio).
 //   Thanh dính đáy (trên thanh tab): "{n} bộ lọc" + "Áp dụng" → ghi bộ lọc vào phiên mini-app, về trang chủ.
 // Màn sửa bản nháp (chép từ bộ lọc đang áp dụng mỗi lần mở) — chưa "Áp dụng" thì trang chủ không đổi.
@@ -13,15 +15,16 @@
 // "Gần tôi nhất" / "Xem nhiều nhất" (chưa có dữ liệu / RPC), không "Tự định vị" (lọc theo khu, không theo GPS).
 import { ATTRIBUTE_FIELDS, CONDITIONS, type ListingCategory, LISTING_SORTS } from '@hp/shared';
 import { useFocusEffect } from 'expo-router';
-import { Filter, History, RotateCcw } from 'lucide-react-native';
+import { Filter, History, RotateCcw, X } from 'lucide-react-native';
 import { type ReactNode, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { formatNumber } from '@/lib/format';
 import { Button, Card, Chip, Icon, PriceInput, RadioOption, SearchBar, StickyCta, Text } from '@/ui';
-import { activeFilterCount, ALL, DISTANCE_OPTIONS_KM, isFreeQuickFilter, type ListingBrowserState } from '../../hooks';
+import { activeFilterCount, ALL, DISTANCE_OPTIONS_KM, isFreeQuickFilter, type ListingBrowserState, NO_PRICE } from '../../hooks';
 import { type MiniAppFeatureConfig, useMiniApp, useMiniFilterState, useRecentSearches } from '../../miniApp';
 import { openMiniTab } from '../../navigation';
+import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniTabHeader } from './MiniHeader';
 
 /** Khoá "loại đồ" của danh mục: trường enum đầu tiên khác `condition` (ATTRIBUTE_FIELDS — @hp/shared). */
@@ -77,7 +80,7 @@ export function MiniFilter() {
         const key = typeFieldOf(c)?.key;
         if (key && key !== keep) delete attributes[key];
       }
-      return { ...d, category, attributes, preset: category !== ALL ? null : d.preset };
+      return { ...d, category, attributes, preset: null };
     });
   const toggleAttribute = (key: string, value: string) =>
     setDraft((d) => {
@@ -86,8 +89,19 @@ export function MiniFilter() {
       else attributes[key] = value;
       return { ...d, attributes };
     });
+  // Bộ lọc đặt sẵn (Hub / link): chip đang chọn, bấm → bỏ.
+  const presetChip = draft.preset ? (
+    <Chip
+      selected
+      label={draft.preset.label}
+      trailingIcon={X}
+      accessibilityHint={t('common:actions.clear_filter')}
+      onPress={() => set({ preset: null })}
+    />
+  ) : null;
   const setPrice = (bound: 'min' | 'max', value: number | null) =>
-    set({ customPrice: { ...price, [bound]: value }, priceRange: ALL, priceMax: null });
+    set({ customPrice: { ...price, [bound]: value }, priceRange: ALL, priceMax: null, ...(value !== null ? { freeOnly: false } : {}) });
+  const toggleFree = () => set(draft.freeOnly ? { freeOnly: false } : { ...NO_PRICE, freeOnly: true });
 
   return (
     <>
@@ -115,7 +129,8 @@ export function MiniFilter() {
               placeholder={t('list.search_placeholder', { feature: t(config.titleKey) })}
             />
           </View>
-          <Button size="sm" variant="accent" shape="pill" label={t('list.search_submit')} onPress={() => apply(draft)} />
+          {/* Nút phụ (kính trên header xanh) — hành động chính của màn là "Áp dụng". */}
+          <Button size="sm" variant="glass" shape="pill" label={t('list.search_submit')} onPress={() => apply(draft)} />
         </View>
         {recent.list.length > 0 ? (
           <View className="gap-1">
@@ -149,11 +164,17 @@ export function MiniFilter() {
       </MiniTabHeader>
 
       <ScrollView className="flex-1" contentContainerClassName="gap-4 pb-6 pt-4" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {presetChip && !showCategory ? <ChipWrap>{presetChip}</ChipWrap> : null}
         {showCategory ? (
           <Section title={t('mini_app.filter.category_title')}>
             <Caption>{t('mini_app.filter.category_big')}</Caption>
             <ChipWrap>
-              <Chip label={t('mini_app.filter.category_all')} selected={draft.category === ALL} onPress={() => selectCategory(ALL)} />
+              {presetChip}
+              <Chip
+                label={t('mini_app.filter.category_all')}
+                selected={draft.category === ALL && !draft.preset}
+                onPress={() => selectCategory(ALL)}
+              />
               {config.categories.map((c) => (
                 <Chip key={c} label={t(`common:category.${c}`)} selected={draft.category === c} onPress={() => selectCategory(c)} />
               ))}
@@ -237,12 +258,12 @@ export function MiniFilter() {
                     size="sm"
                     label={t(`price_range.${r.key}`)}
                     selected={selected}
-                    onPress={() => set({ priceRange: selected ? ALL : r.key, customPrice: null, priceMax: null })}
+                    onPress={() => set(selected ? NO_PRICE : { ...NO_PRICE, priceRange: r.key, freeOnly: false })}
                   />
                 );
               })}
               {free ? (
-                <Chip size="sm" dot="accent" label={t(free.labelKey)} selected={draft.freeOnly} onPress={() => set({ freeOnly: !draft.freeOnly })} />
+                <Chip size="sm" dot="accent" label={t(free.labelKey)} selected={draft.freeOnly} onPress={toggleFree} />
               ) : null}
             </ChipWrap>
           </Section>
@@ -286,9 +307,7 @@ export function MiniFilter() {
           </Section>
         ) : null}
 
-        <Text variant="micro" tone="muted" className="text-center">
-          {t('common:disclaimer')}
-        </Text>
+        <MiniDisclaimer />
       </ScrollView>
 
       <StickyCta elevated>

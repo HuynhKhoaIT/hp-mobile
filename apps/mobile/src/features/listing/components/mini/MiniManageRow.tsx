@@ -30,6 +30,7 @@ import { formatDate, formatRelative } from '@/lib/format';
 import { LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
 import { Badge, Button, type ButtonVariant, Card, Icon, IconButton, ListingCover, Text } from '@/ui';
 import { ownerActions, useShareListing } from '../../hooks';
+import { useMiniApp } from '../../miniApp';
 import { openEditListing, openListing } from '../../navigation';
 import { canSellOf, type MyListingQuickAction } from '../MyListingRow';
 
@@ -78,6 +79,7 @@ function buttonsOf(listing: MyListing, t: (key: string) => string): { main: RowB
 
 export function MiniManageRow({ listing, tab, siteName, onMore, onAction }: MiniManageRowProps) {
   const { t, i18n } = useTranslation('listing');
+  const { config } = useMiniApp();
   const price = usePriceText()(listing);
   const share = useShareListing();
   const a = ownerActions(listing);
@@ -97,8 +99,9 @@ export function MiniManageRow({ listing, tab, siteName, onMore, onAction }: Mini
     .filter(Boolean)
     .join(' · ');
   const { main, icons } = buttonsOf(listing, t);
-  // Tin công khai → xem như người khác thấy; nháp / chờ duyệt / bị từ chối → sửa.
-  const open = () => (review || listing.status === 'draft' ? openEditListing(listing.id) : openListing(listing.id));
+  // Tin công khai → xem như người khác thấy; nháp / chờ duyệt / bị từ chối → sửa. Cả hai giữ mini-app (`mini`).
+  const mini = config.slug;
+  const open = () => (review || listing.status === 'draft' ? openEditListing(listing.id, { mini }) : openListing(listing.id, { mini }));
   const press = (b: RowButton) => (b.action === 'share' ? share(listing) : onAction(b.action));
 
   return (

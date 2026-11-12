@@ -51,7 +51,7 @@ import {
   Text,
 } from '@/ui';
 import { useContactListing, useIsOwner, useListingMatches, useListingTranslation, useRevealPhone } from '../hooks';
-import { backOrHome, openEditListing, openListing, openMyListings } from '../navigation';
+import { backOrHome, type MiniSlug, openEditListing, openListing, openMyListings, openMyListingsFrom } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 import { AttributeList } from './AttributeList';
 import { ListingRail } from './ListingRail';
@@ -74,13 +74,16 @@ const NOT_FOUND = new Set(['not_found', 'invalid_input']);
 export function ListingDetailState({
   query,
   configOf,
+  mini,
 }: {
   query: ListingQueryState;
   /** Config của tính năng theo category (route lấy từ registry features/configs) — khối riêng ở `config.detail`. */
   configOf?: (category: ListingCategory) => ListingFeatureConfig;
+  /** Mở từ mini-app — nút của chủ tin (Sửa tin, Tin của tôi) ở lại mini-app. */
+  mini?: MiniSlug;
 }) {
   const { t } = useTranslation('listing');
-  if (query.data) return <ListingDetailBody listing={query.data} config={configOf?.(query.data.category)} />;
+  if (query.data) return <ListingDetailBody listing={query.data} config={configOf?.(query.data.category)} mini={mini} />;
   if (query.isLoading) {
     return (
       <ScrollView className="-mx-4 flex-1" contentContainerClassName="px-4 pb-6">
@@ -101,7 +104,7 @@ export function ListingDetailState({
   return <ErrorState code={query.error.code} onRetry={() => void query.refetch()} />;
 }
 
-function ListingDetailBody({ listing, config }: { listing: PublicListing; config?: ListingFeatureConfig }) {
+function ListingDetailBody({ listing, config, mini }: { listing: PublicListing; config?: ListingFeatureConfig; mini?: MiniSlug }) {
   const { t, i18n } = useTranslation('listing');
   const translation = useListingTranslation(listing);
   const returned = isReturned(listing);
@@ -303,11 +306,16 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
                 icon={Pencil}
                 variant={lostFoundOpen ? 'outline' : 'primary'}
                 fullWidth
-                onPress={() => openEditListing(listing.id)}
+                onPress={() => openEditListing(listing.id, { mini })}
               />
             </View>
             <View className="flex-1">
-              <Button label={t('form.my_listings')} variant="outline" fullWidth onPress={() => openMyListings()} />
+              <Button
+                label={t('form.my_listings')}
+                variant="outline"
+                fullWidth
+                onPress={() => (mini ? openMyListingsFrom(mini, 'active') : openMyListings())}
+              />
             </View>
           </View>
         </StickyCta>

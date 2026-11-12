@@ -36,7 +36,7 @@ import { formatDate } from '@/lib/format';
 import { isReturned, LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
 import { Badge, BottomSheet, Button, type ButtonVariant, Card, Col, Icon, IconButton, ListingCover, Skeleton, Text } from '@/ui';
 import { ownerActions, useOwnerListingActions } from '../hooks';
-import { openEditListing, openListing } from '../navigation';
+import { type MiniSlug, openEditListing, openListing } from '../navigation';
 import { ListingRateSheet } from './ListingRateSheet';
 import { ReturnedSheet, returnedLabelKeys } from './ReturnedSheet';
 
@@ -278,16 +278,18 @@ type SheetView = 'menu' | 'sold' | 'delete' | 'returned' | 'rate';
 type SheetState = { listing: MyListing; view: SheetView } | null;
 
 /**
- * Thao tác trên thẻ quản lý (dùng chung màn "Tin của tôi" và khối xem trước ở tab Tôi): `onMore` mở menu ⋮, `onAction`
- * chạy nút nhanh (Đã bán → hỏi lại trong cùng sheet), `sheet` truyền thẳng cho <ListingActionsSheet>.
+ * Thao tác trên thẻ quản lý (dùng chung màn "Tin của tôi", khối xem trước ở tab Tôi và tab "Quản lý tin" của mini-app):
+ * `onMore` mở menu ⋮, `onAction` chạy nút nhanh (Đã bán → hỏi lại trong cùng sheet), `sheet` truyền thẳng cho
+ * <ListingActionsSheet>. `mini`: trong mini-app → "Sửa" giữ luồng sửa ở lại mini-app.
  */
-export function useMyListingActions() {
+export function useMyListingActions(opts: { mini?: MiniSlug } = {}) {
   const run = useOwnerListingActions();
   const [state, setState] = useState<SheetState>(null);
+  const edit = (id: string) => openEditListing(id, { mini: opts.mini });
   const onAction = (listing: MyListing, action: MyListingQuickAction) => {
     switch (action) {
       case 'edit':
-        return openEditListing(listing.id);
+        return edit(listing.id);
       case 'sold':
         return setState({ listing, view: 'sold' });
       case 'returned':
@@ -307,14 +309,14 @@ export function useMyListingActions() {
   return {
     onMore: (listing: MyListing) => setState({ listing, view: 'menu' }),
     onAction,
-    sheet: { state, run, onView: (view: SheetView) => setState((s) => (s ? { ...s, view } : s)), onClose: () => setState(null) },
+    sheet: { state, run, edit, onView: (view: SheetView) => setState((s) => (s ? { ...s, view } : s)), onClose: () => setState(null) },
   };
 }
 
 /** Menu thao tác + xác nhận (cùng một BottomSheet đổi nội dung). */
 export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyListingActions>['sheet'] }) {
   const { t } = useTranslation('listing');
-  const { state, run, onView, onClose } = sheet;
+  const { state, run, edit, onView, onClose } = sheet;
   if (!state) return <BottomSheet open={false} onClose={onClose} />;
 
   const { listing, view } = state;
@@ -352,7 +354,7 @@ export function ListingActionsSheet({ sheet }: { sheet: ReturnType<typeof useMyL
       ) : (
         <Col gap={2}>
           {a.resubmit ? <Button label={t('manage.resubmit')} icon={Send} fullWidth onPress={act(run.resubmit)} /> : null}
-          <Button label={t('manage.edit')} icon={Pencil} variant="outline" fullWidth onPress={act((id) => openEditListing(id))} />
+          <Button label={t('manage.edit')} icon={Pencil} variant="outline" fullWidth onPress={act(edit)} />
           {canSell ? <Button label={t('manage.mark_sold')} icon={CheckCircle2} variant="outline" fullWidth onPress={() => onView('sold')} /> : null}
           {canReturn ? (
             <Button

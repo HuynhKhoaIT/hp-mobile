@@ -11,8 +11,8 @@
 import { FEATURE_LISTINGS_TABS, type FeatureListingsTab, type MyListing } from '@hp/core';
 import { useFeatureListings, useFeatureListingsSummary, useMyProfile, useSession } from '@hp/core/react';
 import { FlashList } from '@shopify/flash-list';
-import { Package, Star, Zap } from 'lucide-react-native';
-import { type ReactNode, useMemo, useState } from 'react';
+import { MapPin, Package, SearchX, Star, Zap } from 'lucide-react-native';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
@@ -39,6 +39,7 @@ import {
 import { usePostListing } from '../../hooks';
 import { useMiniApp } from '../../miniApp';
 import { ListingActionsSheet, MyListingRowSkeleton, useMyListingActions } from '../MyListingRow';
+import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniManageRow } from './MiniManageRow';
 import { MiniTabHeader } from './MiniHeader';
 
@@ -51,7 +52,7 @@ function visibleRows(items: MyListing[], query: string, sort: ManageSort) {
   return sort === 'views' ? [...rows].sort((a, b) => b.view_count - a.view_count) : rows;
 }
 
-export function MiniManage() {
+export function MiniManage({ tab: requestedTab, requestKey }: { tab?: FeatureListingsTab; requestKey?: string } = {}) {
   const { t } = useTranslation('listing');
   const { config } = useMiniApp();
   const session = useSession();
@@ -68,7 +69,7 @@ export function MiniManage() {
       </Col>
     );
   } else if (!signedIn) body = <SignInPrompt description={t('mini_app.manage.signed_out_body')} />;
-  else body = <ManageList summary={summary} />;
+  else body = <ManageList summary={summary} requestedTab={requestedTab} requestKey={requestKey} />;
 
   return (
     <>
@@ -82,17 +83,41 @@ export function MiniManage() {
   );
 }
 
-function ManageList({ summary }: { summary: ReturnType<typeof useFeatureListingsSummary> }) {
+function ManageList({
+  summary,
+  requestedTab,
+  requestKey,
+}: {
+  summary: ReturnType<typeof useFeatureListingsSummary>;
+  /** ?tab= của route — đổi khi quay về từ luồng đăng tin (tab đã mở sẵn nên không dựa vào giá trị khởi tạo). */
+  requestedTab?: FeatureListingsTab;
+  /** ?at= của route — mỗi lần quay về một giá trị mới: chuyển lại tab kể cả khi `requestedTab` không đổi. */
+  requestKey?: string;
+}) {
   const { t } = useTranslation('listing');
   const { space } = useTheme();
   const { config, sites } = useMiniApp();
-  const [tab, setTab] = useState<FeatureListingsTab>('active');
+  const [tab, setTab] = useState<FeatureListingsTab>(requestedTab ?? 'active');
   const [query, setQuery] = useState('');
+  const request = `${requestedTab ?? ''}:${requestKey ?? ''}`;
+  const [seenRequest, setSeenRequest] = useState(request);
+  if (request !== seenRequest) {
+    // Quay về từ luồng đăng / sửa: đúng tab, bỏ từ khoá cũ (tin vừa lưu luôn hiện).
+    setSeenRequest(request);
+    if (requestedTab) setTab(requestedTab);
+    setQuery('');
+  }
   const [sort, setSort] = useState<ManageSort>('newest');
   const list = useFeatureListings(config.categories, tab);
-  const actions = useMyListingActions();
-  const post = usePostListing(config.key);
+  const actions = useMyListingActions({ mini: config.slug });
+  const post = usePostListing(config.key, { mini: true });
   const rows = useMemo(() => visibleRows(list.items, query, sort), [list.items, query, sort]);
+  const searching = query.trim().length > 0;
+  // Tìm tại chỗ: tải nốt các trang còn lại để tìm trên mọi tin của tab (không chỉ trang đã cuộn tới).
+  const { hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage } = list;
+  useEffect(() => {
+    if (searching && hasNextPage && !isFetchingNextPage && !isFetchNextPageError) void fetchNextPage();
+  }, [searching, hasNextPage, isFetchingNextPage, isFetchNextPageError, fetchNextPage]);
   const siteName = (code: string | null) => (code ? (sites.find((s) => s.code === code)?.name ?? null) : null);
 
   const header = (
@@ -128,13 +153,28 @@ function ManageList({ summary }: { summary: ReturnType<typeof useFeatureListings
     </View>
   );
 
-  const state: ReactNode = list.isLoading ? (
+  const loadingRows = (
     <Col gap={3}>
       <MyListingRowSkeleton />
       <MyListingRowSkeleton />
     </Col>
+  );
+  const state: ReactNode = list.isLoading ? (
+    loadingRows
   ) : list.isError && list.items.length === 0 ? (
     <ErrorState code={list.error.code} onRetry={() => void list.refetch()} />
+  ) : searching && rows.length === 0 ? (
+    // Đang tải nốt trang để tìm → khung chờ; hết trang mà không khớp → "không tìm thấy" + xoá từ khoá (không mời đăng tin).
+    list.hasNextPage && !list.isFetchNextPageError ? (
+      loadingRows
+    ) : (
+      <EmptyState
+        icon={SearchX}
+        title={t('list.empty_search_title')}
+        description={t('list.empty_search_body')}
+        action={{ label: t('list.clear_search'), onPress: () => setQuery('') }}
+      />
+    )
   ) : rows.length === 0 && !list.hasNextPage ? (
     <EmptyState
       icon={Package}
@@ -162,7 +202,12 @@ function ManageList({ summary }: { summary: ReturnType<typeof useFeatureListings
         )}
         ListHeaderComponent={header}
         ListEmptyComponent={state ? <View>{state}</View> : null}
-        ListFooterComponent={list.isFetchingNextPage ? <MyListingRowSkeleton /> : null}
+        ListFooterComponent={
+          <View className="gap-4">
+            {list.isFetchingNextPage ? <MyListingRowSkeleton /> : null}
+            <MiniDisclaimer />
+          </View>
+        }
         onEndReached={() => {
           if (list.hasNextPage && !list.isFetchingNextPage) void list.fetchNextPage();
         }}
@@ -181,12 +226,14 @@ function ManageList({ summary }: { summary: ReturnType<typeof useFeatureListings
   );
 }
 
-/** Thẻ hồ sơ: avatar + tên + huy hiệu + đánh giá → 3 số liệu của tính năng → mẹo đăng tin. */
+/** Thẻ hồ sơ: avatar + tên + huy hiệu + đánh giá + khu làm việc (profile.site) → 3 số liệu của tính năng → mẹo đăng tin. */
 function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListingsSummary> }) {
   const { t, i18n } = useTranslation('listing');
+  const { sites } = useMiniApp();
   const me = useMyProfile();
   const profile = me.data;
   const badges = (profile?.badges ?? []).filter((b) => i18n.exists(`listing:owner_badge.${b}`));
+  const siteName = profile?.site ? (sites.find((x) => x.code === profile.site)?.name ?? null) : null;
   const s = summary.data;
 
   return (
@@ -213,8 +260,22 @@ function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListing
                 </Text>
               </View>
             ) : null}
+            {siteName ? (
+              <View
+                accessible
+                accessibilityLabel={[t('common:home.site_label'), siteName].join(', ')}
+                className="max-w-full flex-row items-center gap-1 self-start rounded-full bg-surface-2 px-3 py-1"
+              >
+                <Icon icon={MapPin} tone="primary" size={16} />
+                <Text variant="caption" weight="medium" numberOfLines={1} className="shrink">
+                  {siteName}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
+      ) : me.isError ? (
+        <ErrorState compact code={me.error.code} onRetry={() => void me.refetch()} />
       ) : (
         <View className="flex-row items-center gap-3">
           <Skeleton className="size-16 rounded-full" />

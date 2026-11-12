@@ -1,6 +1,7 @@
 // Screen type: Form
 // Sửa tin của tôi: cùng form "Đăng nhanh", điền sẵn từ getMyListing (giữ ảnh cũ, upload ảnh mới, dọn ảnh bỏ).
 // Chờ bản mới nhất từ server trước khi điền (tránh sửa trên dữ liệu cũ trong cache). Không phải tin của mình → "Tin không còn".
+// `?mini=<slug>`: sửa từ mini-app → lưu nháp / gửi duyệt / "Tin của tôi" về "Quản lý tin" của mini-app.
 import { useMyListing, useMyProfile } from '@hp/core/react';
 import { useLocalSearchParams } from 'expo-router';
 import { SearchX } from 'lucide-react-native';
@@ -10,7 +11,7 @@ import { getLocale } from '@/core/i18n';
 import { configOfCategory } from '@/features/configs';
 import { ListingForm } from '@/features/listing/form/ListingForm';
 import { ListingFormSkeleton } from '@/features/listing/form/ListingFormSkeleton';
-import { backOrHome } from '@/features/listing/navigation';
+import { backOrHome, isMiniSlug } from '@/features/listing/navigation';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
 import { EmptyState, ErrorState, Header, Screen } from '@/ui';
 
@@ -18,7 +19,7 @@ const NOT_FOUND = new Set(['not_found', 'invalid_input']);
 
 export default function EditListingScreen() {
   const { t } = useTranslation('listing');
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, mini } = useLocalSearchParams<{ id: string; mini?: string }>();
   const me = useMyProfile();
   const query = useMyListing(me.data ? id : undefined);
   const listing = query.data;
@@ -35,6 +36,7 @@ export default function EditListingScreen() {
           defaultSite={me.data.site}
           lang={getLocale()}
           phone={me.data.phone}
+          mini={isMiniSlug(mini) ? mini : undefined}
         />
       </Screen>
     );

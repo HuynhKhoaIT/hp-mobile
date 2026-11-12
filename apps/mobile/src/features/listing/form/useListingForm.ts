@@ -33,7 +33,7 @@ import { type PickedImage, pickImages, prepareListingImage } from '@/core/upload
 import { useErrorText } from '@/lib/errors';
 import { listingImageUrl } from '@/lib/images';
 import { type ImagePickerItemStatus, toast } from '@/ui';
-import { backOrHome, openMyListings } from '../navigation';
+import { backOrHome, type MiniSlug, openMyListingsFrom } from '../navigation';
 import type { ListingFeatureConfig, ListingFormConfig } from '../types';
 
 export type ListingFormValues = CreateListingInput;
@@ -124,9 +124,11 @@ export type UseListingFormArgs = {
   /** Khu mặc định của tin mới (profile.site). */
   defaultSite: string | null;
   lang: Locale;
+  /** Luồng đăng của mini-app — lưu nháp xong về "Quản lý tin" của mini-app. */
+  mini?: MiniSlug;
 };
 
-export function useListingForm({ mode, config, userId, defaultSite, lang }: UseListingFormArgs) {
+export function useListingForm({ mode, config, userId, defaultSite, lang, mini }: UseListingFormArgs) {
   const { t } = useTranslation('listing');
   const errorText = useErrorText();
   const client = useSupabase();
@@ -260,7 +262,7 @@ export function useListingForm({ mode, config, userId, defaultSite, lang }: UseL
     const wasDraft = mode.kind === 'new' || mode.listing.status === 'draft';
     if (saved.status === 'draft') {
       toast.show(t('form.draft_saved'), 'success');
-      return openMyListings('draft', { replace: true });
+      return openMyListingsFrom(mini, 'draft');
     }
     // Sửa tin mà trạng thái không đổi (vd sửa giá tin đang hiện) → báo đã lưu và quay lại.
     // Gửi duyệt lại tin bị từ chối luôn hiện màn kết quả (chờ duyệt, hoặc bị từ chối lại).

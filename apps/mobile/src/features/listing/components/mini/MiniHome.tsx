@@ -6,9 +6,12 @@
 //     màu dịch vụ nhạt, nhãn category_short) + ô "Cho tặng" (khi config.quickFilters có freeOnly) + ô "Tất cả mục" — bấm
 //     → mở rộng ngay trong thẻ ra đủ danh mục (không sang màn Bộ lọc: một chạm là thấy hết, chọn tiếp một chạm).
 //   4 (khi chưa lọc) banner theo config.miniApp.bannerPlacement; chưa có banner / lỗi → khối "An tâm trao tay" (CTA → huy
-//     hiệu xác minh, cần đăng nhập).
-//   5 hàng chip nhanh: "Tất cả" (chưa lọc) hoặc "{n} bộ lọc ×" (đang lọc → bỏ hết) · "Gần {khu}" (khu của super app) ·
-//     chip lọc nhanh của config (Cho tặng, tình trạng, xe máy…).
+//     hiệu xác minh, cần đăng nhập). Link banner về chính mini-app (`/pass-do?category=…`, `/pass-do/da-luu`…) → đặt bộ
+//     lọc của phiên / chuyển tab, `/pass-do/dang-tin` → luồng đăng của mini-app (không mở chồng mini-app thứ hai); link khác
+//     → openWebLink.
+//   5 hàng chip nhanh: "Tất cả" (chưa lọc) hoặc "{n} bộ lọc ×" (đang lọc → bỏ hết) · bộ lọc đặt sẵn (chip "Tìm nhanh" của
+//     Hub / ?categories= — nhãn như ListingBrowser, × bỏ riêng nó) · "Gần {khu}" (khu của super app) · chip lọc nhanh của
+//     config (Cho tặng, tình trạng, xe máy…).
 //   6 "Tin mới đăng quanh bạn" + "Lọc thêm" (→ tab Bộ lọc) → lưới 2 cột cuộn vô hạn (ListingCard, tim lưu tin; đồ cho tặng
 //     hiện "Miễn phí") → dòng miễn trừ "ứng dụng cộng đồng, không thuộc Tập đoàn Hòa Phát".
 // Kéo xuống làm mới: danh sách + banner. Đổi bộ lọc → danh sách cuộn về đầu.
@@ -23,13 +26,23 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { requireAuth } from '@/core/auth';
 import { openBadges } from '@/features/profile/navigation';
+import { miniAppLinkOf, openWebLink } from '@/lib/urls';
 import { BannerCarousel, Card, Chip, Icon, SectionHeader, ServiceGrid, ServiceTile, Text } from '@/ui';
-import { ALL, isFreeQuickFilter, type ListingBrowserResult, usePlacementBanners, usePostListing } from '../../hooks';
-import { useMiniApp, useMiniBrowser } from '../../miniApp';
+import {
+  ALL,
+  initialBrowserState,
+  isFreeQuickFilter,
+  type ListingBrowserResult,
+  listingPresetOf,
+  usePlacementBanners,
+  usePostListing,
+} from '../../hooks';
+import { useMiniApp, useMiniBrowser, useMiniFilterState } from '../../miniApp';
 import { openMiniTab } from '../../navigation';
 import { ListingFeed } from '../ListingFeed';
 import { PlacementBanners } from '../PlacementBanners';
 import { QuickFilterChips } from '../QuickFilterChips';
+import { MiniDisclaimer } from './MiniDisclaimer';
 import { MiniHomeHeader } from './MiniHeader';
 
 export function MiniHome({ active }: { active: boolean }) {
@@ -37,8 +50,22 @@ export function MiniHome({ active }: { active: boolean }) {
   const { config } = useMiniApp();
   const browser = useMiniBrowser();
   const banners = usePlacementBanners(config.miniApp.bannerPlacement);
-  const post = usePostListing(config.key);
+  const post = usePostListing(config.key, { mini: true });
   const filtered = browser.isFiltered;
+  const session = useMiniFilterState();
+  const { t: tc } = useTranslation();
+
+  /** Link banner: về chính mini-app → ở lại phiên (bộ lọc đặt sẵn / tab / đăng tin); còn lại → openWebLink. */
+  const openBannerLink = (link: string) => {
+    const target = miniAppLinkOf(link);
+    if (!target || target.slug !== config.slug) return openWebLink(link);
+    if (target.page === 'post') return post();
+    if (target.page === 'index' || target.page === 'filter') {
+      const preset = listingPresetOf({ categories: target.params.categories }, tc);
+      session.update(() => initialBrowserState(config, { site: target.params.site, preset }));
+    }
+    if (target.page !== 'index') openMiniTab(config.slug, target.page);
+  };
 
   const header = (
     <View className="gap-4">
@@ -52,6 +79,7 @@ export function MiniHome({ active }: { active: boolean }) {
             active={active}
             hideOnError
             fallback={<SafetyBanner active={active} />}
+            onLink={openBannerLink}
           />
         </View>
       )}
@@ -86,11 +114,7 @@ export function MiniHome({ active }: { active: boolean }) {
       header={header}
       headerAlways
       gutter
-      footer={
-        <Text variant="micro" tone="muted" className="px-4 pb-2 text-center">
-          {t('common:disclaimer')}
-        </Text>
-      }
+      footer={<MiniDisclaimer className="px-4 pb-2" />}
       listKey={JSON.stringify(browser.filters)}
     />
   );
@@ -200,7 +224,7 @@ function SafetyBanner({ active }: { active: boolean }) {
   );
 }
 
-/** Hàng chip nhanh: Tất cả / "{n} bộ lọc ×" · Gần {khu} · chip lọc nhanh của config. */
+/** Hàng chip nhanh: Tất cả / "{n} bộ lọc ×" · bộ lọc đặt sẵn × · Gần {khu} · chip lọc nhanh của config. */
 function QuickRow({ browser }: { browser: ListingBrowserResult }) {
   const { t } = useTranslation('listing');
   const { config, site } = useMiniApp();
@@ -225,6 +249,16 @@ function QuickRow({ browser }: { browser: ListingBrowserResult }) {
       ) : (
         <Chip size="sm" selected label={t('mini_app.home.chip_all')} onPress={browser.clearAll} />
       )}
+      {browser.preset ? (
+        <Chip
+          size="sm"
+          selected
+          label={browser.preset.label}
+          trailingIcon={X}
+          accessibilityHint={t('common:actions.clear_filter')}
+          onPress={browser.clearPreset}
+        />
+      ) : null}
       {site ? (
         <Chip
           size="sm"
