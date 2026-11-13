@@ -1,11 +1,10 @@
 // BottomSheet — @gorhom/bottom-sheet theo token (nền surface, bo lg, nền mờ chạm để đóng), cao theo nội dung.
-// Điều khiển bằng `open` + `onClose`. Dùng cho Select, xác nhận hành động khó hoàn tác (nút ghi rõ việc, không "OK").
+// Điều khiển bằng `open` + `onClose`. Trong mini-app: nội dung giữ màu mini-app (AppThemeProvider — portal ra ngoài cây). Dùng cho Select, xác nhận hành động khó hoàn tác (nút ghi rõ việc, không "OK").
 import { BottomSheetBackdrop, type BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
-import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from './Text';
-import { useReducedMotion, useTheme } from './theme';
+import { AppThemeProvider, useAppThemeKey, useReducedMotion, useTheme } from './theme';
 
 export type BottomSheetProps = {
   open: boolean;
@@ -19,6 +18,8 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
   const t = useTheme();
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
+  // Sheet vẽ qua portal (ngoài cây của mini-app) → bọc lại màu mini-app đang mở (nút / chip primary trong sheet).
+  const app = useAppThemeKey();
 
   useEffect(() => {
     if (open) ref.current?.present();
@@ -44,14 +45,14 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
       accessibilityLabel={title}
     >
       <BottomSheetScrollView contentContainerStyle={{ paddingBottom: insets.bottom + t.space[4] }}>
-        <View className="gap-4 px-4 pt-2">
+        <AppThemeProvider theme={app} className="gap-4 px-4 pt-2">
           {title ? (
             <Text variant="title" accessibilityRole="header">
               {title}
             </Text>
           ) : null}
           {children}
-        </View>
+        </AppThemeProvider>
       </BottomSheetScrollView>
     </BottomSheetModal>
   );

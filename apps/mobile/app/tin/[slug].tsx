@@ -20,7 +20,7 @@ export default function ListingBySlugScreen() {
     <Screen>
       {/* Mở từ link khi app chưa chạy → không có màn trước: nút quay lại về trang chủ. */}
       <Header
-        title={t('detail.title')}
+        title={t(listing ? (configOfCategory(listing.category).detail?.titleKey ?? 'detail.title') : 'detail.title')}
         back
         onBack={backOrHome}
         right={listing ? <ListingHeaderActions listing={listing} /> : undefined}

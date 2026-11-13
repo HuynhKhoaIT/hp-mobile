@@ -1,18 +1,20 @@
 'use client';
 
 // Điều hướng riêng của mini-app (Stitch pass_home / saved / manage: thanh dưới "Chợ Pass · Đã lưu · [ĐĂNG TIN] · Chat ·
-// Quản lý tin"). Một nguồn mục (useMiniAppItems) cho hai kiểu:
+// Quản lý tin"; Nhà Trọ: "Tìm trọ · …"). Màu theo config.miniApp.theme (data-app-theme — tab đang mở primary của mini-app,
+// nút Đăng tin giữ cam accent). Một nguồn mục (useMiniAppItems) cho hai kiểu:
 // - MiniAppBottomNav: điện thoại (< 640px), thay thanh 5 tab của super app (BottomNav tự chọn theo đường dẫn); nút Đăng tin
 //   cam nổi giữa (BottomNavBar).
 // - MiniAppTabStrip: từ 640px — dải tab dưới header mini-app (header chung của site vẫn giữ): viên thuốc, tab đang mở nền
 //   primary-light chữ primary; "Đăng tin" là nút cam cuối dải.
-// "Đăng tin" → /dang-tin?feature=<tính năng> (chọn sẵn tính năng; khách → proxy.ts chuyển /dang-nhap rồi quay lại).
+// "Đăng tin" → trang đăng tin của mini-app (paths.post, vd /pass-do/dang-tin): form chỉ có danh mục của tính năng, đăng
+// xong về "Quản lý tin" — không rời mini-app (khách → proxy.ts chuyển /dang-nhap rồi quay lại).
 // Số trên tab Chat = số hội thoại CHƯA ĐỌC thuộc tính năng (conversationFeature) trong các trang hộp thư đã tải
 // (useConversations — chỉ khi đã đăng nhập); hội thoại cũ ngoài trang đầu chưa tính (giống hộp thư lọc theo dịch vụ).
 import { conversationFeature } from '@hp/core';
 import { useConversations, useSession } from '@hp/core/react';
 import type { ListingFeature } from '@hp/shared';
-import { Heart, ListChecks, MessageCircle, Plus, Store } from 'lucide-react';
+import { Heart, ListChecks, MessageCircle, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { BottomNavBar, type BottomNavItem } from '@/components/shared/bottom-nav-bar';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -32,16 +34,16 @@ function useMiniAppItems(cfg: MiniAppConfig): BottomNavItem[] {
   const pathname = usePathname();
   const current = miniAppTabOf(cfg, pathname);
   const unread = useFeatureUnread(cfg);
-  const { paths, homeTabKey } = cfg.miniApp;
+  const { paths, homeTabKey, HomeIcon } = cfg.miniApp;
   return [
-    { key: 'home', href: paths.home, label: t(homeTabKey), Icon: Store, active: current === 'home' },
+    { key: 'home', href: paths.home, label: t(homeTabKey), Icon: HomeIcon, active: current === 'home' },
     { key: 'saved', href: paths.saved, label: t('listing.mini_app.tabs.saved'), Icon: Heart, active: current === 'saved' },
     {
       key: 'post',
-      href: { pathname: '/dang-tin', query: { feature: cfg.feature } },
+      href: paths.post,
       label: t('listing.mini_app.tabs.post'),
       Icon: Plus,
-      active: false,
+      active: current === 'post',
       isPost: true,
     },
     {
@@ -60,7 +62,12 @@ function useMiniAppItems(cfg: MiniAppConfig): BottomNavItem[] {
 export function MiniAppBottomNav({ cfg }: { cfg: MiniAppConfig }) {
   const t = useTranslations();
   const items = useMiniAppItems(cfg);
-  return <BottomNavBar items={items} label={t('listing.mini_app.tabs_a11y', { feature: t(cfg.miniApp.titleKey) })} />;
+  // Thanh dưới nằm ở layout (ngoài khung trang) → tự gắn màu mini-app; nút Đăng vẫn cam (accent không bị ghi đè).
+  return (
+    <div data-app-theme={cfg.miniApp.theme} className="contents">
+      <BottomNavBar items={items} label={t('listing.mini_app.tabs_a11y', { feature: t(cfg.miniApp.titleKey) })} />
+    </div>
+  );
 }
 
 /**

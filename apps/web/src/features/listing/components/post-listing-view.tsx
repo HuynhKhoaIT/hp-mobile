@@ -2,13 +2,13 @@
 // Lấy hồ sơ (khu mặc định, SĐT của chính chủ để nhắc số nào hiện qua "Hiện số"), danh mục khu, tin đang sửa rồi giao cho
 // ListingForm (client). Khung trang: tràn mép trên điện thoại (header xanh của form), từ 640px là khối giữa trang.
 import { featureOfCategory, LISTING_CATEGORIES, type ListingCategory, type ListingFeature, LISTING_FEATURES } from '@hp/shared';
-import { getLocale, getTranslations } from 'next-intl/server';
+import { getLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { EmptyState } from '@/components/shared/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { asLocale } from '../display';
 import { getMyListingForEdit, getPostFormContext } from '../queries';
-import { ListingForm } from './listing-form/listing-form';
+import { RefreshErrorState } from './list-error';
+import { ListingForm, type ListingFormScope } from './listing-form/listing-form';
 
 type RawParams = Record<string, string | string[] | undefined>;
 
@@ -24,16 +24,16 @@ function parsePreset(raw: RawParams): { feature: ListingFeature | null; category
   return { feature, category: null };
 }
 
-async function ContextError({ code }: { code: string }) {
-  const t = await getTranslations();
-  return (
-    <EmptyState title={t('common.states.error_title')} description={t.has(`errors.${code}`) ? t(`errors.${code}`) : t('errors.unknown')} />
-  );
+/** Lỗi đọc hồ sơ / khu / tin: khối lỗi + "Thử lại" (đọc lại phần server của trang — router.refresh). */
+function ContextError({ code }: { code: string }) {
+  return <RefreshErrorState code={code} />;
 }
 
-/** /dang-tin?feature=pass|room|job|lostFound[&category=<code>] */
-export async function PostListingView({ searchParams }: { searchParams: Promise<RawParams> }) {
-  const { feature, category } = parsePreset(await searchParams);
+/** /dang-tin?feature=pass|room|job|lostFound[&category=<code>]; trong mini-app (/pass-do/dang-tin) có `scope` khoá tính năng. */
+export async function PostListingView({ searchParams, scope }: { searchParams: Promise<RawParams>; scope?: ListingFormScope }) {
+  const preset = parsePreset(await searchParams);
+  // Mini-app: bỏ ?feature / ?category của tính năng khác.
+  const { feature, category } = scope && preset.feature !== scope.feature ? { feature: scope.feature, category: null } : preset;
   const ctx = await getPostFormContext();
   if (ctx.error) return <ContextError code={ctx.error.code} />;
   const locale = asLocale(await getLocale());
@@ -48,15 +48,20 @@ export async function PostListingView({ searchParams }: { searchParams: Promise<
       initialFeature={feature}
       initialCategory={category}
       listing={null}
+      scope={scope}
     />
   );
 }
 
-/** /toi/tin-cua-toi/[id]/sua */
-export async function EditListingView({ params }: { params: Promise<{ id: string }> }) {
+/**
+ * /toi/tin-cua-toi/[id]/sua; trong mini-app (/pass-do/quan-ly/[id]/sua) có `scope`: tin thuộc tính năng khác → 404 (trang sửa
+ * chung vẫn mở được qua /toi).
+ */
+export async function EditListingView({ params, scope }: { params: Promise<{ id: string }>; scope?: ListingFormScope }) {
   const { id } = await params;
   const [ctx, listing] = await Promise.all([getPostFormContext(), getMyListingForEdit(id)]);
   if (listing.error?.code === 'not_found' || listing.error?.code === 'invalid_input') notFound();
+  if (scope && listing.data && featureOfCategory(listing.data.category) !== scope.feature) notFound();
   if (ctx.error) return <ContextError code={ctx.error.code} />;
   if (listing.error) return <ContextError code={listing.error.code} />;
   const locale = asLocale(await getLocale());
@@ -70,6 +75,7 @@ export async function EditListingView({ params }: { params: Promise<{ id: string
       initialFeature={null}
       initialCategory={null}
       listing={listing.data}
+      scope={scope}
     />
   );
 }

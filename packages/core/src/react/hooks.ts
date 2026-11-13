@@ -17,7 +17,7 @@ import {
 } from '../listings';
 import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile, uploadAvatar } from '../profile';
 import type { AppError, Result } from '../result';
-import { countUnreadNotifications, listSites, type Page, type Site } from '../social';
+import { countUnreadNotifications, listSiteLocations, listSites, type Page, type Site, type SiteLocation } from '../social';
 import { useSupabase } from './provider';
 
 /** Result → data, hoặc ném AppError cho TanStack. */
@@ -71,6 +71,17 @@ export function useSites() {
     queryKey: keys.sites(),
     queryFn: () => unwrap(listSites(client)),
     staleTime: 60 * 60_000,
+  });
+}
+
+/** Khu kèm toạ độ — khoảng cách tin trọ tới từng khu (chi tiết phòng trọ). */
+export function useSiteLocations(opts: { enabled?: boolean } = {}) {
+  const client = useSupabase();
+  return useQuery<SiteLocation[], AppError>({
+    queryKey: keys.siteLocations(),
+    queryFn: () => unwrap(listSiteLocations(client)),
+    staleTime: 60 * 60_000,
+    enabled: opts.enabled ?? true,
   });
 }
 

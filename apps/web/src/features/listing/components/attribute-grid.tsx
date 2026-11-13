@@ -5,13 +5,19 @@
 // @hp/shared — trọ "Chi phí" / "Nội quy", việc "Người phụ trách" (tên; SĐT chỉ qua Gọi) / "Yêu cầu" (đoạn chữ).
 import { type AttributeField, type AttributeValue, groupAttributeRows, type ListingCategory } from '@hp/shared';
 import {
+  AirVent,
   Baby,
+  Banknote,
+  Bath,
   Bike,
   BriefcaseBusiness,
   Calendar,
+  CalendarClock,
   CalendarRange,
+  Cctv,
   CircleDollarSign,
   Clock,
+  CookingPot,
   Droplet,
   Dumbbell,
   Gauge,
@@ -33,9 +39,12 @@ import {
   Sofa,
   Sparkles,
   Tag,
+  Trash2,
   User,
+  UserX,
   Users,
   Wallet,
+  Wifi,
   Wrench,
   Zap,
 } from 'lucide-react';
@@ -59,6 +68,17 @@ const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   water_price: Droplet,
   has_loft: Layers,
   has_parking: Bike,
+  // Trọ (chi phí / tiện nghi — khớp app).
+  wifi_price: Wifi,
+  trash_price: Trash2,
+  deposit_months: Banknote,
+  has_ac: AirVent,
+  private_wc: Bath,
+  has_kitchen: CookingPot,
+  has_wifi: Wifi,
+  has_camera: Cctv,
+  free_hours: CalendarClock,
+  no_landlord: UserX,
   curfew: Clock,
   max_people: Users,
   shift: Clock,
@@ -83,6 +103,9 @@ const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   age_range: CalendarRange,
 };
 
+/** Icon của một thông số (mặc định BriefcaseBusiness) — dùng chung lưới thông số và các khối chi tiết theo config. */
+export const attributeIcon = (key: string): LucideIcon => ATTRIBUTE_ICON[key] ?? BriefcaseBusiness;
+
 const WIDE = new Set(['requirements', 'identifying_marks', 'place', 'curfew']);
 export const HIDDEN_ATTRIBUTES = new Set(['returned']);
 
@@ -102,7 +125,7 @@ export function AttributeGrid({
   return (
     <dl className="grid gap-2 rounded-lg border border-border bg-surface p-3 grid-cols-2 shadow-card">
       {rows.map(({ field, value }) => {
-        const Icon = ATTRIBUTE_ICON[field.key] ?? BriefcaseBusiness;
+        const Icon = attributeIcon(field.key);
         return (
           <div
             key={field.key}

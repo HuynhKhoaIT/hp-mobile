@@ -1,7 +1,8 @@
 // Banner trượt theo placement (bảng `banners` theo ngôn ngữ — useBanners): Hub 'app_home', trang chủ riêng của tính năng
 // (config.home.bannerPlacement, vd 'app_pass'). Đang tải → khung 16:7 chờ + chấm; lỗi → ErrorState gọn có Thử lại, hoặc
 // ẩn (`hideOnError` — banner chỉ là khuyến mãi, không chặn trang); không có banner → ẩn cả khối. Bấm → `onBannerPress`
-// (analytics) rồi mở link (đường dẫn web nội bộ → màn app tương ứng; https → trình duyệt). Lề 16 nằm trong khối.
+// (analytics) rồi mở link (đường dẫn web nội bộ → màn app tương ứng; https → trình duyệt) — `onLink` thay cách mở (trang chủ
+// mini-app: link về chính mini-app → bộ lọc của phiên đang mở, không chồng mini-app thứ hai). Lề 16 nằm trong khối.
 // `fallback` (trang chủ mini-app: khối "An tâm trao tay"): hiện thay khi không có banner nào hoặc lỗi bị ẩn.
 import type { Banner } from '@hp/core';
 import type { ReactNode } from 'react';
@@ -51,9 +52,18 @@ export type PlacementBannersProps = {
   onBannerPress?: (banner: Banner) => void;
   /** Khối thay thế khi không có banner (hoặc lỗi với `hideOnError`). */
   fallback?: ReactNode;
+  /** Mở link của banner thay cho openWebLink (nơi gọi tự fallback openWebLink cho link không xử lý). */
+  onLink?: (link: string) => void;
 };
 
-export function PlacementBanners({ placement, active, hideOnError = false, onBannerPress, fallback = null }: PlacementBannersProps) {
+export function PlacementBanners({
+  placement,
+  active,
+  hideOnError = false,
+  onBannerPress,
+  fallback = null,
+  onLink = openWebLink,
+}: PlacementBannersProps) {
   const { t } = useTranslation();
   // Banner theo ngôn ngữ đang dùng (đổi ngôn ngữ → tải bộ banner của ngôn ngữ đó).
   const banners = usePlacementBanners(placement);
@@ -87,7 +97,7 @@ export function PlacementBanners({ placement, active, hideOnError = false, onBan
         const banner = list.find((b) => b.id === slide.id);
         if (!banner?.link_url) return;
         onBannerPress?.(banner);
-        openWebLink(banner.link_url);
+        onLink(banner.link_url);
       }}
     />
   );

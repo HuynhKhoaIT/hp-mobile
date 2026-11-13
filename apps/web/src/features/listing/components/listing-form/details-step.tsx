@@ -6,7 +6,8 @@
 //   "Khu vực": chip khu gần nhất (danh sách sites thật, mặc định khu trong hồ sơ; bấm lại để bỏ chọn) + khu vực (thôn / xã).
 //   "Liên hệ": người xem nhắn tin trong app; SĐT của mình (profiles.phone) chỉ hiện qua "Hiện số" sau đăng nhập.
 //   Hộp quy định (SafetyTip).
-// enum → chip (bấm lại để bỏ chọn) · int / money → ô số (gợi ý hiện giá trị đã định dạng + đơn vị) · bool → checkbox ·
+// enum → chip (bấm lại để bỏ chọn) · int / money → ô số (gợi ý hiện giá trị đã định dạng + đơn vị — "/kWh", "/tháng"; 0 được
+// giữ: khoản miễn phí) · bool → checkbox (gom lưới 2 cột) ·
 // text → ô chữ · datetime → <input type="datetime-local">.
 import type { Site } from '@hp/core';
 import { type AttributeField, formatVnPhone, LOCALES } from '@hp/shared';
@@ -43,20 +44,31 @@ export function DetailsStep({
 }) {
   const t = useTranslations();
   const setAttr = (key: string, value: string | boolean) => onChange({ attributes: { ...values.attributes, [key]: value } });
+  const bools = fields.filter((f) => f.kind === 'bool');
+  const firstBool = fields.findIndex((f) => f.kind === 'bool');
 
   return (
     <div className="flex flex-col gap-4">
       <FormSection icon={ListChecks} title={t('listing.form.details_title')} subtitle={t('listing.form.optional')}>
-        {fields.map((field) => (
-          <AttributeInput
-            key={field.key}
-            field={field}
-            values={values.attributes}
-            error={errors[`attributes.${field.key}`]?.[0]}
-            disabled={disabled}
-            onChange={(v) => setAttr(field.key, v)}
-          />
-        ))}
+        {fields.map((field, i) => {
+          const input = (f: AttributeField) => (
+            <AttributeInput
+              key={f.key}
+              field={f}
+              values={values.attributes}
+              error={errors[`attributes.${f.key}`]?.[0]}
+              disabled={disabled}
+              onChange={(v) => setAttr(f.key, v)}
+            />
+          );
+          if (field.kind !== 'bool') return input(field);
+          // Các ô tick (trọ: 9 tiện nghi) gom thành lưới 2 cột tại vị trí ô tick đầu tiên — gọn hơn một cột dài.
+          return i === firstBool ? (
+            <div key="bools" className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              {bools.map(input)}
+            </div>
+          ) : null;
+        })}
         <ChoiceField label={t('listing.form.lang_label')} error={errors.lang?.[0]}>
           {LOCALES.map((l) => (
             <ChoiceChip key={l} lang={l} selected={values.lang === l} disabled={disabled} onClick={() => onChange({ lang: l })}>

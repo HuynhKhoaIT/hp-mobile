@@ -119,7 +119,17 @@
     "sport_type": "运动项目",
     "tool_type": "工具类型",
     "baby_type": "物品类型",
-    "age_range": "适用年龄"
+    "age_range": "适用年龄",
+    "wifi_price": "网络费",
+    "trash_price": "卫生 / 垃圾费",
+    "deposit_months": "押金",
+    "has_ac": "空调",
+    "private_wc": "独立卫生间",
+    "has_kitchen": "独立厨房",
+    "has_wifi": "有无线网",
+    "has_camera": "监控摄像头",
+    "free_hours": "作息自由",
+    "no_landlord": "不与房东同住"
   },
   "attr_value": {
     "condition": {
@@ -224,7 +234,8 @@
     "months_other": "{{count}}个月",
     "people_one": "{{count}}人",
     "people_other": "{{count}}人",
-    "per_kwh": "{{price}}/度"
+    "per_kwh": "{{price}}/度",
+    "per_month": "{{price}}/月"
   },
   "owner_badge": {
     "phone": "手机号已验证",
@@ -321,7 +332,9 @@
       "pass_sport": "足球鞋、球拍、健身器材…",
       "pass_tools": "电钻、修车工具、电工工具…",
       "pass_baby": "婴儿车、婴儿衣服、玩具…",
-      "pass_other": "书籍、乐器、盆栽…"
+      "pass_other": "书籍、乐器、盆栽…",
+      "room_house": "适合工班、家庭",
+      "room_apartment": "小公寓、宿舍、全包服务"
     },
     "photos_tip": {
       "pass": "照片清晰、多角度，更容易卖出。",
@@ -487,7 +500,8 @@
     "costs": "费用",
     "rules": "房屋守则",
     "contact": "负责人",
-    "requirements": "要求"
+    "requirements": "要求",
+    "amenities": "设施"
   },
   "availability": {
     "pass": "有货",
@@ -512,7 +526,9 @@
     "job_main": "全职",
     "job_parttime": "兼职",
     "lost": "丢失",
-    "found": "拾到"
+    "found": "拾到",
+    "room_house": "整套",
+    "room_apartment": "公寓 / 宿舍"
   },
   "sort": {
     "label": "排序",
@@ -526,7 +542,11 @@
     "under_500k": "50万以下",
     "500k_2m": "50万–200万",
     "2m_5m": "200万–500万",
-    "over_5m": "500万以上"
+    "over_5m": "500万以上",
+    "under_1m": "100万以下",
+    "1m_2m": "100万–200万",
+    "2m_3m": "200万–300万",
+    "over_3m": "300万以上"
   },
   "feature_home": {
     "categories_title": "分类",
@@ -543,14 +563,17 @@
     "back_super": "{{app}} 超级应用",
     "back_super_a11y": "返回{{app}}",
     "title": {
-      "pass": "二手市场"
+      "pass": "二手市场",
+      "room": "Dung Quat 租房"
     },
     "subtitle": {
-      "pass": "工友之间方便买卖"
+      "pass": "工友之间方便买卖",
+      "room": "在工厂附近找单间、整套房屋和合租"
     },
     "tabs": {
       "home": {
-        "pass": "市场"
+        "pass": "市场",
+        "room": "找房"
       },
       "saved": "收藏",
       "post": "发布",
@@ -586,7 +609,9 @@
       "tip_body": "在交班时间约在工厂门口或宿舍当面交易，当面检查物品，不要在网上先付定金。",
       "empty_title": "还没有收藏",
       "empty_body": "点信息上的 ♡ 收藏，稍后再看。",
-      "empty_cta": "看看新发布"
+      "empty_cta": "看看新发布",
+      "count_one": "{{count}} 条",
+      "count_other": "{{count}} 条"
     },
     "manage": {
       "title": "管理我的发布",
@@ -652,6 +677,67 @@
       "apply": "应用",
       "active_count_one": "{{count}} 个筛选",
       "active_count_other": "{{count}} 个筛选"
+    },
+    "room": {
+      "badge": "租房",
+      "near_label": "附近",
+      "categories_title": "按类型找房",
+      "tile_ac": "空调房",
+      "tile_ac_hint": "有空调",
+      "tile_near": "靠近园区大门",
+      "tile_near_hint": "上班 < 2 公里",
+      "trust_title": "放心租房",
+      "trust_body": "先实地看房再付押金。不要给没见过面的人转账。",
+      "list_title": "适合轮班工人的实惠房源",
+      "list_subtitle": "你工作地点附近的新房源",
+      "landlord_eyebrow": "房东专区",
+      "landlord_title": "有空房要出租吗？",
+      "landlord_body": "免费发布，让园区附近的工人和工程师找到你。",
+      "landlord_cta": "发布房源",
+      "photos": "{{count}} 张照片",
+      "call": "打电话",
+      "chat": "发消息",
+      "detail": "详情",
+      "saved": {
+        "tab_active": "可租 ({{count}})",
+        "tab_inactive": "已出租 ({{count}})",
+        "sold_badge": "已出租",
+        "inactive_hint": "该房间已出租",
+        "find_similar": "查找类似房间",
+        "tip_title": "安全租房提示",
+        "tip_body": "请实地看房并仔细阅读合同；见到房东前不要转定金。"
+      },
+      "manage": {
+        "active_count_one": "{{count}} 间在租",
+        "active_count_other": "{{count}} 间在租",
+        "tab_active": "出租中",
+        "tab_sold": "已出租",
+        "stat_sold": "已出租",
+        "mark_sold": "标记已出租",
+        "search_placeholder": "按标题、编号搜索…",
+        "empty_active_title": "暂无出租房间",
+        "empty_active_body": "发布第一间房——至少 3 张照片、租金和面积。",
+        "empty_sold_title": "暂无已出租房间",
+        "empty_sold_body": "房间租出后点击\"标记已出租\"，避免继续被询问。"
+      },
+      "filter": {
+        "category_title": "房型"
+      }
+    },
+    "room_detail": {
+      "title": "房源详情",
+      "vacant": "可出租",
+      "updated": "{{time}}更新",
+      "deposit": "押金 {{count}} 个月",
+      "costs_title": "每月费用",
+      "free": "免费",
+      "distance_title": "位置与距离",
+      "distance_value": "{{distance}} · 骑摩托约 {{minutes}} 分钟",
+      "map_cta": "查看地图与路线",
+      "amenities_title": "设施",
+      "landlord_title": "房东信息",
+      "rules_title": "描述与入住须知",
+      "contact_cta": "联系看房"
     }
   }
 }

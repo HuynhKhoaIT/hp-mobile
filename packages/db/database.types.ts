@@ -994,6 +994,11 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"site_locations": {
+                  Row: {
+                    "code": string | null,"lat": number | null,"lng": number | null,"name": string | null,"sort_order": number | null
+                  }
+                  Relationships: []
                 }
           }
           Functions: {
@@ -1499,7 +1504,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "group_kind": "ride"|"sport","group_status": "open"|"full"|"in_progress"|"completed"|"cancelled","listing_category": "pass_electronics"|"pass_vehicle"|"pass_ppe"|"pass_home"|"room_rent"|"room_share"|"job_main"|"job_parttime"|"lost"|"found"|"pass_appliance"|"pass_fashion"|"pass_sport"|"pass_tools"|"pass_baby"|"pass_other","listing_status": "draft"|"pending_review"|"active"|"sold"|"closed"|"expired"|"rejected","member_status": "requested"|"accepted"|"declined"|"left"|"kicked"
+            "group_kind": "ride"|"sport","group_status": "open"|"full"|"in_progress"|"completed"|"cancelled","listing_category": "pass_electronics"|"pass_vehicle"|"pass_ppe"|"pass_home"|"room_rent"|"room_share"|"job_main"|"job_parttime"|"lost"|"found"|"pass_appliance"|"pass_fashion"|"pass_sport"|"pass_tools"|"pass_baby"|"pass_other"|"room_house"|"room_apartment","listing_status": "draft"|"pending_review"|"active"|"sold"|"closed"|"expired"|"rejected","member_status": "requested"|"accepted"|"declined"|"left"|"kicked"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1619,7 +1624,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "group_kind": ["ride", "sport"],"group_status": ["open", "full", "in_progress", "completed", "cancelled"],"listing_category": ["pass_electronics", "pass_vehicle", "pass_ppe", "pass_home", "room_rent", "room_share", "job_main", "job_parttime", "lost", "found", "pass_appliance", "pass_fashion", "pass_sport", "pass_tools", "pass_baby", "pass_other"],"listing_status": ["draft", "pending_review", "active", "sold", "closed", "expired", "rejected"],"member_status": ["requested", "accepted", "declined", "left", "kicked"]
+            "group_kind": ["ride", "sport"],"group_status": ["open", "full", "in_progress", "completed", "cancelled"],"listing_category": ["pass_electronics", "pass_vehicle", "pass_ppe", "pass_home", "room_rent", "room_share", "job_main", "job_parttime", "lost", "found", "pass_appliance", "pass_fashion", "pass_sport", "pass_tools", "pass_baby", "pass_other", "room_house", "room_apartment"],"listing_status": ["draft", "pending_review", "active", "sold", "closed", "expired", "rejected"],"member_status": ["requested", "accepted", "declined", "left", "kicked"]
           }
         }
 } as const

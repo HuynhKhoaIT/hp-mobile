@@ -3,17 +3,21 @@
 // useAttributeText của @/lib/listing). Thông số chữ dài (yêu cầu, đặc điểm nhận dạng, nơi mất / nhặt, giờ giấc) chiếm cả
 // hàng. `returned` không hiện ở đây (nhãn "Đã trả lại" + thông báo ở đầu chi tiết). Icon theo khoá thông số (giống web).
 // Khối có tiêu đề riêng theo groupAttributeRows (@hp/shared — cùng nguồn với web, style Stitch "Chi tiết phòng trọ" /
-// "Chi tiết việc làm"): trọ "Chi phí" (điện, nước) · "Nội quy" (giờ giấc, số người); việc "Người phụ trách" (tên — SĐT chỉ
-// qua Gọi ở thanh liên hệ) · "Yêu cầu" (đoạn chữ trong thẻ). Thông số còn lại ở lưới "Thông tin".
+// "Chi tiết việc làm"): trọ "Chi phí" (điện, nước, wifi, rác, cọc) · "Tiện nghi" · "Nội quy" (giờ giấc, số người); việc "Người
+// phụ trách" (tên — SĐT chỉ qua Gọi ở thanh liên hệ) · "Yêu cầu" (đoạn chữ trong thẻ). Thông số còn lại ở lưới "Thông tin".
+// Nhóm có khối riêng ở chi tiết (config.detail.sections — DetailSections) được bỏ qua ở đây (`skipGroups`).
 import type { PublicListing } from '@hp/core';
 import { type AttributeField, type AttributeValue, groupAttributeRows, readAttributes } from '@hp/shared';
 import {
+  AirVent,
   Baby,
   Bike,
   BriefcaseBusiness,
   Calendar,
+  Cctv,
   CircleDollarSign,
   Clock,
+  CookingPot,
   Droplet,
   Dumbbell,
   Gauge,
@@ -33,9 +37,13 @@ import {
   Sofa,
   Sparkles,
   Tag,
+  Toilet,
+  Trash,
   User,
   Users,
+  UserX,
   Wallet,
+  Wifi,
   Wrench,
   Zap,
 } from 'lucide-react-native';
@@ -44,8 +52,8 @@ import { View } from 'react-native';
 import { useAttributeText } from '@/lib/listing';
 import { Card, Icon, SectionHeader, Text } from '@/ui';
 
-/** Icon theo khoá thông số (khoá trùng giữa các category — vd item_type — dùng chung một icon). */
-const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
+/** Icon theo khoá thông số (khoá trùng giữa các category — vd item_type — dùng chung một icon). Dùng lại ở DetailSections. */
+export const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   brand: Tag,
   model: Smartphone,
   condition: Sparkles,
@@ -59,8 +67,18 @@ const ATTRIBUTE_ICON: Record<string, LucideIcon> = {
   area_m2: Ruler,
   electricity_price: Zap,
   water_price: Droplet,
+  wifi_price: Wifi,
+  trash_price: Trash,
+  deposit_months: Wallet,
   has_loft: Layers,
+  has_ac: AirVent,
+  private_wc: Toilet,
+  has_kitchen: CookingPot,
+  has_wifi: Wifi,
+  has_camera: Cctv,
   has_parking: Bike,
+  free_hours: Clock,
+  no_landlord: UserX,
   curfew: Clock,
   max_people: Users,
   shift: Clock,
@@ -90,12 +108,21 @@ const HIDDEN = new Set(['returned']);
 
 type Row = { field: AttributeField; value: AttributeValue };
 
-export function AttributeList({ listing }: { listing: Pick<PublicListing, 'category' | 'attributes'> }) {
+/** Thông tin. `skipGroups`: nhóm đã có khối riêng ở chi tiết (config.detail.sections — chi phí, tiện nghi, nội quy). */
+export function AttributeList({
+  listing,
+  skipGroups,
+}: {
+  listing: Pick<PublicListing, 'category' | 'attributes'>;
+  skipGroups?: readonly string[];
+}) {
   const { t } = useTranslation('listing');
   const text = useAttributeText();
   const rows = readAttributes(listing.category, listing.attributes).filter((r) => !HIDDEN.has(r.field.key));
   if (rows.length === 0) return null;
-  const { general, groups } = groupAttributeRows(listing.category, rows);
+  const grouped = groupAttributeRows(listing.category, rows);
+  const general = grouped.general;
+  const groups = grouped.groups.filter((g) => !skipGroups?.includes(g.key));
   return (
     <>
       {general.length > 0 ? (

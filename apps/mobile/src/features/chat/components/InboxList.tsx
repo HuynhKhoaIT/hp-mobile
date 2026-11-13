@@ -8,6 +8,7 @@ import { useConversations, useSession, useUnreadConversationCount } from '@hp/co
 import type { Feature } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
 import { MessageCircle, ShieldCheck } from 'lucide-react-native';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
@@ -20,9 +21,13 @@ export type InboxListProps = {
   feature?: Feature;
   /** Nút của trạng thái rỗng (vd "Xem tin" → Khám phá / trang chủ mini-app). */
   emptyAction: { label: string; onPress: () => void };
+  /** Khối cuối danh sách, dưới hộp nhắc an toàn (vd dòng miễn trừ của mini-app). */
+  footer?: ReactNode;
+  /** Hộp thư trong mini-app (slug) → màn chat mở với màu mini-app. */
+  mini?: string;
 };
 
-export function InboxList({ feature, emptyAction }: InboxListProps) {
+export function InboxList({ feature, emptyAction, footer, mini }: InboxListProps) {
   const { t } = useTranslation(['chat', 'common']);
   const theme = useTheme();
   const session = useSession();
@@ -63,7 +68,7 @@ export function InboxList({ feature, emptyAction }: InboxListProps) {
       <FlashList
         data={visible}
         keyExtractor={(c) => c.id}
-        renderItem={({ item }) => <ConversationRow conversation={item} onPress={() => openConversation(item.id)} />}
+        renderItem={({ item }) => <ConversationRow conversation={item} onPress={() => openConversation(item.id, { mini })} />}
         ItemSeparatorComponent={() => <View className="h-3" />}
         contentContainerStyle={{ paddingTop: theme.space[3], paddingBottom: theme.space[4] }}
         showsVerticalScrollIndicator={false}
@@ -101,6 +106,7 @@ export function InboxList({ feature, emptyAction }: InboxListProps) {
                 text={`${t('safety.tip_deposit')} ${t('safety.tip_report')}`}
               />
             )}
+            {list.hasNextPage ? null : footer}
           </View>
         }
       />

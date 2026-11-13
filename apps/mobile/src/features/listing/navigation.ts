@@ -19,8 +19,9 @@ export function backOrHome() {
   else router.replace('/');
 }
 
-export function openListing(id: string, opts: { replace?: boolean } = {}) {
-  const href = { pathname: '/listing/[id]', params: { id } } as const;
+/** Chi tiết tin. `mini`: mở từ mini-app (Quản lý tin) → nút của chủ tin (Sửa tin, Tin của tôi) ở lại mini-app. */
+export function openListing(id: string, opts: { replace?: boolean; mini?: MiniSlug } = {}) {
+  const href = { pathname: '/listing/[id]', params: { id, ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
   if (opts.replace) router.replace(href);
   else router.push(href);
 }
@@ -41,20 +42,26 @@ export function openListingList(
   });
 }
 
-/** Bước 0 của "Đăng nhanh": chọn loại tin (đặt sẵn tính năng khi đến từ danh sách của tính năng đó). */
-export function openPostPicker(feature?: ListingFeature) {
-  router.push({ pathname: '/listing/new', params: feature ? { feature } : {} });
-}
-
-/** Form đăng tin của một danh mục (bước 1–3). */
-export function openPostForm(category: ListingCategory, opts: { replace?: boolean } = {}) {
-  const href = { pathname: '/listing/new/[category]', params: { category } } as const;
+/**
+ * Bước 0 của "Đăng nhanh": chọn loại tin (đặt sẵn tính năng khi đến từ danh sách của tính năng đó). `mini`: mở từ mini-app
+ * (slug, vd 'pass') → chỉ danh mục của tính năng, đăng xong về "Quản lý tin" của mini-app (xem openMyListingsFrom).
+ */
+export function openPostPicker(feature?: ListingFeature, opts: { mini?: MiniSlug; replace?: boolean } = {}) {
+  const href = { pathname: '/listing/new', params: { ...(feature ? { feature } : {}), ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
   if (opts.replace) router.replace(href);
   else router.push(href);
 }
 
-export function openEditListing(id: string, opts: { replace?: boolean } = {}) {
-  const href = { pathname: '/listing/edit/[id]', params: { id } } as const;
+/** Form đăng tin của một danh mục (bước 1–3). `mini`: luồng đăng của mini-app (giữ tới màn kết quả). */
+export function openPostForm(category: ListingCategory, opts: { replace?: boolean; mini?: MiniSlug } = {}) {
+  const href = { pathname: '/listing/new/[category]', params: { category, ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
+  if (opts.replace) router.replace(href);
+  else router.push(href);
+}
+
+/** Sửa tin. `mini`: sửa từ mini-app → lưu nháp / gửi duyệt / "Tin của tôi" về "Quản lý tin" của mini-app. */
+export function openEditListing(id: string, opts: { replace?: boolean; mini?: MiniSlug } = {}) {
+  const href = { pathname: '/listing/edit/[id]', params: { id, ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
   if (opts.replace) router.replace(href);
   else router.push(href);
 }
@@ -78,7 +85,10 @@ export function openSearch() {
 /** Tab của mini-app (`index` = trang chủ chợ; `filter` = màn Bộ lọc, không có ô trên thanh tab). */
 export type MiniAppTab = 'index' | 'saved' | 'chat' | 'manage' | 'filter';
 
-type MiniSlug = Exclude<ListingFeatureConfig['slug'], 'all'>;
+export type MiniSlug = Exclude<ListingFeatureConfig['slug'], 'all'>;
+
+export const isMiniSlug = (v: string | undefined): v is MiniSlug =>
+  !!v && (Object.values(LISTING_ROUTE_SLUG) as string[]).includes(v);
 
 /** Bộ lọc đặt sẵn khi mở mini-app (giống openListingList): khu, chip "Tìm nhanh", nhóm category. */
 export type MiniAppParams = { site?: string; shortcut?: string; categories?: string };
@@ -95,21 +105,40 @@ export function openMiniApp(slug: MiniSlug, params: { site?: string; shortcut?: 
   router.push(miniAppHref(slug, { ...rest, ...(categories?.length ? { categories: categories.join(',') } : {}) }));
 }
 
-/** Chuyển tab trong mini-app đang mở. */
-export function openMiniTab(slug: MiniSlug, tab: MiniAppTab) {
-  const params = { feature: slug };
+/** Href một tab của mini-app (link web tới trang con: `params` = bộ lọc đặt sẵn của phiên). */
+export function miniTabHref(slug: MiniSlug, tab: MiniAppTab, params: MiniAppParams = {}) {
+  const extra = Object.fromEntries(Object.entries(params).filter(([, v]) => !!v)) as Record<string, string>;
+  const p = { feature: slug, ...extra };
   switch (tab) {
     case 'index':
-      return router.navigate({ pathname: '/mini/[feature]', params });
+      return { pathname: '/mini/[feature]', params: p } as const;
     case 'saved':
-      return router.navigate({ pathname: '/mini/[feature]/saved', params });
+      return { pathname: '/mini/[feature]/saved', params: p } as const;
     case 'chat':
-      return router.navigate({ pathname: '/mini/[feature]/chat', params });
+      return { pathname: '/mini/[feature]/chat', params: p } as const;
     case 'manage':
-      return router.navigate({ pathname: '/mini/[feature]/manage', params });
+      return { pathname: '/mini/[feature]/manage', params: p } as const;
     case 'filter':
-      return router.navigate({ pathname: '/mini/[feature]/filter', params });
+      return { pathname: '/mini/[feature]/filter', params: p } as const;
   }
+}
+
+/** Chuyển tab trong mini-app đang mở. */
+export function openMiniTab(slug: MiniSlug, tab: MiniAppTab) {
+  router.navigate(miniTabHref(slug, tab));
+}
+
+/**
+ * Kết thúc luồng đăng / sửa → "Tin của tôi". Từ mini-app (`mini`): đóng các màn đăng tin và về tab "Quản lý tin" của
+ * mini-app (nháp nằm ở tab Đã ẩn) — không rơi ra màn của super app. Ngoài mini-app → màn my-listings như cũ.
+ * `at` (mốc giờ): mỗi lần về là một yêu cầu mới — tab Quản lý chuyển tab kể cả khi `tab` trùng lần trước.
+ */
+export function openMyListingsFrom(mini: MiniSlug | undefined, tab: 'active' | 'pending' | 'draft') {
+  if (!mini) return openMyListings(tab, { replace: true });
+  router.dismissTo({
+    pathname: '/mini/[feature]/manage',
+    params: { feature: mini, tab: tab === 'draft' ? 'hidden' : tab, at: String(Date.now()) },
+  });
 }
 
 /** Rời mini-app về super app (gỡ cả route mini-app khỏi stack gốc); mở thẳng từ link (không có màn trước) → Hub. */

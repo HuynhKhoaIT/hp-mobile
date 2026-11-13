@@ -1,12 +1,13 @@
 // Một trường `attributes` của form đăng tin, dựng từ ATTRIBUTE_FIELDS (@hp/shared) — không khai báo trường theo
 // từng tính năng: enum → chip (`attr_value.<key>.<v>`), int → ô số + đơn vị, money → PriceInput, bool → ô tích,
-// text → ô chữ, datetime (lost_at) → chip ngày "hôm nay … 6 ngày trước" (không cần thư viện chọn ngày).
+// (đơn vị "₫/kWh", "₫/tháng" theo `per`), text → ô chữ, datetime (lost_at) → chip ngày "hôm nay … 6 ngày trước" (không cần thư viện chọn ngày).
 import type { AttributeField, AttributeValue } from '@hp/shared';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useErrorText } from '@/lib/errors';
 import { formatDate } from '@/lib/format';
+import { MONEY_PER } from '@/lib/listing';
 import { Checkbox, Chip, Input, PriceInput, Row, Text } from '@/ui';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -70,6 +71,8 @@ export function AttributeInput({ field, value, onChange, onBlur, error }: Attrib
       return (
         <PriceInput
           label={label}
+          // Đơn vị theo `per` của trường (điện /kWh, wifi / rác /tháng): "₫/tháng" thay "₫".
+          {...(field.per ? { suffix: t(MONEY_PER[field.per] ?? 'unit.per_month', { price: '₫' }) } : {})}
           value={typeof value === 'number' ? value : null}
           onChange={(v) => onChange(v ?? undefined)}
           onBlur={onBlur}

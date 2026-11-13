@@ -5,7 +5,8 @@
 //   ?sort=), nút Tìm. Giữ category + thuộc tính + giá tối đa + cho tặng đang lọc qua input ẩn.
 // - ListChips: dưới header — hàng chip danh mục (trang một tính năng: category, nhãn theo config.card.categoryBadge nếu có —
 //   đồ thất lạc "Mất đồ / Nhặt được"; /tin + /tim-kiem: 4 tính năng, link sang trang riêng) → hàng chip lọc nhanh theo thông
-//   số (config.quickFilters, bật / tắt — `?has_loft=1`; chip giá tối đa — `?price_max=1000000`; chip "Cho tặng" — `?free=1`)
+//   số (config.quickFilters, bật / tắt — `?has_loft=1`; chip giá tối đa — `?price_max=1000000`; chip "Cho tặng" — `?free=1`;
+//   Cho tặng và giá loại trừ nhau: bật Cho tặng bỏ mọi tham số giá, bật chip giá bỏ Cho tặng — filters.ts)
 //   → thuộc tính khác đang lọc (chip "Tìm nhanh" của trang chủ) dạng
 //   viên có nút bỏ + "Xoá từ khoá" + "Xoá lọc" (bỏ mọi tham số) khi đang lọc / sắp xếp.
 // Khác Stitch (cố ý): không thanh trượt giá (khoảng giá đặt sẵn — tập hữu hạn, trang còn cache được) / xác thực người bán /
@@ -331,7 +332,11 @@ export function QuickFilterChips({
       const on = filters.priceMax === q.priceMax;
       return (
         <li key={`price_max:${q.priceMax}`}>
-          <FilterChip href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax }) }} selected={on} pressed={on}>
+          <FilterChip
+            href={{ pathname: path, query: filterQuery({ ...filters, priceMax: on ? null : q.priceMax, ...(on ? {} : { priceMin: null, freeOnly: false }) }) }}
+            selected={on}
+            pressed={on}
+          >
             <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
             {t(q.labelKey)}
           </FilterChip>
@@ -342,7 +347,14 @@ export function QuickFilterChips({
       const on = filters.freeOnly;
       return (
         <li key="free">
-          <FilterChip href={{ pathname: path, query: filterQuery({ ...filters, freeOnly: !on }) }} selected={on} pressed={on}>
+          <FilterChip
+            href={{
+              pathname: path,
+              query: filterQuery({ ...filters, freeOnly: !on, ...(on ? {} : { priceMin: null, priceMax: null, priceRange: null }) }),
+            }}
+            selected={on}
+            pressed={on}
+          >
             <span aria-hidden className={cn('size-2 rounded-full bg-current', cfg.tone.fg)} />
             {t(q.labelKey)}
           </FilterChip>

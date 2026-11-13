@@ -8,6 +8,8 @@
 // toàn. Tuỳ chọn: tắt thông báo, báo cáo người dùng, chặn / bỏ chặn. "Xem tin cũ hơn" giữ nguyên vị trí đang đọc.
 // Chat nhóm: tên + avatar người gửi trên tin của người khác (useConversationMembers), không chặn / báo cáo người dùng /
 // "Đã xem" (nhiều người đọc), rỗng → group.chat.empty.
+// `inboxHref` (mini-app — khung chat ở /pass-do/tin-nhan/[id], không có cột hộp thư): nút quay lại luôn hiện và về hộp thư
+// của mini-app; thiếu → /tin-nhan (nút quay lại chỉ khi một cột).
 import type { ChatMessage } from '@hp/core';
 import {
   useChatImageUrls,
@@ -47,12 +49,12 @@ const GROUP_MS = 5 * 60_000;
 const NEAR_BOTTOM_PX = 120;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export function ChatThread({ conversationId }: { conversationId: string }) {
-  if (!UUID.test(conversationId)) return <ThreadNotFound />;
-  return <Thread conversationId={conversationId} />;
+export function ChatThread({ conversationId, inboxHref }: { conversationId: string; inboxHref?: string }) {
+  if (!UUID.test(conversationId)) return <ThreadNotFound inboxHref={inboxHref} />;
+  return <Thread conversationId={conversationId} inboxHref={inboxHref} />;
 }
 
-function Thread({ conversationId }: { conversationId: string }) {
+function Thread({ conversationId, inboxHref }: { conversationId: string; inboxHref?: string }) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
   const { userId } = useSession();
@@ -140,7 +142,7 @@ function Thread({ conversationId }: { conversationId: string }) {
   };
 
   if (conversation.isError && !c) {
-    if (conversation.error.code === 'not_found') return <ThreadNotFound />;
+    if (conversation.error.code === 'not_found') return <ThreadNotFound inboxHref={inboxHref} />;
     return (
       <div className="flex flex-1 flex-col justify-center">
         <ErrorState code={conversation.error.code} onRetry={() => void conversation.refetch()} />
@@ -219,6 +221,7 @@ function Thread({ conversationId }: { conversationId: string }) {
     <div className="flex min-h-0 flex-1 flex-col">
       <ThreadHeader
         conversation={c}
+        inboxHref={inboxHref}
         isTyping={isTyping}
         isBlocked={blockedByMe}
         onToggleMute={() => {
@@ -284,7 +287,7 @@ function Thread({ conversationId }: { conversationId: string }) {
   );
 }
 
-function ThreadNotFound() {
+function ThreadNotFound({ inboxHref }: { inboxHref?: string }) {
   const t = useTranslations();
   return (
     <div className="flex flex-1 flex-col justify-center">
@@ -293,7 +296,7 @@ function ThreadNotFound() {
         title={t('chat.thread.not_found')}
         action={
           <Button asChild variant="outline">
-            <Link href="/tin-nhan">{t('chat.title')}</Link>
+            <Link href={inboxHref ?? '/tin-nhan'}>{t('chat.title')}</Link>
           </Button>
         }
       />

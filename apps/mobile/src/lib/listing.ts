@@ -87,9 +87,10 @@ export function isReturned(listing: Pick<PublicListing, 'category' | 'attributes
   return !!attrs && typeof attrs === 'object' && !Array.isArray(attrs) && attrs.returned === true;
 }
 
-const MONEY_PER: Record<string, string> = {
+/** Đơn vị sau giá của thông số tiền (ATTRIBUTE_FIELDS `per`): "3.500 ₫/kWh", "100.000 ₫/tháng" (wifi, rác của trọ). */
+export const MONEY_PER: Record<string, string> = {
   kwh: 'listing:unit.per_kwh',
-  month: 'listing:card.per_month',
+  month: 'listing:unit.per_month',
   hour: 'listing:card.per_hour',
   day: 'listing:card.per_day',
 };

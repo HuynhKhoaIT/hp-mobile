@@ -1,6 +1,7 @@
-// MiniAppHeader — header xanh của mini-app trong super app (style Stitch "Sub-App Chợ Pass", "Tin đã lưu", "Quản lý tin
-// đăng", "Bộ lọc & Tìm kiếm"): cùng ngôn ngữ với PageHero / header Hub — nền primary bo đáy rounded-b-xl + hoạ tiết HeroDecor
-// (dải xanh kéo lên vùng trạng thái), tràn mép màn (-mx-4 bù padding 16 của Screen).
+// MiniAppHeader — header của mini-app trong super app (style Stitch "Sub-App Chợ Pass", "Nhà Trọ Dung Quất", "Tin đã lưu",
+// "Quản lý tin đăng", "Bộ lọc & Tìm kiếm"): cùng ngôn ngữ với PageHero / header Hub — nền gradient màu riêng của mini-app
+// (GradientSurface — appThemes: Chợ Pass cam đất, Nhà trọ emerald…; chữ / icon trắng cả giao diện tối) bo đáy rounded-b-xl +
+// hoạ tiết HeroDecor (dải màu đầu gradient kéo lên vùng trạng thái), tràn mép màn (-mx-4 bù padding 16 của Screen).
 //   Hàng 1 (min-h-12): nút viên "← {nhãn}" trong mờ (rời mini-app về super app, hoặc về trang chủ mini-app) | vùng phải.
 //   Khối tên: ô vuông size-12 nền accent + icon on-accent (tuỳ chọn) | dòng nhỏ in hoa (eyebrow) → tiêu đề text-xl đậm +
 //   viên cam (`badge`: số tin đã lưu, "3 tin đang bán") + nhãn viền trong mờ (`tag`: "MINI-APP") → dòng phụ.
@@ -9,6 +10,7 @@
 import { ArrowLeft, type LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
+import { GradientSurface } from './GradientSurface';
 import { HeroDecor } from './HomeHeader';
 import { Icon } from './Icon';
 import { Text } from './Text';
@@ -35,8 +37,8 @@ export type MiniAppHeaderProps = {
 
 export function MiniAppHeader({ back, right, eyebrow, title, badge, tag, subtitle, icon, aside, children }: MiniAppHeaderProps) {
   return (
-    <View className="-mx-4 rounded-b-xl bg-primary px-4 pb-4 pt-2">
-      <HeroDecor rounded="rounded-b-xl" />
+    <GradientSurface className="-mx-4 rounded-b-xl px-4 pb-4 pt-2">
+      <HeroDecor rounded="rounded-b-xl" strip="app" />
       <View className="min-h-12 flex-row items-center gap-2">
         <BackPill {...back} />
         <View className="flex-1" />
@@ -82,7 +84,7 @@ export function MiniAppHeader({ back, right, eyebrow, title, badge, tag, subtitl
       </View>
       {aside ? <View className="mt-3 flex-row flex-wrap items-center gap-2">{aside}</View> : null}
       {children ? <View className="mt-3 gap-2">{children}</View> : null}
-    </View>
+    </GradientSurface>
   );
 }
 

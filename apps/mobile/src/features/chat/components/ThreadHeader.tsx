@@ -13,7 +13,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { openGroup } from '@/features/group/navigation';
-import { openListing } from '@/features/listing/navigation';
+import { type MiniSlug, openListing } from '@/features/listing/navigation';
 import { openProfile } from '@/features/profile/navigation';
 import { formatDate, formatRelative } from '@/lib/format';
 import { listingImageUrl, profileAvatarUrl } from '@/lib/images';
@@ -26,11 +26,14 @@ export function ThreadHeader({
   isTyping,
   onBack,
   onOptions,
+  mini,
 }: {
   conversation: ConversationSummary | undefined;
   isTyping: boolean;
   onBack: () => void;
   onOptions: () => void;
+  /** Mở từ mini-app → "Xem tin" mở chi tiết trong mini-app. */
+  mini?: MiniSlug;
 }) {
   const { t } = useTranslation(['chat', 'common', 'group']);
   const group = !!c && isGroupConversation(c);
@@ -102,7 +105,7 @@ export function ThreadHeader({
           )}
         </View>
       </View>
-      {c?.context_type === 'listing' ? <ListingContext conversation={c} /> : null}
+      {c?.context_type === 'listing' ? <ListingContext conversation={c} mini={mini} /> : null}
       {c && group && c.group_starts_at ? <GroupContext conversation={c} /> : null}
     </View>
   );
@@ -123,7 +126,7 @@ function ContextStrip({ children }: { children: ReactNode }) {
   return <View className="border-b border-border bg-surface px-4 py-2.5">{children}</View>;
 }
 
-function ListingContext({ conversation: c }: { conversation: ConversationSummary }) {
+function ListingContext({ conversation: c, mini }: { conversation: ConversationSummary; mini?: MiniSlug }) {
   const { t } = useTranslation(['chat', 'common']);
   const price = useConversationPrice();
   const gone = !c.listing_title;
@@ -136,7 +139,7 @@ function ListingContext({ conversation: c }: { conversation: ConversationSummary
         accessibilityRole="button"
         accessibilityLabel={gone ? t('inbox.listing_gone') : `${t('thread.view_listing')}: ${c.listing_title}`}
         disabled={gone || !c.context_id}
-        onPress={() => c.context_id && openListing(c.context_id)}
+        onPress={() => c.context_id && openListing(c.context_id, { mini })}
         className="min-h-14 flex-row items-center gap-3 rounded-md border border-border bg-bg p-2 active:bg-surface-2"
       >
         {c.listing_image ? (

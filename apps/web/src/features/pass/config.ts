@@ -7,7 +7,7 @@
 // bộ lọc có khoảng cách (< 2 / 5 / 10 km) và ô giá tối thiểu / tối đa.
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { LISTING_FEATURES, PASS_PRICE_RANGES } from '@hp/shared';
-import { Baby, Bike, Dumbbell, HardHat, Package, Refrigerator, Shirt, Smartphone, Sofa, Wrench } from 'lucide-react';
+import { Baby, Bike, Dumbbell, HardHat, Package, Refrigerator, Shirt, ShoppingBag, Smartphone, Sofa, Store, Wrench } from 'lucide-react';
 import type { ListingFeatureConfig } from '@/features/listing/feature-config';
 import { miniAppPaths } from '@/features/listing/mini-app-routes';
 
@@ -64,6 +64,11 @@ export const passConfig: ListingFeatureConfig = {
     titleKey: 'listing.mini_app.title.pass',
     subtitleKey: 'listing.mini_app.subtitle.pass',
     homeTabKey: 'listing.mini_app.tabs.home.pass',
+    theme: 'pass',
+    HomeIcon: Store,
+    header: { variant: 'market', Icon: ShoppingBag },
+    home: ['sites', 'categories', 'banner', 'chips', 'latest'],
+    savedTip: { titleKey: 'listing.mini_app.saved.tip_title', bodyKey: 'listing.mini_app.saved.tip_body' },
     bannerPlacement: 'web_pass',
     homeCategoryCount: 6,
     paths: miniAppPaths(LISTING_FEATURE_PATHS.pass),

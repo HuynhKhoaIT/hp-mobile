@@ -25,7 +25,19 @@
             { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/tin/" },
             { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/nhom/" },
             { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/tin/" },
-            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/nhom/" }
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/nhom/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/pass-do" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/pass-do/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/en/pass-do" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/pass-do/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/zh/pass-do" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/pass-do/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/tro" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/tro/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/en/tro" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/tro/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/zh/tro" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/tro/" }
           ]
         }
       ],

@@ -12,6 +12,7 @@ import {
   getMyProfile,
   listMyListings,
   listSavedListings,
+  listSiteLocations,
   listSites,
   logSearch,
   type MyListing,
@@ -23,6 +24,7 @@ import {
   searchListings,
   similarListings,
   type Site,
+  type SiteLocation,
 } from '@hp/core';
 import type { Database } from '@hp/db';
 import type { ListingCategory, ListingSort } from '@hp/shared';
@@ -159,6 +161,25 @@ async function getCachedSites() {
 export async function getPublicSites(): Promise<Site[]> {
   try {
     return await getCachedSites();
+  } catch {
+    return [];
+  }
+}
+
+async function getCachedSiteLocations() {
+  'use cache';
+  cacheLife('hours');
+  cacheTag('sites');
+  return unwrap(await listSiteLocations(createPublicClient()));
+}
+
+/**
+ * Toạ độ các khu (view site_locations, anon) — khối "Vị trí & khoảng cách" của chi tiết trọ. Cache theo giờ (admin ít khi
+ * đổi); lỗi → rỗng (ẩn danh sách khoảng cách, trang vẫn hiện).
+ */
+export async function getSiteLocations(): Promise<SiteLocation[]> {
+  try {
+    return await getCachedSiteLocations();
   } catch {
     return [];
   }

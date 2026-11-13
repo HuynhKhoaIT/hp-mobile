@@ -2,10 +2,12 @@
 
 // "Quản lý tin đăng" của mini-app (/pass-do/quan-ly?tab=active|sold|pending|hidden — Stitch manage). Dữ liệu riêng → đọc ở
 // trình duyệt bằng hook chung @hp/core/react (khung tĩnh render skeleton — ClientOnly):
-//   thẻ hồ sơ (useMyProfile: ảnh, tên, huy hiệu, đánh giá) + 3 số liệu (useFeatureListingsSummary: tin hiển thị · đã thanh lý
+//   thẻ hồ sơ (useMyProfile: ảnh, tên, huy hiệu, đánh giá, chip khu làm việc — profile.site → tên khu) + 3 số liệu (useFeatureListingsSummary: tin hiển thị · đã thanh lý
 //   · lượt xem) + mẹo giờ đăng → tab có số (link ?tab= — chạy cả khi tắt JS; Chờ duyệt gồm bị từ chối, Đã ẩn gồm rút tin /
-//   hết hạn / nháp) → ô tìm (lọc tại chỗ trên các tin đã tải: tiêu đề, mã tin) + sắp xếp (Mới nhất / Nhiều lượt xem — tại chỗ)
-//   → thẻ tin (useFeatureListings, "Xem thêm" trang sau).
+//   hết hạn / nháp) → ô tìm (lọc tại chỗ trên các tin đã tải: tiêu đề, mã tin; chưa khớp tin nào mà server còn trang → tự tải
+//   trang kế cho tới khi khớp / hết trang; hết trang vẫn không khớp → "Không tìm thấy" + "Xoá từ khoá") + sắp xếp (Mới nhất /
+//   Nhiều lượt xem — tại chỗ) → thẻ tin (useFeatureListings, "Xem thêm" trang sau).
+// Sửa tin (nút "Sửa tin", tiêu đề tin chưa có trang công khai, menu ⋮) → trang sửa trong mini-app (/pass-do/quan-ly/[id]/sua).
 // Thẻ: ảnh + nhãn danh mục │ tiêu đề + menu ⋮ (MyListingMenu dùng chung "Tin của tôi": sửa / đã bán / rút tin / mở lại /
 // gửi duyệt lại / gia hạn / xoá có xác nhận) │ giá │ khu · thời gian │ dải số liệu (lượt xem, nhãn trạng thái, hết hạn) │
 // ghi chú chờ duyệt / bị từ chối + lý do │ hàng nút theo trạng thái: đang bán → (Gia hạn) · Đã bán · Sửa tin · Chia sẻ; đã bán
@@ -38,7 +40,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
-import { type ReactNode, useId, useState } from 'react';
+import { type ReactNode, useEffect, useId, useState } from 'react';
 import { Badge } from '@/components/shared/badge';
 import { ClientOnly } from '@/components/shared/client-only';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -54,6 +56,7 @@ import { cn } from '@/lib/utils';
 import { asLocale, priceText } from '../../display';
 import { LISTING_FEATURE_CONFIGS } from '../../features';
 import { hasPublicPage, isInactive, manageActions, ownerStatus, STATUS_TONE } from '../../manage';
+import { miniAppEditPath } from '../../mini-app-routes';
 import { useShareListing } from '../../use-share-listing';
 import { ListingPlaceholder } from '../listing-placeholder';
 import { MyListingMenu, useManage } from '../my-listing-menu';
@@ -110,6 +113,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
   const locale = asLocale(useLocale());
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const managePath = cfg.miniApp?.paths.manage ?? '/toi/tin-cua-toi';
+  const postHref = cfg.miniApp?.paths.post ?? { pathname: '/dang-tin', query: { feature } };
   const session = useSession();
   const enabled = !!session.userId;
   const summary = useFeatureListingsSummary(cfg.categories, { enabled });
@@ -119,14 +123,21 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
   const [sort, setSort] = useState<'newest' | 'views'>('newest');
   const searchId = useId();
 
-  if (session.isLoading) return <ManageSkeleton />;
-  if (!session.userId) return <SignInPrompt description={t('listing.mini_app.manage.signed_out_body')} />;
-
-  const siteName = (code: string | null) => (code ? sites.data?.find((s) => s.code === code)?.name : undefined);
   const q = query.trim().toLocaleLowerCase();
   const rows = list.items
     .filter((l) => !q || l.title.toLocaleLowerCase().includes(q) || l.short_id.toLocaleLowerCase().includes(q))
     .sort((a, b) => (sort === 'views' ? b.view_count - a.view_count : 0));
+  // Tìm chỉ lọc trên trang đã tải: chưa khớp tin nào mà server còn trang → tải tiếp (dừng khi lỗi — nút thử lại).
+  const searching = !!q && rows.length === 0 && list.hasNextPage;
+  const { isFetchingNextPage, isError, fetchNextPage } = list;
+  useEffect(() => {
+    if (searching && !isFetchingNextPage && !isError) void fetchNextPage();
+  }, [searching, isFetchingNextPage, isError, fetchNextPage]);
+
+  if (session.isLoading) return <ManageSkeleton />;
+  if (!session.userId) return <SignInPrompt description={t('listing.mini_app.manage.signed_out_body')} />;
+
+  const siteName = (code: string | null) => (code ? sites.data?.find((s) => s.code === code)?.name : undefined);
 
   return (
     <div className="flex flex-col gap-4">
@@ -196,7 +207,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
           action={
             tab === 'active' ? (
               <Button asChild variant="accent" className="font-semibold">
-                <Link href={{ pathname: '/dang-tin', query: { feature } }}>
+                <Link href={postHref}>
                   <Plus aria-hidden strokeWidth={2} />
                   {t('listing.list.post_cta')}
                 </Link>
@@ -204,10 +215,20 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
             ) : undefined
           }
         />
+      ) : searching ? (
+        list.isError ? (
+          <ErrorState code={list.error.code} onRetry={() => void list.fetchNextPage()} />
+        ) : (
+          <div role="status" aria-live="polite">
+            <span className="sr-only">{t('listing.list.loading_more')}</span>
+            <ManageRowsSkeleton />
+          </div>
+        )
       ) : rows.length === 0 ? (
         <EmptyState
           icon={Search}
           title={t('listing.list.empty_search_title')}
+          description={t('listing.list.empty_search_body')}
           action={
             <Button type="button" variant="outline" onClick={() => setQuery('')}>
               {t('listing.list.clear_search')}
@@ -219,7 +240,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
           <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             {rows.map((l) => (
               <li key={l.id} className="flex flex-col *:flex-1">
-                <ManageRow listing={l} now={list.dataUpdatedAt} siteName={siteName(l.site)} />
+                <ManageRow listing={l} now={list.dataUpdatedAt} siteName={siteName(l.site)} managePath={managePath} />
               </li>
             ))}
           </ul>
@@ -268,14 +289,16 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const profile = useMyProfile();
   const summary = useFeatureListingsSummary(cfg.categories, { enabled: !!profile.userId });
+  const sites = useSites();
   const p = profile.data;
+  const siteName = p?.site ? sites.data?.find((s) => s.code === p.site)?.name : undefined;
   const name = p?.full_name?.trim() || '';
   const badges = (p?.badges ?? []).filter((b) => t.has(`listing.owner_badge.${b}`));
   const rated = !!p && p.rating_count > 0;
 
   const stats: { key: string; label: string; value: number | undefined; tone: string }[] = [
     { key: 'active', label: t('listing.mini_app.manage.stat_active'), value: summary.data?.active, tone: 'text-primary' },
-    { key: 'sold', label: t('listing.mini_app.manage.stat_sold'), value: summary.data?.sold, tone: 'text-service-pass' },
+    { key: 'sold', label: t('listing.mini_app.manage.stat_sold'), value: summary.data?.sold, tone: cfg.tone.fg },
     { key: 'views', label: t('listing.mini_app.manage.stat_views'), value: summary.data?.views, tone: 'text-primary' },
   ];
 
@@ -302,6 +325,12 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
                   {t(`listing.owner_badge.${b}`)}
                 </Badge>
               ))}
+              {siteName ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary-light px-2.5 py-0.5 font-medium text-primary">
+                  <MapPin aria-hidden strokeWidth={1.75} className="size-4" />
+                  {siteName}
+                </span>
+              ) : null}
               <span className="inline-flex items-center gap-1">
                 <Star aria-hidden strokeWidth={1.75} className={cn('size-4', rated ? 'fill-current text-warning' : 'text-muted')} />
                 {rated && p
@@ -351,7 +380,18 @@ function InlineError({ code, onRetry }: { code: string; onRetry: () => void }) {
 
 type RowAction = { key: string; label: string; Icon: LucideIcon; tone: 'primary' | 'accent' | 'outline'; onClick?: () => void; href?: string };
 
-function ManageRow({ listing: l, now, siteName }: { listing: MyListing; now: number; siteName: string | undefined }) {
+function ManageRow({
+  listing: l,
+  now,
+  siteName,
+  managePath,
+}: {
+  listing: MyListing;
+  now: number;
+  siteName: string | undefined;
+  /** "Quản lý tin" của mini-app — trang sửa nằm dưới nó. */
+  managePath: string;
+}) {
   const t = useTranslations();
   const locale = asLocale(useLocale());
   const status = ownerStatus(l, now);
@@ -361,8 +401,8 @@ function ManageRow({ listing: l, now, siteName }: { listing: MyListing; now: num
   const share = useShareListing();
   const cover = l.images[0];
   const price = priceText(priceLabel(l), t, locale);
-  const titleHref = hasPublicPage(status) ? `/tin/${l.slug}` : `/toi/tin-cua-toi/${l.id}/sua`;
-  const editHref = `/toi/tin-cua-toi/${l.id}/sua`;
+  const editHref = miniAppEditPath(managePath, l.id);
+  const titleHref = hasPublicPage(status) ? `/tin/${l.slug}` : editHref;
   const reasons = l.moderation_reasons.filter((r) => t.has(`listing.manage.reason.${r}`));
   const statusKey = STATUS_KEY[status];
 
@@ -434,7 +474,7 @@ function ManageRow({ listing: l, now, siteName }: { listing: MyListing; now: num
                 {l.title}
               </Link>
             </h3>
-            <MyListingMenu id={l.id} title={l.title} actions={allowed} className="-mt-1.5 -mr-1.5" />
+            <MyListingMenu id={l.id} title={l.title} actions={allowed} editHref={editHref} className="-mt-1.5 -mr-1.5" />
           </div>
           {price ? <p className={cn('text-lg font-bold', inactive ? 'text-muted' : 'text-primary')}>{price}</p> : null}
           <p className="mt-auto flex min-w-0 items-center gap-1 text-sm text-muted">

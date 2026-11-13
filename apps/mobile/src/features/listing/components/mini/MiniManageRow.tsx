@@ -30,6 +30,7 @@ import { formatDate, formatRelative } from '@/lib/format';
 import { LISTING_STATUS_TONE, usePriceText } from '@/lib/listing';
 import { Badge, Button, type ButtonVariant, Card, Icon, IconButton, ListingCover, Text } from '@/ui';
 import { ownerActions, useShareListing } from '../../hooks';
+import { useMiniApp, useMiniT } from '../../miniApp';
 import { openEditListing, openListing } from '../../navigation';
 import { canSellOf, type MyListingQuickAction } from '../MyListingRow';
 
@@ -54,12 +55,16 @@ const STATUS_KEY: Partial<Record<string, string>> = {
 };
 
 /** Nút chính (rộng) + các nút icon theo tab và trạng thái — khớp chú thích đầu file. */
-function buttonsOf(listing: MyListing, t: (key: string) => string): { main: RowButton | null; icons: RowButton[] } {
+function buttonsOf(
+  listing: MyListing,
+  t: (key: string) => string,
+  mt: (key: string) => string,
+): { main: RowButton | null; icons: RowButton[] } {
   const a = ownerActions(listing);
-  const edit: RowButton = { action: 'edit', label: t('mini_app.manage.edit'), icon: Pencil, variant: 'outline' };
-  const share: RowButton = { action: 'share', label: t('mini_app.manage.share'), icon: Share2, variant: 'outline' };
-  const renew: RowButton = { action: 'renew', label: t('mini_app.manage.renew'), icon: CalendarClock, variant: 'accent' };
-  const repost: RowButton = { action: 'reopen', label: t('mini_app.manage.repost'), icon: RotateCcw, variant: 'outline' };
+  const edit: RowButton = { action: 'edit', label: mt('manage.edit'), icon: Pencil, variant: 'outline' };
+  const share: RowButton = { action: 'share', label: mt('manage.share'), icon: Share2, variant: 'outline' };
+  const renew: RowButton = { action: 'renew', label: mt('manage.renew'), icon: CalendarClock, variant: 'accent' };
+  const repost: RowButton = { action: 'reopen', label: mt('manage.repost'), icon: RotateCcw, variant: 'outline' };
   if (listing.status === 'rejected') {
     return { main: { action: 'resubmit', label: t('manage.resubmit'), icon: Send, variant: 'primary' }, icons: [edit] };
   }
@@ -68,7 +73,7 @@ function buttonsOf(listing: MyListing, t: (key: string) => string): { main: RowB
   if (listing.status === 'active') {
     if (a.renew) return { main: renew, icons: [edit, share] };
     if (canSellOf(listing, a.markSold)) {
-      return { main: { action: 'sold', label: t('mini_app.manage.mark_sold'), icon: CheckCircle2, variant: 'outline' }, icons: [edit, share] };
+      return { main: { action: 'sold', label: mt('manage.mark_sold'), icon: CheckCircle2, variant: 'outline' }, icons: [edit, share] };
     }
     return { main: a.close ? { action: 'close', label: t('manage.mark_closed'), icon: Archive, variant: 'outline' } : edit, icons: a.close ? [edit, share] : [share] };
   }
@@ -78,6 +83,8 @@ function buttonsOf(listing: MyListing, t: (key: string) => string): { main: RowB
 
 export function MiniManageRow({ listing, tab, siteName, onMore, onAction }: MiniManageRowProps) {
   const { t, i18n } = useTranslation('listing');
+  const mt = useMiniT();
+  const { config } = useMiniApp();
   const price = usePriceText()(listing);
   const share = useShareListing();
   const a = ownerActions(listing);
@@ -91,14 +98,15 @@ export function MiniManageRow({ listing, tab, siteName, onMore, onAction }: Mini
   const place = siteName ?? listing.address_text;
   const meta = [place, formatRelative(listing.created_at)].filter(Boolean).join(' · ');
   const views = [
-    t('mini_app.manage.views', { count: listing.view_count }),
+    mt('manage.views', { count: listing.view_count }),
     listing.expires_at && listing.status === 'active' && !a.expired ? t('manage.expires_on', { date: formatDate(listing.expires_at) }) : null,
   ]
     .filter(Boolean)
     .join(' · ');
-  const { main, icons } = buttonsOf(listing, t);
-  // Tin công khai → xem như người khác thấy; nháp / chờ duyệt / bị từ chối → sửa.
-  const open = () => (review || listing.status === 'draft' ? openEditListing(listing.id) : openListing(listing.id));
+  const { main, icons } = buttonsOf(listing, t, mt);
+  // Tin công khai → xem như người khác thấy; nháp / chờ duyệt / bị từ chối → sửa. Cả hai giữ mini-app (`mini`).
+  const mini = config.slug;
+  const open = () => (review || listing.status === 'draft' ? openEditListing(listing.id, { mini }) : openListing(listing.id, { mini }));
   const press = (b: RowButton) => (b.action === 'share' ? share(listing) : onAction(b.action));
 
   return (
@@ -141,7 +149,7 @@ export function MiniManageRow({ listing, tab, siteName, onMore, onAction }: Mini
         </Pressable>
         <IconButton
           icon={MoreVertical}
-          accessibilityLabel={t('mini_app.manage.more_a11y', { title: listing.title })}
+          accessibilityLabel={mt('manage.more_a11y', { title: listing.title })}
           onPress={onMore}
           className="-mr-2 -mt-2"
         />

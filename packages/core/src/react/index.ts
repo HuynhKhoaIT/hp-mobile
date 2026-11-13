@@ -18,6 +18,7 @@ export {
   useRecordListingView,
   useSession,
   useSimilarListings,
+  useSiteLocations,
   useSites,
   useUpdateProfile,
   useUploadAvatar,

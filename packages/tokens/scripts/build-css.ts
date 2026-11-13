@@ -5,7 +5,20 @@
 // Tên class giống app: bg-primary, bg-primary-light, bg-surface-2, text-muted, rounded-md, shadow-card / shadow-bar / shadow-fab, bg-service-pass-soft + text-service-pass.
 import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { aspect, colors, font, motion, radius, serviceColors, shadow, shimmer, type ColorScheme, type ColorToken } from '../src/index.ts';
+import {
+  appThemes,
+  aspect,
+  colors,
+  font,
+  gradients,
+  motion,
+  radius,
+  serviceColors,
+  shadow,
+  shimmer,
+  type ColorScheme,
+  type ColorToken,
+} from '../src/index.ts';
 
 // Tên token → tên biến CSS (class Tailwind). text* đổi tên để tránh "text-text".
 const COLOR_NAME: Record<ColorToken, string> = {
@@ -33,6 +46,24 @@ const shadowCss = ({ x, y, blur, color }: { x: number; y: number; blur: number; 
 
 const colorVars = (scheme: 'light' | 'dark', indent: string) =>
   (Object.keys(COLOR_NAME) as ColorToken[]).map((k) => `${indent}--color-${COLOR_NAME[k]}: ${colors[scheme][k]};`).join('\n');
+
+// Gradient header (class from-app-from / to-app-to): mặc định = thương hiệu super app; mini-app ghi đè ([data-app-theme]).
+const appGradientVars = (indent: string) => [
+  `${indent}--color-app-from: ${gradients.brand[0]};`,
+  `${indent}--color-app-to: ${gradients.brand[1]};`,
+];
+
+// Màu chủ đạo của từng mini-app (appThemes): khung mini-app gắn data-app-theme="<key>" → các biến dưới đây thay giá trị mặc định.
+const appThemeBlocks = (scheme: 'light' | 'dark') =>
+  Object.entries(appThemes[scheme]).flatMap(([k, v]) => [
+    `${scheme === 'dark' ? '.dark ' : ''}[data-app-theme='${kebab(k)}'] {`,
+    `  --color-primary: ${v.primary};`,
+    `  --color-primary-light: ${v.primaryLight};`,
+    `  --color-on-primary: ${v.onPrimary};`,
+    `  --color-app-from: ${v.gradient[0]};`,
+    `  --color-app-to: ${v.gradient[1]};`,
+    '}',
+  ]);
 
 const serviceVars = (scheme: 'light' | 'dark', indent: string) =>
   Object.entries(serviceColors[scheme]).flatMap(([k, v]) => [
@@ -75,6 +106,7 @@ const lines = [
   '@theme {',
   colorVars('light', '  '),
   ...serviceVars('light', '  '),
+  ...appGradientVars('  '),
   '',
   ...Object.entries(radius).map(([k, v]) => `  --radius-${k}: ${k === 'full' ? '9999px' : px(v)};`),
   '',
@@ -99,6 +131,10 @@ const lines = [
   `  --color-shimmer: ${shimmer.dark};`,
   '}',
   '',
+  '/* Mini-app (Chợ Pass, Nhà trọ, …): khung gắn data-app-theme="<key>" — màu chủ đạo riêng (appThemes). */',
+  ...appThemeBlocks('light'),
+  ...appThemeBlocks('dark'),
+  '',
 ];
 
 const out = join(import.meta.dirname, '..', 'theme.css');
@@ -115,6 +151,8 @@ const rgb = (hex: string) => {
 const colorNames = [
   ...(Object.keys(COLOR_NAME) as ColorToken[]).map((k) => COLOR_NAME[k]),
   ...Object.keys(serviceColors.light).flatMap((k) => [`service-${kebab(k)}`, `service-${kebab(k)}-soft`]),
+  'app-from',
+  'app-to',
 ];
 const rootVars = (scheme: ColorScheme) =>
   Object.fromEntries([
@@ -123,6 +161,8 @@ const rootVars = (scheme: ColorScheme) =>
       [`--color-service-${kebab(k)}`, rgb(v.fg)],
       [`--color-service-${kebab(k)}-soft`, rgb(v.soft)],
     ]),
+    ['--color-app-from', rgb(gradients.brand[0])],
+    ['--color-app-to', rgb(gradients.brand[1])],
   ]);
 const preset = {
   darkMode: 'class',

@@ -37,6 +37,7 @@ export function ListingActions({
   category,
   active,
   primaryCta = 'chat',
+  primaryLabel,
 }: {
   listingId: string;
   slug: string;
@@ -48,6 +49,8 @@ export function ListingActions({
   active: boolean;
   /** Nút liên hệ chính (config.primaryCta). */
   primaryCta?: 'chat' | 'call';
+  /** Nhãn nút chính (config.detail.primaryLabelKey, đã dịch) — thiếu → listing.contact.primary.<cta>_<tính năng>. */
+  primaryLabel?: string;
 }) {
   const t = useTranslations();
   const userId = useSessionUser();
@@ -102,7 +105,7 @@ export function ListingActions({
 
   return (
     <div className="flex flex-col gap-3">
-      <ContactBar listingId={listingId} userId={userId} category={category} primaryCta={primaryCta} />
+      <ContactBar listingId={listingId} userId={userId} category={category} primaryCta={primaryCta} primaryLabel={primaryLabel} />
       <div className="flex gap-2 *:flex-1">
         {shareButton}
         {reportButton}
@@ -117,11 +120,13 @@ function ContactBar({
   userId,
   category,
   primaryCta,
+  primaryLabel,
 }: {
   listingId: string;
   userId: string | null | undefined;
   category: ListingCategory;
   primaryCta: 'chat' | 'call';
+  primaryLabel?: string;
 }) {
   const t = useTranslations();
   const errorText = useErrorText();
@@ -154,7 +159,7 @@ function ContactBar({
         onClick={userId ? () => open(listingId) : undefined}
       >
         <MessageCircle strokeWidth={1.75} aria-hidden />
-        {square ? null : t(`listing.contact.primary.chat_${feature}`)}
+        {square ? null : (primaryLabel ?? t(`listing.contact.primary.chat_${feature}`))}
       </Button>
     );
     return userId === null ? <LoginDialog trigger={button} intent={{ action: 'chat', target: listingId }} /> : button;
@@ -174,7 +179,7 @@ function ContactBar({
                   state={phone}
                   listingId={listingId}
                   userId={userId}
-                  label={t(`listing.contact.primary.call_${feature}`)}
+                  label={primaryLabel ?? t(`listing.contact.primary.call_${feature}`)}
                 />
               ) : (
                 chatButton(false)

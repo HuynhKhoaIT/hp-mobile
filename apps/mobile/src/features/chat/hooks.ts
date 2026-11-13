@@ -2,7 +2,7 @@
 // Hộp thư: dịch vụ của hội thoại (conversationFeature) và lọc tại chỗ (useInboxFilter) ở @hp/core — dùng chung web;
 // chữ giá tin ngữ cảnh (useConversationPrice) dịch + định dạng ở đây.
 import { type ChatMessage, type ConversationSummary, conversationFeature, conversationPriceSource } from '@hp/core';
-import { useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
+import { useConversations, useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
 import { type ChatContentError, type Feature, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -26,8 +26,9 @@ export const useChatSafety = create<{ seen: boolean; markSeen: () => void }>()(
   }),
 );
 
-export function openConversation(id: string, opts: { replace?: boolean } = {}) {
-  const href = { pathname: '/chat/[conversationId]', params: { conversationId: id } } as const;
+/** Màn chat. `mini`: mở từ mini-app (slug, vd 'room') → màn chat giữ màu mini-app, "Xem tin" mở chi tiết trong mini-app. */
+export function openConversation(id: string, opts: { replace?: boolean; mini?: string } = {}) {
+  const href = { pathname: '/chat/[conversationId]', params: { conversationId: id, ...(opts.mini ? { mini: opts.mini } : {}) } } as const;
   if (opts.replace) router.replace(href);
   else router.push(href);
 }
@@ -40,13 +41,13 @@ export function openConversation(id: string, opts: { replace?: boolean } = {}) {
 export function useOpenConversation() {
   const start = useStartConversation();
   const errorText = useErrorText();
-  const open = (listing: { id: string; category: string }) =>
+  const open = (listing: { id: string; category: string }, opts: { mini?: string } = {}) =>
     requireAuth(() => {
       track('contact', { channel: 'chat', listing_id: listing.id, category: listing.category });
       start.mutate(
         { listingId: listing.id },
         {
-          onSuccess: (conversationId) => openConversation(conversationId),
+          onSuccess: (conversationId) => openConversation(conversationId, { mini: opts.mini }),
           onError: (e) => toast.show(errorText(e.code), 'danger'),
         },
       );
@@ -177,6 +178,17 @@ export function useFeatureInbox(
     if (short && hasNextPage && !isFetchingNextPage) void fetchNextPage();
   }, [short, hasNextPage, isFetchingNextPage, fetchNextPage]);
   return visible;
+}
+
+/**
+ * Số hội thoại chưa đọc của một dịch vụ (ô Chat trên thanh tab mini-app — khớp hộp thư khoá theo tính năng, không đếm
+ * dịch vụ khác): đếm trên các trang hộp thư đã tải (useFeatureInbox tự tải thêm khi ít dòng; cùng cache với tab Chat).
+ */
+export function useFeatureUnreadCount(feature: Feature): number {
+  const session = useSession();
+  const list = useConversations({ enabled: !!session.userId });
+  const visible = useFeatureInbox(list, feature);
+  return useMemo(() => visible.filter((c) => c.unread_count > 0).length, [visible]);
 }
 
 /** Chữ giá của tin ngữ cảnh ("1.500.000 ₫", "Thoả thuận"…); việc làm / hội thoại nhóm / không giá → null. */

@@ -4,8 +4,8 @@ import { LISTING_FEATURE_PATHS, shareUrl } from '@hp/core';
 import type { ListingFeature } from '@hp/shared';
 import { type Href, router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { hasMiniApp } from '@/features/configs';
-import { LISTING_ROUTE_SLUG, miniAppHref } from '@/features/listing/navigation';
+import { type MiniAppWebPage, miniAppWebPage } from '@/features/configs';
+import { LISTING_ROUTE_SLUG, miniTabHref } from '@/features/listing/navigation';
 import { requireAuth } from '@/core/auth';
 import { getLocale } from '@/core/i18n';
 import { env } from '@/core/env';
@@ -32,28 +32,49 @@ export type AppRoute = { href: Href; auth: boolean };
 
 const LOCALE_PREFIX = /^\/(en|zh)(?=\/|$)/;
 
+/** Đường dẫn web nội bộ → path (bỏ tiền tố ngôn ngữ `/en`, `/zh`, dấu `/` cuối) + query. */
+function parseWebPath(input: string) {
+  const [rawPath = '/', rawQuery = ''] = input.split('#')[0]?.split('?') ?? [];
+  const path = (rawPath.replace(LOCALE_PREFIX, '') || '/').replace(/\/+$/, '') || '/';
+  const query = new URLSearchParams(rawQuery);
+  const site = query.get('site') ?? undefined;
+  // Web lọc một category bằng `?category=` (apps/web features/listing/filters.ts) → params `categories` của màn List.
+  const category = query.get('category') ?? undefined;
+  const listParams: { site?: string; categories?: string } = { ...(site ? { site } : {}), ...(category ? { categories: category } : {}) };
+  return { path, q: query.get('q') ?? undefined, listParams };
+}
+
+/**
+ * Link nội bộ (link banner) thuộc mini-app: trang (tab / 'post') + bộ lọc đặt sẵn (khu, nhóm category) — trang chủ mini-app
+ * dùng để ở lại phiên đang mở thay vì mở chồng mini-app thứ hai. URL `https://…` / không thuộc mini-app → null.
+ */
+export function miniAppLinkOf(link: string): (MiniAppWebPage & { params: { site?: string; categories?: string } }) | null {
+  if (/^https?:\/\//.test(link)) return null;
+  const { path, listParams } = parseWebPath(link);
+  const page = miniAppWebPage(path);
+  return page ? { ...page, params: listParams } : null;
+}
+
 /**
  * Đường dẫn web nội bộ (link banner, link trong nội dung: `/pass-do`, `/dang-tin`, `/tin/{slug}`, `/tim-kiem?q=`…)
  * → route của app. Bỏ tiền tố ngôn ngữ `/en`, `/zh`. Không có màn tương ứng (trang pháp lý…) → null
  * (nơi gọi mở trang web). Khớp đường dẫn cố định của web (LISTING_FEATURE_PATHS, apps/web/app/[locale]).
  */
 export function routeForWebPath(input: string): AppRoute | null {
-  const [rawPath = '/', rawQuery = ''] = input.split('#')[0]?.split('?') ?? [];
-  const path = (rawPath.replace(LOCALE_PREFIX, '') || '/').replace(/\/+$/, '') || '/';
-  const query = new URLSearchParams(rawQuery);
-  const site = query.get('site') ?? undefined;
-  const q = query.get('q') ?? undefined;
-  // Web lọc một category bằng `?category=` (apps/web features/listing/filters.ts) → params `categories` của màn List.
-  const category = query.get('category') ?? undefined;
-  const listParams = { ...(site ? { site } : {}), ...(category ? { categories: category } : {}) };
+  const { path, q, listParams } = parseWebPath(input);
 
   if (path === '/') return { href: '/', auth: false };
   if (path === '/tin') return { href: { pathname: '/listings/[feature]', params: { feature: 'all', ...listParams } }, auth: false };
+  // Mini-app (Chợ Pass Đồ — /pass-do và trang con /bo-loc, /da-luu, /tin-nhan, /quan-ly, /dang-tin): đúng tab của mini-app.
+  const mini = miniAppWebPage(path);
+  if (mini) {
+    if (mini.page === 'post') return { href: { pathname: '/listing/new', params: { feature: mini.feature, mini: mini.slug } }, auth: true };
+    // Tab Đã lưu / Chat / Quản lý tự mời khách đăng nhập (SignInPrompt) — không cần requireAuth trước.
+    return { href: miniTabHref(mini.slug, mini.page, listParams), auth: false };
+  }
   const feature = (Object.keys(LISTING_FEATURE_PATHS) as ListingFeature[]).find((f) => LISTING_FEATURE_PATHS[f] === path);
   if (feature) {
     const slug = LISTING_ROUTE_SLUG[feature];
-    // Tính năng có mini-app (Pass đồ → Chợ Pass Đồ): mở trang chủ mini-app với cùng bộ lọc đặt sẵn.
-    if (hasMiniApp(slug)) return { href: miniAppHref(slug, listParams), auth: false };
     return { href: { pathname: '/listings/[feature]', params: { feature: slug, ...listParams } }, auth: false };
   }
   const slug = /^\/tin\/([^/]+)$/.exec(path)?.[1];

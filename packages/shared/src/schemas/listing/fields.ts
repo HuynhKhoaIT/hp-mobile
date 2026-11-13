@@ -80,12 +80,23 @@ const PASS_BABY: AttributeField[] = [
   { key: 'condition', kind: 'enum', options: CONDITIONS },
 ];
 const PASS_OTHER: AttributeField[] = [{ key: 'condition', kind: 'enum', options: CONDITIONS }];
+// Trọ: diện tích → chi phí (điện, nước, wifi, rác, tháng cọc) → tiện nghi (bool) → nội quy. Mọi loại room_* dùng chung.
 const ROOM: AttributeField[] = [
   { key: 'area_m2', kind: 'int', unit: 'm2' },
   { key: 'electricity_price', kind: 'money', per: 'kwh' },
   { key: 'water_price', kind: 'money' },
+  { key: 'wifi_price', kind: 'money', per: 'month' },
+  { key: 'trash_price', kind: 'money', per: 'month' },
+  { key: 'deposit_months', kind: 'int', unit: 'months' },
   { key: 'has_loft', kind: 'bool' },
+  { key: 'has_ac', kind: 'bool' },
+  { key: 'private_wc', kind: 'bool' },
+  { key: 'has_kitchen', kind: 'bool' },
+  { key: 'has_wifi', kind: 'bool' },
+  { key: 'has_camera', kind: 'bool' },
   { key: 'has_parking', kind: 'bool' },
+  { key: 'free_hours', kind: 'bool' },
+  { key: 'no_landlord', kind: 'bool' },
   { key: 'curfew', kind: 'text' },
   { key: 'max_people', kind: 'int', unit: 'people' },
 ];
@@ -122,6 +133,8 @@ export const ATTRIBUTE_FIELDS: Record<ListingCategory, readonly AttributeField[]
   pass_tools: PASS_TOOLS,
   pass_baby: PASS_BABY,
   pass_other: PASS_OTHER,
+  room_house: ROOM,
+  room_apartment: ROOM,
 };
 
 // ── Form đăng tin: chia thông số theo bước (app + web) ───────────────────────────────────────────────────────────

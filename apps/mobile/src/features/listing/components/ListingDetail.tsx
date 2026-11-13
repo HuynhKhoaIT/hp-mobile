@@ -16,8 +16,13 @@
 // reveal_contact, cần đăng nhập) + Nhắn tin, rồi nút chính rộng theo config.detail.primaryCta ('call' cho trọ / đồ thất lạc:
 // "Gọi hỏi phòng" → Hiện số → "Gọi 0912…"; 'chat': "Nhắn người bán" / "Nhắn tin ứng tuyển"…) · chủ tin: Sửa tin + Tin của
 // tôi (+ "Đã nhận lại đồ") · tin không còn hiện: không có liên hệ.
-// Khác Stitch (cố ý): không "Trả giá / Đề xuất giá", Zalo, "Hẹn xem", giá gốc gạch ngang, bảng chi phí / khoảng cách tới
-// từng nhà máy, bản đồ, "đang trực tuyến" — không có tính năng / dữ liệu đó; chỉ hiện thông số người đăng đã nhập.
+// config.detail.sections (trọ — Stitch "Chi tiết phòng trọ", DetailSections): sau thẻ tóm tắt là "Bảng chi phí sinh hoạt" →
+// "Vị trí & khoảng cách" (3 khu gần nhất, ~phút xe máy, mở bản đồ) → "Tiện nghi" → mẹo → thông tin còn lại → chủ trọ
+// (texts.owner) → "Mô tả & nội quy" (nội quy gộp vào thẻ mô tả). Dòng dưới giá: config.detail.priceNote (vd "Cọc 1 tháng");
+// nhãn trên ảnh: config.detail.availabilityKey; dòng đầu thẻ: "Cập nhật {thời gian}" (texts.updated); nút chính:
+// config.detail.primaryCtaKey (vd "Liên hệ hẹn xem phòng" → chat).
+// Khác Stitch (cố ý): không "Trả giá / Đề xuất giá", Zalo, "Giá niêm yết", giá gốc gạch ngang, "đang trực tuyến", tỉ lệ phản
+// hồi, "Đã xác minh CCCD" — không có tính năng / dữ liệu đó; chỉ hiện thông số người đăng đã nhập.
 // Tuần 10: nút Dịch (tin khác ngôn ngữ đang dùng) đổi tiêu đề + mô tả sang bản dịch tự động / "Xem bản gốc".
 // Tuần 9 (config.detail.lostFound — đồ thất lạc, chủ tin): "Tin có thể khớp" + "Đã nhận lại đồ" / "Đã trả cho chủ"
 // (ReturnedSheet — style Stitch L2 → RPC markListingReturned: returned + đóng tin); tin đã nhận lại có nhãn "Đã trả lại".
@@ -51,9 +56,10 @@ import {
   Text,
 } from '@/ui';
 import { useContactListing, useIsOwner, useListingMatches, useListingTranslation, useRevealPhone } from '../hooks';
-import { backOrHome, openEditListing, openListing, openMyListings } from '../navigation';
+import { backOrHome, type MiniSlug, openEditListing, openListing, openMyListings, openMyListingsFrom } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 import { AttributeList } from './AttributeList';
+import { AmenityGrid, CostTable, SiteDistances, useRulesLines } from './DetailSections';
 import { ListingRail } from './ListingRail';
 import { OwnerCard } from './OwnerCard';
 import { ListingRateEntry } from './ListingRateSheet';
@@ -74,13 +80,16 @@ const NOT_FOUND = new Set(['not_found', 'invalid_input']);
 export function ListingDetailState({
   query,
   configOf,
+  mini,
 }: {
   query: ListingQueryState;
   /** Config của tính năng theo category (route lấy từ registry features/configs) — khối riêng ở `config.detail`. */
   configOf?: (category: ListingCategory) => ListingFeatureConfig;
+  /** Mở từ mini-app — nút của chủ tin (Sửa tin, Tin của tôi) ở lại mini-app. */
+  mini?: MiniSlug;
 }) {
   const { t } = useTranslation('listing');
-  if (query.data) return <ListingDetailBody listing={query.data} config={configOf?.(query.data.category)} />;
+  if (query.data) return <ListingDetailBody listing={query.data} config={configOf?.(query.data.category)} mini={mini} />;
   if (query.isLoading) {
     return (
       <ScrollView className="-mx-4 flex-1" contentContainerClassName="px-4 pb-6">
@@ -101,7 +110,7 @@ export function ListingDetailState({
   return <ErrorState code={query.error.code} onRetry={() => void query.refetch()} />;
 }
 
-function ListingDetailBody({ listing, config }: { listing: PublicListing; config?: ListingFeatureConfig }) {
+function ListingDetailBody({ listing, config, mini }: { listing: PublicListing; config?: ListingFeatureConfig; mini?: MiniSlug }) {
   const { t, i18n } = useTranslation('listing');
   const translation = useListingTranslation(listing);
   const returned = isReturned(listing);
@@ -114,6 +123,11 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
   // Đồ thất lạc của mình, còn đang hiện, chưa nhận lại → tin khớp + nút "Đã nhận lại đồ".
   const lostFoundOpen = isOwner && !!config?.detail?.lostFound && !returned && display === 'active';
   const [returnOpen, setReturnOpen] = useState(false);
+  const rulesLines = useRulesLines();
+  const detail = config?.detail;
+  const sections = detail?.sections ?? [];
+  const texts = detail?.texts;
+  const rules = sections.includes('rules') ? rulesLines(listing) : [];
   useRecordListingView(listing.id);
   useEffect(() => {
     track('view_listing', { listing_id: listing.id, category: listing.category });
@@ -127,13 +141,15 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
   const status = returned
     ? { label: t('lost_found.returned_badge'), tone: 'success' as const }
     : display === 'active'
-      ? { label: t(`availability.${feature === 'lostFound' ? listing.category : feature}`), tone: 'success' as const }
+      ? { label: t(detail?.availabilityKey ?? `availability.${feature === 'lostFound' ? listing.category : feature}`), tone: 'success' as const }
       : { label: t(`common:status.${display}`), tone: 'danger' as const };
   // Cùng quy tắc với OwnerCard: có huy hiệu (đã dịch được) = đã xác minh.
   const verified = listing.owner_badges.some((b) => i18n.exists(`listing:owner_badge.${b}`));
   const header = [
     listing.short_id ? t('detail.code', { code: listing.short_id.toUpperCase() }) : null,
-    t('detail.posted_at', { time: formatRelative(listing.created_at) }),
+    texts?.updated
+      ? t(texts.updated, { time: formatRelative(listing.updated_at) })
+      : t('detail.posted_at', { time: formatRelative(listing.created_at) }),
   ]
     .filter(Boolean)
     .join(' · ');
@@ -144,6 +160,7 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
     .filter(Boolean)
     .join(' · ');
   const cut = price.lastIndexOf('/');
+  const priceNote = detail?.priceNote ? priceNoteOf(listing, detail.priceNote.key) : null;
 
   return (
     <>
@@ -196,6 +213,11 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
               ) : null}
             </Text>
           ) : null}
+          {priceNote !== null && detail?.priceNote ? (
+            <Text variant="caption" tone="muted">
+              {t(detail.priceNote.labelKey, { count: priceNote })}
+            </Text>
+          ) : null}
           {facts.length > 0 ? (
             <View className="flex-row flex-wrap gap-1.5">
               {facts.map((f) => (
@@ -240,18 +262,27 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
 
         <Notice variant="bordered" tone="warning" title={t('tip.title')} text={t(config?.tipKey ?? 'detail.safety_tip')} />
 
-        <AttributeList listing={listing} />
+        {sections.includes('costs') ? <CostTable listing={listing} texts={texts} skip={detail?.priceNote?.key} /> : null}
+        {sections.includes('distance') ? <SiteDistances listing={listing} texts={texts} /> : null}
+        {sections.includes('amenities') ? <AmenityGrid listing={listing} texts={texts} /> : null}
 
-        <OwnerCard listing={listing} />
+        <AttributeList listing={listing} skipGroups={sections} />
+
+        <OwnerCard listing={listing} title={texts?.owner ? t(texts.owner) : undefined} />
 
         <View className="gap-2">
-          <SectionHeader title={t('detail.description')} bar="primary" />
+          <SectionHeader title={t(sections.includes('rules') ? (texts?.rules ?? 'detail.description') : 'detail.description')} bar="primary" />
           <Card className="gap-2">
             {translation.description ? (
               <Text selectable>{translation.description}</Text>
-            ) : (
+            ) : rules.length === 0 ? (
               <Text tone="muted">{t('detail.no_description')}</Text>
-            )}
+            ) : null}
+            {rules.map((line) => (
+              <Text key={line} selectable>
+                {`• ${line}`}
+              </Text>
+            ))}
             {translation.available ? (
               <View className="flex-row flex-wrap items-center gap-2" accessibilityLiveRegion="polite">
                 {translation.translated ? (
@@ -303,16 +334,21 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
                 icon={Pencil}
                 variant={lostFoundOpen ? 'outline' : 'primary'}
                 fullWidth
-                onPress={() => openEditListing(listing.id)}
+                onPress={() => openEditListing(listing.id, { mini })}
               />
             </View>
             <View className="flex-1">
-              <Button label={t('form.my_listings')} variant="outline" fullWidth onPress={() => openMyListings()} />
+              <Button
+                label={t('form.my_listings')}
+                variant="outline"
+                fullWidth
+                onPress={() => (mini ? openMyListingsFrom(mini, 'active') : openMyListings())}
+              />
             </View>
           </View>
         </StickyCta>
       ) : display === 'active' ? (
-        <ContactBar listing={listing} primary={config?.detail?.primaryCta ?? 'chat'} />
+        <ContactBar listing={listing} primary={detail?.primaryCta ?? 'chat'} primaryKey={detail?.primaryCtaKey} mini={mini} />
       ) : null}
 
       {lostFoundOpen ? (
@@ -320,6 +356,14 @@ function ListingDetailBody({ listing, config }: { listing: PublicListing; config
       ) : null}
     </>
   );
+}
+
+/** Giá trị số của một thông số (dòng dưới giá — config.detail.priceNote); không có / không phải số → null. */
+function priceNoteOf(listing: Pick<PublicListing, 'attributes'>, key: string): number | null {
+  const attrs = listing.attributes;
+  if (!attrs || typeof attrs !== 'object' || Array.isArray(attrs)) return null;
+  const value = attrs[key];
+  return typeof value === 'number' && value > 0 ? value : null;
 }
 
 /** Số thẻ tối đa ở "Tin có thể khớp" (RPC trả ≤ 20, gần nhất trước). */
@@ -358,7 +402,19 @@ function LostFoundMatches({ listing }: { listing: PublicListing }) {
  * (listing.contact.primary.<cta>_<feature>). Khách bấm → đăng nhập rồi làm tiếp. Đã hiện số mà người đăng không có SĐT →
  * nút chính chuyển sang Nhắn tin + dòng contact.no_phone; đã hiện số khi nút chính là Nhắn tin → dòng "Số điện thoại: …".
  */
-function ContactBar({ listing, primary }: { listing: PublicListing; primary: 'chat' | 'call' }) {
+function ContactBar({
+  listing,
+  primary,
+  primaryKey,
+  mini,
+}: {
+  listing: PublicListing;
+  primary: 'chat' | 'call';
+  /** Nhãn nút chính riêng (config.detail.primaryCtaKey). */
+  primaryKey?: string;
+  /** Mở từ mini-app → chat mở trong màu mini-app. */
+  mini?: MiniSlug;
+}) {
   const { t } = useTranslation('listing');
   const contact = useContactListing();
   const phone = useRevealPhone(listing);
@@ -367,7 +423,7 @@ function ContactBar({ listing, primary }: { listing: PublicListing; primary: 'ch
   const cta = primary === 'call' && noPhone ? 'chat' : primary;
   const shown = phone.revealed && phone.phone ? formatVnPhone(phone.phone) : null;
   const onCall = () => (phone.phone ? phone.call(phone.phone) : phone.reveal());
-  const chat = () => contact.open(listing);
+  const chat = () => contact.open(listing, { mini });
   return (
     <StickyCta elevated>
       <View className="flex-row items-center gap-2">
@@ -385,14 +441,20 @@ function ContactBar({ listing, primary }: { listing: PublicListing; primary: 'ch
         <View className="flex-1">
           {cta === 'call' ? (
             <Button
-              label={shown ? t('contact.call', { phone: shown }) : t(`contact.primary.call_${feature}`)}
+              label={shown ? t('contact.call', { phone: shown }) : t(primaryKey ?? `contact.primary.call_${feature}`)}
               icon={Phone}
               fullWidth
               loading={phone.isPending}
               onPress={onCall}
             />
           ) : (
-            <Button label={t(`contact.primary.chat_${feature}`)} icon={MessageCircle} fullWidth loading={contact.isPending} onPress={chat} />
+            <Button
+              label={t(primaryKey ?? `contact.primary.chat_${feature}`)}
+              icon={MessageCircle}
+              fullWidth
+              loading={contact.isPending}
+              onPress={chat}
+            />
           )}
         </View>
       </View>

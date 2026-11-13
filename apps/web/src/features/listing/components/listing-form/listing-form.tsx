@@ -1,6 +1,7 @@
 'use client';
 
-// Form "Đăng nhanh" (đăng mới ở /dang-tin, sửa ở /toi/tin-cua-toi/[id]/sua) — một engine cho 4 tính năng Listing, khác biệt
+// Form "Đăng nhanh" (đăng mới ở /dang-tin, sửa ở /toi/tin-cua-toi/[id]/sua; trong mini-app: /pass-do/dang-tin,
+// /pass-do/quan-ly/[id]/sua — `scope`) — một engine cho 4 tính năng Listing, khác biệt
 // lấy từ config (features.ts) + ATTRIBUTE_FIELDS. Thứ tự bước và chữ khớp app (hợp đồng tuần 4):
 //   0 chọn tính năng / danh mục (chỉ khi đăng mới chưa chọn) → 1 ảnh → 2 thông tin chính → 3 chi tiết.
 // Ghi qua Server Action (features/listing/actions.ts); ảnh upload thẳng Storage từ trình duyệt (uploadListingImage):
@@ -15,7 +16,7 @@
 // đáy (trên bottom nav < 640px) giống thanh liên hệ ở chi tiết tin; từ 1024px nằm cuối form. Sửa tin đã đăng: "Lưu thay đổi"
 // có ở mọi bước (giống app).
 // Cố ý khác Stitch: giữ 3 bước "Đăng nhanh"; bỏ Xem trước, trả giá, Zalo, hậu tạ, nơi đang giữ đồ (không có dữ liệu thật).
-import { type MyListing, removeListingImages, type SavedListingResult, type Site, flattenIssues, uploadListingImage } from '@hp/core';
+import { keys, type MyListing, removeListingImages, type SavedListingResult, type Site, flattenIssues, uploadListingImage } from '@hp/core';
 import {
   CreateListingInput,
   featureOfCategory,
@@ -26,6 +27,7 @@ import {
   MAX_LISTING_IMAGES,
   splitAttributeFields,
 } from '@hp/shared';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, Send, Timer } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
@@ -46,6 +48,7 @@ import {
   valuesFromListing,
 } from '../../form-values';
 import { prepareListingImage } from '../../listing-image';
+import { miniAppEditPath } from '../../mini-app-routes';
 import { BasicsStep } from './basics-step';
 import { DetailsStep } from './details-step';
 import { clearDraft, parseDraft, readDraftRaw, subscribeDraft, writeDraft } from './draft-store';
@@ -68,7 +71,16 @@ type Props = {
   initialCategory: ListingCategory | null;
   /** Tin đang sửa (mode edit). */
   listing: MyListing | null;
+  /**
+   * Đăng / sửa trong mini-app (vd /pass-do/dang-tin, /pass-do/quan-ly/[id]/sua): khoá tính năng (chỉ chọn danh mục của nó),
+   * huỷ đăng mới → trang chủ mini-app, huỷ sửa → "Quản lý tin" của mini-app, màn kết quả → "Quản lý tin" / "Sửa tin" /
+   * "Đăng tin khác" của mini-app thay vì /toi/tin-cua-toi, /dang-tin. Nháp localStorage riêng theo tính năng (draft-store.ts).
+   * Không có → form chung của super app (/dang-tin, /toi/tin-cua-toi/[id]/sua).
+   */
+  scope?: ListingFormScope;
 };
+
+export type ListingFormScope = { feature: ListingFeature; homeHref: string; manageHref: string; postHref: string };
 
 /**
  * publish = Đăng tin (active) · draft = Lưu nháp · save = Lưu thay đổi (giữ trạng thái hiện tại)
@@ -83,13 +95,13 @@ const singleCategory = (f: ListingFeature | null): ListingCategory | null => {
 
 const newKey = () => (typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Math.random()).slice(2));
 
-export function ListingForm({ mode, userId, sites, defaults, phone, initialFeature, initialCategory, listing }: Props) {
+export function ListingForm({ mode, userId, sites, defaults, phone, initialFeature, initialCategory, listing, scope }: Props) {
   const t = useTranslations();
   const errorText = useErrorText();
   const router = useRouter();
 
-  const startFeature = listing ? featureOfCategory(listing.category) : initialFeature;
-  const startCategory = listing?.category ?? initialCategory ?? singleCategory(initialFeature);
+  const startFeature = listing ? featureOfCategory(listing.category) : (scope?.feature ?? initialFeature);
+  const startCategory = listing?.category ?? initialCategory ?? singleCategory(startFeature);
   const [feature, setFeature] = useState<ListingFeature | null>(startFeature);
   const [category, setCategory] = useState<ListingCategory | null>(startCategory);
   const [step, setStep] = useState<0 | FormStep>(startCategory ? 1 : 0);
@@ -113,8 +125,12 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
   const photosRef = useRef(photos);
 
   // Nháp localStorage (chỉ đăng mới): đọc qua useSyncExternalStore để server render và hydrate giống nhau.
-  const storedRaw = useSyncExternalStore(subscribeDraft, readDraftRaw, () => null);
-  const stored = mode === 'create' && !dirty && !result ? parseDraft(storedRaw) : null;
+  // Mini-app: nháp riêng của tính năng (hoặc nháp chung cùng tính năng) — nháp tin trọ không hiện / không bị ghi đè ở Chợ Pass.
+  const draftScope = scope?.feature;
+  const storedRaw = useSyncExternalStore(subscribeDraft, () => readDraftRaw(draftScope), () => null);
+  const parsedDraft = mode === 'create' && !dirty && !result ? parseDraft(storedRaw) : null;
+  const stored = parsedDraft && (!scope || parsedDraft.feature === scope.feature) ? parsedDraft : null;
+  const queryClient = useQueryClient();
 
   const disabled = busy !== null;
   const isDraftListing = mode === 'edit' && listing?.status === 'draft';
@@ -154,8 +170,8 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
   // Tự lưu phần chữ khi đăng mới.
   useEffect(() => {
     if (mode !== 'create' || !dirty || result || !feature || !category) return;
-    writeDraft({ feature, category, values });
-  }, [mode, dirty, result, feature, category, values]);
+    writeDraft({ feature, category, values }, draftScope);
+  }, [mode, dirty, result, feature, category, values, draftScope]);
 
   const change = (patch: Partial<FormValues>) => {
     setValues((v) => ({ ...v, ...patch }));
@@ -275,11 +291,13 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
   const finish = (data: SavedListingResult) => {
     if (removedPaths.length > 0) void removeListingImages(createBrowserClient(), removedPaths);
     setRemovedPaths([]);
-    clearDraft();
+    if (mode === 'create') clearDraft(draftScope);
     setDirty(false);
     setBusy(null);
     setProgress(null);
     setResult(data);
+    // "Quản lý tin" (mini-app) / khối xem trước "Tin của tôi" đọc ở trình duyệt (staleTime 60s) → làm mới ngay.
+    void queryClient.invalidateQueries({ queryKey: keys.myListings() });
   };
 
   const failWith = (code: string, fieldErrors?: Record<string, string[]>) => {
@@ -358,10 +376,10 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
   };
 
   const reset = () => {
-    if (mode === 'edit') return router.push('/dang-tin');
+    if (mode === 'edit') return router.push(scope?.postHref ?? '/dang-tin');
     for (const p of photos) if (p.kind === 'new') URL.revokeObjectURL(p.preview);
-    setFeature(null);
-    setCategory(null);
+    setFeature(scope?.feature ?? null);
+    setCategory(singleCategory(scope?.feature ?? null));
     setValues(emptyValues(defaults));
     setPhotos([]);
     setRemovedPaths([]);
@@ -376,10 +394,10 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
   };
 
   const leave = () => {
-    if (mode === 'create') clearDraft();
+    if (mode === 'create') clearDraft(draftScope);
     setDirty(false);
     setDiscardOpen(false);
-    router.push(mode === 'edit' ? '/toi/tin-cua-toi' : '/tin');
+    router.push(mode === 'edit' ? (scope?.manageHref ?? '/toi/tin-cua-toi') : (scope?.homeHref ?? '/tin'));
   };
 
   const title =
@@ -395,7 +413,13 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
         <h1 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold text-fg outline-none">
           {title}
         </h1>
-        <FormResult result={result} mode={mode} onPostAnother={reset} />
+        <FormResult
+          result={result}
+          mode={mode}
+          onPostAnother={reset}
+          manageHref={scope?.manageHref}
+          editHref={scope ? miniAppEditPath(scope.manageHref, result.id) : undefined}
+        />
       </div>
     );
   }
@@ -489,7 +513,7 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
               <Button type="button" onClick={restoreDraft}>
                 {t('listing.form.keep_editing')}
               </Button>
-              <Button type="button" variant="outline" onClick={clearDraft}>
+              <Button type="button" variant="outline" onClick={() => clearDraft(draftScope)}>
                 {t('listing.form.discard_confirm')}
               </Button>
             </div>
@@ -507,7 +531,13 @@ export function ListingForm({ mode, userId, sites, defaults, phone, initialFeatu
         >
           {step === 0 ? (
             <div className="rounded-lg border border-border bg-surface p-4 shadow-card sm:p-6">
-              <FeaturePicker feature={feature} category={category} onFeature={chooseFeature} onCategory={chooseCategory} />
+              <FeaturePicker
+                feature={feature}
+                category={category}
+                onFeature={chooseFeature}
+                onCategory={chooseCategory}
+                locked={!!scope}
+              />
             </div>
           ) : null}
           {step === 1 ? (

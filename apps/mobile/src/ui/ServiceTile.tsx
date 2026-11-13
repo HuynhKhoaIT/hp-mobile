@@ -1,6 +1,7 @@
 // ServiceTile — ô dịch vụ. Icon ở Hub luôn kèm chữ; chữ dùng text-fg (không dùng màu dịch vụ cho chữ).
 // variant 'card' (mặc định): thẻ Card (bo lg, viền hairline), icon tròn 48 — bước chọn loại tin (PostPicker), có `selected`
-//   (viền 2 primary do Card vẽ).
+//   (viền 2 primary do Card vẽ); `hint` → dòng gợi ý nhỏ muted dưới nhãn (ô danh mục 3 cột ở trang chủ mini-app Nhà trọ,
+//   style Stitch: icon tròn + nhãn đậm + gợi ý; nhãn / gợi ý xuống dòng khi phóng chữ, không cắt).
 // variant 'grid': ô trong lưới 8 ô của Hub (style Stitch) — ô icon 48×48 rounded-md nền nhạt bg-service-<x>-soft + viền
 //   nhạt cùng tông (border-service-<x>/20), icon 24 màu dịch vụ (ô tiện ích có `icon`: bg-primary-light, viền primary/15,
 //   icon primary); nhãn text-sm 500 tối đa 2 dòng trong khung min-h-10 (không numberOfLines: phóng chữ 150% thì khung giãn
@@ -38,6 +39,8 @@ export type ServiceTileProps = Glyph & {
   badge?: ServiceTileBadge;
   /** Tính năng chưa có: mờ 60% + đọc "đã tắt" (vẫn bấm được để mở màn "Sắp có"). */
   soon?: boolean;
+  /** Dòng gợi ý dưới nhãn (variant 'card'), vd "Có gác lửng". Được đọc kèm nhãn. */
+  hint?: string;
   /** Nhãn đọc màn hình thay cho `label` (vd "Xem Xe cộ" ở ô danh mục); nhãn góc vẫn được đọc kèm. */
   accessibilityLabel?: string;
   className?: string;
@@ -60,20 +63,28 @@ const ringOf = (glyph: Glyph) => (glyph.service !== undefined ? SERVICE[glyph.se
 
 export function ServiceTile(props: ServiceTileProps) {
   if (props.variant === 'grid') return <GridTile {...props} />;
-  const { label, onPress, selected, className, accessibilityLabel } = props;
+  const { label, hint, onPress, selected, className, accessibilityLabel } = props;
+  const a11y = accessibilityLabel ?? label;
   return (
     <Card
       onPress={onPress}
-      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityLabel={hint ? `${a11y}, ${hint}` : a11y}
       selected={selected}
-      className={['min-h-24 items-center gap-2', className].filter(Boolean).join(' ')}
+      className={['min-h-24 items-center gap-2', hint && 'px-2 py-3', className].filter(Boolean).join(' ')}
     >
       <View className={`h-12 w-12 items-center justify-center rounded-full ${softOf(props)}`}>
         <TileIcon glyph={props} size="tab" />
       </View>
-      <Text variant="label" className="text-center">
-        {label}
-      </Text>
+      <View className="items-center gap-0.5">
+        <Text variant="label" weight={hint ? 'semibold' : undefined} className="text-center">
+          {label}
+        </Text>
+        {hint ? (
+          <Text variant="caption" tone="muted" className="text-center">
+            {hint}
+          </Text>
+        ) : null}
+      </View>
     </Card>
   );
 }

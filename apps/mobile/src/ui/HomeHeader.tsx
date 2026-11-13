@@ -9,7 +9,7 @@
 //   HomeHeaderSearch  dính trên cùng khi cuộn: ô tìm kiếm cao 48 rounded-full nền surface shadow-card trên nền primary.
 //   HomeHeaderCurve   phần đáy bo rounded-b-xl — cùng 8 dưới ô tìm kiếm tạo pb-16 (64) để lưới dịch vụ nổi lên 48.
 // NotificationBell: số chưa đọc (> 9 → "9+", 0 → ẩn), lắc nhẹ một lần khi số tăng. SiteChip dùng riêng được.
-import { Bell, ChevronDown, MapPin } from 'lucide-react-native';
+import { ArrowLeftRight, Bell, ChevronDown, MapPin } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { type LayoutChangeEvent, Pressable, View } from 'react-native';
 import {
@@ -114,10 +114,14 @@ export function HomeHeader({ scrollY, user, loading = false, title, subtitle, si
  * hub-header.tsx). Đặt làm con đầu của khối `bg-primary` có position relative; `rounded` = bo của khối (cắt hoạ tiết
  * theo góc bo, vd 'rounded-b-xl').
  */
-export function HeroDecor({ rounded }: { rounded?: string }) {
+/**
+ * Hoạ tiết header (vòng tròn on-primary) + dải màu kéo lên trên header (cuộn quá đầu không lộ nền). `strip`: 'primary'
+ * (header nền primary) · 'app' (header gradient mini-app — GradientSurface — dải màu bg-app-from).
+ */
+export function HeroDecor({ rounded, strip = 'primary' }: { rounded?: string; strip?: 'primary' | 'app' }) {
   return (
     <>
-      <View className="absolute inset-x-0 bottom-full h-96 bg-primary" />
+      <View className={`absolute inset-x-0 bottom-full h-96 ${strip === 'app' ? 'bg-app-from' : 'bg-primary'}`} />
       <View
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
@@ -152,9 +156,39 @@ export type SiteChipProps = {
   onPress: () => void;
   accessibilityLabel: string;
   accessibilityHint?: string;
+  /**
+   * 'chip' (mặc định): viên nhỏ "📍 Khu ▾" · 'bar': thanh rộng hết header (trang chủ mini-app Nhà trọ, style Stitch) —
+   * "📍 {prefix}: Khu" + icon đổi (⇄), nền on-primary/15 bo md, chữ xuống dòng khi phóng chữ.
+   */
+  variant?: 'chip' | 'bar';
+  /** Chữ đậm trước tên khu ở variant 'bar' (vd "Gần bạn"). */
+  prefix?: string;
 };
 
-export function SiteChip({ label, onPress, accessibilityLabel, accessibilityHint }: SiteChipProps) {
+export function SiteChip({ label, onPress, accessibilityLabel, accessibilityHint, variant = 'chip', prefix }: SiteChipProps) {
+  if (variant === 'bar') {
+    if (label === null) return <View className="h-11 w-full rounded-md bg-on-primary/15" />;
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityHint={accessibilityHint}
+        onPress={onPress}
+        className="min-h-11 w-full flex-row items-center gap-2 rounded-md border border-on-primary/20 bg-on-primary/15 px-3 py-2 active:opacity-80"
+      >
+        <Icon icon={MapPin} tone="onPrimary" size={16} />
+        <Text variant="caption" tone="onPrimary" className="flex-1">
+          {prefix ? (
+            <Text variant="caption" weight="semibold" tone="onPrimary">
+              {`${prefix}: `}
+            </Text>
+          ) : null}
+          {label}
+        </Text>
+        <Icon icon={ArrowLeftRight} tone="onPrimary" size={16} />
+      </Pressable>
+    );
+  }
   if (label === null) return <View className="h-7 w-48 rounded-full bg-on-primary/15" />;
   return (
     <Pressable

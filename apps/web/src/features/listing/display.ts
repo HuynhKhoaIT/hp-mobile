@@ -72,6 +72,8 @@ export function attributeText(field: AttributeField, value: AttributeValue, t: T
     case 'money': {
       const price = formatMoney(Number(value), locale);
       if (field.per === 'kwh') return t('listing.unit.per_kwh', { price });
+      // Khoản tháng của trọ (wifi, rác): "100.000 ₫/tháng".
+      if (field.per === 'month') return t('listing.unit.per_month', { price });
       return field.per ? t(`listing.card.per_${field.per}`, { price }) : price;
     }
     case 'datetime':

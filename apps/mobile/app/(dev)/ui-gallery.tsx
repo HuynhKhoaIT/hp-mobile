@@ -8,21 +8,25 @@ import {
   Baby,
   Bell,
   Bike,
+  CirclePlus,
   ClipboardList,
   Compass,
   Heart,
   House,
   LayoutGrid,
   ListChecks,
+  Megaphone,
   LogIn,
   LogOut,
   MapPin,
   MessageCircle,
   Package,
+  Phone,
   Plus,
   Refrigerator,
   Search,
   Share2,
+  SlidersHorizontal,
   ShieldCheck,
   ShoppingBag,
   Store,
@@ -41,6 +45,7 @@ import { type ThemePref, useSettings } from '@/core/settings';
 import { formatMoney } from '@/lib/format';
 import {
   AlertRow,
+  AppThemeProvider,
   Avatar,
   AvatarStack,
   type AvatarStackPerson,
@@ -64,6 +69,8 @@ import {
   ErrorState,
   Fab,
   FilterBar,
+  GradientPromo,
+  GradientSurface,
   GroupCard,
   Header,
   HomeHeader,
@@ -536,6 +543,61 @@ export default function UiGalleryScreen() {
         />
       </Section>
 
+      {/* Màu mini-app (appThemes): AppThemeProvider đổi primary / gradient bên trong — Nhà trọ emerald, Chợ Pass cam đất. */}
+      <Section title="AppThemeProvider · GradientSurface · MiniAppHeader (room directory) · SiteChip bar · GradientPromo">
+        <AppThemeProvider theme="room" className="gap-3">
+          <MiniAppHeader
+            back={{ label: t('listing:mini_app.back_super', { app: APP_NAME }), onPress: () => toast.show(t('actions.back')) }}
+            right={<Badge overlay label={t('listing:mini_app.room.badge')} tone="warning" />}
+            title={t('listing:mini_app.title.room')}
+            subtitle={t('listing:mini_app.subtitle.room')}
+            aside={
+              <SiteChip
+                variant="bar"
+                prefix={t('listing:mini_app.room.near_label')}
+                label="Dung Quất"
+                onPress={() => undefined}
+                accessibilityLabel={t('home.site_label')}
+              />
+            }
+          >
+            <View className="flex-row items-center gap-2">
+              <View className="flex-1">
+                <SearchBar variant="elevated" onPress={() => undefined} placeholder={t('listing:list.search_placeholder', { feature: t('feature.room') })} />
+              </View>
+              <IconButton icon={SlidersHorizontal} variant="filled" tone="primary" accessibilityLabel={t('listing:mini_app.filter.title')} onPress={() => undefined} />
+            </View>
+          </MiniAppHeader>
+          <SiteChip variant="bar" label={null} onPress={() => undefined} accessibilityLabel={t('home.site_label')} />
+          <View className="flex-row gap-2">
+            <Button label={t('listing:mini_app.room.call')} variant="secondary" icon={Phone} onPress={() => undefined} />
+            <Button label={t('listing:mini_app.room.chat')} icon={MessageCircle} onPress={() => undefined} />
+          </View>
+          <GradientPromo
+            icon={Megaphone}
+            eyebrow={t('listing:mini_app.room.landlord_eyebrow')}
+            title={t('listing:mini_app.room.landlord_title')}
+            body={t('listing:mini_app.room.landlord_body')}
+            action={{ label: t('listing:mini_app.room.landlord_cta'), icon: CirclePlus, onPress: () => toast.show(t('nav.post')) }}
+          />
+          <ServiceGrid columns={3}>
+            {(['room_rent', 'room_share', 'room_house'] as const).map((c) => (
+              <View key={c} className="flex-1">
+                <ServiceTile service="room" icon={House} label={t(`listing:category_short.${c}`)} hint={t(`listing:form.category_hint.${c}`)} onPress={() => undefined} />
+              </View>
+            ))}
+          </ServiceGrid>
+        </AppThemeProvider>
+        <AppThemeProvider theme="pass" className="gap-3">
+          <GradientSurface className="rounded-lg p-4">
+            <Text variant="title" weight="bold" tone="onPrimary">
+              {t('listing:mini_app.title.pass')}
+            </Text>
+          </GradientSurface>
+          <Button label={t('listing:mini_app.tabs.post')} onPress={() => undefined} />
+        </AppThemeProvider>
+      </Section>
+
       <Section title="Chip onRemove · RadioOption">
         <View className="flex-row flex-wrap gap-2">
           {recent.map((q) => (
@@ -751,6 +813,25 @@ export default function UiGalleryScreen() {
           display={{ facts: ['shift'], owner: true, bookmark: true }}
           bookmark={{ saved, onToggle: setSaved, labels: { save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') } }}
           onPress={() => toast.show(samples[2].title)}
+        />
+        {/* layout 'featured' (thẻ nổi bật đầu danh sách mini-app Nhà trọ): "{n} ảnh", thông số, tiện nghi, footer nút. */}
+        <ListingCard
+          listing={samples[1]}
+          layout="featured"
+          display={{ facts: ['area_m2', 'has_loft'], highlights: ['private_wc', 'has_wifi', 'has_camera', 'free_hours'] }}
+          coverLabel={t('listing:mini_app.room.photos', { count: 5 })}
+          bookmark={{ saved, onToggle: setSaved, labels: { save: t('listing:bookmark.save'), unsave: t('listing:bookmark.unsave') } }}
+          footer={
+            <View className="flex-row gap-2">
+              <View className="flex-1">
+                <Button fullWidth variant="secondary" icon={Phone} label={t('listing:mini_app.room.call')} onPress={() => undefined} />
+              </View>
+              <View className="flex-1">
+                <Button fullWidth icon={MessageCircle} label={t('listing:mini_app.room.chat')} loading onPress={() => undefined} />
+              </View>
+            </View>
+          }
+          onPress={() => toast.show(samples[1].title)}
         />
         {/* display.description + đồ thất lạc đã trả lại (attributes.returned): ảnh mờ, tiêu đề gạch ngang, badge "Đã trả lại". */}
         <ListingCard

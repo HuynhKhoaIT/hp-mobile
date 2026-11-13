@@ -7,7 +7,7 @@
 //     → mẹo an toàn riêng tính năng (config.tipKey) → tiêu đề có vạch cam ("Tin mới đăng" / "Kết quả cho …") → lưới.
 // Tính năng có config.home và chưa lọc / sắp xếp → trang chủ mini (cùng thứ tự với app): header + ô tìm → lưới danh
 // mục → banner → các dải (FeatureHome) → mẹo an toàn → "Tất cả tin {tính năng}" (chip lọc + lưới + Xem thêm). Có lọc → như trên.
-// Tính năng có config.miniApp (Chợ Pass Đồ) → MiniAppList: header + điều hướng riêng của mini-app, trang chủ mini-app khi chưa
+// Tính năng có config.miniApp (Chợ Pass Đồ, Nhà Trọ) → khung gắn data-app-theme + MiniAppList: header + điều hướng riêng của mini-app, trang chủ mini-app khi chưa
 // lọc, danh sách đã lọc trong cùng khung khi có lọc (mini-app-list.tsx). Cùng dữ liệu / cache / SEO với danh sách thường.
 // Render (Cache Components):
 // - Fallback của <Suspense> = trang đầu KHÔNG lọc (dữ liệu cache 300s) → nằm trong static shell: HTML có tin thật ngay cả khi
@@ -26,7 +26,7 @@ import { asLocale } from '../display';
 import { hasCustomPrice, isFiltered, type ListFilterState, NO_FILTERS, parseListFilters, searchFiltersOf } from '../filters';
 import { getListPage, getPublicSites, logSearchTerm } from '../queries';
 import { LISTING_FEATURE_CONFIGS } from '../features';
-import { isMiniApp } from '../mini-app';
+import { appThemeOf, isMiniApp } from '../mini-app';
 import { type ListScope, scopeInfo } from '../scope';
 import { FeatureHome } from './feature-home';
 import { ListChips, ListSearchForm } from './list-filters';
@@ -39,8 +39,11 @@ import { BarHeading, SafetyTip } from './safety-tip';
 type RawParams = Record<string, string | string[] | undefined>;
 
 export function ListingListPage({ scope, searchParams }: { scope: ListScope; searchParams: Promise<RawParams> }) {
+  const { feature } = scopeInfo(scope);
+  // Mini-app (config.miniApp): màu chủ đạo riêng cho cả trang (header gradient, chip, nút chính).
+  const theme = appThemeOf(feature ? LISTING_FEATURE_CONFIGS[feature] : null);
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-6 sm:px-4 sm:pt-6">
+    <section data-app-theme={theme} className="mx-auto flex w-full max-w-6xl flex-col gap-4 pb-6 sm:px-4 sm:pt-6">
       <Suspense fallback={<ListBody scope={scope} filters={NO_FILTERS} />}>
         <ListContent scope={scope} searchParams={searchParams} />
       </Suspense>

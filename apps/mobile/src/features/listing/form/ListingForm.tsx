@@ -49,7 +49,7 @@ import {
   Text,
   useScheme,
 } from '@/ui';
-import { backOrHome } from '../navigation';
+import { backOrHome, type MiniSlug } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 import { AttributeInput } from './AttributeInput';
 import { PostResult } from './PostResult';
@@ -63,6 +63,8 @@ export type ListingFormProps = {
   lang: Locale;
   /** SĐT trong hồ sơ (profiles.phone, dạng 84…) — chỉ để chủ tin biết số nào sẽ hiện qua "Hiện số". */
   phone?: string | null;
+  /** Luồng đăng của mini-app (slug) — kết thúc về "Quản lý tin" của mini-app thay vì màn my-listings. */
+  mini?: MiniSlug;
 };
 
 export function ListingForm(props: ListingFormProps) {
@@ -108,7 +110,16 @@ export function ListingForm(props: ListingFormProps) {
     else backOrHome();
   };
 
-  if (f.result) return <PostResult result={f.result} isEdit={f.isEdit && f.editingStatus !== 'draft'} />;
+  if (f.result) {
+    return (
+      <PostResult
+        result={f.result}
+        isEdit={f.isEdit && f.editingStatus !== 'draft'}
+        feature={props.config.key === 'all' ? undefined : props.config.key}
+        mini={props.mini}
+      />
+    );
+  }
 
   const editPublished = f.isEdit && f.editingStatus !== 'draft';
   const feature = props.config.key === 'all' ? null : props.config.key;

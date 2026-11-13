@@ -29,7 +29,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { env } from '@/core/env';
 import { setActiveConversation } from '@/core/notifications';
 import { useBlockAction, useReportAction } from '@/core/report';
-import { backOrHome } from '@/features/listing/navigation';
+import { backOrHome, type MiniSlug } from '@/features/listing/navigation';
 import { useErrorText } from '@/lib/errors';
 import { formatDate } from '@/lib/format';
 import { profileAvatarUrl } from '@/lib/images';
@@ -56,7 +56,8 @@ const GROUP_MS = 5 * 60_000;
 /** List đảo ngược + bàn phím: vẽ trước xa hơn để không chớp trắng khi nội dung trượt theo bàn phím. */
 const DRAW_DISTANCE = 1000;
 
-export function ChatThread({ conversationId }: { conversationId: string }) {
+/** `mini`: mở từ mini-app (slug) → "Xem tin" ở thẻ ngữ cảnh mở chi tiết trong mini-app. */
+export function ChatThread({ conversationId, mini }: { conversationId: string; mini?: MiniSlug }) {
   const { t } = useTranslation('chat');
   const theme = useTheme();
   const insets = useSafeAreaInsets();
@@ -175,7 +176,7 @@ export function ChatThread({ conversationId }: { conversationId: string }) {
 
   return (
     <View className="flex-1">
-      <ThreadHeader conversation={c} isTyping={typing.isTyping} onBack={backOrHome} onOptions={() => setOptionsOpen(true)} />
+      <ThreadHeader conversation={c} isTyping={typing.isTyping} onBack={backOrHome} onOptions={() => setOptionsOpen(true)} mini={mini} />
 
       <View className="flex-1">
         {messages.isLoading ? (
