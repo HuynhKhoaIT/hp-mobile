@@ -4,7 +4,7 @@
 // Luồng có ảnh: createListing(status 'draft') → uploadListingImage từng ảnh (cần listing id cho path)
 //   → updateListing({ id, images, status: 'active' }). Thoát giữa chừng thì tin còn ở Nháp.
 import type { Database, Json } from '@hp/db';
-import { CreateListingInput, type ListingCategory, type OwnerListingStatus, UpdateListingInput } from '@hp/shared';
+import { canMarkSold, CreateListingInput, type ListingCategory, type OwnerListingStatus, UpdateListingInput } from '@hp/shared';
 import { flattenIssues } from './profile';
 import { type Client, type Result, fail, fromSupabase, ok, requireUserId } from './result';
 import type { Page } from './social';
@@ -137,6 +137,15 @@ export async function listMyListings(
 /** Tab "Quản lý tin" của mini-app: Đang bán · Đã bán · Chờ duyệt (gồm bị từ chối) · Đã ẩn (rút tin, hết hạn, nháp). */
 export type FeatureListingsTab = 'active' | 'sold' | 'pending' | 'hidden';
 export const FEATURE_LISTINGS_TABS: readonly FeatureListingsTab[] = ['active', 'sold', 'pending', 'hidden'];
+
+/**
+ * Tab của "Quản lý tin" theo tính năng: bỏ "Đã bán" khi không danh mục nào bán được (việc làm / đồ thất lạc chỉ "Đóng tin",
+ * không bao giờ có tin `sold` — canMarkSold của @hp/shared) để không có tab và số liệu trống mãi.
+ */
+export function featureListingsTabs(categories: readonly ListingCategory[]): readonly FeatureListingsTab[] {
+  return categories.some(canMarkSold) ? FEATURE_LISTINGS_TABS : FEATURE_LISTINGS_TABS.filter((tab) => tab !== 'sold');
+}
+
 const FEATURE_TAB_STATUSES: Record<FeatureListingsTab, ListingRow['status'][]> = {
   active: ['active'],
   sold: ['sold'],
