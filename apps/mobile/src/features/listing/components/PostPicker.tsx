@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { requireAuth } from '@/core/auth';
-import { Card, Col, Icon, SectionHeader, SERVICE, ServiceTile, Text } from '@/ui';
+import { Card, CategoryArt, Col, hasCategoryArt, Icon, SectionHeader, SERVICE, ServiceTile, Text } from '@/ui';
 import { type MiniSlug, openPostForm } from '../navigation';
 import type { ListingFeatureConfig } from '../types';
 
@@ -80,9 +80,13 @@ function CategoryCard({
   const hint = t(`form.category_hint.${category}`);
   return (
     <Card onPress={onPress} accessibilityLabel={`${name}. ${hint}`} className="min-h-32 gap-2">
-      <View className={`size-10 items-center justify-center rounded-md ${SERVICE[feature].soft}`}>
-        <Icon icon={config.categoryIcons?.[category] ?? SERVICE[feature].icon} service={feature} />
-      </View>
+      {hasCategoryArt(category) ? (
+        <CategoryArt category={category} />
+      ) : (
+        <View className={`size-10 items-center justify-center rounded-md ${SERVICE[feature].soft}`}>
+          <Icon icon={config.categoryIcons?.[category] ?? SERVICE[feature].icon} service={feature} />
+        </View>
+      )}
       <Text variant="label" weight="semibold">
         {name}
       </Text>

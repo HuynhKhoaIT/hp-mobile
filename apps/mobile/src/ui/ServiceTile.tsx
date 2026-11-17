@@ -10,6 +10,8 @@
 //   Nhấn: scale 0.97 (motion.fast) + nền surface-2. Vùng chạm cả ô (icon + nhãn) ≥ 48.
 // Glyph: `service` (icon + màu dịch vụ) · `service` + `icon` (icon riêng tô màu dịch vụ trên nền dịch vụ nhạt — ô danh mục
 //   ở trang chủ riêng của tính năng) · `icon` (tiện ích, primary).
+// `art` (mã danh mục): danh mục có hình minh hoạ riêng thì ô icon được thay bằng CategoryArt (nền nhạt + hình nhiều màu,
+//   cả hai variant); không có hình → ô icon Lucide như trên.
 // ServiceGrid xếp các ô 'grid' thành hàng `columns` cột (mặc định 4; gap-x-2, gap-y-4) — RN không có CSS grid nên chia
 // hàng tường minh.
 import type { LucideIcon } from 'lucide-react-native';
@@ -17,6 +19,7 @@ import { Children, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { useAnimatedStyle } from 'react-native-reanimated';
 import { Card } from './Card';
+import { CategoryArt, hasCategoryArt } from './CategoryArt';
 import { Icon } from './Icon';
 import { AnimatedView } from './interop';
 import { SERVICE, type ServiceKey } from './service';
@@ -43,6 +46,8 @@ export type ServiceTileProps = Glyph & {
   hint?: string;
   /** Nhãn đọc màn hình thay cho `label` (vd "Xem Xe cộ" ở ô danh mục); nhãn góc vẫn được đọc kèm. */
   accessibilityLabel?: string;
+  /** Mã danh mục (vd `pass_vehicle`): có hình minh hoạ (`@hp/tokens/category-art`) thì vẽ hình thay cho ô icon; không có → ô icon như cũ. */
+  art?: string;
   className?: string;
 };
 
@@ -72,9 +77,13 @@ export function ServiceTile(props: ServiceTileProps) {
       selected={selected}
       className={['min-h-24 items-center gap-2', hint && 'px-2 py-3', className].filter(Boolean).join(' ')}
     >
-      <View className={`h-12 w-12 items-center justify-center rounded-full ${softOf(props)}`}>
-        <TileIcon glyph={props} size="tab" />
-      </View>
+      {hasCategoryArt(props.art) ? (
+        <CategoryArt category={props.art} />
+      ) : (
+        <View className={`h-12 w-12 items-center justify-center rounded-full ${softOf(props)}`}>
+          <TileIcon glyph={props} size="tab" />
+        </View>
+      )}
       <View className="items-center gap-0.5">
         <Text variant="label" weight={hint ? 'semibold' : undefined} className="text-center">
           {label}
@@ -113,9 +122,13 @@ function GridTile(props: ServiceTileProps) {
         className="min-h-12 items-center gap-2 rounded-lg py-1 active:bg-surface-2"
       >
         <View className="relative">
-          <View className={['size-12 items-center justify-center rounded-md border', softOf(props), ringOf(props), dim].join(' ')}>
-            <TileIcon glyph={props} size="tab" />
-          </View>
+          {hasCategoryArt(props.art) ? (
+            <CategoryArt category={props.art} className={dim || undefined} />
+          ) : (
+            <View className={['size-12 items-center justify-center rounded-md border', softOf(props), ringOf(props), dim].join(' ')}>
+              <TileIcon glyph={props} size="tab" />
+            </View>
+          )}
           {badge ? (
             <AnimatedView
               accessibilityElementsHidden

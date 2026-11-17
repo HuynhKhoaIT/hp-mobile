@@ -83,12 +83,13 @@ function CategoryGrid({ config, onSelect }: { config: ListingFeatureConfig; onSe
                     variant="grid"
                     service={config.color}
                     icon={icon}
+                    art={c}
                     label={label}
                     accessibilityLabel={a11y}
                     onPress={() => onSelect(c)}
                   />
                 ) : (
-                  <ServiceTile variant="grid" icon={icon ?? Tag} label={label} accessibilityLabel={a11y} onPress={() => onSelect(c)} />
+                  <ServiceTile variant="grid" icon={icon ?? Tag} art={c} label={label} accessibilityLabel={a11y} onPress={() => onSelect(c)} />
                 )}
               </View>
             );

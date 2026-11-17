@@ -1,8 +1,9 @@
-// Analytics web. PostHog chỉ tải (dynamic import) sau khi người dùng đồng ý cookie; chưa đồng ý / chưa có key → track() bỏ qua,
-// không đặt cookie. Không autocapture, không session replay, props không chứa SĐT / họ tên / liên hệ.
+// Analytics web: PostHog + Google Analytics 4 (ga.ts). Cả hai chỉ tải sau khi người dùng đồng ý cookie; chưa đồng ý / chưa có key
+// → track() bỏ qua, không đặt cookie. Không autocapture, không session replay, props không chứa SĐT / họ tên / liên hệ.
 import type { PostHog } from 'posthog-js';
 import { publicEnv } from '@/lib/env';
 import type { AnalyticsEvent } from './events';
+import { startGa, stopGa, trackGa } from './ga';
 
 export type { AnalyticsEvent } from './events';
 export type AnalyticsProps = Record<string, string | number | boolean | null | undefined>;
@@ -15,7 +16,7 @@ const UTM_PARAMS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm
 let client: PostHog | null = null;
 let loading: Promise<void> | null = null;
 
-export const analyticsEnabled = () => !!publicEnv.posthogKey;
+export const analyticsEnabled = () => !!publicEnv.posthogKey || !!publicEnv.gaMeasurementId;
 
 export function readConsent(): ConsentState {
   try {
@@ -27,6 +28,7 @@ export function readConsent(): ConsentState {
 }
 
 function start() {
+  if (publicEnv.gaMeasurementId) startGa(publicEnv.gaMeasurementId);
   if (client || loading || !publicEnv.posthogKey) return;
   loading = import('posthog-js')
     .then(({ default: posthog }) => {
@@ -44,7 +46,7 @@ function start() {
     });
 }
 
-/** Lưu lựa chọn. Từ chối sau khi đã đồng ý → ngừng gửi và xoá dữ liệu PostHog trên máy. */
+/** Lưu lựa chọn. Từ chối sau khi đã đồng ý → ngừng gửi và xoá dữ liệu PostHog / GA trên máy. */
 export function writeConsent(value: 'granted' | 'denied') {
   try {
     localStorage.setItem(CONSENT_KEY, value);
@@ -54,9 +56,10 @@ export function writeConsent(value: 'granted' | 'denied') {
   if (value === 'granted') {
     client?.opt_in_capturing();
     start();
-  } else if (client) {
-    client.opt_out_capturing();
-    client.reset();
+  } else {
+    if (publicEnv.gaMeasurementId) stopGa(publicEnv.gaMeasurementId);
+    client?.opt_out_capturing();
+    client?.reset();
   }
 }
 
@@ -69,6 +72,7 @@ export function track(event: AnalyticsEvent, props: AnalyticsProps = {}) {
   try {
     if (readConsent() !== 'granted') return;
     client?.capture(event, props);
+    trackGa(event, props);
   } catch {
     // Analytics không bao giờ làm hỏng thao tác của người dùng.
   }
