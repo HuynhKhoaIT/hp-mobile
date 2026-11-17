@@ -10,6 +10,7 @@
 import type { Site } from '@hp/core';
 import type { Locale } from '@hp/shared';
 import { getTranslations } from 'next-intl/server';
+import { CategoryArt, hasCategoryArt } from '@/components/shared/category-art';
 import { BannerCarousel } from '@/features/home/components/banner-carousel';
 import { getBanners, getListRail } from '@/features/home/queries';
 import { Link } from '@/i18n/navigation';
@@ -83,16 +84,23 @@ async function CategoryGrid({ cfg }: { cfg: ListingFeatureConfig }) {
                   'hover:bg-surface-2 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-97 motion-reduce:active:scale-100',
                 )}
               >
-                <span
-                  aria-hidden
-                  className={cn(
-                    'flex size-12 shrink-0 items-center justify-center rounded-md transition-transform duration-200',
-                    'group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0',
-                    cfg.tone.soft,
-                  )}
-                >
-                  <Icon strokeWidth={1.75} className={cn('size-6', cfg.tone.fg)} />
-                </span>
+                {hasCategoryArt(c) ? (
+                  <CategoryArt
+                    category={c}
+                    className="size-12 transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0"
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'flex size-12 shrink-0 items-center justify-center rounded-md transition-transform duration-200',
+                      'group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0',
+                      cfg.tone.soft,
+                    )}
+                  >
+                    <Icon strokeWidth={1.75} className={cn('size-6', cfg.tone.fg)} />
+                  </span>
+                )}
                 <span aria-hidden className="flex min-h-9 items-start justify-center text-center text-xs leading-tight font-medium text-fg sm:text-sm">
                   {label}
                 </span>
