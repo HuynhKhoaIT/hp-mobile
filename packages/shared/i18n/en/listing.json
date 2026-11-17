@@ -564,16 +564,19 @@
     "back_super_a11y": "Back to {{app}}",
     "title": {
       "pass": "Pass Market",
-      "room": "Dung Quat Rooms"
+      "room": "Dung Quat Rooms",
+      "job": "Dung Quat Jobs"
     },
     "subtitle": {
       "pass": "Buy and sell between workers around the sites",
-      "room": "Find rooms, whole houses and roommates near the factories"
+      "room": "Find rooms, whole houses and roommates near the factories",
+      "job": "Shift and part-time jobs near the factories"
     },
     "tabs": {
       "home": {
         "pass": "Market",
-        "room": "Rooms"
+        "room": "Rooms",
+        "job": "Jobs"
       },
       "saved": "Saved",
       "post": "Post",
@@ -738,6 +741,58 @@
       "landlord_title": "Landlord",
       "rules_title": "Description & house rules",
       "contact_cta": "Contact to view the room"
+    },
+    "job": {
+      "badge": "Jobs",
+      "near_label": "Near you",
+      "categories_title": "Browse by job type",
+      "tile_day": "Day shift",
+      "tile_day_hint": "Daytime work",
+      "tile_night": "Night shift",
+      "tile_night_hint": "Nighttime work",
+      "tile_rotating": "Rotating shift",
+      "tile_rotating_hint": "Alternating day and night",
+      "trust_title": "Job hunting with peace of mind",
+      "trust_body": "Never pay a fee, deposit or hand over original documents to get hired.",
+      "list_title": "Latest jobs",
+      "list_subtitle": "Newly posted around your workplace",
+      "employer_eyebrow": "For employers",
+      "employer_title": "Need to hire workers?",
+      "employer_body": "Post for free and reach workers around the sites.",
+      "employer_cta": "Post a job",
+      "saved": {
+        "tab_active": "Hiring ({{count}})",
+        "tab_inactive": "Closed ({{count}})",
+        "inactive_hint": "This job is no longer hiring",
+        "find_similar": "Find similar jobs",
+        "tip_title": "Safe job-hunting tips",
+        "tip_body": "Never pay a fee or deposit to get hired. Ask for the company, work address and pay before accepting."
+      },
+      "manage": {
+        "active_count_one": "{{count}} job open",
+        "active_count_other": "{{count}} jobs open",
+        "tab_active": "Hiring",
+        "tab_hidden": "Closed",
+        "tip": "Tip: state the shift, pay and workplace clearly so candidates can reach you faster.",
+        "search_placeholder": "Search by title or code…",
+        "empty_active_title": "No jobs open",
+        "empty_active_body": "Post your first job — add the shift and pay.",
+        "empty_hidden_title": "No closed jobs",
+        "empty_hidden_body": "Jobs you close, expired jobs and drafts are kept here."
+      },
+      "filter": {
+        "category_title": "Job type",
+        "category_sub": "Shift",
+        "location_title": "Work area",
+        "location_hint": "Pick the area where you want to work."
+      }
+    },
+    "job_detail": {
+      "title": "Job details",
+      "open": "Hiring",
+      "updated": "Updated {{time}}",
+      "contact_cta": "Message to apply",
+      "employer_title": "Employer"
     }
   }
 }

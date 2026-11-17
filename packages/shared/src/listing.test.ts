@@ -1,7 +1,7 @@
 // Chạy: pnpm --filter @hp/shared test. Module được test không import gì có đuôi thiếu (node --test).
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { featureOfCategory, priceLabel } from './listing-display.ts';
+import { canMarkSold, featureOfCategory, priceLabel } from './listing-display.ts';
 
 test('priceLabel: việc làm lấy khoảng lương theo pay_type', () => {
   assert.deepEqual(
@@ -37,6 +37,15 @@ test('featureOfCategory', () => {
   assert.equal(featureOfCategory('room_share'), 'room');
   assert.equal(featureOfCategory('job_parttime'), 'job');
   assert.equal(featureOfCategory('found'), 'lostFound');
+});
+
+test('canMarkSold: chỉ pass đồ và trọ; việc làm / thất lạc chỉ đóng tin', async () => {
+  assert.equal(canMarkSold('pass_vehicle'), true);
+  assert.equal(canMarkSold('room_rent'), true);
+  assert.equal(canMarkSold('job_main'), false);
+  assert.equal(canMarkSold('job_parttime'), false);
+  assert.equal(canMarkSold('lost'), false);
+  assert.equal(canMarkSold('found'), false);
 });
 
 test('featureOfCategory khớp LISTING_FEATURES', async () => {
