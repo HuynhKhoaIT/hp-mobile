@@ -8,7 +8,7 @@
 // Khách → mời đăng nhập; đang tải → khung chờ thẻ; lỗi → thử lại; tab rỗng → lời theo tab + "Đăng tin".
 // Khác Stitch (cố ý): không "Phản hồi chat 98%", số chat / gọi trên thẻ, "Đẩy tin", "Gửi nhóm Zalo", khối "Tiện ích hỗ trợ
 // thợ bán nhanh" (đẩy tin ca kíp, in mã QR) và nút hoá đơn / hỗ trợ trên header — chưa có dữ liệu / dịch vụ.
-import { FEATURE_LISTINGS_TABS, type FeatureListingsTab, type MyListing } from '@hp/core';
+import { type FeatureListingsTab, featureListingsTabs, type MyListing } from '@hp/core';
 import { useFeatureListings, useFeatureListingsSummary, useMyProfile, useSession } from '@hp/core/react';
 import { FlashList } from '@shopify/flash-list';
 import { MapPin, Package, SearchX, Star, Zap } from 'lucide-react-native';
@@ -99,14 +99,18 @@ function ManageList({
   const mt = useMiniT();
   const { space } = useTheme();
   const { config, sites } = useMiniApp();
-  const [tab, setTab] = useState<FeatureListingsTab>(requestedTab ?? 'active');
+  // Việc làm không có tab "Đã bán" (chỉ Đóng tin) → ?tab=sold bị bỏ qua, mở tab đầu.
+  const tabs = featureListingsTabs(config.categories);
+  const validTab = (v?: FeatureListingsTab) => (v && tabs.includes(v) ? v : undefined);
+  const [tab, setTab] = useState<FeatureListingsTab>(validTab(requestedTab) ?? 'active');
   const [query, setQuery] = useState('');
   const request = `${requestedTab ?? ''}:${requestKey ?? ''}`;
   const [seenRequest, setSeenRequest] = useState(request);
   if (request !== seenRequest) {
     // Quay về từ luồng đăng / sửa: đúng tab, bỏ từ khoá cũ (tin vừa lưu luôn hiện).
     setSeenRequest(request);
-    if (requestedTab) setTab(requestedTab);
+    const next = validTab(requestedTab);
+    if (next) setTab(next);
     setQuery('');
   }
   const [sort, setSort] = useState<ManageSort>('newest');
@@ -130,7 +134,7 @@ function ManageList({
         appearance="solid"
         value={tab}
         onChange={setTab}
-        options={FEATURE_LISTINGS_TABS.map((value) => ({
+        options={tabs.map((value) => ({
           value,
           label: mt(`manage.tab_${value}`),
           count: summary.data?.[value],
@@ -232,12 +236,14 @@ function ManageList({
 function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListingsSummary> }) {
   const { t, i18n } = useTranslation('listing');
   const mt = useMiniT();
-  const { sites } = useMiniApp();
+  const { config, sites } = useMiniApp();
   const me = useMyProfile();
   const profile = me.data;
   const badges = (profile?.badges ?? []).filter((b) => i18n.exists(`listing:owner_badge.${b}`));
   const siteName = profile?.site ? (sites.find((x) => x.code === profile.site)?.name ?? null) : null;
   const s = summary.data;
+  // Tính năng không có "Đã bán" (Tìm việc) → ẩn ô thống kê đó (luôn 0).
+  const hasSold = featureListingsTabs(config.categories).includes('sold');
 
   return (
     <Card className="gap-4">
@@ -301,8 +307,8 @@ function ProfileCard({ summary }: { summary: ReturnType<typeof useFeatureListing
           className="rounded-lg bg-surface-2 py-3"
           items={[
             { value: formatNumber(s.active), label: mt('manage.stat_active'), tone: 'primary' },
-            { value: formatNumber(s.sold), label: mt('manage.stat_sold') },
-            { value: formatNumber(s.views), label: mt('manage.stat_views'), tone: 'primary' },
+            ...(hasSold ? [{ value: formatNumber(s.sold), label: mt('manage.stat_sold') }] : []),
+            { value: formatNumber(s.views), label: mt('manage.stat_views'), tone: 'primary' as const },
           ]}
         />
       ) : (

@@ -20,7 +20,8 @@
 //   2 (khi chưa lọc) "Danh mục tìm kiếm" lưới 3 cột: ô danh mục (nhãn ngắn + gợi ý) + ô thêm (home.extraTiles: máy lạnh →
 //     has_ac, gần cổng → khoảng cách ≤ 2 km).
 //   3 hàng chip nhanh (như 'market') → 4 (khi chưa lọc) khối tin cậy (home.trust — hộp viền cam nhạt).
-//   5 "Phòng trọ giá tốt ca kíp" + dòng phụ + "Lọc thêm" → thẻ nổi bật đầu tiên (MiniFeaturedCard) rồi thẻ hàng, cuộn vô hạn.
+//   5 "Phòng trọ giá tốt ca kíp" + dòng phụ + "Lọc thêm" → thẻ nổi bật đầu tiên (MiniFeaturedCard) rồi thẻ hàng, cuộn vô hạn
+//     (không khai báo home.featured — Tìm việc: tin ít ảnh — thì tất cả là thẻ hàng).
 //   6 chân: khối mời đăng (home.promo — gradient, mở thẳng form home.promo.category trong luồng mini-app) → dòng miễn trừ.
 // Mọi thẻ mở chi tiết với `mini` (màu mini-app). Kéo xuống làm mới: danh sách (+ banner ở 'market'). Đổi bộ lọc → danh sách
 // cuộn về đầu.
@@ -172,6 +173,7 @@ function DirectoryHome({ home }: { home: DirectoryHomeConfig }) {
   );
 
   const promo = home.promo;
+  const featured = home.featured;
   const footer = (
     <View className="gap-4 px-4 pb-2">
       {promo ? (
@@ -195,7 +197,7 @@ function DirectoryHome({ home }: { home: DirectoryHomeConfig }) {
     <ListingFeed
       config={config}
       layout="row"
-      renderCard={(item, index) => (index === 0 ? <MiniFeaturedCard listing={item} featured={home.featured} /> : null)}
+      renderCard={featured ? (item, index) => (index === 0 ? <MiniFeaturedCard listing={item} featured={featured} /> : null) : undefined}
       items={browser.items}
       isLoading={browser.isLoading}
       isError={browser.isError}
