@@ -20,4 +20,6 @@ export const publicEnv = {
   playStoreUrl: process.env.NEXT_PUBLIC_PLAY_STORE_URL ?? '',
   posthogKey: process.env.NEXT_PUBLIC_POSTHOG_KEY ?? '',
   posthogHost: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
+  /** GA4 Measurement ID (G-XXXXXXXXXX). Trống → không tải Google Analytics. */
+  gaMeasurementId: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? '',
 } as const;

@@ -1,5 +1,5 @@
 'use client';
-// Hỏi đồng ý cookie thống kê (Nghị định 13/2023). Chỉ hiện khi có PostHog key — không có thì web không đặt cookie thống kê,
+// Hỏi đồng ý cookie thống kê (Nghị định 13/2023). Chỉ hiện khi có PostHog key hoặc GA Measurement ID — không có thì web không đặt cookie thống kê,
 // không cần hỏi. Không hiện ở /admin. "Cài đặt cookie" ở footer mở lại qua sự kiện `hp:cookie-settings`.
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
