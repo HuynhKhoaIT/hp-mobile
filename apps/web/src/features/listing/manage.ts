@@ -6,7 +6,7 @@
 // chủ" (mark_listing_returned) là nút nhanh chính; đã trả lại → không còn Mở lại, nút nhanh chính "Cảm ơn người trả đồ" /
 // "Đánh giá người nhận" (rate_listing — RateListingDialog).
 import { FEATURE_LISTINGS_TABS, type FeatureListingsTab, type MyListing, type MyListingsTab } from '@hp/core';
-import { featureOfCategory, type ListingStatus } from '@hp/shared';
+import { canMarkSold, featureOfCategory, type ListingStatus } from '@hp/shared';
 import type { BadgeTone } from '@/components/shared/badge';
 import { isReturned } from './display';
 
@@ -16,10 +16,16 @@ export const RENEW_WINDOW_DAYS = 3;
 /** Tab "Tin của tôi" (listMyListings): Chờ duyệt gồm cả bị từ chối; Đã đóng gồm đã bán / đã đóng / hết hạn. */
 export const MY_LISTING_TABS: readonly MyListingsTab[] = ['active', 'pending', 'draft', 'closed'];
 
-/** Tab "Quản lý tin" của mini-app (?tab=active|sold|pending|hidden — listFeatureListings); sai / thiếu → Đang bán. */
-export function parseFeatureTab(raw: string | string[] | undefined): FeatureListingsTab {
+/**
+ * Tab "Quản lý tin" của mini-app (?tab=active|sold|pending|hidden — listFeatureListings); sai / thiếu → Đang bán. `tabs` =
+ * các tab của tính năng (featureListingsTabs: Tìm việc không có "sold") — tab ngoài danh sách coi như sai.
+ */
+export function parseFeatureTab(
+  raw: string | string[] | undefined,
+  tabs: readonly FeatureListingsTab[] = FEATURE_LISTINGS_TABS,
+): FeatureListingsTab {
   const v = Array.isArray(raw) ? raw[0] : raw;
-  return (FEATURE_LISTINGS_TABS as readonly string[]).includes(v ?? '') ? (v as FeatureListingsTab) : 'active';
+  return (tabs as readonly string[]).includes(v ?? '') ? (v as FeatureListingsTab) : 'active';
 }
 
 export type ManageAction = 'edit' | 'sold' | 'returned' | 'rate' | 'close' | 'reopen' | 'resubmit' | 'renew' | 'delete';
@@ -37,18 +43,13 @@ export function canRenew(l: Pick<MyListing, 'status' | 'expires_at'>, now: numbe
   return new Date(l.expires_at).getTime() - now <= RENEW_WINDOW_DAYS * DAY_MS;
 }
 
-/** "Đã bán" chỉ có nghĩa với pass đồ / trọ; việc làm / thất lạc chỉ Đóng tin. */
-export function canMarkSold(l: Pick<MyListing, 'category'>): boolean {
-  const feature = featureOfCategory(l.category);
-  return feature === 'pass' || feature === 'room';
-}
-
 export function manageActions(l: Pick<MyListing, 'status' | 'expires_at' | 'category' | 'attributes'>, now: number): ManageAction[] {
   const status = ownerStatus(l, now);
   const returned = featureOfCategory(l.category) === 'lostFound' && isReturned(l);
   const out: ManageAction[] = ['edit'];
   if (status === 'active') {
-    if (canMarkSold(l)) out.push('sold');
+    // "Đã bán" chỉ có nghĩa với pass đồ / trọ; việc làm / thất lạc chỉ Đóng tin (canMarkSold của @hp/shared).
+    if (canMarkSold(l.category)) out.push('sold');
     if (featureOfCategory(l.category) === 'lostFound' && !returned) out.push('returned');
     out.push('close');
   }

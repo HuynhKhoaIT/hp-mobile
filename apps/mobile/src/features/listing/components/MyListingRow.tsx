@@ -12,7 +12,7 @@
 // badge "Đã trả lại" thay "Đã đóng", không còn Mở lại; nút chính "Cảm ơn người trả đồ" / "Đánh giá người nhận"
 // (ListingRateSheet → RPC rate_listing; đã chấm → sheet hiện "Bạn đã đánh giá …").
 import type { MyListing } from '@hp/core';
-import { featureOfCategory } from '@hp/shared';
+import { canMarkSold, featureOfCategory } from '@hp/shared';
 import {
   Archive,
   CalendarClock,
@@ -63,10 +63,9 @@ function rateLabelKey(category: MyListing['category']) {
 
 type QuickRow = { primary?: { action: MyListingQuickAction; variant: Extract<ButtonVariant, 'primary' | 'accent'> }; secondary: MyListingQuickAction[] };
 
-/** "Đã bán" có nghĩa với đồ pass và phòng trọ; việc làm / đồ thất lạc dùng "Đóng tin". */
+/** "Đã bán" có nghĩa với đồ pass và phòng trọ; việc làm / đồ thất lạc dùng "Đóng tin" (canMarkSold của @hp/shared). */
 export function canSellOf(listing: Pick<MyListing, 'category'>, markSold: boolean) {
-  const feature = featureOfCategory(listing.category);
-  return markSold && (feature === 'pass' || feature === 'room');
+  return markSold && canMarkSold(listing.category);
 }
 
 /** Đồ thất lạc đang đăng, chưa trả lại → được "Đã nhận lại đồ" (RPC mark_listing_returned; DB vẫn quyết định). */

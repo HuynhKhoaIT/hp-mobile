@@ -120,8 +120,11 @@ export type ListingMiniHomeConfig =
       extraTiles?: readonly ListingMiniHomeTile[];
       trust: { titleKey: string; bodyKey: string };
       list: { titleKey: string; subtitleKey: string };
-      /** Thẻ nổi bật: đếm ảnh (`{{count}} ảnh`), nút Gọi / Nhắn tin, khoá bool hiện viên tiện nghi. */
-      featured: { photosKey: string; callKey: string; chatKey: string; highlights: readonly string[] };
+      /**
+       * Thẻ nổi bật cho tin đầu danh sách: đếm ảnh (`{{count}} ảnh`), nút Gọi / Nhắn tin, khoá bool hiện viên tiện nghi.
+       * Không khai báo (Tìm việc — tin ít ảnh) → mọi tin là thẻ hàng của `card.variant`.
+       */
+      featured?: { photosKey: string; callKey: string; chatKey: string; highlights: readonly string[] };
       promo?: {
         eyebrowKey: string;
         titleKey: string;

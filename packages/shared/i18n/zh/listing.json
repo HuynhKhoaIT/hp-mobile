@@ -564,16 +564,19 @@
     "back_super_a11y": "返回{{app}}",
     "title": {
       "pass": "二手市场",
-      "room": "Dung Quat 租房"
+      "room": "Dung Quat 租房",
+      "job": "Dung Quat 招工"
     },
     "subtitle": {
       "pass": "工友之间方便买卖",
-      "room": "在工厂附近找单间、整套房屋和合租"
+      "room": "在工厂附近找单间、整套房屋和合租",
+      "job": "工厂附近的轮班与兼职工作"
     },
     "tabs": {
       "home": {
         "pass": "市场",
-        "room": "找房"
+        "room": "找房",
+        "job": "找工作"
       },
       "saved": "收藏",
       "post": "发布",
@@ -738,6 +741,58 @@
       "landlord_title": "房东信息",
       "rules_title": "描述与入住须知",
       "contact_cta": "联系看房"
+    },
+    "job": {
+      "badge": "招工",
+      "near_label": "附近",
+      "categories_title": "按工作类型",
+      "tile_day": "白班",
+      "tile_day_hint": "白天上班",
+      "tile_night": "夜班",
+      "tile_night_hint": "夜间上班",
+      "tile_rotating": "倒班",
+      "tile_rotating_hint": "白夜轮换",
+      "trust_title": "放心找工作",
+      "trust_body": "不要为了被录用而交费、交押金或交出证件原件。",
+      "list_title": "最新职位",
+      "list_subtitle": "你工作地点附近的新职位",
+      "employer_eyebrow": "招聘方专区",
+      "employer_title": "需要招人吗？",
+      "employer_body": "免费发布，让园区附近的工人找到你。",
+      "employer_cta": "发布招聘",
+      "saved": {
+        "tab_active": "招聘中 ({{count}})",
+        "tab_inactive": "已结束 ({{count}})",
+        "inactive_hint": "该职位已停止招聘",
+        "find_similar": "查找类似职位",
+        "tip_title": "安全求职提示",
+        "tip_body": "不要为了被录用而交费或交押金。接受前先问清公司、工作地址和工资。"
+      },
+      "manage": {
+        "active_count_one": "{{count}} 个职位招聘中",
+        "active_count_other": "{{count}} 个职位招聘中",
+        "tab_active": "招聘中",
+        "tab_hidden": "已关闭",
+        "tip": "提示：写清班次、工资和工作地点，应聘者能更快联系你。",
+        "search_placeholder": "按标题、编号搜索…",
+        "empty_active_title": "暂无招聘中的职位",
+        "empty_active_body": "发布第一条招聘——写明班次和工资。",
+        "empty_hidden_title": "暂无已关闭的职位",
+        "empty_hidden_body": "你关闭的职位、已过期的职位和草稿都在这里。"
+      },
+      "filter": {
+        "category_title": "工作类型",
+        "category_sub": "班次",
+        "location_title": "工作区域",
+        "location_hint": "选择你想上班的区域。"
+      }
+    },
+    "job_detail": {
+      "title": "职位详情",
+      "open": "招聘中",
+      "updated": "{{time}}更新",
+      "contact_cta": "发消息应聘",
+      "employer_title": "招聘方"
     }
   }
 }

@@ -12,6 +12,7 @@
 //   mini-app, "Đăng tin khác" → trang đăng của mini-app); tin thuộc tính năng khác → 404. Cần đăng nhập, noindex.
 // - MiniAppThreadPage (/…/tin-nhan/[id]): khung chat dùng chung (ChatThread) trong khung mini-app — nút quay lại về hộp thư
 //   của mini-app; < 640px phủ toàn màn hình như /tin-nhan/[id], từ 640px nằm dưới dải tab mini-app. Cần đăng nhập, noindex.
+import { featureListingsTabs } from '@hp/core';
 import type { ListingFeature } from '@hp/shared';
 import { SearchX } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -172,7 +173,8 @@ export async function MiniAppManagePage({ feature, searchParams }: { feature: Li
 }
 
 async function ManageFromParams({ feature, searchParams }: { feature: ListingFeature; searchParams: Promise<RawParams> }) {
-  const tab = parseFeatureTab((await searchParams).tab);
+  // Tìm việc không có tab "Đã bán" → ?tab=sold coi như sai (về Đang tuyển).
+  const tab = parseFeatureTab((await searchParams).tab, featureListingsTabs(LISTING_FEATURE_CONFIGS[feature].categories));
   return <MiniAppManageView feature={feature} tab={tab} />;
 }
 

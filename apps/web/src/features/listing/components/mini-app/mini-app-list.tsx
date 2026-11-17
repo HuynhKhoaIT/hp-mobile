@@ -127,7 +127,8 @@ async function ListSection({ kind, ...data }: ListData & { kind: 'latest' | 'fea
   const t = await getTranslations();
   const filtered = isFiltered(filters);
   const count = activeFilterCount(filters) + (filters.sort !== 'newest' ? 1 : 0);
-  const list = kind === 'featured' ? cfg.miniApp.list : undefined;
+  // Tiêu đề riêng của tính năng (Nhà Trọ, Tìm việc) cho cả hai kiểu khối; Chợ Pass không khai báo → "Tin mới đăng quanh bạn".
+  const list = cfg.miniApp.list;
   const title = filters.query
     ? t('web.listing.search_results', { query: filters.query })
     : filtered

@@ -564,16 +564,19 @@
     "back_super_a11y": "Quay lại {{app}}",
     "title": {
       "pass": "Chợ Pass Đồ",
-      "room": "Nhà Trọ Dung Quất"
+      "room": "Nhà Trọ Dung Quất",
+      "job": "Việc Làm Dung Quất"
     },
     "subtitle": {
       "pass": "Cộng đồng thợ & công nhân mua bán tiện ích",
-      "room": "Tìm phòng trọ, nhà nguyên căn, ở ghép gần nhà máy"
+      "room": "Tìm phòng trọ, nhà nguyên căn, ở ghép gần nhà máy",
+      "job": "Việc ca kíp, làm thêm ngay gần nhà máy"
     },
     "tabs": {
       "home": {
         "pass": "Chợ Pass",
-        "room": "Tìm trọ"
+        "room": "Tìm trọ",
+        "job": "Tìm việc"
       },
       "saved": "Đã lưu",
       "post": "Đăng tin",
@@ -738,6 +741,58 @@
       "landlord_title": "Thông tin chủ trọ",
       "rules_title": "Mô tả & nội quy",
       "contact_cta": "Liên hệ hẹn xem phòng"
+    },
+    "job": {
+      "badge": "Việc làm KKT",
+      "near_label": "Gần bạn",
+      "categories_title": "Loại việc",
+      "tile_day": "Ca ngày",
+      "tile_day_hint": "Làm ban ngày",
+      "tile_night": "Ca đêm",
+      "tile_night_hint": "Làm ban đêm",
+      "tile_rotating": "Ca xoay",
+      "tile_rotating_hint": "Đổi ca ngày / đêm",
+      "trust_title": "Tìm việc an tâm",
+      "trust_body": "Không nộp phí, đặt cọc hay giao giấy tờ gốc để được nhận việc.",
+      "list_title": "Việc làm mới đăng",
+      "list_subtitle": "Mới đăng quanh khu làm việc của bạn",
+      "employer_eyebrow": "Dành cho nhà tuyển dụng",
+      "employer_title": "Cần tuyển người làm?",
+      "employer_body": "Đăng tin tuyển dụng miễn phí, tiếp cận anh em công nhân quanh khu.",
+      "employer_cta": "Đăng tin tuyển dụng",
+      "saved": {
+        "tab_active": "Đang tuyển ({{count}})",
+        "tab_inactive": "Đã đóng ({{count}})",
+        "inactive_hint": "Tin này đã đóng tuyển",
+        "find_similar": "Tìm việc tương tự",
+        "tip_title": "Mẹo tìm việc an toàn",
+        "tip_body": "Không nộp phí hay đặt cọc để được nhận việc. Hỏi rõ công ty, địa chỉ làm việc và mức lương trước khi nhận."
+      },
+      "manage": {
+        "active_count_one": "{{count}} tin đang tuyển",
+        "active_count_other": "{{count}} tin đang tuyển",
+        "tab_active": "Đang tuyển",
+        "tab_hidden": "Đã đóng",
+        "tip": "Mẹo: ghi rõ ca làm, mức lương và nơi làm việc để ứng viên liên hệ nhanh hơn.",
+        "search_placeholder": "Tìm theo tiêu đề, mã tin…",
+        "empty_active_title": "Chưa có tin đang tuyển",
+        "empty_active_body": "Đăng tin tuyển dụng đầu tiên — ghi rõ ca làm và mức lương.",
+        "empty_hidden_title": "Chưa có tin đã đóng",
+        "empty_hidden_body": "Tin bạn đóng, tin hết hạn và bản nháp nằm ở đây."
+      },
+      "filter": {
+        "category_title": "Loại việc",
+        "category_sub": "Ca làm",
+        "location_title": "Khu vực làm việc",
+        "location_hint": "Chọn khu gần nơi bạn muốn đi làm."
+      }
+    },
+    "job_detail": {
+      "title": "Chi tiết việc làm",
+      "open": "Đang tuyển",
+      "updated": "Cập nhật {{time}}",
+      "contact_cta": "Nhắn tin ứng tuyển",
+      "employer_title": "Nhà tuyển dụng"
     }
   }
 }

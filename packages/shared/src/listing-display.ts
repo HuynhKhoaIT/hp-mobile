@@ -49,3 +49,12 @@ export function featureOfCategory(category: ListingCategory): ListingFeature {
   if (category.startsWith('job_')) return 'job';
   return 'pass';
 }
+
+/**
+ * "Đã bán" chỉ có nghĩa với đồ pass và phòng trọ; việc làm / đồ thất lạc chỉ "Đóng tin" (không có trạng thái `sold`).
+ * Nguồn duy nhất cho nút "Đã bán" ở app + web và cho tab / số liệu "Đã bán" của "Quản lý tin" trong mini-app.
+ */
+export function canMarkSold(category: ListingCategory): boolean {
+  const feature = featureOfCategory(category);
+  return feature === 'pass' || feature === 'room';
+}
