@@ -504,6 +504,25 @@ export default function UiGalleryScreen() {
         </View>
       </Section>
 
+      <Section title="ServiceTile grid · art (CategoryArt: hình minh hoạ danh mục, nền nhạt đổi theo sáng / tối)">
+        <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <ServiceGrid columns={5}>
+            {GALLERY_CATEGORY_TILES.map(({ category, icon }) => (
+              <View key={category} className="flex-1">
+                <ServiceTile
+                  variant="grid"
+                  service="pass"
+                  icon={icon}
+                  art={category}
+                  label={t(`listing:category_short.${category}`)}
+                  onPress={() => toast.show(t(`category.${category}`))}
+                />
+              </View>
+            ))}
+          </ServiceGrid>
+        </View>
+      </Section>
+
       <Section title="TabBarItem · Post glow">
         {/* Nút Đăng thở chậm khi chưa mở; bấm "Đăng" → xoay 45°, tắt quầng. Reduce Motion → đứng yên. */}
         <View className="mt-6 flex-row border-t border-border bg-surface px-1 pt-1 shadow-bar">

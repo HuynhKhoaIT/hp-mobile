@@ -310,9 +310,9 @@ function CategoryCard({ browser, limit }: { browser: ListingBrowserResult; limit
     return (
       <View key={c} className="flex-1">
         {config.color ? (
-          <ServiceTile variant="grid" service={config.color} icon={icon} label={label} accessibilityLabel={a11y} onPress={() => browser.setCategory(c)} />
+          <ServiceTile variant="grid" service={config.color} icon={icon} art={c} label={label} accessibilityLabel={a11y} onPress={() => browser.setCategory(c)} />
         ) : (
-          <ServiceTile variant="grid" icon={icon ?? Tag} label={label} accessibilityLabel={a11y} onPress={() => browser.setCategory(c)} />
+          <ServiceTile variant="grid" icon={icon ?? Tag} art={c} label={label} accessibilityLabel={a11y} onPress={() => browser.setCategory(c)} />
         )}
       </View>
     );
