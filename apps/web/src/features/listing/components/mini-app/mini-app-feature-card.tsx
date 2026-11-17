@@ -63,7 +63,7 @@ export async function MiniAppFeatureCard({ cfg, listing }: { cfg: MiniAppConfig;
             {status}
           </Badge>
         </div>
-        {list && listing.images.length > 1 ? (
+        {list?.photosKey && listing.images.length > 1 ? (
           <span className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-sm bg-surface/90 px-2 py-0.5 text-xs font-semibold text-fg shadow-card backdrop-blur-sm">
             <Camera aria-hidden strokeWidth={1.75} className="size-3.5" />
             {t(list.photosKey, { count: listing.images.length })}
@@ -115,7 +115,7 @@ export async function MiniAppFeatureCard({ cfg, listing }: { cfg: MiniAppConfig;
             ))}
           </ul>
         ) : null}
-        {list ? (
+        {list?.callKey && list.chatKey ? (
           <div className="mt-auto pt-1">
             <MiniAppCardContact
               listingId={listing.id}

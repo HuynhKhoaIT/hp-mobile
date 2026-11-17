@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { asLocale, priceText } from '../../display';
 import { LISTING_FEATURE_CONFIGS } from '../../features';
 import { filterQuery } from '../../filters';
+import { miniAppText } from '../../mini-app-text';
 import { ListingPlaceholder } from '../listing-placeholder';
 import { SafetyTip } from '../safety-tip';
 
@@ -78,6 +79,7 @@ export function MiniAppSavedView({ feature }: { feature: ListingFeature }) {
 
 function SavedBody({ feature }: { feature: ListingFeature }) {
   const t = useTranslations();
+  const mt = miniAppText(t, feature);
   const locale = asLocale(useLocale());
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const session = useSession();
@@ -107,11 +109,11 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
       <div className="flex flex-col gap-4">
         <EmptyState
           icon={Heart}
-          title={t('listing.mini_app.saved.empty_title')}
-          description={t('listing.mini_app.saved.empty_body')}
+          title={mt('saved.empty_title')}
+          description={mt('saved.empty_body')}
           action={
             <Button asChild>
-              <Link href={cfg.path}>{t('listing.mini_app.saved.empty_cta')}</Link>
+              <Link href={cfg.path}>{mt('saved.empty_cta')}</Link>
             </Button>
           }
         />
@@ -137,7 +139,7 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
                     selected ? 'border-primary bg-primary text-on-primary' : 'border-border bg-surface text-muted hover:bg-surface-2 hover:text-fg',
                   )}
                 >
-                  {t(`listing.mini_app.saved.tab_${key}`, { count: formatNumber(counts[key], locale) })}
+                  {mt(`saved.tab_${key}`, { count: formatNumber(counts[key], locale) })}
                 </button>
               </li>
             );
@@ -151,7 +153,7 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
           title={t('listing.list.empty_search_title')}
           action={
             <Button type="button" variant="outline" onClick={() => setTab('all')}>
-              {t('listing.mini_app.saved.tab_all', { count: formatNumber(counts.all, locale) })}
+              {mt('saved.tab_all', { count: formatNumber(counts.all, locale) })}
             </Button>
           }
         />
@@ -159,7 +161,7 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {visible.map((l) => (
             <li key={l.id} className="flex flex-col *:flex-1">
-              <SavedRow listing={l} now={now} viewerId={session.userId} featurePath={cfg.path} chatBase={cfg.miniApp?.paths.chat} />
+              <SavedRow feature={feature} listing={l} now={now} viewerId={session.userId} featurePath={cfg.path} chatBase={cfg.miniApp?.paths.chat} />
             </li>
           ))}
         </ul>
@@ -170,12 +172,14 @@ function SavedBody({ feature }: { feature: ListingFeature }) {
 }
 
 function SavedRow({
+  feature,
   listing: l,
   now,
   viewerId,
   featurePath,
   chatBase,
 }: {
+  feature: ListingFeature;
   listing: PublicListing;
   now: number;
   viewerId: string | null;
@@ -185,13 +189,14 @@ function SavedRow({
   chatBase?: string;
 }) {
   const t = useTranslations();
+  const mt = miniAppText(t, feature);
   const locale = asLocale(useLocale());
   const onSale = isOnSale(l);
   const cover = l.images[0];
   const price = priceText(priceLabel(l), t, locale);
   const statusLabel =
     l.status === 'sold'
-      ? t('listing.mini_app.saved.sold_badge')
+      ? mt('saved.sold_badge')
       : t(`common.status.${l.is_expired && l.status === 'active' ? 'expired' : l.status}`);
   const worker = l.owner_badges.includes('worker');
 
@@ -256,12 +261,12 @@ function SavedRow({
           </>
         ) : (
           <>
-            <p className="min-w-0 flex-1 text-sm text-muted">{t('listing.mini_app.saved.inactive_hint')}</p>
+            <p className="min-w-0 flex-1 text-sm text-muted">{mt('saved.inactive_hint')}</p>
             <Link
               href={{ pathname: featurePath, query: filterQuery({ category: l.category }) }}
               className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-md px-2 text-sm font-semibold text-primary outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              {t('listing.mini_app.saved.find_similar')}
+              {mt('saved.find_similar')}
               <ChevronRight aria-hidden strokeWidth={1.75} className="size-4" />
             </Link>
           </>

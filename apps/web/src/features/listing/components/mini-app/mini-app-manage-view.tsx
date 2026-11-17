@@ -17,7 +17,7 @@
 // Khác Stitch (cố ý): không "Phản hồi chat 98%", số chat / gọi, "Đẩy tin" / "Đã đẩy tin" / "Đang ưu tiên trang 1", "Gửi nhóm
 // Zalo", "Sửa giá" riêng, khối tiện ích (đẩy tin ca kíp, in mã QR), dòng "Đã xác minh thẻ nhà máy Hòa Phát", nút hỗ trợ /
 // hoá đơn trên header — chưa có dữ liệu / tính năng.
-import { FEATURE_LISTINGS_TABS, type FeatureListingsTab, type MyListing } from '@hp/core';
+import { type FeatureListingsTab, featureListingsTabs, type MyListing } from '@hp/core';
 import { useFeatureListings, useFeatureListingsSummary, useMyProfile, useSession, useSites } from '@hp/core/react';
 import { formatDate, formatNumber, formatRelative, type ListingFeature, type ListingStatus, priceLabel } from '@hp/shared';
 import {
@@ -57,6 +57,7 @@ import { asLocale, priceText } from '../../display';
 import { LISTING_FEATURE_CONFIGS } from '../../features';
 import { hasPublicPage, isInactive, manageActions, ownerStatus, STATUS_TONE } from '../../manage';
 import { miniAppEditPath } from '../../mini-app-routes';
+import { miniAppText } from '../../mini-app-text';
 import { useShareListing } from '../../use-share-listing';
 import { ListingPlaceholder } from '../listing-placeholder';
 import { MyListingMenu, useManage } from '../my-listing-menu';
@@ -85,13 +86,13 @@ export function MiniAppManageCount({ feature }: { feature: ListingFeature }) {
 }
 
 function ManageCount({ feature }: { feature: ListingFeature }) {
-  const t = useTranslations('listing.mini_app.manage');
+  const mt = miniAppText(useTranslations(), feature);
   const session = useSession();
   const summary = useFeatureListingsSummary(LISTING_FEATURE_CONFIGS[feature].categories, { enabled: !!session.userId });
   if (!summary.data) return null;
   return (
     <span className="rounded-full bg-accent px-3 py-1 text-sm font-semibold text-on-accent">
-      {t('active_count', { count: summary.data.active })}
+      {mt('manage.active_count', { count: summary.data.active })}
     </span>
   );
 }
@@ -110,6 +111,7 @@ export function MiniAppManageView({ feature, tab }: { feature: ListingFeature; t
 
 function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureListingsTab }) {
   const t = useTranslations();
+  const mt = miniAppText(t, feature);
   const locale = asLocale(useLocale());
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const managePath = cfg.miniApp?.paths.manage ?? '/toi/tin-cua-toi';
@@ -145,7 +147,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
 
       <nav aria-label={t('listing.mini_app.manage.title')} className="no-scrollbar -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         <ul className="flex gap-1 rounded-lg border border-border bg-surface p-1 shadow-card">
-          {FEATURE_LISTINGS_TABS.map((key) => {
+          {featureListingsTabs(cfg.categories).map((key) => {
             const selected = key === tab;
             const count = summary.data?.[key];
             return (
@@ -158,7 +160,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
                     selected ? 'bg-primary text-on-primary' : 'text-muted hover:bg-surface-2 hover:text-fg',
                   )}
                 >
-                  {t(`listing.mini_app.manage.tab_${key}`)}
+                  {mt(`manage.tab_${key}`)}
                   {count !== undefined ? (
                     <span
                       className={cn(
@@ -179,7 +181,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
       <div className="flex flex-col gap-2 sm:flex-row">
         <div className="relative flex-1">
           <label htmlFor={searchId} className="sr-only">
-            {t('listing.mini_app.manage.search_placeholder')}
+            {mt('manage.search_placeholder')}
           </label>
           <Search aria-hidden strokeWidth={1.75} className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted" />
           <Input
@@ -187,7 +189,7 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
             type="search"
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
-            placeholder={t('listing.mini_app.manage.search_placeholder')}
+            placeholder={mt('manage.search_placeholder')}
             maxLength={100}
             className="rounded-full pl-11"
           />
@@ -202,8 +204,8 @@ function ManageBody({ feature, tab }: { feature: ListingFeature; tab: FeatureLis
       ) : list.items.length === 0 ? (
         <EmptyState
           icon={FileText}
-          title={t(`listing.mini_app.manage.empty_${tab}_title`)}
-          description={t(`listing.mini_app.manage.empty_${tab}_body`)}
+          title={mt(`manage.empty_${tab}_title`)}
+          description={mt(`manage.empty_${tab}_body`)}
           action={
             tab === 'active' ? (
               <Button asChild variant="accent" className="font-semibold">
@@ -285,6 +287,7 @@ function SortSelect({ value, onChange }: { value: 'newest' | 'views'; onChange: 
 /** Thẻ hồ sơ + 3 số liệu + mẹo (Stitch). */
 function ProfileCard({ feature }: { feature: ListingFeature }) {
   const t = useTranslations();
+  const mt = miniAppText(t, feature);
   const locale = asLocale(useLocale());
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const profile = useMyProfile();
@@ -296,10 +299,12 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
   const badges = (p?.badges ?? []).filter((b) => t.has(`listing.owner_badge.${b}`));
   const rated = !!p && p.rating_count > 0;
 
+  // Tính năng không có "Đã bán" (Tìm việc — chỉ Đóng tin) → bỏ ô thống kê đó (luôn 0), lưới còn 2 cột.
+  const hasSold = featureListingsTabs(cfg.categories).includes('sold');
   const stats: { key: string; label: string; value: number | undefined; tone: string }[] = [
-    { key: 'active', label: t('listing.mini_app.manage.stat_active'), value: summary.data?.active, tone: 'text-primary' },
-    { key: 'sold', label: t('listing.mini_app.manage.stat_sold'), value: summary.data?.sold, tone: cfg.tone.fg },
-    { key: 'views', label: t('listing.mini_app.manage.stat_views'), value: summary.data?.views, tone: 'text-primary' },
+    { key: 'active', label: mt('manage.stat_active'), value: summary.data?.active, tone: 'text-primary' },
+    ...(hasSold ? [{ key: 'sold', label: mt('manage.stat_sold'), value: summary.data?.sold, tone: cfg.tone.fg }] : []),
+    { key: 'views', label: mt('manage.stat_views'), value: summary.data?.views, tone: 'text-primary' },
   ];
 
   return (
@@ -345,7 +350,7 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
       {summary.isError ? (
         <InlineError code={summary.error.code} onRetry={() => void summary.refetch()} />
       ) : (
-        <dl className="grid grid-cols-3 gap-2">
+        <dl className={cn('grid gap-2', stats.length === 2 ? 'grid-cols-2' : 'grid-cols-3')}>
           {stats.map((s) => (
             <div key={s.key} className="flex flex-col-reverse items-center gap-1 rounded-md bg-surface-2 px-2 py-3 text-center">
               <dt className="text-xs font-medium text-muted sm:text-sm">{s.label}</dt>
@@ -359,7 +364,7 @@ function ProfileCard({ feature }: { feature: ListingFeature }) {
 
       <p className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-fg">
         <Lightbulb aria-hidden strokeWidth={1.75} className="mt-0.5 size-4 shrink-0 text-warning" />
-        <span>{t('listing.mini_app.manage.tip')}</span>
+        <span>{mt('manage.tip')}</span>
       </p>
     </section>
   );

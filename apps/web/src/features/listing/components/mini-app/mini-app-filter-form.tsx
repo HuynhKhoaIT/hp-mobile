@@ -38,6 +38,7 @@ import {
   PRICE_INPUT_MAX,
   parsePriceInput,
 } from '../../filters';
+import { miniAppText } from '../../mini-app-text';
 import { rememberSearch, useRecentSearches } from '../../recent-searches';
 
 const CHIP =
@@ -134,9 +135,12 @@ export function MiniAppFilterForm({
   action: string;
 }) {
   const t = useTranslations();
+  const mt = miniAppText(t, feature);
   const router = useRouter();
   const cfg = LISTING_FEATURE_CONFIGS[feature];
   const options = filterOptionsOf(cfg);
+  // Tìm việc không có ô giá / khoảng giá / "Cho tặng" → ẩn cả khối giá.
+  const hasPrice = !!options.customPrice || (options.priceRanges ?? []).length > 0 || !!options.freeOnly;
   const recent = useRecentSearches(feature);
   const qRef = useRef<HTMLInputElement>(null);
   const minRef = useRef<HTMLInputElement>(null);
@@ -283,7 +287,7 @@ export function MiniAppFilterForm({
             // Đổi danh mục → hàng loại đồ mới (bỏ lựa chọn cũ).
             key={typeField.key}
             name={typeField.key}
-            legend={t('listing.mini_app.filter.category_sub')}
+            legend={mt('filter.category_sub')}
             initial={typeof initial.attributes[typeField.key] === 'string' ? (initial.attributes[typeField.key] as string) : ''}
             choices={[
               { value: '', label: t('listing.list.filter_all') },
@@ -293,7 +297,7 @@ export function MiniAppFilterForm({
         ) : null}
       </Section>
 
-      <Section icon={MapPin} title={t('listing.mini_app.filter.location_title')} hint={locationHintKey ? t(locationHintKey) : undefined}>
+      <Section icon={MapPin} title={mt('filter.location_title')} hint={locationHintKey ? t(locationHintKey) : undefined}>
         {sites.length > 0 ? (
           <RadioChips
             name="site"
@@ -316,91 +320,93 @@ export function MiniAppFilterForm({
         ) : null}
       </Section>
 
-      <Section icon={Wallet} title={t('listing.mini_app.filter.price_title')}>
-        {options.customPrice ? (
-          <div className="flex flex-col gap-1">
-            <div className="flex items-end gap-2">
-              <PriceInput
-                ref={minRef}
-                name="price_min"
-                label={t('listing.mini_app.filter.price_min')}
-                value={priceMin}
-                invalid={priceError}
-                errorId={errorId}
-                onChange={(v) => {
-                  setPriceMin(v);
-                  setPriceError(false);
-                  if (v) {
-                    setPriceRange('');
-                    setFreeOnly(false);
-                  }
-                }}
-              />
-              <span aria-hidden className="pb-3 text-muted">
-                –
-              </span>
-              <PriceInput
-                name="price_max"
-                label={t('listing.mini_app.filter.price_max')}
-                value={priceMax}
-                invalid={priceError}
-                errorId={errorId}
-                onChange={(v) => {
-                  setPriceMax(v);
-                  setPriceError(false);
-                  if (v) {
-                    setPriceRange('');
-                    setFreeOnly(false);
-                  }
-                }}
-              />
+      {hasPrice ? (
+        <Section icon={Wallet} title={t('listing.mini_app.filter.price_title')}>
+          {options.customPrice ? (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-end gap-2">
+                <PriceInput
+                  ref={minRef}
+                  name="price_min"
+                  label={t('listing.mini_app.filter.price_min')}
+                  value={priceMin}
+                  invalid={priceError}
+                  errorId={errorId}
+                  onChange={(v) => {
+                    setPriceMin(v);
+                    setPriceError(false);
+                    if (v) {
+                      setPriceRange('');
+                      setFreeOnly(false);
+                    }
+                  }}
+                />
+                <span aria-hidden className="pb-3 text-muted">
+                  –
+                </span>
+                <PriceInput
+                  name="price_max"
+                  label={t('listing.mini_app.filter.price_max')}
+                  value={priceMax}
+                  invalid={priceError}
+                  errorId={errorId}
+                  onChange={(v) => {
+                    setPriceMax(v);
+                    setPriceError(false);
+                    if (v) {
+                      setPriceRange('');
+                      setFreeOnly(false);
+                    }
+                  }}
+                />
+              </div>
+              {priceError ? (
+                <p id={errorId} role="alert" className="text-sm font-medium text-danger">
+                  {t('listing.mini_app.filter.price_invalid')}
+                </p>
+              ) : null}
             </div>
-            {priceError ? (
-              <p id={errorId} role="alert" className="text-sm font-medium text-danger">
-                {t('listing.mini_app.filter.price_invalid')}
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-        {(options.priceRanges ?? []).length > 0 ? (
-          <RadioChips
-            name="price"
-            legend={t('listing.price_range.label')}
-            value={priceRange}
-            onChange={(v) => {
-              setPriceRange(v);
-              if (v) {
-                setPriceMin('');
-                setPriceMax('');
-                setPriceError(false);
-                setFreeOnly(false);
-              }
-            }}
-            choices={[
-              { value: '', label: t('listing.price_range.any') },
-              ...(options.priceRanges ?? []).map((r) => ({ value: r.key, label: t(`listing.price_range.${r.key}`) })),
-            ]}
-          />
-        ) : null}
-        {options.freeOnly ? (
-          <label className={cn(CHIP, 'self-start')}>
-            <input
-              type="checkbox"
-              name="free"
-              value="1"
-              checked={freeOnly}
-              onChange={(e) => {
-                const on = e.currentTarget.checked;
-                setFreeOnly(on);
-                if (on) clearPrice();
+          ) : null}
+          {(options.priceRanges ?? []).length > 0 ? (
+            <RadioChips
+              name="price"
+              legend={t('listing.price_range.label')}
+              value={priceRange}
+              onChange={(v) => {
+                setPriceRange(v);
+                if (v) {
+                  setPriceMin('');
+                  setPriceMax('');
+                  setPriceError(false);
+                  setFreeOnly(false);
+                }
               }}
-              className="sr-only"
+              choices={[
+                { value: '', label: t('listing.price_range.any') },
+                ...(options.priceRanges ?? []).map((r) => ({ value: r.key, label: t(`listing.price_range.${r.key}`) })),
+              ]}
             />
-            <Gift aria-hidden strokeWidth={1.75} className="size-5 text-success" />
-            {t('listing.list.quick_free')}
-          </label>
-        ) : null}
-      </Section>
+          ) : null}
+          {options.freeOnly ? (
+            <label className={cn(CHIP, 'self-start')}>
+              <input
+                type="checkbox"
+                name="free"
+                value="1"
+                checked={freeOnly}
+                onChange={(e) => {
+                  const on = e.currentTarget.checked;
+                  setFreeOnly(on);
+                  if (on) clearPrice();
+                }}
+                className="sr-only"
+              />
+              <Gift aria-hidden strokeWidth={1.75} className="size-5 text-success" />
+              {t('listing.list.quick_free')}
+            </label>
+          ) : null}
+        </Section>
+      ) : null}
 
       {filterCfg?.toggles && toggleKeys.length > 0 ? (
         <Section icon={ListChecks} title={t(filterCfg.toggles.titleKey)}>

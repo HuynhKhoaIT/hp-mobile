@@ -148,9 +148,10 @@ export type ListingMiniApp = {
   /** Khối `trust`. */
   trust?: { titleKey: string; bodyKey: string };
   /**
-   * Khối `featured`: tiêu đề + dòng phụ; nhãn nút Gọi / Nhắn tin của thẻ lớn và nhãn số ảnh (`photosKey` nhận {count}).
+   * Tiêu đề + dòng phụ của khối danh sách (`latest` hoặc `featured`; thiếu → "Tin mới đăng quanh bạn"). Khối `featured` cần
+   * thêm nhãn nút Gọi / Nhắn tin của thẻ lớn và nhãn số ảnh (`photosKey` nhận {count}); `latest` (Tìm việc) không dùng ba nhãn đó.
    */
-  list?: { titleKey: string; subtitleKey?: string; callKey: string; chatKey: string; photosKey: string };
+  list?: { titleKey: string; subtitleKey?: string; callKey?: string; chatKey?: string; photosKey?: string };
   /** Khối `promo`: mời đăng tin → trang đăng của mini-app chọn sẵn `category`. */
   promo?: { eyebrowKey: string; titleKey: string; bodyKey: string; ctaKey: string; category: ListingCategory };
   /**
