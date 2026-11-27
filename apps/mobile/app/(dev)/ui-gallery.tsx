@@ -3,6 +3,7 @@
 // Có sẵn bộ chuyển sáng / tối và ngôn ngữ để rà màn ở cả 3 ngôn ngữ, 2 giao diện.
 import type { PublicGroup, PublicListing } from '@hp/core';
 import { APP_NAME, LISTING_SORTS, LOCALES, type ListingCategory, type ListingSort, type Locale } from '@hp/shared';
+import { serviceArtKey, tradeArtKey } from '@hp/tokens/category-art';
 import { Redirect } from 'expo-router';
 import {
   Baby,
@@ -159,6 +160,18 @@ function sampleListing(over: Partial<PublicListing>): PublicListing {
 }
 const SAMPLE_CATEGORIES: ListingCategory[] = ['pass_vehicle', 'room_rent', 'job_parttime', 'lost'];
 /** Ô danh mục trang chủ Pass đồ (6 ô → hàng thứ hai thiếu, ServiceGrid bù chỗ trống). */
+/** Hình dịch vụ Hub (`serviceArtKey`) + 5 loại thợ Gọi thợ (`tradeArtKey`) — khoá nhãn i18n đi kèm. */
+const GALLERY_SERVICE_ART: readonly { art: string; labelKey: string }[] = [
+  ...(['pass', 'room', 'job', 'lostFound', 'ride', 'sport', 'goiTho'] as const).map((id) => ({
+    art: serviceArtKey(id),
+    labelKey: `common:feature.${id}`,
+  })),
+  ...(['electric_plumbing', 'cleaning', 'welding', 'hvac', 'other'] as const).map((code) => ({
+    art: tradeArtKey(code),
+    labelKey: `tho:trade.${code}`,
+  })),
+];
+
 const GALLERY_CATEGORY_TILES: readonly { category: ListingCategory; icon: LucideIcon }[] = [
   { category: 'pass_electronics', icon: Smartphone },
   { category: 'pass_vehicle', icon: Bike },
@@ -517,6 +530,18 @@ export default function UiGalleryScreen() {
                   label={t(`listing:category_short.${category}`)}
                   onPress={() => toast.show(t(`category.${category}`))}
                 />
+              </View>
+            ))}
+          </ServiceGrid>
+        </View>
+      </Section>
+
+      <Section title="ServiceTile grid · art dịch vụ Hub + loại thợ (serviceArtKey / tradeArtKey)">
+        <View className="rounded-lg border border-border bg-surface p-4 shadow-card">
+          <ServiceGrid columns={4}>
+            {GALLERY_SERVICE_ART.map(({ art, labelKey }) => (
+              <View key={art} className="flex-1">
+                <ServiceTile variant="grid" service="pass" art={art} label={t(labelKey)} onPress={() => toast.show(t(labelKey))} />
               </View>
             ))}
           </ServiceGrid>

@@ -4,14 +4,14 @@
 // Khớp web (apps/web/src/features/goi-tho/components/request-card.tsx): đổi một bên → đổi bên kia.
 import type { PublicServiceRequest } from '@hp/core';
 import { serviceRequestDisplayStatus } from '@hp/shared';
+import { tradeArtKey } from '@hp/tokens/category-art';
 import { MessageSquareQuote } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatRelative } from '@/lib/format';
-import { Badge, Card, Icon, Skeleton, Text } from '@/ui';
+import { Badge, Card, CategoryArt, Icon, Skeleton, Text } from '@/ui';
 import { useBudgetText } from '../hooks';
-import { TRADE_ICON } from '../trades';
 import { RequestStatusBadge } from './RequestStatusBadge';
 
 type CardRequest = Pick<
@@ -41,9 +41,7 @@ export function RequestCard({ request, onPress, extra }: RequestCardProps) {
       className="gap-3"
     >
       <View className="flex-row items-start gap-3">
-        <View className="size-12 items-center justify-center rounded-md border border-service-goi-tho/20 bg-service-goi-tho-soft">
-          <Icon icon={TRADE_ICON[request.trade]} service="goiTho" size="tab" />
-        </View>
+        <CategoryArt category={tradeArtKey(request.trade)} />
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="muted" numberOfLines={1}>
             {trade}

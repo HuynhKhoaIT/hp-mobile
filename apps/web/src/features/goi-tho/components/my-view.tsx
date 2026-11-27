@@ -6,9 +6,11 @@
 import type { MyServiceQuote } from '@hp/core';
 import { useMyServiceQuotes, useMyServiceRequests, useSession } from '@hp/core/react';
 import { formatMoney, formatRelative, serviceQuoteDisplayStatus } from '@hp/shared';
+import { tradeArtKey } from '@hp/tokens/category-art';
 import { ClipboardList, MessageSquareQuote } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { CategoryArt } from '@/components/shared/category-art';
 import { ChoiceChip } from '@/components/shared/choice-chip';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
@@ -16,7 +18,7 @@ import { SignInPrompt } from '@/components/shared/sign-in-prompt';
 import { Button } from '@/components/ui/button';
 import { asLocale } from '@/features/listing/display';
 import { Link } from '@/i18n/navigation';
-import { GOI_THO_PATHS, TRADE_ICON } from '../trades';
+import { GOI_THO_PATHS } from '../trades';
 import { RequestCard, RequestCardSkeleton } from './request-card';
 import { QuoteStatusBadge, RequestStatusBadge } from './request-status-badge';
 
@@ -146,7 +148,6 @@ function MyQuotes() {
 function MyQuoteCard({ quote }: { quote: MyServiceQuote }) {
   const t = useTranslations('tho');
   const locale = asLocale(useLocale());
-  const TradeIcon = TRADE_ICON[quote.trade];
   const meta = [quote.customer_name, quote.site_name, formatRelative(quote.quoted_at, locale)].filter(Boolean).join(' · ');
   return (
     <Link
@@ -154,9 +155,7 @@ function MyQuoteCard({ quote }: { quote: MyServiceQuote }) {
       className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-card outline-none transition hover:-translate-y-0.5 hover:bg-surface-2 focus-visible:ring-3 focus-visible:ring-ring/50 motion-reduce:hover:translate-y-0"
     >
       <span className="flex items-start gap-3">
-        <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-md border border-service-goi-tho/20 bg-service-goi-tho-soft">
-          <TradeIcon strokeWidth={1.75} className="size-6 text-service-goi-tho" />
-        </span>
+        <CategoryArt category={tradeArtKey(quote.trade)} className="size-12" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="truncate text-sm text-muted">{t(`trade.${quote.trade}`)}</span>
           <span className="line-clamp-2 text-lg font-semibold text-fg">{quote.title}</span>

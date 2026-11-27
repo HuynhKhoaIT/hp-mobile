@@ -19,6 +19,7 @@ import {
   SERVICE_URGENCIES,
   type ServiceTrade,
 } from '@hp/shared';
+import { tradeArtKey } from '@hp/tokens/category-art';
 import { Wrench } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -43,6 +44,8 @@ import {
   PriceInput,
   Row,
   SectionHeader,
+  ServiceGrid,
+  ServiceTile,
   Skeleton,
   StickyCta,
   SuccessScreen,
@@ -50,7 +53,7 @@ import {
   toast,
 } from '@/ui';
 import { backOrHome, openServiceRequest, openThoTab } from '../navigation';
-import { TRADE_ICON, TRADES } from '../trades';
+import { TRADES } from '../trades';
 
 type Photo = ImagePickerItem & { path?: string; picked?: PickedImage };
 
@@ -239,18 +242,19 @@ export function RequestForm({ requestId, trade }: RequestFormProps) {
           render={({ field }) => (
             <Block title={t('form.trade')}>
               <View accessibilityLabel={t('form.trade')}>
-                <Row gap={2} wrap>
+                <ServiceGrid columns={3}>
                   {TRADES.map((code) => (
-                    <Chip
-                      key={code}
-                      label={t(`trade.${code}`)}
-                      selected={field.value === code}
-                      disabled={editing}
-                      trailingIcon={TRADE_ICON[code]}
-                      onPress={() => field.onChange(code)}
-                    />
+                    <View key={code} className={editing ? 'flex-1 opacity-60' : 'flex-1'}>
+                      <ServiceTile
+                        service="goiTho"
+                        art={tradeArtKey(code)}
+                        label={t(`trade.${code}`)}
+                        selected={field.value === code}
+                        onPress={editing ? undefined : () => field.onChange(code)}
+                      />
+                    </View>
                   ))}
-                </Row>
+                </ServiceGrid>
               </View>
               <Text variant="caption" tone="muted">
                 {t(`trade_hint.${field.value}`)}

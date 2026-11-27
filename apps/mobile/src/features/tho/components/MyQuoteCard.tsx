@@ -2,11 +2,11 @@
 // báo (đậm, primary) → người cần thợ · khu. Bấm → chi tiết yêu cầu. my_service_quotes không có hạn → trạng thái yêu cầu theo DB.
 import type { MyServiceQuote } from '@hp/core';
 import { serviceQuoteDisplayStatus } from '@hp/shared';
+import { tradeArtKey } from '@hp/tokens/category-art';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { formatMoney, formatRelative } from '@/lib/format';
-import { Card, Icon, Text } from '@/ui';
-import { TRADE_ICON } from '../trades';
+import { Card, CategoryArt, Text } from '@/ui';
 import { QuoteStatusBadge, RequestStatusBadge } from './RequestStatusBadge';
 
 export function MyQuoteCard({ quote, onPress }: { quote: MyServiceQuote; onPress: () => void }) {
@@ -21,9 +21,7 @@ export function MyQuoteCard({ quote, onPress }: { quote: MyServiceQuote; onPress
       className="gap-3"
     >
       <View className="flex-row items-start gap-3">
-        <View className="size-12 items-center justify-center rounded-md border border-service-goi-tho/20 bg-service-goi-tho-soft">
-          <Icon icon={TRADE_ICON[quote.trade]} service="goiTho" size="tab" />
-        </View>
+        <CategoryArt category={tradeArtKey(quote.trade)} />
         <View className="flex-1 gap-0.5">
           <Text variant="caption" tone="muted" numberOfLines={1}>
             {t(`trade.${quote.trade}`)}
