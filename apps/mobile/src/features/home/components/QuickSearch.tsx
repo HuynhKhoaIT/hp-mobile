@@ -1,6 +1,7 @@
 // "Tìm nhanh" (§4.6, §10, style Stitch): tiêu đề khối nhỏ text-md 600 + hàng chip cuộn ngang tràn mép (gap-2, lề 16)
 // từ HOME_SHORTCUTS. Chip pill cao 40 nền surface viền border, chấm cam size-2 (bg-accent) trước chữ. Bấm → danh sách của tính năng với bộ lọc
 // đặt sẵn (params `shortcut` của màn List) + event home_shortcut_click.
+import { useMiniApps } from '@hp/core/react';
 import { HOME_SHORTCUTS } from '@hp/shared';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
@@ -10,6 +11,10 @@ import { openShortcut } from '../navigation';
 
 export function QuickSearch() {
   const { t } = useTranslation();
+  const miniApps = useMiniApps();
+  // Chip của mini-app đang tắt (admin) bị ẩn; không còn chip nào → ẩn cả khối.
+  const shortcuts = HOME_SHORTCUTS.filter((s) => miniApps.isEnabled(s.feature));
+  if (shortcuts.length === 0) return null;
   return (
     <View className="gap-3">
       <SectionHeader className="px-4" size="md" title={t('home.shortcuts_title')} />
@@ -19,7 +24,7 @@ export function QuickSearch() {
         // Chừa 4 trên / dưới cho vùng chạm mở rộng (hitSlop) của chip không bị cắt.
         contentContainerClassName="gap-2 px-4 py-1"
       >
-        {HOME_SHORTCUTS.map((s) => (
+        {shortcuts.map((s) => (
           <Chip
             key={s.id}
             size="sm"

@@ -10,9 +10,21 @@ import { GROUP_CONFIGS, isGroupKind } from '@/features/configs';
 import { GroupBrowser } from '@/features/group/components/GroupBrowser';
 import { useCreateGroupAction } from '@/features/group/hooks';
 import { backOrHome } from '@/features/group/navigation';
+import { MiniAppGate } from '@/features/home/components/MiniAppGate';
 import { Fab, Screen, useScheme } from '@/ui';
 
-export default function GroupListScreen() {
+/** Admin tắt mini-app (bảng mini_apps) → màn "Chưa mở". Kind sai → GroupListScreen đưa về trang chủ. */
+export default function GroupListRoute() {
+  const { kind } = useLocalSearchParams<{ kind: string }>();
+  if (!isGroupKind(kind)) return <GroupListScreen />;
+  return (
+    <MiniAppGate code={kind}>
+      <GroupListScreen />
+    </MiniAppGate>
+  );
+}
+
+function GroupListScreen() {
   const { t } = useTranslation('group');
   const focused = useIsFocused();
   const scheme = useScheme();

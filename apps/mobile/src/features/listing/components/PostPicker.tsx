@@ -5,6 +5,7 @@
 // Config các tính năng do route truyền vào (engine không import feature khác).
 // Mở từ mini-app (`mini`): tính năng đã cố định → chỉ lưới danh mục của nó; chọn danh mục giữ `mini` cho form và thay
 // (replace) màn chọn → stack chỉ còn mini-app + form: "Xem tin" / "Đăng tin khác" ở màn kết quả không quay về bộ chọn cũ.
+import { useMiniApps } from '@hp/core/react';
 import { LISTING_FEATURES, type ListingCategory, type ListingFeature } from '@hp/shared';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +27,9 @@ export type PostPickerProps = {
 
 export function PostPicker({ configs, initialFeature, mini }: PostPickerProps) {
   const { t } = useTranslation('listing');
+  // Tính năng của mini-app đang tắt (admin — bảng mini_apps) không còn trong bộ chọn loại tin.
+  const miniApps = useMiniApps();
+  const featureOrder = FEATURE_ORDER.filter((f) => miniApps.isEnabled(f));
   const [feature, setFeature] = useState<ListingFeature | null>(initialFeature ?? null);
   const locked = !!mini && !!initialFeature;
   const pick = (category: ListingCategory) => requireAuth(() => openPostForm(category, { mini, replace: !!mini }));
@@ -39,7 +43,7 @@ export function PostPicker({ configs, initialFeature, mini }: PostPickerProps) {
           </Text>
           {/* Lưới 2 cột: ô w-1/2 + p-1.5, khung -m-1.5 → khoảng cách ô 12. */}
           <View className="-m-1.5 flex-row flex-wrap">
-            {FEATURE_ORDER.map((f) => (
+            {featureOrder.map((f) => (
               <View key={f} className="w-1/2 p-1.5">
                 <ServiceTile service={f} label={t(`common:feature.${f}`)} selected={feature === f} onPress={() => setFeature(f)} />
               </View>

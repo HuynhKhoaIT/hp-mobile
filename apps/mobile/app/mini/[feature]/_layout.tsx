@@ -22,6 +22,7 @@ import { Archive, Heart, MessagesSquare, Plus, Store } from 'lucide-react-native
 import { useTranslation } from 'react-i18next';
 import { useFeatureUnreadCount } from '@/features/chat/hooks';
 import { LISTING_CONFIGS_BY_SLUG } from '@/features/configs';
+import { MiniAppGate } from '@/features/home/components/MiniAppGate';
 import { useHomeSite } from '@/features/home/hooks';
 import { useListingPreset, usePostListing } from '@/features/listing/hooks';
 import { isMiniAppConfig, type MiniAppFeatureConfig, MiniAppContext, useMiniSession } from '@/features/listing/miniApp';
@@ -35,7 +36,12 @@ export default function MiniAppLayout() {
   const config = LISTING_CONFIGS_BY_SLUG[feature ?? ''];
   if (!config) return <Redirect href="/" />;
   if (!isMiniAppConfig(config)) return <Redirect href={{ pathname: '/listings/[feature]', params: { feature: config.slug } }} />;
-  return <MiniAppShell config={config} />;
+  // Admin tắt mini-app (bảng mini_apps) → màn "Chưa mở", chặn cả deep link.
+  return (
+    <MiniAppGate code={config.key}>
+      <MiniAppShell config={config} />
+    </MiniAppGate>
+  );
 }
 
 function MiniAppShell({ config }: { config: MiniAppFeatureConfig }) {

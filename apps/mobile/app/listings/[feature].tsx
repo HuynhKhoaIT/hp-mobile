@@ -16,9 +16,24 @@ import { useHomeSite } from '@/features/home/hooks';
 import { FeatureHome } from '@/features/listing/components/FeatureHome';
 import { useListingPreset, usePostListing } from '@/features/listing/hooks';
 import { backOrHome, miniAppHref } from '@/features/listing/navigation';
+import { MiniAppGate } from '@/features/home/components/MiniAppGate';
 import { Fab, Screen, useScheme } from '@/ui';
 
+/** Admin tắt mini-app (bảng mini_apps) → màn "Chưa mở"; danh sách "Tất cả tin" (all) không thuộc mini-app nào. */
 export default function ListingListRoute() {
+  const { feature } = useLocalSearchParams<{ feature: string }>();
+  const config = LISTING_CONFIGS_BY_SLUG[feature ?? ''];
+  if (config && config.key !== 'all') {
+    return (
+      <MiniAppGate code={config.key}>
+        <ListingListScreen />
+      </MiniAppGate>
+    );
+  }
+  return <ListingListScreen />;
+}
+
+function ListingListScreen() {
   const { t } = useTranslation('listing');
   const focused = useIsFocused();
   const scheme = useScheme();
