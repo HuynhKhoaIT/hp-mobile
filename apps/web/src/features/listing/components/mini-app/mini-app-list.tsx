@@ -24,6 +24,7 @@ import type { Page, PublicListing, Site } from '@hp/core';
 import type { ListingCategory, Locale } from '@hp/shared';
 import { Gift, LayoutGrid, MapPin, Megaphone, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import { CategoryArt, hasCategoryArt } from '@/components/shared/category-art';
 import { Button } from '@/components/ui/button';
 import { BannerCarousel } from '@/features/home/components/banner-carousel';
 import { getBanners } from '@/features/home/queries';
@@ -54,7 +55,9 @@ const TILE =
   'group flex h-full min-h-12 flex-col items-center gap-2 rounded-md px-0.5 py-1.5 outline-none transition duration-200 hover:bg-surface-2 focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-97 motion-reduce:active:scale-100';
 const TILE_ICON =
   'flex size-12 shrink-0 items-center justify-center rounded-md transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0';
-const TILE_LABEL = 'flex min-h-9 items-start justify-center text-center text-xs leading-tight font-medium text-fg sm:text-sm';
+/** Ô hình danh mục (CategoryArt) — cùng cỡ và chuyển động nhấc nhẹ với TILE_ICON. */
+const TILE_ART = 'size-12 transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:group-hover:translate-y-0';
+const TILE_LABEL ='flex min-h-9 items-start justify-center text-center text-xs leading-tight font-medium text-fg sm:text-sm';
 
 type ListData = {
   cfg: MiniAppConfig;
@@ -287,9 +290,13 @@ async function CategoryTiles({ cfg }: { cfg: MiniAppConfig }) {
                 aria-label={t('listing.feature_home.category_a11y', { category: label })}
                 className={TILE}
               >
-                <span aria-hidden className={cn(TILE_ICON, cfg.tone.soft)}>
-                  <Icon strokeWidth={1.75} className={cn('size-6', cfg.tone.fg)} />
-                </span>
+                {hasCategoryArt(c) ? (
+                  <CategoryArt category={c} className={TILE_ART} />
+                ) : (
+                  <span aria-hidden className={cn(TILE_ICON, cfg.tone.soft)}>
+                    <Icon strokeWidth={1.75} className={cn('size-6', cfg.tone.fg)} />
+                  </span>
+                )}
                 <span aria-hidden className={TILE_LABEL}>
                   {label}
                 </span>

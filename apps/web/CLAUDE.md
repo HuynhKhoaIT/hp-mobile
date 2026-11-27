@@ -40,7 +40,7 @@ App là sản phẩm cá nhân, độc lập, cho cộng đồng người lao đ
 - Bản đồ: Goong JS (`@goongmaps/goong-js`), chỉ tải động khi mở bản đồ
 - i18n: `next-intl`, file dịch dùng chung `packages/shared/i18n` — `vi` (mặc định), `en`, `zh`
 - Admin: TanStack Table, Recharts
-- Analytics: PostHog (sau khi đồng ý cookie), Vercel Analytics / Speed Insights; Sentry
+- Analytics: PostHog + Google Analytics 4 (`src/lib/analytics`, cả hai chỉ sau khi đồng ý cookie), Vercel Analytics / Speed Insights; Sentry
 - Deploy: Vercel (hoặc Docker trên VPS nếu tự host Supabase)
 
 Không thêm thư viện ngoài danh sách khi chưa hỏi.

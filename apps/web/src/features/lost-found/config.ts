@@ -3,8 +3,9 @@
 // returnable: chủ tin xem "Tin có thể khớp" (trigger khớp tự động) + "Đã nhận lại đồ" (attributes.returned + đóng tin).
 import { LISTING_FEATURE_PATHS } from '@hp/core';
 import { LISTING_FEATURES } from '@hp/shared';
-import { HandHeart, Megaphone, Search } from 'lucide-react';
+import { BookUser, HandHeart, KeyRound, Megaphone, Search, Smartphone, Wallet } from 'lucide-react';
 import type { ListingFeatureConfig } from '@/features/listing/feature-config';
+import { miniAppPaths } from '@/features/listing/mini-app-routes';
 
 export const lostFoundConfig: ListingFeatureConfig = {
   feature: 'lostFound',
@@ -56,5 +57,77 @@ export const lostFoundConfig: ListingFeatureConfig = {
     privacyNotice: true,
     titleHintKey: 'listing.form.title_hint_lostFound',
     descriptionHintKey: 'listing.form.description_hint_lostFound',
+  },
+  // Mini-app "Đồ Thất Lạc Dung Quất" (khớp app mini/lost-found): màu hổ phách, header + trang chủ kiểu 'directory' như Nhà Trọ /
+  // Việc Làm; 2 ô danh mục "Làm mất" / "Nhặt được" + ô loại đồ (?item_type=), danh sách là thẻ hàng ngang (`latest` — tin ít ảnh
+  // nên không có thẻ lớn `featured`). Không có "Đã bán" (chỉ Đóng tin / "Đã nhận lại đồ" → Quản lý tin không có tab "Đã bán":
+  // featureListingsTabs). Chi tiết giữ "Tin có thể khớp" + "Đã nhận lại đồ" (returnable).
+  miniApp: {
+    titleKey: 'listing.mini_app.title.lostFound',
+    subtitleKey: 'listing.mini_app.subtitle.lostFound',
+    homeTabKey: 'listing.mini_app.tabs.home.lostFound',
+    theme: 'lost-found',
+    HomeIcon: Megaphone,
+    header: { variant: 'directory', badgeKey: 'listing.mini_app.lost-found.badge', nearLabelKey: 'listing.mini_app.lost-found.near_label' },
+    home: ['tiles', 'chips', 'trust', 'latest', 'promo'],
+    tiles: {
+      titleKey: 'listing.mini_app.lost-found.categories_title',
+      items: [
+        { kind: 'category', category: 'lost' },
+        { kind: 'category', category: 'found' },
+        {
+          kind: 'filter',
+          key: 'card',
+          labelKey: 'listing.mini_app.lost-found.tile_card',
+          hintKey: 'listing.mini_app.lost-found.tile_card_hint',
+          Icon: BookUser,
+          filter: { attributes: { item_type: 'card' } },
+        },
+        {
+          kind: 'filter',
+          key: 'wallet',
+          labelKey: 'listing.mini_app.lost-found.tile_wallet',
+          hintKey: 'listing.mini_app.lost-found.tile_wallet_hint',
+          Icon: Wallet,
+          filter: { attributes: { item_type: 'wallet' } },
+        },
+        {
+          kind: 'filter',
+          key: 'phone',
+          labelKey: 'listing.mini_app.lost-found.tile_phone',
+          hintKey: 'listing.mini_app.lost-found.tile_phone_hint',
+          Icon: Smartphone,
+          filter: { attributes: { item_type: 'phone' } },
+        },
+        {
+          kind: 'filter',
+          key: 'keys',
+          labelKey: 'listing.mini_app.lost-found.tile_keys',
+          hintKey: 'listing.mini_app.lost-found.tile_keys_hint',
+          Icon: KeyRound,
+          filter: { attributes: { item_type: 'keys' } },
+        },
+      ],
+    },
+    trust: { titleKey: 'listing.mini_app.lost-found.trust_title', bodyKey: 'listing.mini_app.lost-found.trust_body' },
+    list: { titleKey: 'listing.mini_app.lost-found.list_title', subtitleKey: 'listing.mini_app.lost-found.list_subtitle' },
+    promo: {
+      eyebrowKey: 'listing.mini_app.lost-found.finder_eyebrow',
+      titleKey: 'listing.mini_app.lost-found.finder_title',
+      bodyKey: 'listing.mini_app.lost-found.finder_body',
+      ctaKey: 'listing.mini_app.lost-found.finder_cta',
+      category: 'found',
+    },
+    filter: {
+      categoryTitleKey: 'listing.mini_app.lost-found.filter.category_title',
+      locationHintKey: 'listing.mini_app.lost-found.filter.location_hint',
+    },
+    savedTip: { titleKey: 'listing.mini_app.lost-found.saved.tip_title', bodyKey: 'listing.mini_app.lost-found.saved.tip_body' },
+    paths: miniAppPaths(LISTING_FEATURE_PATHS.lostFound),
+  },
+  detail: {
+    activeStatusKey: 'listing.mini_app.lost_found_detail.open',
+    updatedLine: { key: 'listing.mini_app.lost_found_detail.updated' },
+    posterTitleKey: 'listing.mini_app.lost_found_detail.poster_title',
   },
 };

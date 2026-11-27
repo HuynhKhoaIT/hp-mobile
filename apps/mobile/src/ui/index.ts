@@ -8,6 +8,7 @@ export { BookmarkButton, type BookmarkButtonProps } from './BookmarkButton';
 export { BottomSheet, type BottomSheetProps } from './BottomSheet';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './Button';
 export { Card, type CardProps } from './Card';
+export { CategoryArt, type CategoryArtProps, hasCategoryArt } from './CategoryArt';
 export { Checkbox, type CheckboxProps } from './Checkbox';
 export { ChatScrollView } from './ChatScrollView';
 export { Chip, type ChipProps } from './Chip';

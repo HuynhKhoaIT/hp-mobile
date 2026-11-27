@@ -8,6 +8,7 @@
 import type { ListingCategory, ListingFeature } from '@hp/shared';
 import { GROUP_KINDS } from '@hp/shared';
 import { useTranslations } from 'next-intl';
+import { CategoryArt, hasCategoryArt } from '@/components/shared/category-art';
 import { GROUP_FEATURE_CONFIGS } from '@/features/group/features';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
@@ -84,9 +85,13 @@ export function FeaturePicker({
                     selected ? 'border-2 border-primary bg-primary-light' : 'border-border hover:bg-surface-2',
                   )}
                 >
-                  <span aria-hidden className={cn('flex size-10 items-center justify-center rounded-md', cfg.tone.soft)}>
-                    <CategoryIcon strokeWidth={1.75} className={cn('size-5', cfg.tone.fg)} />
-                  </span>
+                  {hasCategoryArt(c) ? (
+                    <CategoryArt category={c} className="size-12" />
+                  ) : (
+                    <span aria-hidden className={cn('flex size-10 items-center justify-center rounded-md', cfg.tone.soft)}>
+                      <CategoryIcon strokeWidth={1.75} className={cn('size-5', cfg.tone.fg)} />
+                    </span>
+                  )}
                   <span className="text-md font-semibold text-fg">{t(`common.category.${c}`)}</span>
                   <span className="text-sm text-muted">{t(`listing.form.category_hint.${c}`)}</span>
                 </button>
