@@ -623,6 +623,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"mini_apps": {
+                  Row: {
+                    "code": string,"created_at": string,"is_enabled": boolean,"sort_order": number,"updated_at": string,"updated_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "code": string,"created_at"?: string,"is_enabled"?: boolean,"sort_order"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "code"?: string,"created_at"?: string,"is_enabled"?: boolean,"sort_order"?: number,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "mini_apps_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "mini_apps_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"moderation_queue": {
                   Row: {
                     "created_at": string,"id": string,"listing_id": string,"note": string | null,"reasons": (string)[],"reviewed_at": string | null,"reviewed_by": string | null,"risk_score": number,"status": string,"updated_at": string
