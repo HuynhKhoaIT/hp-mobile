@@ -20,7 +20,7 @@ import { asLocale } from '@/features/listing/display';
 import { Link } from '@/i18n/navigation';
 import type { Query } from '../../lib/params';
 import { useAdminAction } from '../../lib/use-admin-action';
-import { cancelReportedGroupAction, hideReportedListingAction, setReportsStatusAction } from '../actions';
+import { cancelReportedGroupAction, cancelReportedRequestAction, hideReportedListingAction, setReportsStatusAction } from '../actions';
 
 const BASE = '/admin/reports';
 
@@ -135,6 +135,14 @@ export function ReportsView({ data, query, now }: { data: AdminPage<AdminReport>
                     </DropdownMenuItem>
                   </>
                 ) : null}
+                {r.target_type === 'service_request' && r.target.title && !r.target.deleted ? (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive" onSelect={() => setConfirm({ kind: 'cancel', report: r })}>
+                      {t('cancel_request')}
+                    </DropdownMenuItem>
+                  </>
+                ) : null}
               </>
             ) : null}
             {r.target.owner_id ? (
@@ -219,11 +227,21 @@ export function ReportsView({ data, query, now }: { data: AdminPage<AdminReport>
           confirm?.kind === 'hide'
             ? t('hide.title', { title: confirm.report.target.title ?? '' })
             : confirm?.kind === 'cancel'
-              ? t('cancel.title', { title: confirm.report.target.title ?? '' })
+              ? t(confirm.report.target_type === 'service_request' ? 'cancel_request_dialog.title' : 'cancel.title', {
+                  title: confirm.report.target.title ?? '',
+                })
               : ''
         }
-        description={confirm?.kind === 'cancel' ? t('cancel.description') : t('hide.description')}
-        confirmLabel={confirm?.kind === 'cancel' ? t('cancel.confirm') : t('hide.confirm')}
+        description={
+          confirm?.kind === 'cancel'
+            ? t(confirm.report.target_type === 'service_request' ? 'cancel_request_dialog.description' : 'cancel.description')
+            : t('hide.description')
+        }
+        confirmLabel={
+          confirm?.kind === 'cancel'
+            ? t(confirm.report.target_type === 'service_request' ? 'cancel_request_dialog.confirm' : 'cancel.confirm')
+            : t('hide.confirm')
+        }
         destructive
         pending={pending}
         note={{ label: t('note_label'), hint: t('note_hint'), required: true, max: 500 }}
@@ -233,6 +251,8 @@ export function ReportsView({ data, query, now }: { data: AdminPage<AdminReport>
           setConfirm(null);
           if (kind === 'hide') {
             run(() => hideReportedListingAction({ listingId: report.target_id, note }), { success: t('toast.hidden') });
+          } else if (report.target_type === 'service_request') {
+            run(() => cancelReportedRequestAction({ requestId: report.target_id, note }), { success: t('toast.request_cancelled') });
           } else {
             run(() => cancelReportedGroupAction({ groupId: report.target_id, note }), { success: t('toast.cancelled') });
           }
@@ -250,9 +270,11 @@ function TargetLink({ report, label }: { report: AdminReport; label: string }) {
       ? `/tin/${target.slug}`
       : target.type === 'group' && target.slug
         ? `/nhom/${target.slug}`
-        : target.type === 'profile'
-          ? `/admin/users/${target.id}`
-          : null;
+        : target.type === 'service_request'
+          ? `/goi-tho/yeu-cau/${target.id}`
+          : target.type === 'profile'
+            ? `/admin/users/${target.id}`
+            : null;
   if (!href || !target.title) return <span className="font-medium text-muted">{label}</span>;
   const external = target.type !== 'profile';
   return (

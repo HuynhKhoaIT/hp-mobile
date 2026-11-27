@@ -1,7 +1,7 @@
 // Dashboard /admin: hàng chờ cần xử lý (link vào từng màn) → số liệu cộng đồng → tin đang đăng theo danh mục.
 // Nguồn: RPC admin_stats (staff). Chưa tách web / app, chưa có lượt vào từ Google / lượt tải app / lead (docs/plan/web.md 3l).
 import { LISTING_CATEGORIES, formatNumber } from '@hp/shared';
-import { BadgeCheck, CalendarClock, FileText, Flag, MessagesSquare, ShieldCheck, Store, UserX, Users } from 'lucide-react';
+import { BadgeCheck, CalendarClock, FileText, Flag, MessagesSquare, ShieldCheck, Store, UserX, Users, Wrench } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { StatCard } from '@/components/admin/states';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,6 +82,15 @@ export async function OverviewStats() {
               hint={t('new_7d', { count: stats.groups_new_7d })}
               Icon={CalendarClock}
               href="/admin/groups"
+            />
+          </li>
+          <li>
+            <StatCard
+              label={t('requests_open')}
+              value={n(stats.requests_open)}
+              hint={t('new_7d', { count: stats.requests_new_7d })}
+              Icon={Wrench}
+              tone="neutral"
             />
           </li>
           <li>
