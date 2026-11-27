@@ -60,6 +60,7 @@ export const serviceColors = {
     ride: { fg: '#1B8A86', soft: '#E4F4F3' },      // xanh ngọc
     sport: { fg: '#D2555A', soft: '#FCECEC' },     // đỏ san hô
     lostFound: { fg: '#A87A00', soft: '#FBF3D9' }, // vàng mật ong
+    goiTho: { fg: '#7C3AED', soft: '#F3EEFF' },    // tím violet (2026-11-28: mini-app Gọi thợ)
   },
   dark: {
     pass: { fg: '#F0A070', soft: '#3A2A20' },
@@ -68,6 +69,7 @@ export const serviceColors = {
     ride: { fg: '#5FC4BF', soft: '#1A3332' },
     sport: { fg: '#EE8A8D', soft: '#3A2224' },
     lostFound: { fg: '#E6BE55', soft: '#3A3220' },
+    goiTho: { fg: '#C4B5FD', soft: '#2A1F4A' },
   },
 } as const;
 export type ServiceKey = keyof (typeof serviceColors)['light'];
@@ -93,6 +95,7 @@ export const appThemes = {
     ride: { primary: '#0F766E', primaryLight: '#E6F6F4', onPrimary: '#FFFFFF', gradient: ['#134E4A', '#0D9488'] },
     sport: { primary: '#BE123C', primaryLight: '#FFEEF1', onPrimary: '#FFFFFF', gradient: ['#9F1239', '#E11D48'] },
     lostFound: { primary: '#B45309', primaryLight: '#FFF6E0', onPrimary: '#FFFFFF', gradient: ['#92400E', '#D97706'] },
+    goiTho: { primary: '#6D28D9', primaryLight: '#F3EEFF', onPrimary: '#FFFFFF', gradient: ['#5B21B6', '#7C3AED'] },
   },
   dark: {
     pass: { primary: '#FB923C', primaryLight: '#3A2414', onPrimary: '#0B1120', gradient: ['#7C2D12', '#9A3412'] },
@@ -101,6 +104,7 @@ export const appThemes = {
     ride: { primary: '#2DD4BF', primaryLight: '#0F2E2C', onPrimary: '#0B1120', gradient: ['#134E4A', '#115E59'] },
     sport: { primary: '#FB7185', primaryLight: '#3A1620', onPrimary: '#0B1120', gradient: ['#881337', '#9F1239'] },
     lostFound: { primary: '#FBBF24', primaryLight: '#3A2A10', onPrimary: '#0B1120', gradient: ['#78350F', '#92400E'] },
+    goiTho: { primary: '#A78BFA', primaryLight: '#2A1F4A', onPrimary: '#0B1120', gradient: ['#3B0764', '#4C1D95'] },
   },
 } as const satisfies Record<'light' | 'dark', Record<string, { primary: string; primaryLight: string; onPrimary: string; gradient: readonly [string, string] }>>;
 export type AppThemeKey = keyof (typeof appThemes)['light'];
