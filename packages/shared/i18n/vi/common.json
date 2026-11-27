@@ -41,7 +41,8 @@
     "job": "Tìm việc",
     "lostFound": "Đồ thất lạc",
     "ride": "Ghép xe về quê",
-    "sport": "Kèo thể thao"
+    "sport": "Kèo thể thao",
+    "goiTho": "Gọi thợ"
   },
   "status": {
     "draft": "Bản nháp",
@@ -200,7 +201,9 @@
       "listing": "tin đăng",
       "group": "nhóm",
       "profile": "người dùng",
-      "message": "tin nhắn"
+      "message": "tin nhắn",
+      "service_request": "yêu cầu gọi thợ",
+      "service_quote": "báo giá"
     }
   },
   "block": {
@@ -368,5 +371,10 @@
     "post_body": "Bấm nút Đăng (+) ở giữa thanh dưới để pass đồ, cho thuê phòng hay tìm người.",
     "chat_title": "Nhắn tin trong app",
     "chat_body": "Tin nhắn với người mua, người bán nằm ở tab Tin nhắn — không cần đưa số điện thoại."
+  },
+  "mini_app_off": {
+    "title": "Tính năng chưa mở",
+    "body": "Tính năng này tạm thời chưa có. Bạn quay lại trang chủ nhé.",
+    "cta": "Về trang chủ"
   }
 }

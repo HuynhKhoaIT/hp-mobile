@@ -125,6 +125,9 @@ function NotificationsContent() {
         }
       }
       router.push(`/nhom/id/${target.id}`);
+    } else if (target.screen === 'service_request') {
+      // Gọi thợ (quote_* / request_*): chi tiết yêu cầu — chủ xem báo giá, thợ xem trạng thái báo giá của mình.
+      router.push(`/goi-tho/yeu-cau/${target.id}`);
     }
   };
 

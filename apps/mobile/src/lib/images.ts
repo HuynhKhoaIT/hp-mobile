@@ -7,6 +7,10 @@ import { env } from '@/core/env';
 export const listingImageUrl = (path: string, size: ImageSize = 'thumb') =>
   imageUrl(env.supabaseUrl, 'listing-images', path, size, env.imageTransform);
 
+/** Ảnh yêu cầu gọi thợ (bucket public request-images): 'thumb' cho card, 'full' cho chi tiết. */
+export const requestImageUrl = (path: string, size: ImageSize = 'thumb') =>
+  imageUrl(env.supabaseUrl, 'request-images', path, size, env.imageTransform);
+
 /** Ảnh đại diện: path trong bucket avatars hoặc URL đầy đủ (Google); null → Avatar hiện chữ cái đầu. */
 export const profileAvatarUrl = (value: string | null | undefined) => avatarUrl(env.supabaseUrl, value, env.imageTransform);
 

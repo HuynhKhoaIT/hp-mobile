@@ -3,7 +3,7 @@
 // chạy được ở cả ba nơi + node --test; constants.ts kiểm tra kiểu để danh sách ở đây khớp NOTIFICATION_SCREENS.
 
 /** Màn đích của payload thông báo (giá trị NOTIFICATION_SCREENS + 'notifications'). */
-export const NOTIFICATION_TARGET_SCREENS = ['chat', 'group', 'listing', 'notifications'] as const;
+export const NOTIFICATION_TARGET_SCREENS = ['chat', 'group', 'listing', 'service_request', 'notifications'] as const;
 export type NotificationTargetScreen = (typeof NOTIFICATION_TARGET_SCREENS)[number];
 
 /** Loại thông báo có push theo nhóm (khoá của NOTIFICATION_SCREENS). */

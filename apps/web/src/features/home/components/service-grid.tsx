@@ -5,23 +5,34 @@
 // on-accent; nổi lên xuống nhẹ animate-badge-float −3px 2,4s/chu kỳ từ motion.ambient.float — giống app). Hover: khung icon
 // nâng 2px + bóng card, icon phóng 1.1. Giảm chuyển động → nhãn đứng yên, không nâng / phóng. Hiện lần lượt khi tải (stagger 30ms, trượt 8px; giảm chuyển động → chỉ mờ dần 150ms). Server Component: link
 // thật, chạy khi tắt JS.
+import { HOME_TILES, visibleHomeTiles } from '@hp/shared';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
-import { HOME_TILE_VIEWS } from '../services';
+import { getMiniApps } from '../mini-apps';
+import { HOME_TILE_VIEWS, type TileView } from '../services';
 
 /** Độ trễ xuất hiện từng ô (motion.stagger 30ms × 8) — class đầy đủ để Tailwind quét được. */
 const STAGGER = ['delay-0', 'delay-30', 'delay-60', 'delay-90', 'delay-120', 'delay-150', 'delay-180', 'delay-210'] as const;
 
 export async function ServiceGrid() {
-  const t = await getTranslations();
+  const [t, miniApps] = await Promise.all([getTranslations(), getMiniApps()]);
+  // Admin bật / tắt + sắp thứ tự mini-app (bảng mini_apps): ô của mini-app đang tắt bị ẩn.
+  const views = new Map(HOME_TILE_VIEWS.map((v) => [v.id, v]));
+  const tiles = visibleHomeTiles(HOME_TILES, miniApps).flatMap((tile) => views.get(tile.id) ?? []) satisfies TileView[];
   return (
     <nav
       aria-label={t('web.home.services_title')}
       className="relative rounded-lg border border-border bg-surface px-3 py-4 shadow-card sm:p-4"
     >
-      <ul className="grid grid-cols-4 gap-x-1 gap-y-3 md:grid-cols-8 md:gap-x-2">
-        {HOME_TILE_VIEWS.map((tile, i) => {
+      {/* 9 ô (admin bật Gọi thợ) → 3 × 3 trên điện thoại, 9 cột từ 768px; còn lại 4 × 2 / 8 cột. Class đầy đủ cho Tailwind quét. */}
+      <ul
+        className={cn(
+          'grid gap-x-1 gap-y-3 md:gap-x-2',
+          tiles.length > 8 ? 'grid-cols-3 md:grid-cols-9' : 'grid-cols-4 md:grid-cols-8',
+        )}
+      >
+        {tiles.map((tile, i) => {
           const label = t(tile.labelKey);
           const badge = tile.soon ? t('common.home.badge.soon') : tile.isNew ? t('common.home.badge.new') : null;
           return (

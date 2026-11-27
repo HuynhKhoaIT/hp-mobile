@@ -9,6 +9,12 @@ export const EVENTS = [
   'save_listing',
   'login_success',
   'share_listing',
+  // Gọi thợ (khớp web: apps/web/src/lib/analytics/events.ts khi có)
+  'create_request',
+  'send_quote',
+  'accept_quote',
+  'complete_request',
+  'rate_request',
   // Trang chủ (docs/design/home.md §7)
   'home_view',
   'home_tile_click',

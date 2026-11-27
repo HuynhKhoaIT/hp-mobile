@@ -121,7 +121,8 @@
     "new_7d_other": "+{{count}} in 7 days",
     "by_category_title": "Active listings by category",
     "by_category_hint": "Only listings currently shown publicly.",
-    "gaps_note": "Not yet available: new users split by web / app, queue handling time, Google visits, app installs, leads. Coming once source data exists."
+    "gaps_note": "Not yet available: new users split by web / app, queue handling time, Google visits, app installs, leads. Coming once source data exists.",
+    "requests_open": "Open job requests"
   },
   "moderation": {
     "title": "Listing moderation",
@@ -360,13 +361,20 @@
       "status_one": "Moved {{count}} report to “{{status}}”",
       "status_other": "Moved {{count}} reports to “{{status}}”",
       "hidden": "Listing hidden and reports closed",
-      "cancelled": "Group cancelled and reports closed"
+      "cancelled": "Group cancelled and reports closed",
+      "request_cancelled": "Request cancelled and reports closed"
     },
     "empty": {
       "active_title": "No reports to handle",
       "active_body": "New reports from users will show up here.",
       "other_title": "No reports yet",
       "other_body": "Handled reports show up here, newest first."
+    },
+    "cancel_request": "Cancel the job request and close reports",
+    "cancel_request_dialog": {
+      "title": "Cancel the request “{{title}}”?",
+      "description": "The customer and the pros who quoted are notified that the request was cancelled. All open reports about it are marked as handled.",
+      "confirm": "Cancel request"
     }
   },
   "badges": {
@@ -666,7 +674,8 @@
     "tabs": {
       "venues": "Venues",
       "sites": "Sites",
-      "keywords": "Banned keywords"
+      "keywords": "Banned keywords",
+      "miniapps": "Mini-apps"
     },
     "venues": {
       "table_label": "Venues",
@@ -808,6 +817,42 @@
         "created": "Keyword added",
         "updated": "Action changed",
         "removed": "Keyword removed"
+      }
+    },
+    "miniapps": {
+      "hint": "Turn the super app’s mini-apps on or off. A mini-app that is off is hidden from the app and web Hub and its pages return 404; existing posts are kept.",
+      "table_label": "Mini-app list",
+      "col": {
+        "order": "Order",
+        "name": "Mini-app",
+        "code": "Code",
+        "status": "Visible",
+        "actions": "Actions"
+      },
+      "on": "On",
+      "off": "Off",
+      "enable": "Turn on",
+      "disable": "Turn off",
+      "up_a11y": "Move “{{name}}” up",
+      "down_a11y": "Move “{{name}}” down",
+      "confirm": {
+        "off_title": "Turn off “{{name}}”?",
+        "off_body": "The mini-app is hidden from the app / web Hub and its pages return 404. Existing posts are kept.",
+        "on_title": "Turn on “{{name}}”?",
+        "on_body": "The mini-app shows again in the app / web Hub."
+      },
+      "toast": {
+        "updated": "Mini-app settings saved",
+        "reordered": "Mini-app order updated"
+      },
+      "names": {
+        "pass": "Second-hand market",
+        "room": "Rooms",
+        "job": "Jobs",
+        "lostFound": "Lost & found",
+        "ride": "Ride share",
+        "sport": "Sports matches",
+        "goiTho": "Handyman"
       }
     }
   },

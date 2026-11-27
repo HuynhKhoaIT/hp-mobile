@@ -13,6 +13,7 @@ import enErrors from '@hp/shared/i18n/en/errors.json';
 import enGroup from '@hp/shared/i18n/en/group.json';
 import enListing from '@hp/shared/i18n/en/listing.json';
 import enPush from '@hp/shared/i18n/en/push.json';
+import enTho from '@hp/shared/i18n/en/tho.json';
 import enWeb from '@hp/shared/i18n/en/web.json';
 import viAdmin from '@hp/shared/i18n/vi/admin.json';
 import viAuth from '@hp/shared/i18n/vi/auth.json';
@@ -22,6 +23,7 @@ import viErrors from '@hp/shared/i18n/vi/errors.json';
 import viGroup from '@hp/shared/i18n/vi/group.json';
 import viListing from '@hp/shared/i18n/vi/listing.json';
 import viPush from '@hp/shared/i18n/vi/push.json';
+import viTho from '@hp/shared/i18n/vi/tho.json';
 import viWeb from '@hp/shared/i18n/vi/web.json';
 import zhAdmin from '@hp/shared/i18n/zh/admin.json';
 import zhAuth from '@hp/shared/i18n/zh/auth.json';
@@ -31,6 +33,7 @@ import zhErrors from '@hp/shared/i18n/zh/errors.json';
 import zhGroup from '@hp/shared/i18n/zh/group.json';
 import zhListing from '@hp/shared/i18n/zh/listing.json';
 import zhPush from '@hp/shared/i18n/zh/push.json';
+import zhTho from '@hp/shared/i18n/zh/tho.json';
 import zhWeb from '@hp/shared/i18n/zh/web.json';
 
 type Tree = { [key: string]: string | Tree };
@@ -87,8 +90,8 @@ function withFallback(base: Tree, override: Tree): Tree {
 }
 
 const raw = {
-  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, push: viPush, auth: viAuth, web: viWeb, admin: viAdmin },
-  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, push: enPush, auth: enAuth, web: enWeb, admin: enAdmin },
+  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, push: viPush, tho: viTho, auth: viAuth, web: viWeb, admin: viAdmin },
+  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, push: enPush, tho: enTho, auth: enAuth, web: enWeb, admin: enAdmin },
   zh: {
     common: zhCommon,
     errors: zhErrors,
@@ -96,6 +99,7 @@ const raw = {
     group: zhGroup,
     chat: zhChat,
     push: zhPush,
+    tho: zhTho,
     auth: zhAuth,
     web: zhWeb,
     admin: withFallback(viAdmin as Tree, zhAdmin as Tree),

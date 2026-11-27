@@ -4,7 +4,7 @@
 // thẻ cùng một nhận diện.
 // Class viết đầy đủ (Tailwind quét được, không ghép chuỗi động).
 import { type Feature, HOME_TILES, type HomeTile, type ListingFeature } from '@hp/shared';
-import { ClipboardList, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { ClipboardList, LayoutGrid, type LucideIcon, Wrench } from 'lucide-react';
 import { GROUP_FEATURE_CONFIGS } from '@/features/group/features';
 import { LISTING_FEATURE_CONFIGS } from '@/features/listing/features';
 
@@ -26,13 +26,14 @@ const LISTING_DOT: Record<ListingFeature, string> = {
 };
 
 /** Viền nhạt cùng tông của ô icon (class đầy đủ để Tailwind quét được). */
-const SERVICE_EDGE: Record<Feature, string> = {
+const SERVICE_EDGE: Record<Feature | 'goiTho', string> = {
   pass: 'border-service-pass/15',
   room: 'border-service-room/15',
   job: 'border-service-job/15',
   lostFound: 'border-service-lost-found/15',
   ride: 'border-service-ride/15',
   sport: 'border-service-sport/15',
+  goiTho: 'border-service-goi-tho/15',
 };
 
 const listingVisual = (feature: ListingFeature): ServiceVisual => {
@@ -40,23 +41,26 @@ const listingVisual = (feature: ListingFeature): ServiceVisual => {
   return { Icon: c.Icon, soft: c.tone.soft, fg: c.tone.fg, dot: LISTING_DOT[feature] };
 };
 
-export const SERVICE_VISUALS: Record<Feature, ServiceVisual> = {
+export const SERVICE_VISUALS: Record<Feature | 'goiTho', ServiceVisual> = {
   pass: listingVisual('pass'),
   room: listingVisual('room'),
   job: listingVisual('job'),
   lostFound: listingVisual('lostFound'),
   ride: { Icon: GROUP_FEATURE_CONFIGS.ride.Icon, ...GROUP_FEATURE_CONFIGS.ride.tone },
   sport: { Icon: GROUP_FEATURE_CONFIGS.sport.Icon, ...GROUP_FEATURE_CONFIGS.sport.tone },
+  // Gọi thợ (mini-app thứ ba, không phải Feature): tím violet, đường dẫn /goi-tho.
+  goiTho: { Icon: Wrench, soft: 'bg-service-goi-tho-soft', fg: 'text-service-goi-tho', dot: 'bg-service-goi-tho' },
 };
 
-/** Đường dẫn web của 6 dịch vụ. */
-const SERVICE_PATHS: Record<Feature, string> = {
+/** Đường dẫn web của các dịch vụ. */
+const SERVICE_PATHS: Record<Feature | 'goiTho', string> = {
   pass: LISTING_FEATURE_CONFIGS.pass.path,
   room: LISTING_FEATURE_CONFIGS.room.path,
   job: LISTING_FEATURE_CONFIGS.job.path,
   lostFound: LISTING_FEATURE_CONFIGS.lostFound.path,
   ride: GROUP_FEATURE_CONFIGS.ride.path,
   sport: GROUP_FEATURE_CONFIGS.sport.path,
+  goiTho: '/goi-tho',
 };
 
 export type TileView = {

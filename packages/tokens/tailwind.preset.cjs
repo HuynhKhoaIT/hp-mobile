@@ -29,6 +29,8 @@ const light = {
   "--color-service-sport-soft": "252 236 236",
   "--color-service-lost-found": "168 122 0",
   "--color-service-lost-found-soft": "251 243 217",
+  "--color-service-goi-tho": "124 58 237",
+  "--color-service-goi-tho-soft": "243 238 255",
   "--color-app-from": "11 74 156",
   "--color-app-to": "30 111 217"
 };
@@ -61,6 +63,8 @@ const dark = {
   "--color-service-sport-soft": "58 34 36",
   "--color-service-lost-found": "230 190 85",
   "--color-service-lost-found-soft": "58 50 32",
+  "--color-service-goi-tho": "196 181 253",
+  "--color-service-goi-tho-soft": "42 31 74",
   "--color-app-from": "11 74 156",
   "--color-app-to": "30 111 217"
 };
@@ -98,6 +102,8 @@ module.exports = {
       "service-sport-soft": "rgb(var(--color-service-sport-soft) / <alpha-value>)",
       "service-lost-found": "rgb(var(--color-service-lost-found) / <alpha-value>)",
       "service-lost-found-soft": "rgb(var(--color-service-lost-found-soft) / <alpha-value>)",
+      "service-goi-tho": "rgb(var(--color-service-goi-tho) / <alpha-value>)",
+      "service-goi-tho-soft": "rgb(var(--color-service-goi-tho-soft) / <alpha-value>)",
       "app-from": "rgb(var(--color-app-from) / <alpha-value>)",
       "app-to": "rgb(var(--color-app-to) / <alpha-value>)"
     },

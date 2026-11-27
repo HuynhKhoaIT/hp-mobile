@@ -27,6 +27,8 @@ export const RATE_LIMITS = {
   venuesPerDay: 5,
   badgeRequestsPerDay: 3,
   translatePerHour: 30,
+  serviceRequestsPerDay: 5,
+  quotesPerHour: 20,
 } as const;
 
 /** Nhắc gia hạn tin trước khi hết hạn (cron expire_content). */
@@ -69,6 +71,12 @@ export const NOTIFICATION_SCREENS = {
   listing_rejected: 'listing',
   listing_expiring: 'listing',
   lost_found_match: 'listing',
+  quote_received: 'service_request',
+  quote_accepted: 'service_request',
+  quote_declined: 'service_request',
+  request_cancelled: 'service_request',
+  request_completed: 'service_request',
+  request_expired: 'service_request',
 } as const;
 export type NotificationType = keyof typeof NOTIFICATION_SCREENS;
 export type NotificationScreen = (typeof NOTIFICATION_SCREENS)[NotificationType] | 'notifications';

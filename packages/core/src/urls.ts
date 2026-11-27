@@ -5,6 +5,11 @@ export function shareUrl(v: { type: 'listing' | 'group'; slug: string }, siteUrl
   return `${base}/${v.type === 'listing' ? 'tin' : 'nhom'}/${encodeURIComponent(v.slug)}`;
 }
 
+/** Link chia sẻ một yêu cầu gọi thợ (web /goi-tho/yeu-cau/{id}; trang riêng tư theo đăng nhập, noindex). */
+export function serviceRequestUrl(id: string, siteUrl: string): string {
+  return `${siteUrl.replace(/\/+$/, '')}/goi-tho/yeu-cau/${encodeURIComponent(id)}`;
+}
+
 export type ImageSize = 'thumb' | 'full' | 'avatar' | 'original';
 
 const TRANSFORM: Record<Exclude<ImageSize, 'original'>, string> = {
@@ -19,7 +24,7 @@ const TRANSFORM: Record<Exclude<ImageSize, 'original'>, string> = {
  */
 export function imageUrl(
   supabaseUrl: string,
-  bucket: 'listing-images' | 'avatars',
+  bucket: 'listing-images' | 'avatars' | 'request-images',
   path: string,
   size: ImageSize = 'thumb',
   transform = true,

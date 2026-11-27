@@ -1,7 +1,13 @@
 // Hook chat riêng mobile (ghép @hp/core với điều hướng, chọn ảnh, MMKV). Dữ liệu + optimistic ở @hp/core/react.
 // Hộp thư: dịch vụ của hội thoại (conversationFeature) và lọc tại chỗ (useInboxFilter) ở @hp/core — dùng chung web;
 // chữ giá tin ngữ cảnh (useConversationPrice) dịch + định dạng ở đây.
-import { type ChatMessage, type ConversationSummary, conversationFeature, conversationPriceSource } from '@hp/core';
+import {
+  type ChatMessage,
+  type ConversationSummary,
+  conversationFeature,
+  conversationPriceSource,
+  isRequestConversation,
+} from '@hp/core';
 import { useConversations, useDiscardMessage, useSendMessage, useSession, useStartConversation } from '@hp/core/react';
 import { type ChatContentError, type Feature, hasPhoneNumber, isChatContentError, newUuid } from '@hp/shared';
 import { router } from 'expo-router';
@@ -162,6 +168,9 @@ export { type InboxFilter, useInboxFilter } from '@hp/core/react';
 /** Hộp thư khoá theo một dịch vụ (tab Chat của mini-app) tự tải thêm trang tới khi đủ số dòng này (giống useInboxFilter). */
 const LOCKED_MIN_VISIBLE = 8;
 
+/** Phạm vi hộp thư khoá: một tính năng (Feature) hoặc Gọi thợ (`goiTho` — hội thoại về yêu cầu, không phải một Feature). */
+export type InboxScope = Feature | 'goiTho';
+
 /**
  * Hộp thư chỉ một dịch vụ (tab Chat của mini-app — vd Chợ Pass chỉ hội thoại về tin pass đồ): lọc tại chỗ theo
  * conversationFeature; ít dòng mà còn trang → tự tải thêm. Không có chip lọc (useInboxFilter chỉ bật chip khi hộp thư có
@@ -169,10 +178,13 @@ const LOCKED_MIN_VISIBLE = 8;
  */
 export function useFeatureInbox(
   list: { items: ConversationSummary[]; hasNextPage: boolean; isFetchingNextPage: boolean; fetchNextPage: () => unknown },
-  feature: Feature | undefined,
+  feature: InboxScope | undefined,
 ) {
   const { items, hasNextPage, isFetchingNextPage, fetchNextPage } = list;
-  const visible = useMemo(() => (feature ? items.filter((c) => conversationFeature(c) === feature) : items), [items, feature]);
+  const visible = useMemo(
+    () => (feature ? items.filter((c) => (feature === 'goiTho' ? isRequestConversation(c) : conversationFeature(c) === feature)) : items),
+    [items, feature],
+  );
   const short = !!feature && visible.length < LOCKED_MIN_VISIBLE;
   useEffect(() => {
     if (short && hasNextPage && !isFetchingNextPage) void fetchNextPage();
@@ -184,7 +196,7 @@ export function useFeatureInbox(
  * Số hội thoại chưa đọc của một dịch vụ (ô Chat trên thanh tab mini-app — khớp hộp thư khoá theo tính năng, không đếm
  * dịch vụ khác): đếm trên các trang hộp thư đã tải (useFeatureInbox tự tải thêm khi ít dòng; cùng cache với tab Chat).
  */
-export function useFeatureUnreadCount(feature: Feature): number {
+export function useFeatureUnreadCount(feature: InboxScope): number {
   const session = useSession();
   const list = useConversations({ enabled: !!session.userId });
   const visible = useFeatureInbox(list, feature);

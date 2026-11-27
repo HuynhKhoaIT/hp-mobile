@@ -40,6 +40,14 @@ export const passConfig: ListingFeatureConfig = {
 ```
 `GroupFeatureConfig` tương tự: `kind`, `subKinds`, `form`, `card`, `detail.ctas: ['join']`, `map: 'required'`, `reminderMinutes: 60`.
 
+## Mẫu thứ ba: Request (mini-app Gọi thợ)
+- Gọi thợ **không** thuộc Listing hay Group và **không** nằm trong `FEATURES` (`goiTho` chỉ là mã mini-app — `MINI_APP_CODES`). Nó có feature riêng `features/tho` (components, form, hooks, navigation, trades) vì luồng khác: người cần đăng yêu cầu → nhiều thợ báo giá → chọn → chat → hoàn thành → đánh giá hai chiều.
+- Route: `app/tho/*` (Tabs: Việc quanh bạn · Báo giá · [Đăng việc] · Chat · Của tôi, bọc `MiniAppGate code="goiTho"` + `AppThemeProvider theme="goiTho"`) và `app/request/[id]`, `app/request/new` (mở chồng, không thanh tab).
+- Dữ liệu chỉ qua `@hp/core` (`service-requests.ts`, `react/request-hooks.ts`); luật hiển thị / vai trò / hành động ở `@hp/shared` `service-request-display.ts` (dùng chung web). Không viết lại luật ở app.
+- Quyền ở DB: địa chỉ chính xác chỉ chủ + thợ được chọn (`useRequestPrivate`); client chỉ ẩn / hiện nút theo `serviceRequestActions`.
+- `chat` được import từ `features/tho` (`openConversation`) và `features/tho` từ `chat` (`RequestContext`, `ConversationRow`) — ngoại lệ riêng của mẫu này vì hội thoại gắn với yêu cầu.
+- Thêm mini-app kiểu Request mới (khác Gọi thợ) → hỏi trước; chưa có engine chung cho mẫu này.
+
 ## Dữ liệu
 - `features/*/hooks.ts` chỉ **gọi lại** hook/hàm của `@hp/core` và thêm phần riêng mobile (GPS, MMKV, haptic, toast). Không `supabase.from(...)` ở đây; thiếu hàm → thêm vào `packages/core`.
 - Query key chỉ từ `keys` của `@hp/core/keys`. Mutation `invalidateQueries` đúng key.

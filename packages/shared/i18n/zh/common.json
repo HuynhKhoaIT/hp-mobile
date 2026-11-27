@@ -41,7 +41,8 @@
     "job": "找工作",
     "lostFound": "失物招领",
     "ride": "拼车回家",
-    "sport": "约球"
+    "sport": "约球",
+    "goiTho": "找师傅"
   },
   "status": {
     "draft": "草稿",
@@ -200,7 +201,9 @@
       "listing": "信息",
       "group": "小组",
       "profile": "用户",
-      "message": "消息"
+      "message": "消息",
+      "service_request": "找师傅需求",
+      "service_quote": "报价"
     }
   },
   "block": {
@@ -368,5 +371,10 @@
     "post_body": "点击底部中间的发布 (+) 按钮，转让物品、出租房间或招人。",
     "chat_title": "在应用内聊天",
     "chat_body": "与买家、卖家的消息都在“消息”标签中，无需留电话号码。"
+  },
+  "mini_app_off": {
+    "title": "功能暂未开放",
+    "body": "该功能暂时不可用，请返回首页。",
+    "cta": "返回首页"
   }
 }

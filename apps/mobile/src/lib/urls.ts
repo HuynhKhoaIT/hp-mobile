@@ -81,6 +81,13 @@ export function routeForWebPath(input: string): AppRoute | null {
   if (slug) return { href: { pathname: '/tin/[slug]', params: { slug: decodeURIComponent(slug) } }, auth: false };
   const groupSlug = /^\/nhom\/([^/]+)$/.exec(path)?.[1];
   if (groupSlug) return { href: { pathname: '/nhom/[slug]', params: { slug: decodeURIComponent(groupSlug) } }, auth: false };
+  // Gọi thợ: /goi-tho (Việc quanh bạn), /goi-tho/yeu-cau/{id}, /goi-tho/dang-yeu-cau, /goi-tho/cua-toi, /goi-tho/tin-nhan.
+  const requestId = /^\/goi-tho\/yeu-cau\/([^/]+)$/.exec(path)?.[1];
+  if (requestId) return { href: { pathname: '/request/[id]', params: { id: decodeURIComponent(requestId) } }, auth: false };
+  if (path === '/goi-tho') return { href: '/tho', auth: false };
+  if (path === '/goi-tho/dang-yeu-cau') return { href: '/request/new', auth: true };
+  if (path === '/goi-tho/cua-toi') return { href: '/tho/mine', auth: true };
+  if (path === '/goi-tho/tin-nhan') return { href: '/tho/chat', auth: false };
 
   switch (path) {
     case '/ghep-xe':

@@ -4,6 +4,7 @@ import { needsOnboarding } from '@hp/core';
 import {
   useHomeFeed,
   useListingList,
+  useMiniApps,
   useMyListingStats,
   useMyProfile,
   usePublicStats,
@@ -133,7 +134,12 @@ export function useHomeRails(siteCode: string | undefined) {
   const job = useListingList({ categories: [...LISTING_FEATURES.job], limit: HOME_RAIL_SIZE.feature });
   const lostFound = useListingList({ categories: [...LISTING_FEATURES.lostFound], limit: HOME_RAIL_SIZE.feature });
   const byFeature = { pass, room, job, lostFound };
-  const features = HOME_FEATURE_ORDER.map((feature) => ({ feature, query: byFeature[feature] }));
+  // Dải của mini-app đang tắt (admin — bảng mini_apps) bị ẩn; query vẫn gọi vì hook không được gọi có điều kiện.
+  const miniApps = useMiniApps();
+  const features = HOME_FEATURE_ORDER.filter((feature) => miniApps.isEnabled(feature)).map((feature) => ({
+    feature,
+    query: byFeature[feature],
+  }));
 
   const settled = (q: { isLoading: boolean; isError: boolean }) => !q.isLoading && !q.isError;
   // Toàn bộ không có tin nào (đã tải xong, không lỗi) → một EmptyState thay cho các dải (§5).

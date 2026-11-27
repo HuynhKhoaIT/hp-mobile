@@ -62,5 +62,31 @@
   "rating_received": {
     "title": "You received a thank-you",
     "body": "{{name}} rated you {{score}}/5 stars for \"{{title}}\"."
+  },
+  "quote_received": {
+    "title": "New quote",
+    "body": "{{pro_name}} sent a quote for \"{{title}}\"."
+  },
+  "quote_accepted": {
+    "title": "You were chosen!",
+    "body": "The owner chose your quote for \"{{title}}\". Send a message to set a time."
+  },
+  "quote_declined": {
+    "title": "Quote not chosen",
+    "body": "The owner chose another pro for \"{{title}}\"."
+  },
+  "request_cancelled": {
+    "title": "Request cancelled",
+    "body": "The request \"{{title}}\" was cancelled.",
+    "body_owner": "Your request \"{{title}}\" was cancelled for breaking the rules."
+  },
+  "request_completed": {
+    "title": "Job completed",
+    "body": "\"{{title}}\" was marked as done. Please rate the customer!"
+  },
+  "request_expired": {
+    "title": "Request expired",
+    "body": "The request \"{{title}}\" is no longer taking quotes.",
+    "body_owner": "Your request \"{{title}}\" has expired. Post it again if you still need a pro."
   }
 }

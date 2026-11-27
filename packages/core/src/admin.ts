@@ -156,6 +156,9 @@ export type AdminStats = {
   badges_pending: number;
   venues_pending: number;
   leads_new: number;
+  /** Gọi thợ: yêu cầu đang mở (chưa hết hạn) và yêu cầu mới trong 7 ngày. */
+  requests_open: number;
+  requests_new_7d: number;
 };
 
 /** Số liệu dashboard (RPC admin_stats, staff). Chưa tách nguồn web / app (cần PostHog). */
@@ -183,6 +186,8 @@ export async function getAdminStats(client: Client): Promise<Result<AdminStats>>
     badges_pending: num(j.badges_pending),
     venues_pending: num(j.venues_pending),
     leads_new: num(j.leads_new),
+    requests_open: num(j.requests_open),
+    requests_new_7d: num(j.requests_new_7d),
   });
 }
 
@@ -226,7 +231,9 @@ async function reportTargets(client: Client, rows: Pick<Tables<'reports'>, 'targ
   const listingIds = ids('listing');
   const groupIds = ids('group');
   const profileIds = ids('profile');
-  const [listings, groups, profiles, names] = await Promise.all([
+  const requestIds = ids('service_request');
+  const quoteIds = ids('service_quote');
+  const [listings, groups, profiles, names, requests, quotes] = await Promise.all([
     listingIds.length
       ? client.from('listings').select('id,title,slug,status,owner_id,deleted_at').in('id', listingIds)
       : null,
@@ -235,6 +242,12 @@ async function reportTargets(client: Client, rows: Pick<Tables<'reports'>, 'targ
       ? client.from('profiles').select('id,is_banned,banned_until,deleted_at').in('id', profileIds)
       : null,
     shortNames(client, profileIds),
+    requestIds.length
+      ? client.from('service_requests').select('id,title,status,customer_id,deleted_at').in('id', requestIds)
+      : null,
+    quoteIds.length
+      ? client.from('service_quotes').select('id,pro_id,status,request_id').in('id', quoteIds)
+      : null,
   ]);
   const map = new Map<string, ReportTargetSummary>();
   for (const l of listings?.data ?? []) {
@@ -245,6 +258,17 @@ async function reportTargets(client: Client, rows: Pick<Tables<'reports'>, 'targ
   for (const g of groups?.data ?? []) {
     map.set(`group:${g.id}`, {
       type: 'group', id: g.id, title: g.title, slug: g.slug, status: g.status, owner_id: g.host_id, deleted: g.deleted_at !== null,
+    });
+  }
+  for (const r of requests?.data ?? []) {
+    map.set(`service_request:${r.id}`, {
+      type: 'service_request', id: r.id, title: r.title, slug: null, status: r.status, owner_id: r.customer_id, deleted: r.deleted_at !== null,
+    });
+  }
+  for (const q of quotes?.data ?? []) {
+    // Báo giá: tiêu đề = id yêu cầu cha (staff mở trang yêu cầu); chủ = thợ báo giá.
+    map.set(`service_quote:${q.id}`, {
+      type: 'service_quote', id: q.id, title: null, slug: q.request_id, status: q.status, owner_id: q.pro_id, deleted: false,
     });
   }
   for (const p of profiles?.data ?? []) {
@@ -742,6 +766,15 @@ export async function staffCancelGroup(client: Client, input: { groupId: unknown
   const note = cleanText(input.note, ADMIN_NOTE_MAX);
   if (note === undefined) return fail('too_long');
   const res = await client.rpc('staff_cancel_group', { p_group_id: input.groupId, ...(note ? { p_note: note } : {}) });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
+/** Huỷ yêu cầu gọi thợ vi phạm (RPC, audit `service_request.cancel`; chủ + thợ đã báo giá nhận request_cancelled). Lỗi: not_found, request_closed. */
+export async function staffCancelServiceRequest(client: Client, input: { requestId: unknown; note?: unknown }): Promise<Result<null>> {
+  if (!isUuid(input.requestId)) return fail('invalid_input');
+  const note = cleanText(input.note, ADMIN_NOTE_MAX);
+  if (note === undefined) return fail('too_long');
+  const res = await client.rpc('staff_cancel_request', { p_request_id: input.requestId, ...(note ? { p_note: note } : {}) });
   return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
 }
 

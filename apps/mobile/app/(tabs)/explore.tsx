@@ -6,6 +6,7 @@ import { useIsFocused } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Heart } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { useMiniApps } from '@hp/core/react';
 import { configOfCategory, GROUP_CONFIGS } from '@/features/configs';
 import { GroupRail } from '@/features/group/components/GroupRail';
 import { ListingBrowser } from '@/features/listing/components/ListingBrowser';
@@ -17,6 +18,7 @@ export default function ExploreScreen() {
   const { t } = useTranslation();
   const focused = useIsFocused();
   const scheme = useScheme();
+  const miniApps = useMiniApps();
   return (
     <Screen tab>
       <ListingBrowser
@@ -28,8 +30,9 @@ export default function ExploreScreen() {
         }
         header={
           <Col gap={5}>
-            <GroupRail config={GROUP_CONFIGS.ride} />
-            <GroupRail config={GROUP_CONFIGS.sport} />
+            {/* Dải nhóm của mini-app đang tắt (admin) bị ẩn. */}
+            {miniApps.isEnabled('ride') ? <GroupRail config={GROUP_CONFIGS.ride} /> : null}
+            {miniApps.isEnabled('sport') ? <GroupRail config={GROUP_CONFIGS.sport} /> : null}
           </Col>
         }
       />

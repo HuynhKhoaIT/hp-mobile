@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { buttonVariants } from '@/components/ui/button';
+import { isMiniAppOn } from '@/features/home/mini-apps';
 import { SERVICE_VISUALS } from '@/features/home/services';
 import { asLocale } from '@/features/listing/display';
 import { TrackedLink } from '@/features/marketing/components/tracked-link';
@@ -33,7 +34,8 @@ export async function generateMetadata({ params }: PageProps<'/[locale]/tinh-nan
 export default async function Page({ params }: PageProps<'/[locale]/tinh-nang/[slug]'>) {
   const { slug } = await params;
   const page = findPage(slug);
-  if (!page) notFound();
+  // Mini-app đang tắt (admin — bảng mini_apps) → 404 như trang không tồn tại.
+  if (!page || !(await isMiniAppOn(page.feature))) notFound();
   const t = await getTranslations('web.marketing');
   const { feature } = page;
   const { Icon, soft, fg } = SERVICE_VISUALS[feature];

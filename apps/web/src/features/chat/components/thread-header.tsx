@@ -10,7 +10,7 @@
 // người dùng — báo cáo nhóm ở trang nhóm). Không có gọi điện / vị trí xe / đặt chỗ của Stitch.
 import type { ConversationSummary } from '@hp/core';
 import { formatDate, formatRelative, groupDisplayStatus } from '@hp/shared';
-import { BadgeCheck, Ban, Bell, BellOff, ChevronLeft, ChevronRight, EllipsisVertical, Flag, Package } from 'lucide-react';
+import { BadgeCheck, Ban, Bell, BellOff, ChevronLeft, ChevronRight, EllipsisVertical, Flag, Package, Wrench } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -124,7 +124,46 @@ export function ThreadHeader({
       </div>
       {c?.context_type === 'listing' ? <ListingContext conversation={c} /> : null}
       {c && group && c.group_starts_at ? <GroupContext conversation={c} /> : null}
+      {c?.context_type === 'service_request' ? <RequestContext conversation={c} /> : null}
     </div>
+  );
+}
+
+/** Thẻ ngữ cảnh chat về yêu cầu gọi thợ: ô icon Gọi thợ · tiêu đề yêu cầu · trạng thái → /goi-tho/yeu-cau/{id}. */
+function RequestContext({ conversation: c }: { conversation: ConversationSummary }) {
+  const t = useTranslations();
+  const gone = !c.request_title || !c.context_id;
+  const closed = c.request_status === 'cancelled' || c.request_status === 'expired';
+
+  const content = (
+    <>
+      <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-md bg-service-goi-tho-soft">
+        <Wrench strokeWidth={1.75} className="size-5 text-service-goi-tho" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className={gone ? 'truncate text-md text-muted' : 'truncate text-md font-semibold text-fg'}>
+          {c.request_title || t('tho.chat.closed')}
+        </span>
+        {c.request_status ? (
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <Badge tone={closed ? 'danger' : 'neutral'}>{t(`tho.status.${c.request_status}`)}</Badge>
+          </span>
+        ) : null}
+      </span>
+    </>
+  );
+
+  return (
+    <ContextStrip>
+      {gone ? (
+        <div className={CARD}>{content}</div>
+      ) : (
+        <Link href={`/goi-tho/yeu-cau/${c.context_id}`} aria-label={`${t('tho.chat.open_request')}: ${c.request_title}`} className={CARD_LINK}>
+          {content}
+          <ViewMore label={t('tho.chat.open_request')} />
+        </Link>
+      )}
+    </ContextStrip>
   );
 }
 

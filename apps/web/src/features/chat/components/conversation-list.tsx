@@ -14,10 +14,10 @@
 // trang → tự tải trang kế, như useInboxFilter), `bare` bỏ header xanh (trang có header mini-app riêng); thẻ mở khung chat
 // trong mini-app (`threadBase`/[id], vd /pass-do/tin-nhan/[id] — quay lại về hộp thư mini-app). Hộp thư rỗng → CTA về trang
 // `emptyHref` (trang chủ mini-app).
-import type { ConversationSummary } from '@hp/core';
+import { type ConversationSummary, isRequestConversation } from '@hp/core';
 import { useConversations, useSession, useUnreadConversationCount } from '@hp/core/react';
 import { type Feature, formatDate, formatNumber, formatRelative, unreadBadge } from '@hp/shared';
-import { BadgeCheck, BellOff, MessageCircle, ShieldCheck } from 'lucide-react';
+import { BadgeCheck, BellOff, MessageCircle, ShieldCheck, Wrench } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useMemo } from 'react';
 import { ClientOnly } from '@/components/shared/client-only';
@@ -45,7 +45,13 @@ import {
 import { ConversationListSkeleton, ConversationRowSkeleton } from './chat-skeletons';
 import { GroupChatIcon } from './group-chat-icon';
 
-type Lock = { feature: Feature; emptyHref: string; threadBase?: string };
+/** Phạm vi hộp thư khoá: một dịch vụ (Feature) hoặc Gọi thợ (`goiTho` — hội thoại về yêu cầu, không phải một Feature). */
+export type InboxScope = Feature | 'goiTho';
+
+type Lock = { feature: InboxScope; emptyHref: string; threadBase?: string };
+
+/** Icon + màu của hội thoại về yêu cầu gọi thợ (cùng nhận diện ô icon của các dịch vụ khác). */
+const REQUEST_LOOK = { Icon: Wrench, tone: { soft: 'bg-service-goi-tho-soft', fg: 'text-service-goi-tho' } } as const;
 
 export function ConversationList({
   selectedId,
@@ -56,7 +62,7 @@ export function ConversationList({
 }: {
   selectedId: string | null;
   /** Chỉ hội thoại của một dịch vụ (mini-app), không chip lọc. */
-  lockFeature?: Feature;
+  lockFeature?: InboxScope;
   /** CTA của hộp thư rỗng khi khoá dịch vụ (mặc định /tin). */
   emptyHref?: string;
   /** Gốc đường dẫn khung chat khi khoá dịch vụ (mini-app, vd /pass-do/tin-nhan); thiếu → /tin-nhan/[id]. */
@@ -89,6 +95,7 @@ const LOCK_MIN_VISIBLE = 8;
 
 /** Ô icon + màu của dịch vụ (lấy từ config tính năng — giống ô icon trên thẻ tin / thẻ nhóm). */
 function serviceLook(c: ConversationSummary) {
+  if (isRequestConversation(c)) return REQUEST_LOOK;
   const feature = conversationFeature(c);
   if (!feature) return null;
   if (feature === 'ride' || feature === 'sport') return GROUP_FEATURE_CONFIGS[feature];
@@ -105,7 +112,10 @@ function ConversationItems({ selectedId, lock }: { selectedId: string | null; lo
   const { items, hasNextPage, isFetchingNextPage, fetchNextPage } = conversations;
   const lockedFeature = lock?.feature;
   const locked = useMemo(
-    () => (lockedFeature ? items.filter((c) => conversationFeature(c) === lockedFeature) : null),
+    () =>
+      lockedFeature
+        ? items.filter((c) => (lockedFeature === 'goiTho' ? isRequestConversation(c) : conversationFeature(c) === lockedFeature))
+        : null,
     [items, lockedFeature],
   );
   const short = !!locked && locked.length < LOCK_MIN_VISIBLE;
@@ -269,9 +279,13 @@ function ConversationRow({ conversation: c, selected, href }: { conversation: Co
     ? [c.group_starts_at ? formatDate(c.group_starts_at, locale, 'datetime') : null, t('group.chat.members', { count: c.member_count ?? 0 })]
         .filter(Boolean)
         .join(' · ')
-    : c.listing_title
-      ? [c.listing_title, price(c)].filter(Boolean).join(' · ')
-      : t('chat.inbox.listing_gone');
+    : isRequestConversation(c)
+      ? c.request_title
+        ? t('tho.chat.context', { title: c.request_title })
+        : t('tho.chat.closed')
+      : c.listing_title
+        ? [c.listing_title, price(c)].filter(Boolean).join(' · ')
+        : t('chat.inbox.listing_gone');
   const unread = unreadBadge(c.unread_count);
   const when = c.last_message_at ?? c.created_at;
 

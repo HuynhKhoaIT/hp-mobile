@@ -3,7 +3,7 @@
 // Server Action báo cáo (moderator+). audit_log do DB ghi: trigger trg_reports_audit (`report.update` mỗi dòng),
 // RPC staff_set_listing_status (`listing.status`), staff_cancel_group (`group.cancel`, thành viên nhận thông báo).
 // "Ẩn tin / Huỷ nhóm rồi đóng báo cáo" là 2 bước độc lập, mỗi bước tự ghi audit; bước 2 lỗi → báo cáo còn mở, làm lại được.
-import { resolveReportsForTarget, setReportsStatus, staffCancelGroup, staffSetListingStatus } from '@hp/core';
+import { resolveReportsForTarget, setReportsStatus, staffCancelGroup, staffCancelServiceRequest, staffSetListingStatus } from '@hp/core';
 import { updateTag } from 'next/cache';
 import type { ActionResult } from '@/lib/action-result';
 import { asRecord, refreshAdmin, withStaff } from '../lib/server';
@@ -28,6 +28,19 @@ export async function hideReportedListingAction(raw: unknown): Promise<ActionRes
     updateTag(`listing:${v.listingId}`);
     updateTag('listings');
   }
+  if (result.ok) refreshAdmin();
+  return result;
+}
+
+/** Huỷ yêu cầu gọi thợ bị báo cáo (có ghi chú; chủ + thợ đã báo giá nhận thông báo, audit service_request.cancel) rồi đóng báo cáo. */
+export async function cancelReportedRequestAction(raw: unknown): Promise<ActionResult<{ updated: string[] }>> {
+  const v = asRecord(raw);
+  const result = await withStaff('moderator', async (s) => {
+    const cancelled = await staffCancelServiceRequest(s.supabase, { requestId: v.requestId, note: v.note });
+    // Yêu cầu đã đóng (hoàn thành / huỷ / hết hạn) từ trước: vẫn cho đóng báo cáo.
+    if (cancelled.error && cancelled.error.code !== 'request_closed') return cancelled;
+    return resolveReportsForTarget(s.supabase, { targetType: 'service_request', targetId: v.requestId });
+  });
   if (result.ok) refreshAdmin();
   return result;
 }

@@ -7,9 +7,11 @@ import {
   createBannedKeyword,
   createSite,
   deleteBannedKeyword,
+  reorderMiniApps,
   reviewVenue,
   setVenueHidden,
   updateBannedKeyword,
+  updateMiniApp,
   updateSite,
   updateVenue,
 } from '@hp/core';
@@ -73,6 +75,21 @@ export async function updateSiteAction(raw: unknown): Promise<ActionResult<null>
     ),
     () => updateTag('sites'),
   );
+}
+
+// ── Mini-app bật / tắt + thứ tự (admin) — audit `mini_app.update` do trigger trg_mini_apps_audit ──
+// updateTag('mini-apps'): làm mới cấu hình đã cache (Hub, cổng route, sitemap) ngay.
+export async function setMiniAppAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  return done(
+    await withStaff('admin', (s) => updateMiniApp(s.supabase, { code: v.code, isEnabled: v.isEnabled })),
+    () => updateTag('mini-apps'),
+  );
+}
+
+export async function reorderMiniAppsAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  return done(await withStaff('admin', (s) => reorderMiniApps(s.supabase, v.codes)), () => updateTag('mini-apps'));
 }
 
 // ── Từ khoá cấm (admin) ──

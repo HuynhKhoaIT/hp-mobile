@@ -62,5 +62,31 @@
   "rating_received": {
     "title": "Bạn nhận được lời cảm ơn",
     "body": "{{name}} đã đánh giá bạn {{score}}/5 sao cho \"{{title}}\"."
+  },
+  "quote_received": {
+    "title": "Có báo giá mới",
+    "body": "{{pro_name}} vừa báo giá cho \"{{title}}\"."
+  },
+  "quote_accepted": {
+    "title": "Bạn được chọn!",
+    "body": "Chủ yêu cầu đã chọn báo giá của bạn cho \"{{title}}\". Nhắn tin để hẹn giờ."
+  },
+  "quote_declined": {
+    "title": "Báo giá chưa được chọn",
+    "body": "Chủ yêu cầu đã chọn thợ khác cho \"{{title}}\"."
+  },
+  "request_cancelled": {
+    "title": "Yêu cầu đã bị huỷ",
+    "body": "Yêu cầu \"{{title}}\" đã bị huỷ.",
+    "body_owner": "Yêu cầu \"{{title}}\" của bạn đã bị huỷ vì vi phạm quy định."
+  },
+  "request_completed": {
+    "title": "Đã hoàn thành",
+    "body": "\"{{title}}\" đã được xác nhận hoàn thành. Hãy đánh giá người cần thợ nhé!"
+  },
+  "request_expired": {
+    "title": "Yêu cầu đã hết hạn",
+    "body": "Yêu cầu \"{{title}}\" đã hết hạn nhận báo giá.",
+    "body_owner": "Yêu cầu \"{{title}}\" của bạn đã hết hạn. Đăng lại nếu bạn vẫn cần thợ."
   }
 }

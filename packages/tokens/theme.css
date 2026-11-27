@@ -28,6 +28,8 @@
   --color-service-sport-soft: #FCECEC;
   --color-service-lost-found: #A87A00;
   --color-service-lost-found-soft: #FBF3D9;
+  --color-service-goi-tho: #7C3AED;
+  --color-service-goi-tho-soft: #F3EEFF;
   --color-app-from: #0B4A9C;
   --color-app-to: #1E6FD9;
 
@@ -114,6 +116,8 @@
   --color-service-sport-soft: #3A2224;
   --color-service-lost-found: #E6BE55;
   --color-service-lost-found-soft: #3A3220;
+  --color-service-goi-tho: #C4B5FD;
+  --color-service-goi-tho-soft: #2A1F4A;
   --color-shimmer: rgba(148,163,184,0.14);
 }
 
@@ -160,6 +164,13 @@
   --color-app-from: #92400E;
   --color-app-to: #D97706;
 }
+[data-app-theme='goi-tho'] {
+  --color-primary: #6D28D9;
+  --color-primary-light: #F3EEFF;
+  --color-on-primary: #FFFFFF;
+  --color-app-from: #5B21B6;
+  --color-app-to: #7C3AED;
+}
 .dark [data-app-theme='pass'] {
   --color-primary: #FB923C;
   --color-primary-light: #3A2414;
@@ -201,4 +212,11 @@
   --color-on-primary: #0B1120;
   --color-app-from: #78350F;
   --color-app-to: #92400E;
+}
+.dark [data-app-theme='goi-tho'] {
+  --color-primary: #A78BFA;
+  --color-primary-light: #2A1F4A;
+  --color-on-primary: #0B1120;
+  --color-app-from: #3B0764;
+  --color-app-to: #4C1D95;
 }

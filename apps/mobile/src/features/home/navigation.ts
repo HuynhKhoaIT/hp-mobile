@@ -8,6 +8,7 @@ import { hasMiniApp } from '@/features/configs';
 import { openGroupList } from '@/features/group/navigation';
 import { LISTING_ROUTE_SLUG, openListingList, openMiniApp, openMyListings } from '@/features/listing/navigation';
 import type { ListingFeatureConfig } from '@/features/listing/types';
+import { openGoiTho } from '@/features/tho/navigation';
 
 /** Vào một tính năng Listing (ô dịch vụ, "Xem tất cả", "Tìm nhanh"): có mini-app → mini-app, không thì danh sách. */
 export function openFeature(
@@ -27,7 +28,8 @@ export function openTile(tile: HomeTile) {
     else openListingList('all');
     return;
   }
-  if (isListingTile(tile.id)) openFeature(LISTING_ROUTE_SLUG[tile.id]);
+  if (tile.id === 'goiTho') openGoiTho();
+  else if (isListingTile(tile.id)) openFeature(LISTING_ROUTE_SLUG[tile.id]);
   else openGroupList(tile.id);
 }
 

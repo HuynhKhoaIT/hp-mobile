@@ -6,7 +6,7 @@
 // (ô icon dịch vụ · giờ hẹn · còn bao lâu · trạng thái · "Xem nhóm").
 // Không có nút gọi điện / vị trí xe / đặt chỗ của Stitch: chat không có các tính năng đó.
 import type { ConversationSummary } from '@hp/core';
-import { groupDisplayStatus } from '@hp/shared';
+import { groupDisplayStatus, type ServiceTrade } from '@hp/shared';
 import { Image } from 'expo-image';
 import { ChevronLeft, ChevronRight, EllipsisVertical, Package } from 'lucide-react-native';
 import type { ReactNode } from 'react';
@@ -15,6 +15,8 @@ import { Pressable, View } from 'react-native';
 import { openGroup } from '@/features/group/navigation';
 import { type MiniSlug, openListing } from '@/features/listing/navigation';
 import { openProfile } from '@/features/profile/navigation';
+import { openServiceRequest } from '@/features/tho/navigation';
+import { TRADE_ICON } from '@/features/tho/trades';
 import { formatDate, formatRelative } from '@/lib/format';
 import { listingImageUrl, profileAvatarUrl } from '@/lib/images';
 import { Avatar, Badge, GROUP_STATUS_TONE, HeroDecor, Icon, IconButton, SERVICE, Text, useGroupTexts } from '@/ui';
@@ -107,7 +109,51 @@ export function ThreadHeader({
       </View>
       {c?.context_type === 'listing' ? <ListingContext conversation={c} mini={mini} /> : null}
       {c && group && c.group_starts_at ? <GroupContext conversation={c} /> : null}
+      {c?.context_type === 'service_request' ? <RequestContext conversation={c} /> : null}
     </View>
+  );
+}
+
+/** Thẻ ngữ cảnh chat về yêu cầu gọi thợ: loại thợ · tiêu đề yêu cầu · trạng thái → chạm mở chi tiết yêu cầu. */
+function RequestContext({ conversation: c }: { conversation: ConversationSummary }) {
+  const { t } = useTranslation('tho');
+  const gone = !c.request_title;
+  const trade = c.request_trade as ServiceTrade | null;
+  const TradeIcon = trade && trade in TRADE_ICON ? TRADE_ICON[trade] : SERVICE.goiTho.icon;
+  const closed = c.request_status === 'cancelled' || c.request_status === 'expired';
+
+  return (
+    <ContextStrip>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={gone ? t('chat.closed') : `${t('chat.open_request')}: ${c.request_title}`}
+        disabled={gone || !c.context_id}
+        onPress={() => c.context_id && openServiceRequest(c.context_id)}
+        className="min-h-14 flex-row items-center gap-3 rounded-md border border-border bg-bg p-2 active:bg-surface-2"
+      >
+        <View className={`size-10 items-center justify-center rounded-md ${SERVICE.goiTho.soft}`}>
+          <Icon icon={TradeIcon} service="goiTho" />
+        </View>
+        <View className="flex-1 gap-1">
+          <Text variant="label" weight="semibold" numberOfLines={1} tone={gone ? 'muted' : 'default'}>
+            {c.request_title ?? t('chat.closed')}
+          </Text>
+          {c.request_status ? (
+            <View className="flex-row flex-wrap items-center gap-1">
+              <Badge label={t(`status.${c.request_status}`)} tone={closed ? 'danger' : 'neutral'} numberOfLines={1} />
+            </View>
+          ) : null}
+        </View>
+        {gone ? null : (
+          <View className="flex-row items-center">
+            <Text variant="caption" weight="semibold" tone="primary">
+              {t('chat.open_request')}
+            </Text>
+            <Icon icon={ChevronRight} tone="primary" size={16} />
+          </View>
+        )}
+      </Pressable>
+    </ContextStrip>
   );
 }
 

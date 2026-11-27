@@ -2,13 +2,14 @@
 // Lưu ý: toàn site `noindex` ở layout gốc trừ khi NEXT_PUBLIC_ALLOW_INDEX=true; robots.txt vẫn cho phép thu thập để Google
 // đọc được thẻ noindex đó.
 import type { MetadataRoute } from 'next';
+import { GOI_THO_PRIVATE_PATHS } from '@/features/goi-tho/routes';
 import { MINI_APP_PRIVATE_PATHS } from '@/features/listing/mini-app-routes';
 import { publicEnv } from '@/lib/env';
 import { withLocale } from '@/i18n/paths';
 import { routing } from '@/i18n/routing';
 
 // Trang con riêng tư của mini-app (/pass-do/da-luu, /tin-nhan, /quan-ly) cũng chặn; trang bộ lọc /pass-do/bo-loc chỉ noindex.
-const PRIVATE = ['/admin', '/toi', '/tin-nhan', '/dang-tin', '/thong-bao', '/tao-nhom', '/dang-nhap', ...MINI_APP_PRIVATE_PATHS];
+const PRIVATE = ['/admin', '/toi', '/tin-nhan', '/dang-tin', '/thong-bao', '/tao-nhom', '/dang-nhap', ...MINI_APP_PRIVATE_PATHS, ...GOI_THO_PRIVATE_PATHS];
 
 export default function robots(): MetadataRoute.Robots {
   const base = publicEnv.siteUrl.replace(/\/+$/, '');

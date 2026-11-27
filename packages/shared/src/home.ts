@@ -4,10 +4,13 @@
 import type { Feature, ListingCategory, ListingFeature } from './enums';
 
 export type HomeTile =
-  | { id: Feature; kind: 'service'; soon?: boolean; isNew?: boolean }
+  | { id: Feature | 'goiTho'; kind: 'service'; soon?: boolean; isNew?: boolean }
   | { id: 'my_listings' | 'all'; kind: 'utility'; isNew?: boolean };
 
-/** 8 ô lưới dịch vụ (4 × 2 trên điện thoại). Nhãn: service → `common.feature.<id>`, utility → `common.home.tiles.<id>`. */
+/**
+ * Ô lưới dịch vụ (4 × 2 trên điện thoại; 9 ô khi admin bật Gọi thợ → 3 × 3). Nhãn: service → `common.feature.<id>`,
+ * utility → `common.home.tiles.<id>`. Gọi thợ (`goiTho`) mặc định tắt trong bảng mini_apps nên Hub vẫn 8 ô tới khi admin bật.
+ */
 export const HOME_TILES: readonly HomeTile[] = [
   { id: 'pass', kind: 'service' },
   { id: 'room', kind: 'service' },
@@ -15,6 +18,7 @@ export const HOME_TILES: readonly HomeTile[] = [
   { id: 'lostFound', kind: 'service' },
   { id: 'ride', kind: 'service', isNew: true },
   { id: 'sport', kind: 'service', isNew: true },
+  { id: 'goiTho', kind: 'service', isNew: true },
   { id: 'my_listings', kind: 'utility' },
   { id: 'all', kind: 'utility' },
 ];

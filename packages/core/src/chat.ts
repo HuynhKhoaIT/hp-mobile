@@ -30,6 +30,15 @@ export function conversationFeature(c: Pick<ConversationSummary, 'kind' | 'listi
 }
 
 /**
+ * Hội thoại về một yêu cầu gọi thợ (context_type 'service_request', direct giữa chủ ↔ thợ có báo giá). Gọi thợ không
+ * thuộc 6 Feature nên conversationFeature trả null — hộp thư / header chat rẽ nhánh bằng hàm này và đọc `request_*`
+ * (request_title, request_trade, request_status, request_customer_id, request_accepted_pro_id).
+ */
+export function isRequestConversation(c: Pick<ConversationSummary, 'context_type'>): boolean {
+  return c.context_type === 'service_request';
+}
+
+/**
  * Nguồn giá của tin ngữ cảnh cho priceLabel (@hp/shared) — client tự dịch + định dạng. Việc làm (lương nằm trong
  * attributes, hộp thư không có) / hội thoại nhóm / không giá → null.
  */
