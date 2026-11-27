@@ -8,6 +8,7 @@ export {
   unwrap,
   useBanners,
   useCompleteOnboarding,
+  useMiniApps,
   useMyListingStats,
   usePublicStats,
   useUnreadNotificationCount,

@@ -1,9 +1,9 @@
 // Hook TanStack Query dùng chung app và web (client). Client lấy qua useSupabase(); key chỉ từ keys.ts.
 // queryFn ném AppError (unwrap) để TanStack đánh dấu lỗi; component đọc `error.code` rồi t('errors.' + code).
-import type { Locale } from '@hp/shared';
+import { DEFAULT_MINI_APPS, enabledMiniApps, isMiniAppEnabled, type Locale, type MiniAppCode, type MiniAppState } from '@hp/shared';
 import type { Session } from '@supabase/supabase-js';
 import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { type Banner, type BannerPlacement, getMyListingStats, getPublicStats, listBanners, type MyListingStats, type PublicStats } from '../home';
 import { keys } from '../keys';
 import {
@@ -15,6 +15,7 @@ import {
   searchListings,
   similarListings,
 } from '../listings';
+import { listMiniApps } from '../mini-apps';
 import { completeOnboarding, getMyProfile, type MyProfile, updateMyProfile, uploadAvatar } from '../profile';
 import type { AppError, Result } from '../result';
 import { countUnreadNotifications, listSiteLocations, listSites, type Page, type Site, type SiteLocation } from '../social';
@@ -83,6 +84,32 @@ export function useSiteLocations(opts: { enabled?: boolean } = {}) {
     staleTime: 60 * 60_000,
     enabled: opts.enabled ?? true,
   });
+}
+
+/**
+ * Cấu hình bật / tắt mini-app (admin quản lý ở /admin/catalog; đổi hiếm → cache 5 phút). Chưa tải / lỗi → mặc định fail-open
+ * (`DEFAULT_MINI_APPS`: 6 mini-app hiện có bật) để Hub không trống khi mạng yếu.
+ */
+export function useMiniApps() {
+  const client = useSupabase();
+  const query = useQuery<MiniAppState[], AppError>({
+    queryKey: keys.miniApps(),
+    queryFn: () => unwrap(listMiniApps(client)),
+    staleTime: 5 * 60_000,
+  });
+  const states: readonly MiniAppState[] = query.data ?? DEFAULT_MINI_APPS;
+  return useMemo(
+    () => ({
+      states,
+      /** Mã đang bật, theo thứ tự hiển thị. */
+      enabled: enabledMiniApps(states),
+      isEnabled: (code: MiniAppCode) => isMiniAppEnabled(states, code),
+      isLoading: query.isLoading,
+      isError: query.isError,
+      refetch: query.refetch,
+    }),
+    [states, query.isLoading, query.isError, query.refetch],
+  );
 }
 
 /** Bước cuối onboarding: tên, ngôn ngữ, khu, quan tâm + đồng ý điều khoản. */

@@ -11,6 +11,8 @@ export const keys = {
   me: (userId?: string) => (userId ? (['hp', 'me', userId] as const) : (['hp', 'me'] as const)),
   sites: () => ['hp', 'sites'] as const,
   siteLocations: () => ['hp', 'sites', 'locations'] as const,
+  /** Cấu hình bật / tắt mini-app (admin quản lý ở /admin/catalog). */
+  miniApps: () => ['hp', 'mini-apps'] as const,
   banners: (placement: string, locale: string) => ['hp', 'banners', placement, locale] as const,
   myListingStats: () => ['hp', 'my-listings', 'stats'] as const,
   publicStats: () => ['hp', 'public-stats'] as const,
@@ -71,6 +73,7 @@ export const keys = {
   adminListings: (filters?: Filters) => ['hp', 'admin', 'listings', filters ?? {}] as const,
   adminGroups: (filters?: Filters) => ['hp', 'admin', 'groups', filters ?? {}] as const,
   adminSites: () => ['hp', 'admin', 'sites'] as const,
+  adminMiniApps: () => ['hp', 'admin', 'mini-apps'] as const,
   adminVenues: (filters?: Filters) => ['hp', 'admin', 'venues', filters ?? {}] as const,
   adminKeywords: (filters?: Filters) => ['hp', 'admin', 'keywords', filters ?? {}] as const,
   adminBanners: (filters?: Filters) => ['hp', 'admin', 'banners', filters ?? {}] as const,
