@@ -565,18 +565,21 @@
     "title": {
       "pass": "二手市场",
       "room": "Dung Quat 租房",
-      "job": "Dung Quat 招工"
+      "job": "Dung Quat 招工",
+      "lostFound": "Dung Quat 失物招领"
     },
     "subtitle": {
       "pass": "工友之间方便买卖",
       "room": "在工厂附近找单间、整套房屋和合租",
-      "job": "工厂附近的轮班与兼职工作"
+      "job": "工厂附近的轮班与兼职工作",
+      "lostFound": "寻找丢失的物品，归还在园区附近拾到的东西"
     },
     "tabs": {
       "home": {
         "pass": "市场",
         "room": "找房",
-        "job": "找工作"
+        "job": "找工作",
+        "lostFound": "失物招领"
       },
       "saved": "收藏",
       "post": "发布",
@@ -793,6 +796,59 @@
       "updated": "{{time}}更新",
       "contact_cta": "发消息应聘",
       "employer_title": "招聘方"
+    },
+    "lost-found": {
+      "badge": "失物招领",
+      "near_label": "附近",
+      "categories_title": "你需要什么？",
+      "tile_card": "证件 / 卡",
+      "tile_card_hint": "身份证、工牌",
+      "tile_wallet": "钱包",
+      "tile_wallet_hint": "钱包、现金、银行卡",
+      "tile_phone": "手机",
+      "tile_phone_hint": "手机、充电器",
+      "tile_keys": "钥匙",
+      "tile_keys_hint": "车钥匙、房间钥匙",
+      "trust_title": "安全归还",
+      "trust_body": "询问只有失主才知道的一个细节。约在人多的地方见面，不要公布证件号码。",
+      "list_title": "最新发布",
+      "list_subtitle": "你工作地点附近的失物与招领",
+      "finder_eyebrow": "捡到东西了？",
+      "finder_title": "捡到别人的东西？",
+      "finder_body": "发布信息，让失主找回——只需一分钟。",
+      "finder_cta": "发布拾物",
+      "saved": {
+        "tab_active": "进行中 ({{count}})",
+        "tab_inactive": "已关闭 ({{count}})",
+        "inactive_hint": "该信息已关闭",
+        "find_similar": "查看类似信息",
+        "tip_title": "安全归还提示",
+        "tip_body": "询问只有失主才知道的一个细节。约在厂门口、食堂等人多的地方。"
+      },
+      "manage": {
+        "active_count_one": "{{count}} 条进行中",
+        "active_count_other": "{{count}} 条进行中",
+        "tab_active": "进行中",
+        "tab_hidden": "已关闭",
+        "tip": "提示：写清丢失 / 拾到的地点和时间，留一个细节用来询问认领人。",
+        "search_placeholder": "按标题、编号搜索…",
+        "empty_active_title": "暂无进行中的信息",
+        "empty_active_body": "丢了或捡到东西——发布信息，让大家一起帮忙。",
+        "empty_hidden_title": "暂无已关闭的信息",
+        "empty_hidden_body": "已归还、已过期的信息和草稿都在这里。"
+      },
+      "filter": {
+        "category_title": "信息类型",
+        "category_sub": "物品类型",
+        "location_title": "丢失 / 拾到的区域",
+        "location_hint": "选择离你丢失或拾到物品最近的区域。"
+      }
+    },
+    "lost_found_detail": {
+      "title": "信息详情",
+      "open": "尚未归还",
+      "updated": "{{time}}更新",
+      "poster_title": "发布者"
     }
   }
 }

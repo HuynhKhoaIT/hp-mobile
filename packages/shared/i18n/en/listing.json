@@ -565,18 +565,21 @@
     "title": {
       "pass": "Pass Market",
       "room": "Dung Quat Rooms",
-      "job": "Dung Quat Jobs"
+      "job": "Dung Quat Jobs",
+      "lostFound": "Dung Quat Lost & Found"
     },
     "subtitle": {
       "pass": "Buy and sell between workers around the sites",
       "room": "Find rooms, whole houses and roommates near the factories",
-      "job": "Shift and part-time jobs near the factories"
+      "job": "Shift and part-time jobs near the factories",
+      "lostFound": "Find lost items and return what you found around the sites"
     },
     "tabs": {
       "home": {
         "pass": "Market",
         "room": "Rooms",
-        "job": "Jobs"
+        "job": "Jobs",
+        "lostFound": "Lost & found"
       },
       "saved": "Saved",
       "post": "Post",
@@ -793,6 +796,59 @@
       "updated": "Updated {{time}}",
       "contact_cta": "Message to apply",
       "employer_title": "Employer"
+    },
+    "lost-found": {
+      "badge": "Lost & found",
+      "near_label": "Near you",
+      "categories_title": "What do you need?",
+      "tile_card": "Cards / IDs",
+      "tile_card_hint": "ID card, staff badge",
+      "tile_wallet": "Wallet",
+      "tile_wallet_hint": "Wallet, cash, bank cards",
+      "tile_phone": "Phone",
+      "tile_phone_hint": "Phone, charger",
+      "tile_keys": "Keys",
+      "tile_keys_hint": "Vehicle or room keys",
+      "trust_title": "Safe handovers",
+      "trust_body": "Ask about one detail only the owner would know. Meet in a busy place and never post document numbers.",
+      "list_title": "Latest posts",
+      "list_subtitle": "Lost and found items around your workplace",
+      "finder_eyebrow": "Found something?",
+      "finder_title": "Found someone else’s belongings?",
+      "finder_body": "Post it so the owner can get it back — it takes a minute.",
+      "finder_cta": "Report a find",
+      "saved": {
+        "tab_active": "Open ({{count}})",
+        "tab_inactive": "Closed ({{count}})",
+        "inactive_hint": "This post is closed",
+        "find_similar": "See similar posts",
+        "tip_title": "Safe handover tips",
+        "tip_body": "Ask about one detail only the owner would know. Meet somewhere busy such as the factory gate or canteen."
+      },
+      "manage": {
+        "active_count_one": "{{count}} post open",
+        "active_count_other": "{{count}} posts open",
+        "tab_active": "Open",
+        "tab_hidden": "Closed",
+        "tip": "Tip: state where and when it was lost or found, and keep one detail back to ask the claimant.",
+        "search_placeholder": "Search by title or code…",
+        "empty_active_title": "No open posts",
+        "empty_active_body": "Lost or found something — post it so others can help.",
+        "empty_hidden_title": "No closed posts",
+        "empty_hidden_body": "Returned items, expired posts and drafts are kept here."
+      },
+      "filter": {
+        "category_title": "Post type",
+        "category_sub": "Item type",
+        "location_title": "Where it was lost / found",
+        "location_hint": "Pick the area closest to where you lost or found it."
+      }
+    },
+    "lost_found_detail": {
+      "title": "Post details",
+      "open": "Not returned yet",
+      "updated": "Updated {{time}}",
+      "poster_title": "Posted by"
     }
   }
 }

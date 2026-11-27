@@ -565,18 +565,21 @@
     "title": {
       "pass": "Chợ Pass Đồ",
       "room": "Nhà Trọ Dung Quất",
-      "job": "Việc Làm Dung Quất"
+      "job": "Việc Làm Dung Quất",
+      "lostFound": "Đồ Thất Lạc Dung Quất"
     },
     "subtitle": {
       "pass": "Cộng đồng thợ & công nhân mua bán tiện ích",
       "room": "Tìm phòng trọ, nhà nguyên căn, ở ghép gần nhà máy",
-      "job": "Việc ca kíp, làm thêm ngay gần nhà máy"
+      "job": "Việc ca kíp, làm thêm ngay gần nhà máy",
+      "lostFound": "Tìm đồ đánh mất, trả lại đồ nhặt được quanh khu"
     },
     "tabs": {
       "home": {
         "pass": "Chợ Pass",
         "room": "Tìm trọ",
-        "job": "Tìm việc"
+        "job": "Tìm việc",
+        "lostFound": "Thất lạc"
       },
       "saved": "Đã lưu",
       "post": "Đăng tin",
@@ -793,6 +796,59 @@
       "updated": "Cập nhật {{time}}",
       "contact_cta": "Nhắn tin ứng tuyển",
       "employer_title": "Nhà tuyển dụng"
+    },
+    "lost-found": {
+      "badge": "Thất lạc KKT",
+      "near_label": "Gần bạn",
+      "categories_title": "Bạn cần gì?",
+      "tile_card": "Thẻ / giấy tờ",
+      "tile_card_hint": "CCCD, thẻ nhân viên",
+      "tile_wallet": "Ví",
+      "tile_wallet_hint": "Ví, tiền, thẻ ngân hàng",
+      "tile_phone": "Điện thoại",
+      "tile_phone_hint": "Điện thoại, sạc",
+      "tile_keys": "Chìa khoá",
+      "tile_keys_hint": "Chìa xe, chìa phòng",
+      "trust_title": "Trả đồ an toàn",
+      "trust_body": "Hỏi một đặc điểm riêng của món đồ để trả đúng chủ. Hẹn nơi đông người, không đăng số giấy tờ.",
+      "list_title": "Tin mới đăng",
+      "list_subtitle": "Mất đồ và nhặt được quanh khu làm việc của bạn",
+      "finder_eyebrow": "Nhặt được đồ?",
+      "finder_title": "Nhặt được đồ của người khác?",
+      "finder_body": "Đăng tin để người mất nhận lại đồ — chỉ mất một phút.",
+      "finder_cta": "Báo nhặt được",
+      "saved": {
+        "tab_active": "Đang đăng ({{count}})",
+        "tab_inactive": "Đã đóng ({{count}})",
+        "inactive_hint": "Tin này đã đóng",
+        "find_similar": "Xem tin tương tự",
+        "tip_title": "Mẹo trả đồ an toàn",
+        "tip_body": "Hỏi một đặc điểm riêng để chắc đúng chủ. Hẹn nơi đông người như cổng nhà máy, căng-tin."
+      },
+      "manage": {
+        "active_count_one": "{{count}} tin đang đăng",
+        "active_count_other": "{{count}} tin đang đăng",
+        "tab_active": "Đang đăng",
+        "tab_hidden": "Đã đóng",
+        "tip": "Mẹo: ghi rõ nơi và thời điểm mất / nhặt, giữ lại một đặc điểm riêng để hỏi người nhận.",
+        "search_placeholder": "Tìm theo tiêu đề, mã tin…",
+        "empty_active_title": "Chưa có tin đang đăng",
+        "empty_active_body": "Mất đồ hay nhặt được đồ — đăng tin để mọi người cùng giúp.",
+        "empty_hidden_title": "Chưa có tin đã đóng",
+        "empty_hidden_body": "Tin đã trả lại, tin hết hạn và bản nháp nằm ở đây."
+      },
+      "filter": {
+        "category_title": "Loại tin",
+        "category_sub": "Loại đồ",
+        "location_title": "Khu vực mất / nhặt",
+        "location_hint": "Chọn khu gần nơi bạn mất hoặc nhặt được đồ."
+      }
+    },
+    "lost_found_detail": {
+      "title": "Chi tiết tin",
+      "open": "Chưa trả lại",
+      "updated": "Cập nhật {{time}}",
+      "poster_title": "Người đăng"
     }
   }
 }
