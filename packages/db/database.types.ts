@@ -849,6 +849,76 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"service_quotes": {
+                  Row: {
+                    "available_at": string | null,"created_at": string,"id": string,"note": string | null,"price": number,"pro_id": string,"request_id": string,"status": Database["public"]['Enums']["service_quote_status"],"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "available_at"?: string | null,"created_at"?: string,"id"?: string,"note"?: string | null,"price": number,"pro_id"?: string,"request_id": string,"status"?: Database["public"]['Enums']["service_quote_status"],"updated_at"?: string
+                  }
+                  Update: {
+                    "available_at"?: string | null,"created_at"?: string,"id"?: string,"note"?: string | null,"price"?: number,"pro_id"?: string,"request_id"?: string,"status"?: Database["public"]['Enums']["service_quote_status"],"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "service_quotes_pro_id_fkey"
+      columns: ["pro_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_quotes_pro_id_fkey"
+      columns: ["pro_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_quotes_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "service_requests"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"service_requests": {
+                  Row: {
+                    "accepted_quote_id": string | null,"address_text": string | null,"budget_max": number | null,"budget_min": number | null,"completed_at": string | null,"created_at": string,"customer_id": string,"deleted_at": string | null,"description": string | null,"expires_at": string,"id": string,"images": (string)[],"lang": string,"location": unknown,"quotes_count": number,"site": string | null,"status": Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at": string,"urgency": Database["public"]['Enums']["service_urgency"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accepted_quote_id"?: string | null,"address_text"?: string | null,"budget_max"?: number | null,"budget_min"?: number | null,"completed_at"?: string | null,"created_at"?: string,"customer_id"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"quotes_count"?: number,"site"?: string | null,"status"?: Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at"?: string,"urgency"?: Database["public"]['Enums']["service_urgency"]
+                  }
+                  Update: {
+                    "accepted_quote_id"?: string | null,"address_text"?: string | null,"budget_max"?: number | null,"budget_min"?: number | null,"completed_at"?: string | null,"created_at"?: string,"customer_id"?: string,"deleted_at"?: string | null,"description"?: string | null,"expires_at"?: string,"id"?: string,"images"?: (string)[],"lang"?: string,"location"?: unknown,"quotes_count"?: number,"site"?: string | null,"status"?: Database["public"]['Enums']["service_request_status"],"title"?: string,"trade"?: Database["public"]['Enums']["service_trade"],"updated_at"?: string,"urgency"?: Database["public"]['Enums']["service_urgency"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "service_requests_accepted_quote_fkey"
+      columns: ["accepted_quote_id"]
+isOneToOne: false
+      referencedRelation: "service_quotes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_site_fkey"
+      columns: ["site"]
+isOneToOne: false
+      referencedRelation: "sites"
+      referencedColumns: ["code"]
+    }
+                  ]
                 },"sites": {
                   Row: {
                     "code": string,"created_at": string,"is_active": boolean,"location": unknown,"name": string,"sort_order": number,"updated_at": string
@@ -942,6 +1012,40 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"my_service_quotes": {
+                  Row: {
+                    "available_at": string | null,"customer_id": string,"customer_name": string | null,"images": (string)[],"my_rating": number | null,"note": string | null,"price": number,"quote_id": string,"quote_status": Database["public"]['Enums']["service_quote_status"],"quoted_at": string,"request_created_at": string,"request_id": string,"request_status": Database["public"]['Enums']["service_request_status"],"site_name": string | null,"title": string,"trade": Database["public"]['Enums']["service_trade"]
+                  }
+                  ComputedFields: never
+                  Relationships: [
+
+                  ]
+                },"my_service_requests": {
+                  Row: {
+                    "accepted_pro_id": string | null,"budget_max": number | null,"budget_min": number | null,"completed_at": string | null,"created_at": string,"customer_avatar_url": string | null,"customer_id": string,"customer_name": string | null,"customer_rating_avg": number,"customer_rating_count": number,"customer_since": string,"description": string | null,"expires_at": string,"id": string,"images": (string)[],"lang": string,"lat": number | null,"lng": number | null,"quotes_count": number,"site": string | null,"site_name": string | null,"status": Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at": string,"urgency": Database["public"]['Enums']["service_urgency"],"my_rating": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_site_fkey"
+      columns: ["site"]
+isOneToOne: false
+      referencedRelation: "sites"
+      referencedColumns: ["code"]
+    }
+                  ]
                 },"public_groups": {
                   Row: {
                     "attributes": NonNullable<Json>,"created_at": string,"description": string | null,"destination_lat": number | null,"destination_lng": number | null,"destination_text": string | null,"ends_at": string | null,"fee_per_person": number,"host_avatar_url": string | null,"host_badges": (string)[],"host_id": string,"host_name": string | null,"host_rating_avg": number,"host_rating_count": number,"host_since": string,"id": string,"is_past": boolean | null,"kind": Database["public"]['Enums']["group_kind"],"lang": string,"members": Json | null,"origin_lat": number | null,"origin_lng": number | null,"origin_text": string,"requires_approval": boolean,"seats_left": number | null,"seats_taken": number,"seats_total": number,"short_id": string | null,"site": string | null,"site_name": string | null,"slug": string | null,"starts_at": string,"status": Database["public"]['Enums']["group_status"],"sub_kind": string,"title": string,"updated_at": string,"venue_address": string | null,"venue_id": string | null,"venue_name": string | null
@@ -994,6 +1098,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "listings_site_fkey"
+      columns: ["site"]
+isOneToOne: false
+      referencedRelation: "sites"
+      referencedColumns: ["code"]
+    }
+                  ]
+                },"public_service_requests": {
+                  Row: {
+                    "accepted_pro_id": string | null,"budget_max": number | null,"budget_min": number | null,"completed_at": string | null,"created_at": string,"customer_avatar_url": string | null,"customer_id": string,"customer_name": string | null,"customer_rating_avg": number,"customer_rating_count": number,"customer_since": string,"description": string | null,"expires_at": string,"id": string,"images": (string)[],"lang": string,"lat": number | null,"lng": number | null,"quotes_count": number,"site": string | null,"site_name": string | null,"status": Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at": string,"urgency": Database["public"]['Enums']["service_urgency"]
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_customer_id_fkey"
+      columns: ["customer_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "service_requests_site_fkey"
       columns: ["site"]
 isOneToOne: false
       referencedRelation: "sites"
@@ -1247,9 +1377,62 @@ isOneToOne: false
               "avatar_url": string,"badges": (string)[],"display_name": string,"joined_at": string,"user_id": string
             }[]
                            },
+"accept_quote_tx":
+{ Args: { "p_quote_id": string }; Returns: string
+                           },
+"cancel_request":
+{ Args: { "p_request_id": string }; Returns: undefined
+                           },
+"complete_request_tx":
+{ Args: { "p_request_id": string }; Returns: undefined
+                           },
+"expire_service_requests":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
+"get_service_request":
+{ Args: { "p_id": string }; Returns: {
+              "accepted_pro_id": string | null,"budget_max": number | null,"budget_min": number | null,"completed_at": string | null,"created_at": string,"customer_avatar_url": string | null,"customer_id": string,"customer_name": string | null,"customer_rating_avg": number,"customer_rating_count": number,"customer_since": string,"description": string | null,"expires_at": string,"id": string,"images": (string)[],"lang": string,"lat": number | null,"lng": number | null,"quotes_count": number,"site": string | null,"site_name": string | null,"status": Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at": string,"urgency": Database["public"]['Enums']["service_urgency"]
+            }[]
+                           },
+"get_service_request_private":
+{ Args: { "p_request_id": string }; Returns: {
+              "address_text": string,"lat": number,"lng": number
+            }[]
+                           },
+"is_accepted_pro":
+{ Args: { "p_request_id": string }; Returns: boolean
+                           },
+"is_request_customer":
+{ Args: { "p_request_id": string }; Returns: boolean
+                           },
+"list_request_quotes":
+{ Args: { "p_request_id": string }; Returns: {
+              "available_at": string,"created_at": string,"id": string,"note": string,"price": number,"pro_avatar_url": string,"pro_badges": (string)[],"pro_id": string,"pro_name": string,"pro_rating_avg": number,"pro_rating_count": number,"status": Database["public"]['Enums']["service_quote_status"]
+            }[]
+                           },
+"rate_service_request":
+{ Args: { "p_comment"?: string,"p_request_id": string,"p_score": number }; Returns: undefined
+                           },
+"search_service_requests":
+{ Args: { "p_cursor_created_at"?: string,"p_cursor_id"?: string,"p_lat"?: number,"p_limit"?: number,"p_lng"?: number,"p_query"?: string,"p_radius_m"?: number,"p_site"?: string,"p_trade"?: Database["public"]['Enums']["service_trade"],"p_urgency"?: Database["public"]['Enums']["service_urgency"] }; Returns: {
+              "accepted_pro_id": string | null,"budget_max": number | null,"budget_min": number | null,"completed_at": string | null,"created_at": string,"customer_avatar_url": string | null,"customer_id": string,"customer_name": string | null,"customer_rating_avg": number,"customer_rating_count": number,"customer_since": string,"description": string | null,"expires_at": string,"id": string,"images": (string)[],"lang": string,"lat": number | null,"lng": number | null,"quotes_count": number,"site": string | null,"site_name": string | null,"status": Database["public"]['Enums']["service_request_status"],"title": string,"trade": Database["public"]['Enums']["service_trade"],"updated_at": string,"urgency": Database["public"]['Enums']["service_urgency"]
+            }[]
+                           },
+"staff_cancel_request":
+{ Args: { "p_note"?: string,"p_request_id": string }; Returns: undefined
+                           },
+"start_request_conversation":
+{ Args: { "p_pro_id"?: string,"p_request_id": string }; Returns: string
+                           },
+"submit_quote_tx":
+{ Args: { "p_available_at"?: string,"p_note"?: string,"p_price": number,"p_request_id": string }; Returns: string
+                           },
+"withdraw_quote":
+{ Args: { "p_quote_id": string }; Returns: undefined
+                           },
 "list_conversations":
 { Args: { "p_conversation_id"?: string,"p_cursor"?: string,"p_limit"?: number }; Returns: {
-              "blocked_by_me": boolean,"blocked_me": boolean,"context_id": string,"context_type": string,"created_at": string,"group_host_id": string,"group_kind": string,"group_slug": string,"group_starts_at": string,"group_status": string,"group_sub_kind": string,"group_title": string,"id": string,"kind": string,"last_message_at": string,"last_message_preview": string,"last_sender_id": string,"last_sender_name": string,"listing_category": string,"listing_image": string,"listing_owner_id": string,"listing_price": number,"listing_price_type": string,"listing_slug": string,"listing_status": string,"listing_title": string,"member_count": number,"muted": boolean,"other_avatar_url": string,"other_badges": (string)[],"other_last_read_at": string,"other_name": string,"other_user_id": string,"unread_count": number
+              "blocked_by_me": boolean,"blocked_me": boolean,"context_id": string,"context_type": string,"created_at": string,"group_host_id": string,"group_kind": string,"group_slug": string,"group_starts_at": string,"group_status": string,"group_sub_kind": string,"group_title": string,"id": string,"kind": string,"last_message_at": string,"last_message_preview": string,"last_sender_id": string,"last_sender_name": string,"listing_category": string,"listing_image": string,"listing_owner_id": string,"listing_price": number,"listing_price_type": string,"listing_slug": string,"listing_status": string,"listing_title": string,"member_count": number,"muted": boolean,"other_avatar_url": string,"other_badges": (string)[],"other_last_read_at": string,"other_name": string,"other_user_id": string,"request_accepted_pro_id": string,"request_customer_id": string,"request_status": string,"request_title": string,"request_trade": string,"unread_count": number
             }[]
                            },
 "list_group_members":
@@ -1530,7 +1713,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "group_kind": "ride"|"sport","group_status": "open"|"full"|"in_progress"|"completed"|"cancelled","listing_category": "pass_electronics"|"pass_vehicle"|"pass_ppe"|"pass_home"|"room_rent"|"room_share"|"job_main"|"job_parttime"|"lost"|"found"|"pass_appliance"|"pass_fashion"|"pass_sport"|"pass_tools"|"pass_baby"|"pass_other"|"room_house"|"room_apartment","listing_status": "draft"|"pending_review"|"active"|"sold"|"closed"|"expired"|"rejected","member_status": "requested"|"accepted"|"declined"|"left"|"kicked"
+            "group_kind": "ride"|"sport","group_status": "open"|"full"|"in_progress"|"completed"|"cancelled","listing_category": "pass_electronics"|"pass_vehicle"|"pass_ppe"|"pass_home"|"room_rent"|"room_share"|"job_main"|"job_parttime"|"lost"|"found"|"pass_appliance"|"pass_fashion"|"pass_sport"|"pass_tools"|"pass_baby"|"pass_other"|"room_house"|"room_apartment","listing_status": "draft"|"pending_review"|"active"|"sold"|"closed"|"expired"|"rejected","member_status": "requested"|"accepted"|"declined"|"left"|"kicked","service_quote_status": "submitted"|"accepted"|"declined"|"withdrawn","service_request_status": "open"|"assigned"|"completed"|"cancelled"|"expired","service_trade": "electric_plumbing"|"cleaning"|"welding"|"hvac"|"other","service_urgency": "today"|"this_week"|"flexible"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1650,7 +1833,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "group_kind": ["ride", "sport"],"group_status": ["open", "full", "in_progress", "completed", "cancelled"],"listing_category": ["pass_electronics", "pass_vehicle", "pass_ppe", "pass_home", "room_rent", "room_share", "job_main", "job_parttime", "lost", "found", "pass_appliance", "pass_fashion", "pass_sport", "pass_tools", "pass_baby", "pass_other", "room_house", "room_apartment"],"listing_status": ["draft", "pending_review", "active", "sold", "closed", "expired", "rejected"],"member_status": ["requested", "accepted", "declined", "left", "kicked"]
+            "group_kind": ["ride", "sport"],"group_status": ["open", "full", "in_progress", "completed", "cancelled"],"listing_category": ["pass_electronics", "pass_vehicle", "pass_ppe", "pass_home", "room_rent", "room_share", "job_main", "job_parttime", "lost", "found", "pass_appliance", "pass_fashion", "pass_sport", "pass_tools", "pass_baby", "pass_other", "room_house", "room_apartment"],"listing_status": ["draft", "pending_review", "active", "sold", "closed", "expired", "rejected"],"member_status": ["requested", "accepted", "declined", "left", "kicked"],"service_quote_status": ["submitted", "accepted", "declined", "withdrawn"],"service_request_status": ["open", "assigned", "completed", "cancelled", "expired"],"service_trade": ["electric_plumbing", "cleaning", "welding", "hvac", "other"],"service_urgency": ["today", "this_week", "flexible"]
           }
         }
 } as const
