@@ -25,7 +25,13 @@ export async function ServiceGrid() {
       aria-label={t('web.home.services_title')}
       className="relative rounded-lg border border-border bg-surface px-3 py-4 shadow-card sm:p-4"
     >
-      <ul className="grid grid-cols-4 gap-x-1 gap-y-3 md:grid-cols-8 md:gap-x-2">
+      {/* 9 ô (admin bật Gọi thợ) → 3 × 3 trên điện thoại, 9 cột từ 768px; còn lại 4 × 2 / 8 cột. Class đầy đủ cho Tailwind quét. */}
+      <ul
+        className={cn(
+          'grid gap-x-1 gap-y-3 md:gap-x-2',
+          tiles.length > 8 ? 'grid-cols-3 md:grid-cols-9' : 'grid-cols-4 md:grid-cols-8',
+        )}
+      >
         {tiles.map((tile, i) => {
           const label = t(tile.labelKey);
           const badge = tile.soon ? t('common.home.badge.soon') : tile.isNew ? t('common.home.badge.new') : null;
