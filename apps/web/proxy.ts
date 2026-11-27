@@ -3,6 +3,7 @@
 // Vai trò đọc từ JWT claims (app_metadata.role) — không query DB ở đây.
 import createIntlMiddleware from 'next-intl/middleware';
 import { type NextRequest, NextResponse } from 'next/server';
+import { GOI_THO_PRIVATE_PATHS } from '@/features/goi-tho/routes';
 import { MINI_APP_PRIVATE_PATHS } from '@/features/listing/mini-app-routes';
 import { splitLocale } from '@/i18n/paths';
 import { routing } from '@/i18n/routing';
@@ -11,7 +12,7 @@ import { updateSession } from '@/lib/supabase/proxy';
 const intl = createIntlMiddleware(routing);
 
 /** Route cần đăng nhập (khu (auth)) + trang con riêng tư của mini-app (/pass-do/da-luu, /tin-nhan, /quan-ly). */
-const AUTH_ONLY = ['/dang-tin', '/tao-nhom', '/tin-nhan', '/thong-bao', '/toi', ...MINI_APP_PRIVATE_PATHS];
+const AUTH_ONLY = ['/dang-tin', '/tao-nhom', '/tin-nhan', '/thong-bao', '/toi', ...MINI_APP_PRIVATE_PATHS, ...GOI_THO_PRIVATE_PATHS];
 /** Ngoại lệ: trang "Tôi" mở cho khách (nút đăng nhập + cài đặt ngôn ngữ / giao diện / pháp lý), giống tab Tôi của app. */
 const GUEST_OK = new Set(['/toi']);
 const STAFF = new Set(['moderator', 'admin']);

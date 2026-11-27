@@ -9,6 +9,11 @@ export function listingImageUrl(path: string, size: ImageSize): string {
   return imageUrl(publicEnv.supabaseUrl, 'listing-images', path, size, publicEnv.imageTransform);
 }
 
+/** Ảnh yêu cầu gọi thợ (bucket public request-images). */
+export function requestImageUrl(path: string, size: ImageSize): string {
+  return imageUrl(publicEnv.supabaseUrl, 'request-images', path, size, publicEnv.imageTransform);
+}
+
 /** Ảnh đại diện (path trong bucket avatars hoặc URL Google). null → hiện chữ cái đầu / icon. */
 export function profileAvatarUrl(value: string | null | undefined): string | null {
   return avatarUrl(publicEnv.supabaseUrl, value, publicEnv.imageTransform);

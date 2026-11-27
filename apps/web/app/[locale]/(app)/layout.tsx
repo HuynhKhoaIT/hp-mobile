@@ -24,6 +24,7 @@ export default async function AppLayout({ children }: LayoutProps<'/[locale]'>) 
         group: messages.group,
         chat: messages.chat,
         push: messages.push,
+        tho: messages.tho,
       }}
     >
       <DataProvider>
