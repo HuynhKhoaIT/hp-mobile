@@ -6,10 +6,11 @@
 //                                bản en / zh khai báo bằng hreflang trong <head> của trang tin.
 // Không có /admin, khu đăng nhập, /u/[id], /tim-kiem. Dữ liệu cache 1 giờ + tag `listings` (webhook làm mới).
 import 'server-only';
-import { LOCALES } from '@hp/shared';
+import { isMiniAppEnabled, LOCALES } from '@hp/shared';
 import { absoluteUrl } from '@/i18n/alternates';
 import { routing } from '@/i18n/routing';
 import { publicEnv } from '@/lib/env';
+import { getMiniApps } from '../home/mini-apps';
 import { getPublicStats, getSitemapListings, SITEMAP_PAGE_SIZE } from '../listing/queries';
 import { listBlogPosts } from '../marketing/content';
 import { FEATURE_PAGES } from '../marketing/links';
@@ -62,8 +63,10 @@ ${items}
 
 export async function staticSitemapXml(): Promise<string> {
   // Chỉ bài blog đã đăng (nháp không vào sitemap).
-  const posts = await listBlogPosts('vi');
-  const paths = [...STATIC_PATHS, ...posts.map((p) => `/blog/${p.slug}`)];
+  const [posts, miniApps] = await Promise.all([listBlogPosts('vi'), getMiniApps()]);
+  // Mini-app đang tắt (admin — bảng mini_apps): trang chủ mini-app + trang giới thiệu không vào sitemap.
+  const hidden = new Set(FEATURE_PAGES.filter((p) => !isMiniAppEnabled(miniApps, p.feature)).flatMap((p) => [p.href, `/tinh-nang/${p.slug}`]));
+  const paths = [...STATIC_PATHS, ...posts.map((p) => `/blog/${p.slug}`)].filter((path) => !hidden.has(path));
   const urls = paths.flatMap((path) =>
     LOCALES.map((locale) => {
       const links = [

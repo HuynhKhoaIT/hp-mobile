@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/admin/page-header';
 import { AdminOnlyState, AdminPage, TableSkeleton } from '@/components/admin/states';
 import { StatusTabs } from '@/components/admin/status-tabs';
 import { KeywordsPanel } from '@/features/admin/catalog/components/keywords-panel';
+import { MiniAppsPanel } from '@/features/admin/catalog/components/mini-apps-panel';
 import { SitesPanel } from '@/features/admin/catalog/components/sites-panel';
 import { VenuesPanel } from '@/features/admin/catalog/components/venues-panel';
 import { CATALOG_TABS, getCatalogPage } from '@/features/admin/catalog/queries';
@@ -54,6 +55,8 @@ async function Content({ searchParams }: { searchParams: PageProps<'/[locale]/ad
         </>
       ) : data.tab === 'sites' ? (
         <SitesPanel sites={data.sites} />
+      ) : data.tab === 'miniapps' ? (
+        <MiniAppsPanel miniApps={data.miniApps} />
       ) : (
         <>
           <FilterBar

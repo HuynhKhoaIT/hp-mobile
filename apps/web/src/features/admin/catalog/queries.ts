@@ -3,9 +3,11 @@
 import 'server-only';
 import {
   type AdminKeyword,
+  type AdminMiniApp,
   type AdminPage,
   type AdminSite,
   type AdminVenue,
+  listAdminMiniApps,
   listAdminSites,
   listAdminVenues,
   listBannedKeywords,
@@ -14,14 +16,15 @@ import type { StaffRole } from '../roles';
 import { pageOf, pick, pickQuery, type Query, type SearchParams } from '../lib/params';
 import { staffOrThrow, unwrap } from '../lib/server';
 
-export const CATALOG_TABS = ['venues', 'sites', 'keywords'] as const;
+export const CATALOG_TABS = ['venues', 'sites', 'miniapps', 'keywords'] as const;
 export type CatalogTab = (typeof CATALOG_TABS)[number];
 
 export type CatalogData =
   | { tab: 'venues'; venues: AdminPage<AdminVenue>; sites: AdminSite[]; query: Query; role: StaffRole; now: number }
   | { tab: 'sites'; sites: AdminSite[]; query: Query; role: StaffRole }
+  | { tab: 'miniapps'; miniApps: AdminMiniApp[]; query: Query; role: StaffRole }
   | { tab: 'keywords'; keywords: AdminKeyword[]; query: Query; role: StaffRole }
-  | { tab: 'sites' | 'keywords'; forbidden: true; query: Query; role: StaffRole };
+  | { tab: 'sites' | 'miniapps' | 'keywords'; forbidden: true; query: Query; role: StaffRole };
 
 export async function getCatalogPage(params: SearchParams): Promise<CatalogData> {
   const staff = await staffOrThrow();
@@ -45,5 +48,6 @@ export async function getCatalogPage(params: SearchParams): Promise<CatalogData>
   }
   if (role !== 'admin') return { tab, forbidden: true, query, role };
   if (tab === 'sites') return { tab, sites: unwrap(await listAdminSites(staff.supabase)), query, role };
+  if (tab === 'miniapps') return { tab, miniApps: unwrap(await listAdminMiniApps(staff.supabase)), query, role };
   return { tab, keywords: unwrap(await listBannedKeywords(staff.supabase, { q: pick(params, 'q'), action: pick(params, 'action') })), query, role };
 }

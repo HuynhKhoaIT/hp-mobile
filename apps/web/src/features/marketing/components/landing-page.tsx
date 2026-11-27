@@ -2,11 +2,12 @@
 // Hero → 6 dịch vụ → tin mới nhất → 3 bước → an toàn → số liệu → (cảm nhận) → cho chủ trọ / sân / tuyển dụng → FAQ → CTA.
 // Khối "Cảm nhận người dùng" chưa có: chỉ thêm khi có phản hồi thật đã xin phép, không viết lời chứng thực giả.
 // Số liệu chỉ hiện khi đủ lớn (getLandingStats). Dòng độc lập có ở khối FAQ, câu đầu, và footer.
-import { APP_NAME, formatNumber } from '@hp/shared';
+import { APP_NAME, formatNumber, isMiniAppEnabled } from '@hp/shared';
 import { Building2, Dumbbell, Flag, Lock, ShieldCheck, Store, type LucideIcon } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { JsonLd } from '@/components/shared/json-ld';
 import { buttonVariants } from '@/components/ui/button';
+import { getMiniApps } from '@/features/home/mini-apps';
 import { SERVICE_VISUALS } from '@/features/home/services';
 import { asLocale } from '@/features/listing/display';
 import { ListingCard } from '@/features/listing/components/listing-card';
@@ -41,7 +42,9 @@ export async function LandingPage() {
   const t = await getTranslations('web.marketing');
   const tc = await getTranslations('common');
   const locale = asLocale(await getLocale());
-  const [latest, stats] = await Promise.all([getLatestListings(), getLandingStats()]);
+  const [latest, stats, miniApps] = await Promise.all([getLatestListings(), getLandingStats(), getMiniApps()]);
+  // Dịch vụ của mini-app đang tắt (admin — bảng mini_apps) không còn trong danh sách giới thiệu.
+  const featurePages = FEATURE_PAGES.filter((p) => isMiniAppEnabled(miniApps, p.feature));
 
   return (
     <>
@@ -99,7 +102,7 @@ export async function LandingPage() {
           {t('services_title')}
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURE_PAGES.map(({ slug, feature }) => {
+          {featurePages.map(({ slug, feature }) => {
             const { Icon, soft, fg } = SERVICE_VISUALS[feature];
             return (
               <li key={slug}>
