@@ -57,6 +57,19 @@ test('visibleHomeTiles: ẩn mini-app tắt, theo thứ tự admin, ô tiện í
   );
 });
 
+test('visibleHomeTiles: Gọi thợ chỉ hiện khi admin bật, đứng theo thứ tự admin', () => {
+  const on = resolveMiniApps([{ code: 'goiTho', isEnabled: true, sortOrder: 15 }]);
+  assert.deepEqual(
+    visibleHomeTiles(HOME_TILES, on).map((t) => t.id),
+    ['pass', 'goiTho', 'room', 'job', 'lostFound', 'ride', 'sport', 'my_listings', 'all'],
+  );
+  assert.equal(
+    visibleHomeTiles(HOME_TILES, resolveMiniApps(null)).some((t) => t.id === 'goiTho'),
+    false,
+    'mặc định tắt → không có ô Gọi thợ',
+  );
+});
+
 test('isMiniAppCode', () => {
   assert.equal(isMiniAppCode('goiTho'), true);
   assert.equal(isMiniAppCode('lost-found'), false);

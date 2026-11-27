@@ -10,8 +10,8 @@ test('givenName: tên gọi là từ cuối', () => {
   assert.equal(givenName(null), '');
 });
 
-test('HOME_TILES: 8 ô, id không trùng; HOME_SHORTCUTS id không trùng', () => {
-  assert.equal(HOME_TILES.length, 8);
-  assert.equal(new Set(HOME_TILES.map((t) => t.id)).size, 8);
+test('HOME_TILES: 9 ô (8 + Gọi thợ, mặc định tắt), id không trùng; HOME_SHORTCUTS id không trùng', () => {
+  assert.equal(HOME_TILES.length, 9);
+  assert.equal(new Set(HOME_TILES.map((t) => t.id)).size, 9);
   assert.equal(new Set(HOME_SHORTCUTS.map((s) => s.id)).size, HOME_SHORTCUTS.length);
 });
