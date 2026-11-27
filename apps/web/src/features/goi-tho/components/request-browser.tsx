@@ -59,8 +59,8 @@ export function RequestBrowser() {
       <div role="group" aria-label={t('form.trade')} className="no-scrollbar -mx-4 overflow-x-auto px-4">
         <ul className="flex gap-2 py-0.5">
           {['', ...TRADES].map((code) => (
-            <li key={code || 'all'} className="flex">
-              <ChoiceChip selected={trade === code} onClick={() => setTrade(code)}>
+            <li key={code || 'all'} className="flex shrink-0">
+              <ChoiceChip selected={trade === code} className="whitespace-nowrap" onClick={() => setTrade(code)}>
                 {code ? t(`trade.${code}`) : t('list.filter_all')}
               </ChoiceChip>
             </li>

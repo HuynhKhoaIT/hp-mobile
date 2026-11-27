@@ -28,10 +28,12 @@ import {
   type ServiceTrade,
   type ServiceUrgency,
 } from '@hp/shared';
+import { tradeArtKey } from '@hp/tokens/category-art';
 import { CircleCheck, ImagePlus, Trash2, TriangleAlert } from 'lucide-react';
 import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
+import { CategoryArt } from '@/components/shared/category-art';
 import { ChoiceChip } from '@/components/shared/choice-chip';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
@@ -47,7 +49,8 @@ import { asLocale } from '@/features/listing/display';
 import { prepareImage } from '@/features/listing/listing-image';
 import { Link, useRouter } from '@/i18n/navigation';
 import { requestImageUrl } from '@/lib/images';
-import { GOI_THO_PATHS, TRADE_ICON, TRADES } from '../trades';
+import { cn } from '@/lib/utils';
+import { GOI_THO_PATHS, TRADES } from '../trades';
 import { MoneyInput } from './money-input';
 
 type Photo = { key: string; preview: string; status: 'uploading' | 'done' | 'error'; path?: string; revoke?: boolean };
@@ -350,16 +353,23 @@ export function RequestForm({ requestId, trade }: { requestId?: string; trade?: 
       ) : null}
 
       <Block title={t('form.trade')}>
-        <div role="group" aria-label={t('form.trade')} className="flex flex-wrap gap-2">
-          {TRADES.map((code) => {
-            const Icon = TRADE_ICON[code];
-            return (
-              <ChoiceChip key={code} selected={values.trade === code} disabled={editing} onClick={() => change({ trade: code })}>
-                <Icon strokeWidth={1.75} className="size-4" aria-hidden />
-                {t(`trade.${code}`)}
-              </ChoiceChip>
-            );
-          })}
+        <div role="group" aria-label={t('form.trade')} className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          {TRADES.map((code) => (
+            <button
+              key={code}
+              type="button"
+              aria-pressed={values.trade === code}
+              disabled={editing}
+              onClick={() => change({ trade: code })}
+              className={cn(
+                'flex min-h-24 flex-col items-center gap-2 rounded-lg border bg-surface p-3 text-center text-md font-medium text-fg shadow-card outline-none transition focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60',
+                values.trade === code ? 'border-2 border-primary bg-primary-light' : 'border-border hover:bg-surface-2',
+              )}
+            >
+              <CategoryArt category={tradeArtKey(code)} className="size-12" />
+              {t(`trade.${code}`)}
+            </button>
+          ))}
         </div>
         <p className="text-sm text-muted">{t(`trade_hint.${values.trade}`)}</p>
       </Block>

@@ -3,6 +3,7 @@
 // Nhãn: dịch vụ → common.feature.<id>, tiện ích → common.home.tiles.<id>; nhãn góc "Sắp có" / "Mới".
 import { useMiniApps } from '@hp/core/react';
 import { HOME_TILES, type HomeTile, visibleHomeTiles } from '@hp/shared';
+import { serviceArtKey } from '@hp/tokens/category-art';
 import { ClipboardList, LayoutGrid } from 'lucide-react-native';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +40,7 @@ export function HomeServices({ className }: { className?: string }) {
               <ServiceTile
                 variant="grid"
                 service={tile.id}
+                art={serviceArtKey(tile.id)}
                 label={t(`feature.${tile.id}`)}
                 badge={badgeOf(tile)}
                 soon={!!tile.soon}

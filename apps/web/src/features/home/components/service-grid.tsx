@@ -6,7 +6,9 @@
 // nâng 2px + bóng card, icon phóng 1.1. Giảm chuyển động → nhãn đứng yên, không nâng / phóng. Hiện lần lượt khi tải (stagger 30ms, trượt 8px; giảm chuyển động → chỉ mờ dần 150ms). Server Component: link
 // thật, chạy khi tắt JS.
 import { HOME_TILES, visibleHomeTiles } from '@hp/shared';
+import { serviceArtKey } from '@hp/tokens/category-art';
 import { getTranslations } from 'next-intl/server';
+import { CategoryArt, hasCategoryArt } from '@/components/shared/category-art';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { getMiniApps } from '../mini-apps';
@@ -60,23 +62,33 @@ export async function ServiceGrid() {
                   )}
                 >
                   {/* Mờ ở khung icon, không ở nhãn góc (nhãn "Sắp có" phải đọc rõ). */}
-                  <span
-                    className={cn(
-                      'flex size-full items-center justify-center rounded-md border transition-shadow duration-200 group-hover:shadow-card',
-                      tile.soft,
-                      tile.edge,
-                      tile.soon && 'opacity-60',
-                    )}
-                  >
-                    <tile.Icon
-                      aria-hidden
-                      strokeWidth={1.75}
+                  {hasCategoryArt(serviceArtKey(tile.id)) ? (
+                    <CategoryArt
+                      category={serviceArtKey(tile.id)}
                       className={cn(
-                        'size-6 transition-transform duration-200 group-hover:scale-110 motion-reduce:group-hover:scale-100',
-                        tile.fg,
+                        'size-full rounded-md transition-shadow duration-200 group-hover:shadow-card',
+                        tile.soon && 'opacity-60',
                       )}
                     />
-                  </span>
+                  ) : (
+                    <span
+                      className={cn(
+                        'flex size-full items-center justify-center rounded-md border transition-shadow duration-200 group-hover:shadow-card',
+                        tile.soft,
+                        tile.edge,
+                        tile.soon && 'opacity-60',
+                      )}
+                    >
+                      <tile.Icon
+                        aria-hidden
+                        strokeWidth={1.75}
+                        className={cn(
+                          'size-6 transition-transform duration-200 group-hover:scale-110 motion-reduce:group-hover:scale-100',
+                          tile.fg,
+                        )}
+                      />
+                    </span>
+                  )}
                   {badge ? (
                     <span
                       aria-hidden
