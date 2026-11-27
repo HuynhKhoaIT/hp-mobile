@@ -43,7 +43,13 @@
             { "scheme": "https", "host": "tenapp.vn", "path": "/en/viec-lam" },
             { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/viec-lam/" },
             { "scheme": "https", "host": "tenapp.vn", "path": "/zh/viec-lam" },
-            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/viec-lam/" }
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/viec-lam/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/that-lac" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/that-lac/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/en/that-lac" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/en/that-lac/" },
+            { "scheme": "https", "host": "tenapp.vn", "path": "/zh/that-lac" },
+            { "scheme": "https", "host": "tenapp.vn", "pathPrefix": "/zh/that-lac/" }
           ]
         }
       ],
