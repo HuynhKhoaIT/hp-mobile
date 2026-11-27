@@ -23,5 +23,7 @@ export * from './notifications';
 export * from './group-display';
 export * from './schemas/group';
 export * from './schemas/functions/groups';
+export * from './service-request-display';
+export * from './schemas/service-request';
 export * from './schemas/venue';
 export * from './schemas/functions/week10';

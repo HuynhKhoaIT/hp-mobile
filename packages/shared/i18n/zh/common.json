@@ -200,7 +200,9 @@
       "listing": "信息",
       "group": "小组",
       "profile": "用户",
-      "message": "消息"
+      "message": "消息",
+      "service_request": "找师傅需求",
+      "service_quote": "报价"
     }
   },
   "block": {

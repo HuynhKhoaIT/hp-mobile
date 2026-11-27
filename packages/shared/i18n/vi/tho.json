@@ -1,0 +1,184 @@
+{
+  "title": "Gọi thợ",
+  "subtitle": "Đăng việc, thợ báo giá, bạn chọn người ưng ý",
+  "trade": {
+    "electric_plumbing": "Điện nước",
+    "cleaning": "Vệ sinh",
+    "welding": "Thợ hàn",
+    "hvac": "Thợ điện lạnh",
+    "other": "Khác"
+  },
+  "trade_hint": {
+    "electric_plumbing": "Sửa điện, ống nước, thông tắc, lắp thiết bị",
+    "cleaning": "Dọn phòng, vệ sinh nhà, máy lạnh, nhà xưởng",
+    "welding": "Hàn cổng, khung sắt, mái tôn, gia công",
+    "hvac": "Sửa, bơm gas, vệ sinh máy lạnh, tủ lạnh",
+    "other": "Việc khác cần người làm"
+  },
+  "urgency": {
+    "today": "Trong hôm nay",
+    "this_week": "Trong tuần này",
+    "flexible": "Linh hoạt"
+  },
+  "status": {
+    "open": "Đang nhận báo giá",
+    "assigned": "Đã chọn thợ",
+    "completed": "Hoàn thành",
+    "cancelled": "Đã huỷ",
+    "expired": "Hết hạn"
+  },
+  "quote_status": {
+    "submitted": "Chờ chủ chọn",
+    "accepted": "Được chọn",
+    "declined": "Chưa được chọn",
+    "withdrawn": "Đã rút"
+  },
+  "tabs": {
+    "home": "Việc quanh bạn",
+    "quotes": "Báo giá",
+    "new": "Đăng việc",
+    "chat": "Tin nhắn",
+    "mine": "Của tôi"
+  },
+  "home": {
+    "hero_title": "Cần thợ? Đăng việc, thợ sẽ báo giá",
+    "hero_body": "Miễn phí. Bạn so giá, chọn thợ ưng ý rồi nhắn tin trực tiếp.",
+    "hero_cta": "Đăng yêu cầu",
+    "section_trades": "Chọn loại thợ",
+    "section_latest": "Yêu cầu mới",
+    "pro_hint": "Bạn là thợ? Xem yêu cầu quanh bạn và gửi báo giá."
+  },
+  "list": {
+    "title": "Việc quanh bạn",
+    "search_placeholder": "Tìm yêu cầu: máy lạnh, ống nước…",
+    "filter_all": "Tất cả",
+    "empty_title": "Chưa có yêu cầu nào",
+    "empty_body": "Hãy thử đổi loại thợ hoặc khu vực, hoặc đăng yêu cầu của bạn.",
+    "empty_cta": "Đăng yêu cầu",
+    "end": "Đã hiện hết yêu cầu"
+  },
+  "card": {
+    "quotes_count_one": "{{count}} báo giá",
+    "quotes_count_other": "{{count}} báo giá",
+    "no_quotes": "Chưa có báo giá",
+    "budget_none": "Thoả thuận",
+    "budget_exact": "Ngân sách {{amount}}",
+    "budget_range": "{{min}} – {{max}}",
+    "budget_from": "Từ {{min}}",
+    "budget_upto": "Tối đa {{max}}",
+    "expires_in": "Còn {{time}}",
+    "by": "Đăng bởi {{name}}"
+  },
+  "form": {
+    "title_new": "Đăng yêu cầu gọi thợ",
+    "title_edit": "Sửa yêu cầu",
+    "trade": "Loại thợ",
+    "title": "Tiêu đề",
+    "title_placeholder": "Vd: Sửa ổ điện phòng trọ bị chập",
+    "description": "Mô tả chi tiết",
+    "description_placeholder": "Tình trạng, thiết bị, thời gian bạn rảnh… Không ghi số điện thoại — hãy nhắn tin trong app.",
+    "photos": "Ảnh (không bắt buộc)",
+    "photos_hint": "Tối đa {{max}} ảnh giúp thợ báo giá chính xác hơn.",
+    "address": "Địa chỉ làm việc",
+    "address_placeholder": "Số nhà, tên đường, khu trọ…",
+    "address_private": "Địa chỉ chính xác chỉ hiện với thợ bạn đã chọn. Mọi người khác chỉ thấy khu vực gần đúng.",
+    "budget": "Ngân sách mong muốn (không bắt buộc)",
+    "budget_min": "Từ (₫)",
+    "budget_max": "Đến (₫)",
+    "urgency": "Cần làm khi nào",
+    "site": "Khu vực",
+    "submit": "Đăng yêu cầu",
+    "save": "Lưu thay đổi",
+    "edit_locked": "Yêu cầu đã có báo giá nên không sửa được nội dung nữa.",
+    "success_title": "Đã đăng yêu cầu",
+    "success_body": "Thợ quanh bạn sẽ gửi báo giá. Bạn sẽ nhận thông báo khi có báo giá mới.",
+    "success_cta": "Xem yêu cầu"
+  },
+  "detail": {
+    "title": "Chi tiết yêu cầu",
+    "section_info": "Thông tin",
+    "section_quotes": "Báo giá ({{count}})",
+    "section_my_quote": "Báo giá của bạn",
+    "posted": "Đăng {{time}}",
+    "expires": "Hết hạn {{time}}",
+    "customer": "Người cần thợ",
+    "address_title": "Địa chỉ làm việc",
+    "address_hidden": "Địa chỉ chính xác sẽ hiện khi chủ yêu cầu chọn bạn.",
+    "address_area": "Khu vực gần đúng: {{site}}",
+    "no_quotes_title": "Chưa có báo giá",
+    "no_quotes_body": "Thợ quanh bạn sẽ sớm báo giá. Bạn sẽ nhận thông báo ngay.",
+    "best_price": "Giá tốt nhất",
+    "chosen": "Thợ được chọn",
+    "safety_title": "Làm việc an toàn",
+    "safety_body": "Chỉ trao đổi trong app, không chuyển tiền trước khi thợ làm xong. Gặp vấn đề, hãy báo cáo."
+  },
+  "quote": {
+    "sheet_title": "Gửi báo giá",
+    "sheet_edit_title": "Sửa báo giá",
+    "price": "Giá bạn báo (₫)",
+    "price_hint": "Từ {{min}} đến {{max}}.",
+    "available_at": "Có thể làm lúc",
+    "available_hint": "Không bắt buộc",
+    "note": "Ghi chú",
+    "note_placeholder": "Vd: Đã có đồ nghề, làm trong 1 giờ, bảo hành 1 tháng. Không ghi số điện thoại.",
+    "submit": "Gửi báo giá",
+    "update": "Cập nhật báo giá",
+    "sent_toast": "Đã gửi báo giá",
+    "updated_toast": "Đã cập nhật báo giá",
+    "withdraw": "Rút báo giá",
+    "withdraw_title": "Rút báo giá này?",
+    "withdraw_body": "Chủ yêu cầu sẽ không còn thấy báo giá của bạn. Bạn có thể gửi lại nếu yêu cầu còn mở.",
+    "withdrawn_toast": "Đã rút báo giá",
+    "accept": "Chọn thợ này",
+    "accept_title": "Chọn {{name}}?",
+    "accept_body": "Các báo giá khác sẽ bị từ chối và bạn sẽ chat với thợ này. Địa chỉ chính xác được gửi cho thợ.",
+    "accepted_toast": "Đã chọn thợ — hãy nhắn tin để hẹn giờ",
+    "available": "Có thể làm: {{time}}",
+    "mine": "Báo giá của bạn"
+  },
+  "actions": {
+    "login": "Đăng nhập để báo giá",
+    "quote": "Báo giá",
+    "edit_quote": "Sửa báo giá",
+    "withdraw_quote": "Rút báo giá",
+    "chat": "Nhắn tin",
+    "edit": "Sửa yêu cầu",
+    "cancel": "Huỷ yêu cầu",
+    "cancel_title": "Huỷ yêu cầu này?",
+    "cancel_body": "Thợ đã báo giá sẽ được thông báo. Bạn không hoàn tác được.",
+    "cancelled_toast": "Đã huỷ yêu cầu",
+    "complete": "Đã làm xong",
+    "complete_title": "Xác nhận đã làm xong?",
+    "complete_body": "Sau khi xác nhận, bạn và thợ có thể đánh giá nhau.",
+    "completed_toast": "Đã hoàn thành. Hãy đánh giá thợ nhé!",
+    "rate": "Đánh giá",
+    "report": "Báo cáo"
+  },
+  "rate": {
+    "title_customer": "Đánh giá thợ",
+    "title_pro": "Đánh giá người cần thợ",
+    "hint": "Đánh giá của bạn giúp mọi người chọn được người uy tín.",
+    "comment_placeholder": "Nhận xét (không bắt buộc)",
+    "submit": "Gửi đánh giá",
+    "thanks": "Cảm ơn bạn đã đánh giá"
+  },
+  "mine": {
+    "title": "Của tôi",
+    "tab_requests": "Yêu cầu của tôi",
+    "tab_quotes": "Báo giá của tôi",
+    "empty_requests_title": "Bạn chưa đăng yêu cầu nào",
+    "empty_requests_body": "Cần sửa điện nước, máy lạnh, dọn dẹp…? Đăng yêu cầu để thợ báo giá.",
+    "empty_quotes_title": "Bạn chưa gửi báo giá nào",
+    "empty_quotes_body": "Xem các yêu cầu quanh bạn và gửi báo giá để nhận việc.",
+    "empty_quotes_cta": "Xem yêu cầu"
+  },
+  "chat": {
+    "context": "Yêu cầu: {{title}}",
+    "open_request": "Xem yêu cầu",
+    "closed": "Yêu cầu này đã đóng. Bạn vẫn xem lại được tin nhắn."
+  },
+  "report": {
+    "request": "Báo cáo yêu cầu",
+    "quote": "Báo cáo báo giá"
+  }
+}

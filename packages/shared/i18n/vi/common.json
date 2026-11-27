@@ -200,7 +200,9 @@
       "listing": "tin đăng",
       "group": "nhóm",
       "profile": "người dùng",
-      "message": "tin nhắn"
+      "message": "tin nhắn",
+      "service_request": "yêu cầu gọi thợ",
+      "service_quote": "báo giá"
     }
   },
   "block": {

@@ -1,0 +1,184 @@
+{
+  "title": "Hire a pro",
+  "subtitle": "Post a job, pros send quotes, you pick the one you like",
+  "trade": {
+    "electric_plumbing": "Electric & plumbing",
+    "cleaning": "Cleaning",
+    "welding": "Welding",
+    "hvac": "AC & refrigeration",
+    "other": "Other"
+  },
+  "trade_hint": {
+    "electric_plumbing": "Wiring, pipes, clogs, fitting appliances",
+    "cleaning": "Room, house, AC and workshop cleaning",
+    "welding": "Gates, steel frames, metal roofs, fabrication",
+    "hvac": "Repair, gas refill, cleaning for AC and fridges",
+    "other": "Any other job that needs a hand"
+  },
+  "urgency": {
+    "today": "Today",
+    "this_week": "This week",
+    "flexible": "Flexible"
+  },
+  "status": {
+    "open": "Taking quotes",
+    "assigned": "Pro chosen",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "expired": "Expired"
+  },
+  "quote_status": {
+    "submitted": "Waiting for the owner",
+    "accepted": "Chosen",
+    "declined": "Not chosen",
+    "withdrawn": "Withdrawn"
+  },
+  "tabs": {
+    "home": "Jobs near you",
+    "quotes": "Quotes",
+    "new": "Post a job",
+    "chat": "Messages",
+    "mine": "Mine"
+  },
+  "home": {
+    "hero_title": "Need a pro? Post a job and get quotes",
+    "hero_body": "Free. Compare prices, pick the pro you like, then chat directly.",
+    "hero_cta": "Post a request",
+    "section_trades": "Choose a trade",
+    "section_latest": "New requests",
+    "pro_hint": "Are you a pro? Browse requests near you and send quotes."
+  },
+  "list": {
+    "title": "Jobs near you",
+    "search_placeholder": "Search requests: AC, pipes…",
+    "filter_all": "All",
+    "empty_title": "No requests yet",
+    "empty_body": "Try another trade or area, or post your own request.",
+    "empty_cta": "Post a request",
+    "end": "You've seen all requests"
+  },
+  "card": {
+    "quotes_count_one": "{{count}} quote",
+    "quotes_count_other": "{{count}} quotes",
+    "no_quotes": "No quotes yet",
+    "budget_none": "Negotiable",
+    "budget_exact": "Budget {{amount}}",
+    "budget_range": "{{min}} – {{max}}",
+    "budget_from": "From {{min}}",
+    "budget_upto": "Up to {{max}}",
+    "expires_in": "{{time}} left",
+    "by": "Posted by {{name}}"
+  },
+  "form": {
+    "title_new": "Post a request",
+    "title_edit": "Edit request",
+    "trade": "Type of pro",
+    "title": "Title",
+    "title_placeholder": "e.g. Fix a shorting socket in my room",
+    "description": "Details",
+    "description_placeholder": "What's wrong, which device, when you're free… Don't write phone numbers — chat in the app.",
+    "photos": "Photos (optional)",
+    "photos_hint": "Up to {{max}} photos help pros quote more accurately.",
+    "address": "Work address",
+    "address_placeholder": "Street, house number, boarding house…",
+    "address_private": "The exact address is only shown to the pro you choose. Everyone else sees an approximate area.",
+    "budget": "Budget (optional)",
+    "budget_min": "From (₫)",
+    "budget_max": "To (₫)",
+    "urgency": "When do you need it",
+    "site": "Area",
+    "submit": "Post request",
+    "save": "Save changes",
+    "edit_locked": "This request already has quotes, so its content can no longer be edited.",
+    "success_title": "Request posted",
+    "success_body": "Pros near you will send quotes. You'll be notified when a new quote arrives.",
+    "success_cta": "View request"
+  },
+  "detail": {
+    "title": "Request details",
+    "section_info": "Details",
+    "section_quotes": "Quotes ({{count}})",
+    "section_my_quote": "Your quote",
+    "posted": "Posted {{time}}",
+    "expires": "Expires {{time}}",
+    "customer": "Customer",
+    "address_title": "Work address",
+    "address_hidden": "The exact address appears once the owner chooses you.",
+    "address_area": "Approximate area: {{site}}",
+    "no_quotes_title": "No quotes yet",
+    "no_quotes_body": "Pros near you will quote soon. You'll be notified right away.",
+    "best_price": "Best price",
+    "chosen": "Chosen pro",
+    "safety_title": "Stay safe",
+    "safety_body": "Only communicate in the app and never pay before the work is done. If something feels wrong, report it."
+  },
+  "quote": {
+    "sheet_title": "Send a quote",
+    "sheet_edit_title": "Edit quote",
+    "price": "Your price (₫)",
+    "price_hint": "From {{min}} to {{max}}.",
+    "available_at": "Available at",
+    "available_hint": "Optional",
+    "note": "Note",
+    "note_placeholder": "e.g. I have my own tools, about 1 hour, 1-month warranty. Don't write phone numbers.",
+    "submit": "Send quote",
+    "update": "Update quote",
+    "sent_toast": "Quote sent",
+    "updated_toast": "Quote updated",
+    "withdraw": "Withdraw quote",
+    "withdraw_title": "Withdraw this quote?",
+    "withdraw_body": "The owner will no longer see your quote. You can send it again while the request is open.",
+    "withdrawn_toast": "Quote withdrawn",
+    "accept": "Choose this pro",
+    "accept_title": "Choose {{name}}?",
+    "accept_body": "Other quotes will be declined and you'll chat with this pro. The exact address is shared with them.",
+    "accepted_toast": "Pro chosen — send a message to set a time",
+    "available": "Available: {{time}}",
+    "mine": "Your quote"
+  },
+  "actions": {
+    "login": "Sign in to quote",
+    "quote": "Send a quote",
+    "edit_quote": "Edit quote",
+    "withdraw_quote": "Withdraw quote",
+    "chat": "Message",
+    "edit": "Edit request",
+    "cancel": "Cancel request",
+    "cancel_title": "Cancel this request?",
+    "cancel_body": "Pros who quoted will be notified. This can't be undone.",
+    "cancelled_toast": "Request cancelled",
+    "complete": "Job done",
+    "complete_title": "Confirm the job is done?",
+    "complete_body": "After you confirm, you and the pro can rate each other.",
+    "completed_toast": "Completed. Please rate the pro!",
+    "rate": "Rate",
+    "report": "Report"
+  },
+  "rate": {
+    "title_customer": "Rate the pro",
+    "title_pro": "Rate the customer",
+    "hint": "Your rating helps others choose people they can trust.",
+    "comment_placeholder": "Comment (optional)",
+    "submit": "Send rating",
+    "thanks": "Thanks for your rating"
+  },
+  "mine": {
+    "title": "Mine",
+    "tab_requests": "My requests",
+    "tab_quotes": "My quotes",
+    "empty_requests_title": "You haven't posted any requests",
+    "empty_requests_body": "Need electrical, plumbing, AC repair or cleaning? Post a request so pros can quote.",
+    "empty_quotes_title": "You haven't sent any quotes",
+    "empty_quotes_body": "Browse requests near you and send quotes to win jobs.",
+    "empty_quotes_cta": "Browse requests"
+  },
+  "chat": {
+    "context": "Request: {{title}}",
+    "open_request": "View request",
+    "closed": "This request is closed. You can still read the messages."
+  },
+  "report": {
+    "request": "Report request",
+    "quote": "Report quote"
+  }
+}

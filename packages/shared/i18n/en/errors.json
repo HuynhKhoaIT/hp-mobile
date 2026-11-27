@@ -40,7 +40,7 @@
   "host_cannot_leave": "Hosts can't leave their group — cancel it instead if you're not going.",
   "invalid_venue": "This venue is not available for this sport.",
   "group_not_finished": "You can rate once the group has taken place.",
-  "already_rated": "You have already rated this group.",
+  "already_rated": "You have already rated this.",
   "document_missing": "The document was not uploaded. Please take the photo again.",
   "badge_owned": "You already have this badge.",
   "already_requested": "Your request is waiting for review.",
@@ -52,5 +52,12 @@
   "listing_not_returned": "You can rate only after the item has been handed back.",
   "listing_already_rated": "You have already rated for this post.",
   "cannot_rate_self": "You cannot rate yourself.",
-  "rating_no_chat": "You can only rate someone who messaged you about this post."
+  "rating_no_chat": "You can only rate someone who messaged you about this post.",
+  "request_closed": "This request is closed, so you can no longer quote or act on it.",
+  "request_has_quotes": "This request already has quotes, so its content can no longer be edited.",
+  "request_not_assigned": "No pro has been chosen yet, so it can’t be marked as done.",
+  "request_not_completed": "You can rate once the request is completed.",
+  "quote_not_pending": "This quote is no longer waiting to be chosen.",
+  "already_quoted": "You already have a quote on this request.",
+  "cannot_quote_own": "This is your own request, so you can’t quote it."
 }

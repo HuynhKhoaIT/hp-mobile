@@ -40,7 +40,7 @@
   "host_cannot_leave": "Chủ nhóm không rời nhóm được — hãy huỷ nhóm nếu không đi nữa.",
   "invalid_venue": "Sân không hợp lệ hoặc không có môn này.",
   "group_not_finished": "Nhóm chưa diễn ra nên chưa đánh giá được.",
-  "already_rated": "Bạn đã đánh giá nhóm này rồi.",
+  "already_rated": "Bạn đã đánh giá rồi.",
   "document_missing": "Chưa tải giấy tờ lên. Hãy chụp lại và thử lại.",
   "badge_owned": "Bạn đã có huy hiệu này.",
   "already_requested": "Yêu cầu của bạn đang chờ duyệt.",
@@ -52,5 +52,12 @@
   "listing_not_returned": "Chỉ đánh giá được sau khi đồ đã được trao trả.",
   "listing_already_rated": "Bạn đã đánh giá cho tin này rồi.",
   "cannot_rate_self": "Bạn không thể tự đánh giá mình.",
-  "rating_no_chat": "Chỉ đánh giá được người đã nhắn tin với bạn về tin này."
+  "rating_no_chat": "Chỉ đánh giá được người đã nhắn tin với bạn về tin này.",
+  "request_closed": "Yêu cầu này đã đóng nên không báo giá hay thao tác thêm được.",
+  "request_has_quotes": "Yêu cầu đã có báo giá nên không sửa nội dung được nữa.",
+  "request_not_assigned": "Yêu cầu chưa chọn thợ nên chưa xác nhận hoàn thành được.",
+  "request_not_completed": "Chỉ đánh giá được sau khi yêu cầu hoàn thành.",
+  "quote_not_pending": "Báo giá này không còn ở trạng thái chờ chọn.",
+  "already_quoted": "Bạn đã có báo giá cho yêu cầu này.",
+  "cannot_quote_own": "Đây là yêu cầu của bạn nên không tự báo giá được."
 }

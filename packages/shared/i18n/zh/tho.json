@@ -1,0 +1,184 @@
+{
+  "title": "找师傅",
+  "subtitle": "发布需求，师傅报价，由你挑选满意的人",
+  "trade": {
+    "electric_plumbing": "水电",
+    "cleaning": "保洁",
+    "welding": "电焊",
+    "hvac": "空调制冷",
+    "other": "其他"
+  },
+  "trade_hint": {
+    "electric_plumbing": "修电路、水管、疏通、安装设备",
+    "cleaning": "打扫房间、家居、空调、厂房",
+    "welding": "焊接大门、铁架、铁皮屋顶、加工",
+    "hvac": "空调冰箱维修、加氟、清洗",
+    "other": "其他需要人手的活"
+  },
+  "urgency": {
+    "today": "今天内",
+    "this_week": "本周内",
+    "flexible": "时间灵活"
+  },
+  "status": {
+    "open": "接受报价中",
+    "assigned": "已选师傅",
+    "completed": "已完成",
+    "cancelled": "已取消",
+    "expired": "已过期"
+  },
+  "quote_status": {
+    "submitted": "等待发布者选择",
+    "accepted": "已被选中",
+    "declined": "未被选中",
+    "withdrawn": "已撤回"
+  },
+  "tabs": {
+    "home": "附近的活",
+    "quotes": "报价",
+    "new": "发布需求",
+    "chat": "消息",
+    "mine": "我的"
+  },
+  "home": {
+    "hero_title": "需要师傅？发布需求，等师傅报价",
+    "hero_body": "免费使用。比较价格，选择满意的师傅，再直接聊天。",
+    "hero_cta": "发布需求",
+    "section_trades": "选择工种",
+    "section_latest": "最新需求",
+    "pro_hint": "你是师傅？查看附近的需求并发送报价。"
+  },
+  "list": {
+    "title": "附近的活",
+    "search_placeholder": "搜索需求：空调、水管…",
+    "filter_all": "全部",
+    "empty_title": "暂无需求",
+    "empty_body": "试试更换工种或区域，或发布你自己的需求。",
+    "empty_cta": "发布需求",
+    "end": "已显示全部需求"
+  },
+  "card": {
+    "quotes_count_one": "{{count}} 个报价",
+    "quotes_count_other": "{{count}} 个报价",
+    "no_quotes": "暂无报价",
+    "budget_none": "面议",
+    "budget_exact": "预算 {{amount}}",
+    "budget_range": "{{min}} – {{max}}",
+    "budget_from": "{{min}} 起",
+    "budget_upto": "最高 {{max}}",
+    "expires_in": "剩余 {{time}}",
+    "by": "发布者 {{name}}"
+  },
+  "form": {
+    "title_new": "发布找师傅需求",
+    "title_edit": "修改需求",
+    "trade": "工种",
+    "title": "标题",
+    "title_placeholder": "例如：宿舍插座短路需要修理",
+    "description": "详细描述",
+    "description_placeholder": "故障情况、设备、你的空闲时间… 请勿填写电话号码，请在应用内聊天。",
+    "photos": "照片（选填）",
+    "photos_hint": "最多 {{max}} 张照片，帮助师傅报价更准确。",
+    "address": "施工地址",
+    "address_placeholder": "门牌号、街道、出租屋名称…",
+    "address_private": "准确地址只会显示给你选定的师傅，其他人只能看到大致区域。",
+    "budget": "预算（选填）",
+    "budget_min": "最低（₫）",
+    "budget_max": "最高（₫）",
+    "urgency": "什么时候需要",
+    "site": "区域",
+    "submit": "发布需求",
+    "save": "保存修改",
+    "edit_locked": "该需求已有报价，内容无法再修改。",
+    "success_title": "需求已发布",
+    "success_body": "附近的师傅会发送报价，有新报价时你会收到通知。",
+    "success_cta": "查看需求"
+  },
+  "detail": {
+    "title": "需求详情",
+    "section_info": "信息",
+    "section_quotes": "报价（{{count}}）",
+    "section_my_quote": "你的报价",
+    "posted": "发布于 {{time}}",
+    "expires": "{{time}} 到期",
+    "customer": "发布者",
+    "address_title": "施工地址",
+    "address_hidden": "发布者选择你之后，才会显示准确地址。",
+    "address_area": "大致区域：{{site}}",
+    "no_quotes_title": "暂无报价",
+    "no_quotes_body": "附近的师傅很快会报价，你会立即收到通知。",
+    "best_price": "最低价",
+    "chosen": "已选师傅",
+    "safety_title": "安全提示",
+    "safety_body": "请只在应用内沟通，师傅完工前不要提前付款。遇到问题请举报。"
+  },
+  "quote": {
+    "sheet_title": "发送报价",
+    "sheet_edit_title": "修改报价",
+    "price": "你的报价（₫）",
+    "price_hint": "范围 {{min}} 至 {{max}}。",
+    "available_at": "可上门时间",
+    "available_hint": "选填",
+    "note": "备注",
+    "note_placeholder": "例如：自带工具，约 1 小时，保修 1 个月。请勿填写电话号码。",
+    "submit": "发送报价",
+    "update": "更新报价",
+    "sent_toast": "报价已发送",
+    "updated_toast": "报价已更新",
+    "withdraw": "撤回报价",
+    "withdraw_title": "撤回这条报价？",
+    "withdraw_body": "发布者将看不到你的报价。需求仍开放时你可以重新发送。",
+    "withdrawn_toast": "报价已撤回",
+    "accept": "选择这位师傅",
+    "accept_title": "选择 {{name}}？",
+    "accept_body": "其他报价将被拒绝，你将与这位师傅聊天，准确地址也会发给他。",
+    "accepted_toast": "已选定师傅，请发消息约定时间",
+    "available": "可上门：{{time}}",
+    "mine": "你的报价"
+  },
+  "actions": {
+    "login": "登录后报价",
+    "quote": "报价",
+    "edit_quote": "修改报价",
+    "withdraw_quote": "撤回报价",
+    "chat": "发消息",
+    "edit": "修改需求",
+    "cancel": "取消需求",
+    "cancel_title": "取消这个需求？",
+    "cancel_body": "已报价的师傅会收到通知，此操作无法撤销。",
+    "cancelled_toast": "需求已取消",
+    "complete": "已完工",
+    "complete_title": "确认已完工？",
+    "complete_body": "确认后，你和师傅可以互相评价。",
+    "completed_toast": "已完成，请评价师傅！",
+    "rate": "评价",
+    "report": "举报"
+  },
+  "rate": {
+    "title_customer": "评价师傅",
+    "title_pro": "评价发布者",
+    "hint": "你的评价能帮助大家选到可靠的人。",
+    "comment_placeholder": "评语（选填）",
+    "submit": "提交评价",
+    "thanks": "感谢你的评价"
+  },
+  "mine": {
+    "title": "我的",
+    "tab_requests": "我的需求",
+    "tab_quotes": "我的报价",
+    "empty_requests_title": "你还没有发布需求",
+    "empty_requests_body": "需要修水电、空调或打扫？发布需求让师傅报价。",
+    "empty_quotes_title": "你还没有发送报价",
+    "empty_quotes_body": "查看附近的需求并发送报价来接活。",
+    "empty_quotes_cta": "查看需求"
+  },
+  "chat": {
+    "context": "需求：{{title}}",
+    "open_request": "查看需求",
+    "closed": "该需求已结束，你仍可查看聊天记录。"
+  },
+  "report": {
+    "request": "举报需求",
+    "quote": "举报报价"
+  }
+}

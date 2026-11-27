@@ -62,5 +62,31 @@
   "rating_received": {
     "title": "你收到了一份感谢",
     "body": "{{name}} 就“{{title}}”给了你 {{score}}/5 星评价。"
+  },
+  "quote_received": {
+    "title": "收到新报价",
+    "body": "{{pro_name}} 为“{{title}}”发来了报价。"
+  },
+  "quote_accepted": {
+    "title": "你被选中了！",
+    "body": "发布者选择了你对“{{title}}”的报价，发消息约定时间吧。"
+  },
+  "quote_declined": {
+    "title": "报价未被选中",
+    "body": "发布者为“{{title}}”选择了其他师傅。"
+  },
+  "request_cancelled": {
+    "title": "需求已取消",
+    "body": "需求“{{title}}”已被取消。",
+    "body_owner": "你的需求“{{title}}”因违反规定已被取消。"
+  },
+  "request_completed": {
+    "title": "已完成",
+    "body": "“{{title}}”已确认完工，请评价发布者！"
+  },
+  "request_expired": {
+    "title": "需求已过期",
+    "body": "需求“{{title}}”已不再接受报价。",
+    "body_owner": "你的需求“{{title}}”已过期，如仍需要师傅请重新发布。"
   }
 }

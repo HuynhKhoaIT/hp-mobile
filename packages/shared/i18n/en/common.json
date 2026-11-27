@@ -200,7 +200,9 @@
       "listing": "listing",
       "group": "group",
       "profile": "user",
-      "message": "message"
+      "message": "message",
+      "service_request": "job request",
+      "service_quote": "quote"
     }
   },
   "block": {
