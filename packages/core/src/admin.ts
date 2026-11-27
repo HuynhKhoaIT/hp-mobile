@@ -769,6 +769,15 @@ export async function staffCancelGroup(client: Client, input: { groupId: unknown
   return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
 }
 
+/** Huỷ yêu cầu gọi thợ vi phạm (RPC, audit `service_request.cancel`; chủ + thợ đã báo giá nhận request_cancelled). Lỗi: not_found, request_closed. */
+export async function staffCancelServiceRequest(client: Client, input: { requestId: unknown; note?: unknown }): Promise<Result<null>> {
+  if (!isUuid(input.requestId)) return fail('invalid_input');
+  const note = cleanText(input.note, ADMIN_NOTE_MAX);
+  if (note === undefined) return fail('too_long');
+  const res = await client.rpc('staff_cancel_request', { p_request_id: input.requestId, ...(note ? { p_note: note } : {}) });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
 // ── Danh mục: khu (sites) ────────────────────────────────────────────────────────
 export type AdminSite = Pick<Tables<'sites'>, 'code' | 'name' | 'is_active' | 'sort_order' | 'created_at' | 'updated_at'>;
 

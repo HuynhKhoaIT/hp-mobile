@@ -55,7 +55,8 @@
     "empty_title": "Chưa có yêu cầu nào",
     "empty_body": "Hãy thử đổi loại thợ hoặc khu vực, hoặc đăng yêu cầu của bạn.",
     "empty_cta": "Đăng yêu cầu",
-    "end": "Đã hiện hết yêu cầu"
+    "end": "Đã hiện hết yêu cầu",
+    "load_more": "Xem thêm"
   },
   "card": {
     "quotes_count_one": "{{count}} báo giá",

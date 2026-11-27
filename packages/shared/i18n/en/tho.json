@@ -55,7 +55,8 @@
     "empty_title": "No requests yet",
     "empty_body": "Try another trade or area, or post your own request.",
     "empty_cta": "Post a request",
-    "end": "You've seen all requests"
+    "end": "You've seen all requests",
+    "load_more": "Load more"
   },
   "card": {
     "quotes_count_one": "{{count}} quote",

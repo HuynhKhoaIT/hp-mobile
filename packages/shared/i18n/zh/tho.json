@@ -55,7 +55,8 @@
     "empty_title": "暂无需求",
     "empty_body": "试试更换工种或区域，或发布你自己的需求。",
     "empty_cta": "发布需求",
-    "end": "已显示全部需求"
+    "end": "已显示全部需求",
+    "load_more": "查看更多"
   },
   "card": {
     "quotes_count_one": "{{count}} 个报价",

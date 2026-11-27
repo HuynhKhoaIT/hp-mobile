@@ -121,7 +121,8 @@
     "new_7d_other": "+{{count}} trong 7 ngày",
     "by_category_title": "Tin đang đăng theo danh mục",
     "by_category_hint": "Chỉ tính tin đang hiển thị công khai.",
-    "gaps_note": "Chưa có: tách người dùng mới theo web / app, thời gian xử lý hàng chờ, lượt vào từ Google, lượt tải app, lead. Sẽ bổ sung khi có dữ liệu nguồn."
+    "gaps_note": "Chưa có: tách người dùng mới theo web / app, thời gian xử lý hàng chờ, lượt vào từ Google, lượt tải app, lead. Sẽ bổ sung khi có dữ liệu nguồn.",
+    "requests_open": "Yêu cầu gọi thợ đang mở"
   },
   "moderation": {
     "title": "Kiểm duyệt tin",
@@ -360,13 +361,20 @@
       "status_one": "Đã chuyển {{count}} báo cáo sang “{{status}}”",
       "status_other": "Đã chuyển {{count}} báo cáo sang “{{status}}”",
       "hidden": "Đã ẩn tin và đóng báo cáo",
-      "cancelled": "Đã huỷ nhóm và đóng báo cáo"
+      "cancelled": "Đã huỷ nhóm và đóng báo cáo",
+      "request_cancelled": "Đã huỷ yêu cầu và đóng báo cáo"
     },
     "empty": {
       "active_title": "Không có báo cáo cần xử lý",
       "active_body": "Báo cáo mới từ người dùng sẽ hiện ở đây.",
       "other_title": "Chưa có báo cáo nào",
       "other_body": "Báo cáo đã xử lý sẽ hiện ở đây, mới nhất trước."
+    },
+    "cancel_request": "Huỷ yêu cầu gọi thợ và đóng báo cáo",
+    "cancel_request_dialog": {
+      "title": "Huỷ yêu cầu “{{title}}”?",
+      "description": "Chủ yêu cầu và các thợ đã báo giá nhận thông báo yêu cầu bị huỷ. Mọi báo cáo đang mở về yêu cầu được đánh dấu đã xử lý.",
+      "confirm": "Huỷ yêu cầu"
     }
   },
   "badges": {
