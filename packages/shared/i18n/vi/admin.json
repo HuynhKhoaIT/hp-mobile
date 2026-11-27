@@ -666,7 +666,8 @@
     "tabs": {
       "venues": "Sân",
       "sites": "Khu",
-      "keywords": "Từ khoá cấm"
+      "keywords": "Từ khoá cấm",
+      "miniapps": "Mini-app"
     },
     "venues": {
       "table_label": "Danh sách sân",
@@ -808,6 +809,42 @@
         "created": "Đã thêm từ khoá",
         "updated": "Đã đổi hành động",
         "removed": "Đã gỡ từ khoá"
+      }
+    },
+    "miniapps": {
+      "hint": "Bật / tắt mini-app của super app. Mini-app tắt bị ẩn khỏi Hub app và web, trang của nó trả 404; tin đã đăng vẫn được giữ.",
+      "table_label": "Danh sách mini-app",
+      "col": {
+        "order": "Thứ tự",
+        "name": "Mini-app",
+        "code": "Mã",
+        "status": "Hiển thị",
+        "actions": "Thao tác"
+      },
+      "on": "Đang bật",
+      "off": "Đang tắt",
+      "enable": "Bật",
+      "disable": "Tắt",
+      "up_a11y": "Chuyển “{{name}}” lên",
+      "down_a11y": "Chuyển “{{name}}” xuống",
+      "confirm": {
+        "off_title": "Tắt mini-app “{{name}}”?",
+        "off_body": "Mini-app bị ẩn khỏi Hub app / web và trang của nó trả 404. Dữ liệu đã đăng vẫn được giữ.",
+        "on_title": "Bật mini-app “{{name}}”?",
+        "on_body": "Mini-app hiện lại ở Hub app / web."
+      },
+      "toast": {
+        "updated": "Đã lưu cấu hình mini-app",
+        "reordered": "Đã đổi thứ tự mini-app"
+      },
+      "names": {
+        "pass": "Pass đồ",
+        "room": "Tìm trọ",
+        "job": "Tìm việc",
+        "lostFound": "Đồ thất lạc",
+        "ride": "Ghép xe",
+        "sport": "Ghép trận",
+        "goiTho": "Gọi thợ"
       }
     }
   },

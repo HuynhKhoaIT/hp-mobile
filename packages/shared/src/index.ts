@@ -13,6 +13,7 @@ export * from './schemas/profile';
 export * from './schemas/listing';
 export * from './listing-display';
 export * from './home';
+export * from './mini-apps';
 export * from './moderation';
 export * from './schemas/actions/moderation';
 export * from './chat';

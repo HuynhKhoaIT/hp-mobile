@@ -368,5 +368,10 @@
     "post_body": "Tap the Post (+) button in the middle of the bottom bar to sell items, rent a room or hire.",
     "chat_title": "Chat in the app",
     "chat_body": "Messages with buyers and sellers are in the Messages tab — no need to share your phone number."
+  },
+  "mini_app_off": {
+    "title": "Not available yet",
+    "body": "This feature is not available right now. Head back to the home page.",
+    "cta": "Back to home"
   }
 }

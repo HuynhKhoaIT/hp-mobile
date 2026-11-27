@@ -666,7 +666,8 @@
     "tabs": {
       "venues": "Venues",
       "sites": "Sites",
-      "keywords": "Banned keywords"
+      "keywords": "Banned keywords",
+      "miniapps": "Mini-apps"
     },
     "venues": {
       "table_label": "Venues",
@@ -808,6 +809,42 @@
         "created": "Keyword added",
         "updated": "Action changed",
         "removed": "Keyword removed"
+      }
+    },
+    "miniapps": {
+      "hint": "Turn the super app’s mini-apps on or off. A mini-app that is off is hidden from the app and web Hub and its pages return 404; existing posts are kept.",
+      "table_label": "Mini-app list",
+      "col": {
+        "order": "Order",
+        "name": "Mini-app",
+        "code": "Code",
+        "status": "Visible",
+        "actions": "Actions"
+      },
+      "on": "On",
+      "off": "Off",
+      "enable": "Turn on",
+      "disable": "Turn off",
+      "up_a11y": "Move “{{name}}” up",
+      "down_a11y": "Move “{{name}}” down",
+      "confirm": {
+        "off_title": "Turn off “{{name}}”?",
+        "off_body": "The mini-app is hidden from the app / web Hub and its pages return 404. Existing posts are kept.",
+        "on_title": "Turn on “{{name}}”?",
+        "on_body": "The mini-app shows again in the app / web Hub."
+      },
+      "toast": {
+        "updated": "Mini-app settings saved",
+        "reordered": "Mini-app order updated"
+      },
+      "names": {
+        "pass": "Second-hand market",
+        "room": "Rooms",
+        "job": "Jobs",
+        "lostFound": "Lost & found",
+        "ride": "Ride share",
+        "sport": "Sports matches",
+        "goiTho": "Handyman"
       }
     }
   },
