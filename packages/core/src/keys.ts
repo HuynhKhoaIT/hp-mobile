@@ -45,6 +45,18 @@ export const keys = {
   groupMembership: (id: string, userId: string) => ['hp', 'group', id, 'membership', userId] as const,
   /** tab: 'upcoming' | 'past'; không truyền = cả nhánh (invalidate). */
   myGroups: (tab?: string) => (tab ? (['hp', 'my-groups', tab] as const) : (['hp', 'my-groups'] as const)),
+  /** Gọi thợ: nhánh cha, invalidate cả danh sách, chi tiết, của tôi sau mỗi thao tác. */
+  serviceRequests: (filters?: Filters) =>
+    filters ? (['hp', 'service-requests', 'list', filters] as const) : (['hp', 'service-requests'] as const),
+  serviceRequest: (id: string) => ['hp', 'service-requests', 'detail', id] as const,
+  /** Con của serviceRequest(id): báo giá (chủ thấy hết, thợ thấy của mình), báo giá của tôi, địa chỉ chính xác, điểm đã chấm. */
+  requestQuotes: (id: string) => ['hp', 'service-requests', 'detail', id, 'quotes'] as const,
+  myRequestQuote: (id: string, userId: string) => ['hp', 'service-requests', 'detail', id, 'my-quote', userId] as const,
+  requestPrivate: (id: string, userId: string) => ['hp', 'service-requests', 'detail', id, 'private', userId] as const,
+  myRequestRating: (id: string, userId: string) => ['hp', 'service-requests', 'detail', id, 'my-rating', userId] as const,
+  /** Yêu cầu tôi đăng / báo giá tôi đã gửi — con của serviceRequests() nên mutation tự làm mới. */
+  myServiceRequests: () => ['hp', 'service-requests', 'mine', 'requests'] as const,
+  myServiceQuotes: () => ['hp', 'service-requests', 'mine', 'quotes'] as const,
   venues: (filters?: Filters) => (filters ? (['hp', 'venues', filters] as const) : (['hp', 'venues'] as const)),
   myVenues: () => ['hp', 'venues', 'mine'] as const,
 

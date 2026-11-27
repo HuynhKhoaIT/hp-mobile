@@ -23,6 +23,7 @@ export * from './result';
 export * from './profile';
 export * from './ratings';
 export * from './reports';
+export * from './service-requests';
 export * from './social';
 export * from './urls';
 export * from './venues';
