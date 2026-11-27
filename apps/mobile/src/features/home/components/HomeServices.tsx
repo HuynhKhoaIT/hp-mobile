@@ -31,7 +31,8 @@ export function HomeServices({ className }: { className?: string }) {
 
   return (
     <View className={['rounded-lg border border-border bg-surface p-4 shadow-card', className].filter(Boolean).join(' ')}>
-      <ServiceGrid>
+      {/* 9 ô (admin bật Gọi thợ) → 3 × 3; còn lại 4 × 2. */}
+      <ServiceGrid columns={tiles.length > 8 ? 3 : 4}>
         {tiles.map((tile, i) => (
           <StaggerItem key={tile.id} index={i} className="flex-1">
             {tile.kind === 'service' ? (

@@ -17,6 +17,9 @@ export function routeForNotification(data: unknown): Href {
       return { pathname: '/listing/[id]', params: { id: t.id ?? '' } };
     case 'group':
       return { pathname: '/group/[id]', params: { id: t.id ?? '' } };
+    case 'service_request':
+      // Gọi thợ (quote_* / request_*): chi tiết yêu cầu — chủ xem báo giá, thợ xem trạng thái báo giá của mình.
+      return { pathname: '/request/[id]', params: { id: t.id ?? '' } };
     default:
       return '/notifications';
   }

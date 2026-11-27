@@ -5,7 +5,7 @@
 // Chưa đọc: viền primary/30, tên + xem trước đậm, giờ màu primary, chấm số nền accent (luôn kèm số, không chỉ dựa vào màu).
 // Chat nhóm (kind 'group'): ô icon màu dịch vụ (ghép xe / ghép trận) thay avatar · tên nhóm · "giờ hẹn · N thành viên" ·
 // xem trước "Tên: tin". Không có ảnh tin (ảnh nằm ở thẻ ngữ cảnh trong màn hội thoại).
-import type { ConversationSummary } from '@hp/core';
+import { type ConversationSummary, isRequestConversation } from '@hp/core';
 import { unreadBadge } from '@hp/shared';
 import { BadgeCheck, BellOff } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ export function VerifiedDot() {
 }
 
 export function ConversationRow({ conversation: c, onPress }: { conversation: ConversationSummary; onPress: () => void }) {
-  const { t } = useTranslation(['chat', 'group', 'common']);
+  const { t } = useTranslation(['chat', 'group', 'common', 'tho']);
   const preview = usePreviewText();
   const price = useConversationPrice();
   const group = isGroupConversation(c);
@@ -49,9 +49,13 @@ export function ConversationRow({ conversation: c, onPress }: { conversation: Co
     ? [c.group_starts_at ? formatDate(c.group_starts_at, 'datetime') : null, t('group:chat.members', { count: c.member_count ?? 0 })]
         .filter(Boolean)
         .join(' · ')
-    : c.listing_title
-      ? [c.listing_title, price(c)].filter(Boolean).join(' · ')
-      : t('inbox.listing_gone');
+    : isRequestConversation(c)
+      ? c.request_title
+        ? t('tho:chat.context', { title: c.request_title })
+        : t('tho:chat.closed')
+      : c.listing_title
+        ? [c.listing_title, price(c)].filter(Boolean).join(' · ')
+        : t('inbox.listing_gone');
   const unread = unreadBadge(c.unread_count);
   const when = c.last_message_at ?? c.created_at;
 

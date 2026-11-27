@@ -12,6 +12,7 @@ import viErrors from '@hp/shared/i18n/vi/errors.json';
 import viGroup from '@hp/shared/i18n/vi/group.json';
 import viListing from '@hp/shared/i18n/vi/listing.json';
 import viPush from '@hp/shared/i18n/vi/push.json';
+import viTho from '@hp/shared/i18n/vi/tho.json';
 import enAuth from '@hp/shared/i18n/en/auth.json';
 import enChat from '@hp/shared/i18n/en/chat.json';
 import enCommon from '@hp/shared/i18n/en/common.json';
@@ -19,6 +20,7 @@ import enErrors from '@hp/shared/i18n/en/errors.json';
 import enGroup from '@hp/shared/i18n/en/group.json';
 import enListing from '@hp/shared/i18n/en/listing.json';
 import enPush from '@hp/shared/i18n/en/push.json';
+import enTho from '@hp/shared/i18n/en/tho.json';
 import zhAuth from '@hp/shared/i18n/zh/auth.json';
 import zhChat from '@hp/shared/i18n/zh/chat.json';
 import zhCommon from '@hp/shared/i18n/zh/common.json';
@@ -26,17 +28,18 @@ import zhErrors from '@hp/shared/i18n/zh/errors.json';
 import zhGroup from '@hp/shared/i18n/zh/group.json';
 import zhListing from '@hp/shared/i18n/zh/listing.json';
 import zhPush from '@hp/shared/i18n/zh/push.json';
+import zhTho from '@hp/shared/i18n/zh/tho.json';
 import { storage } from '../storage';
 
 const i18n = createInstance();
 
 /** Namespace app dùng (web / admin chỉ ở web). */
-export const NAMESPACES = ['common', 'errors', 'listing', 'group', 'chat', 'auth', 'push'] as const;
+export const NAMESPACES = ['common', 'errors', 'listing', 'group', 'chat', 'auth', 'push', 'tho'] as const;
 
 export const resources = {
-  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, auth: viAuth, push: viPush },
-  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, auth: enAuth, push: enPush },
-  zh: { common: zhCommon, errors: zhErrors, listing: zhListing, group: zhGroup, chat: zhChat, auth: zhAuth, push: zhPush },
+  vi: { common: viCommon, errors: viErrors, listing: viListing, group: viGroup, chat: viChat, auth: viAuth, push: viPush, tho: viTho },
+  en: { common: enCommon, errors: enErrors, listing: enListing, group: enGroup, chat: enChat, auth: enAuth, push: enPush, tho: enTho },
+  zh: { common: zhCommon, errors: zhErrors, listing: zhListing, group: zhGroup, chat: zhChat, auth: zhAuth, push: zhPush, tho: zhTho },
 } as const;
 
 const LOCALE_KEY = 'locale';

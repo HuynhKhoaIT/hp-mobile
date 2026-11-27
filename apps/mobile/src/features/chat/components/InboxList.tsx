@@ -5,7 +5,6 @@
 // chỉ hội thoại của dịch vụ đó (useFeatureInbox). Thẻ hội thoại mới nhất trước (cursor) → hộp nhắc giao dịch an toàn
 // cuối danh sách; kéo để làm mới. Bấm → màn chat (chồng lên, không thanh tab).
 import { useConversations, useSession, useUnreadConversationCount } from '@hp/core/react';
-import type { Feature } from '@hp/shared';
 import { FlashList } from '@shopify/flash-list';
 import { MessageCircle, ShieldCheck } from 'lucide-react-native';
 import type { ReactNode } from 'react';
@@ -13,12 +12,12 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, RefreshControl, View } from 'react-native';
 import { SignInPrompt } from '@/features/profile/components/SignInPrompt';
 import { EmptyState, ErrorState, FilterBar, type FilterOption, Notice, useTheme } from '@/ui';
-import { type InboxFilter, openConversation, useFeatureInbox, useInboxFilter } from '../hooks';
+import { type InboxFilter, type InboxScope, openConversation, useFeatureInbox, useInboxFilter } from '../hooks';
 import { ConversationRow, ConversationRowSkeleton } from './ConversationRow';
 
 export type InboxListProps = {
-  /** Khoá một dịch vụ (không chip lọc). */
-  feature?: Feature;
+  /** Khoá một dịch vụ hoặc Gọi thợ (không chip lọc). */
+  feature?: InboxScope;
   /** Nút của trạng thái rỗng (vd "Xem tin" → Khám phá / trang chủ mini-app). */
   emptyAction: { label: string; onPress: () => void };
   /** Khối cuối danh sách, dưới hộp nhắc an toàn (vd dòng miễn trừ của mini-app). */
