@@ -40,6 +40,14 @@ import {
   type CskhStatus,
   RevealCskhPhoneInput,
   SaveCskhCaseInput,
+  ZALO_DELIVERY_STATUSES,
+  ZALO_KINDS,
+  ZALO_MODES,
+  ZALO_TARGETS,
+  type ZaloDeliveryStatus,
+  type ZaloKind,
+  type ZaloMode,
+  type ZaloTarget,
 } from '@hp/shared';
 import { type Client, fail, fromSupabase, ok, type Result } from './result';
 
@@ -1242,6 +1250,72 @@ export async function listCskhQueue(client: Client, input: CskhQuery = {}): Prom
             handled_at: row.handled_at,
             handled_by_name: row.handled_by_name,
             rated_in_app: row.rated_in_app === true,
+          },
+        ]
+      : [],
+  );
+  return ok(toPage(items, r.data.total, w));
+}
+
+// ── Nhật ký tin Zalo đã gửi (migration 20261129120000_zalo_message_log) ─────────────────────────────────────
+// View zalo_message_log (staff-only): mọi tin Zalo (tự động + bán tự động) kèm tên người gửi / người nhận. Không có SĐT.
+export type ZaloLogItem = {
+  id: string;
+  created_at: string;
+  staff_id: string;
+  staff_name: string | null;
+  target_type: ZaloTarget;
+  target_id: string;
+  target_name: string | null;
+  kind: ZaloKind;
+  mode: ZaloMode;
+  status: ZaloDeliveryStatus;
+  /** Mã lỗi ngắn khi gửi tự động thất bại (không có nội dung nhạy cảm). */
+  error: string | null;
+  content: string;
+};
+export type ZaloLogQuery = PageInput & {
+  status?: string;
+  mode?: string;
+  kind?: string;
+  target?: string;
+  q?: string;
+  from?: string;
+  to?: string;
+};
+
+/** Tin Zalo đã gửi (moderator+). Mới nhất trước; lọc trạng thái / kiểu gửi / loại tin / đối tượng / ngày (giờ VN) / ô tìm (người gửi, người nhận, nội dung). */
+export async function listZaloLog(client: Client, input: ZaloLogQuery = {}): Promise<Result<AdminPage<ZaloLogItem>>> {
+  const w = pageWindow(input);
+  let q = client.from('zalo_message_log').select('*', { count: 'exact' });
+  if (oneOf(ZALO_DELIVERY_STATUSES, input.status)) q = q.eq('status', input.status);
+  if (oneOf(ZALO_MODES, input.mode)) q = q.eq('mode', input.mode);
+  if (oneOf(ZALO_KINDS, input.kind)) q = q.eq('kind', input.kind);
+  if (oneOf(ZALO_TARGETS, input.target)) q = q.eq('target_type', input.target);
+  const from = vnDayStart(input.from);
+  const to = vnDayStart(input.to, 1);
+  if (from) q = q.gte('created_at', from);
+  if (to) q = q.lt('created_at', to);
+  const search = sanitizeSearch(input.q);
+  if (search) q = q.or(`target_name.ilike.*${search}*,staff_name.ilike.*${search}*,content.ilike.*${search}*`);
+  const r = rangeResult(await q.order('created_at', { ascending: false }).order('id').range(w.from, w.to));
+  if (r.error) return fail(r.error.code, r.error.message);
+  const items = r.data.rows.flatMap((row): ZaloLogItem[] =>
+    oneOf(ZALO_TARGETS, row.target_type) && oneOf(ZALO_KINDS, row.kind)
+      ? [
+          {
+            id: row.id,
+            created_at: row.created_at,
+            staff_id: row.staff_id,
+            staff_name: row.staff_name?.trim() || null,
+            target_type: row.target_type,
+            target_id: row.target_id,
+            target_name: row.target_name?.trim() || null,
+            kind: row.kind,
+            mode: oneOf(ZALO_MODES, row.mode) ? row.mode : 'manual',
+            status: oneOf(ZALO_DELIVERY_STATUSES, row.status) ? row.status : 'recorded',
+            error: row.error,
+            content: row.content,
           },
         ]
       : [],

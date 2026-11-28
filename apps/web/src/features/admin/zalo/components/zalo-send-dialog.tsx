@@ -5,7 +5,7 @@
 // người nhận, staff dán tin rồi bấm Gửi trong Zalo. Thanh hạn mức hôm nay + đếm ngược thời gian nghỉ; lịch sử tin đã ghi nhận.
 // Form mount lại mỗi lần mở (state sạch). SĐT không đi qua client: chỉ nhận link zalo.me sau khi ghi nhận.
 import type { ReserveZaloResult, ZaloMessage, ZaloSendResult, ZaloStatus } from '@hp/core';
-import { APP_NAME, formatDate, ZALO_GENERAL_KINDS, type ZaloKind, type ZaloTarget } from '@hp/shared';
+import { APP_NAME, formatDate, renderZaloTemplate, ZALO_GENERAL_KINDS, type ZaloKind, type ZaloTarget } from '@hp/shared';
 import { CircleCheck, Copy, MessageCircle, Send } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useId, useState } from 'react';
@@ -22,6 +22,7 @@ import { useAdminAction } from '../../lib/use-admin-action';
 import {
   getZaloConnectionAction,
   getZaloStatusAction,
+  getZaloTemplatesAction,
   listZaloMessagesAction,
   reserveZaloMessageAction,
   sendZaloAutoAction,
@@ -56,13 +57,20 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
   const id = useId();
   const { pending, run } = useAdminAction();
 
+  // Mẫu tuỳ chỉnh của admin (ghi đè bản mặc định ở i18n); chưa tải xong / loại chưa có mẫu → dùng bản mặc định.
+  const [custom, setCustom] = useState<Partial<Record<ZaloKind, string>>>({});
   const template = useCallback(
-    (k: ZaloKind) => t(`template.${k}`, { name: recipient.name, app: APP_NAME, title: recipient.context ?? '' }),
-    [t, recipient.name, recipient.context],
+    (k: ZaloKind) => {
+      const vars = { name: recipient.name, app: APP_NAME, title: recipient.context ?? '' };
+      const own = custom[k];
+      return own ? renderZaloTemplate(own, vars) : t(`template.${k}`, vars);
+    },
+    [t, custom, recipient.name, recipient.context],
   );
   const [kind, setKind] = useState<ZaloKind>(defaultKind);
-  const [text, setText] = useState(() => template(defaultKind));
-  const [dirty, setDirty] = useState(false);
+  // `edited` = chữ staff đã tự sửa; chưa sửa thì tin soạn sẵn theo loại tin (đổi loại tin / mẫu tải xong thì tự đổi theo).
+  const [edited, setEdited] = useState<string | null>(null);
+  const text = edited ?? template(kind);
   const [status, setStatus] = useState<ZaloStatus | null>(null);
   const [until, setUntil] = useState(0);
   const [now, setNow] = useState(() => Date.now());
@@ -95,6 +103,9 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
     });
     void getZaloConnectionAction().then((r) => {
       if (alive && r.ok) setConn(r.data);
+    });
+    void getZaloTemplatesAction().then((r) => {
+      if (alive && r.ok) setCustom(Object.fromEntries(r.data.map((m) => [m.kind, m.content])));
     });
     return () => {
       alive = false;
@@ -249,11 +260,7 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
                 id={`${id}-kind`}
                 className={SELECT_CLASS}
                 value={kind}
-                onChange={(e) => {
-                  const next = e.target.value as ZaloKind;
-                  setKind(next);
-                  if (!dirty) setText(template(next));
-                }}
+                onChange={(e) => setKind(e.target.value as ZaloKind)}
               >
                 {kinds.map((k) => (
                   <option key={k} value={k}>
@@ -269,10 +276,7 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
                 rows={6}
                 maxLength={2000}
                 value={text}
-                onChange={(e) => {
-                  setText(e.target.value);
-                  setDirty(true);
-                }}
+                onChange={(e) => setEdited(e.target.value)}
               />
             </div>
             <DialogFooter className="flex-col gap-2 sm:flex-col sm:items-stretch sm:justify-start">

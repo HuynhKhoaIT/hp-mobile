@@ -103,6 +103,12 @@ Không cần secret mới (gọi RPC bằng JWT người dùng). Deploy khi đư
 - Dùng: staff vào `/admin/zalo` quét QR bằng app Zalo trên điện thoại → hộp thoại "Nhắn Zalo" có nút "Gửi ngay". Phiên Zalo có thể bị Zalo thu hồi (đổi IP / thiết bị) → trang báo "hết hạn", quét lại.
 - Rủi ro: `zca-js` là API không chính thức, tài khoản Zalo có thể bị hạn chế; luôn giữ hạn mức 15–30 tin / ngày, nghỉ 60–180 giây. Mạng nội bộ chặn `id.zalo.me` thì không thử QR được ở local.
 
+#### Tự báo Zalo khi khách chốt báo giá — Edge Function `zalo-notify`
+- Migration `20261129140000_zalo_accept_notice` lên cùng `db push`; function deploy tay: `supabase functions deploy zalo-notify --project-ref <ref>` (`verify_jwt = false`, tự kiểm `x-webhook-secret`). Dùng lại secret `ZALO_SESSION_KEY`, `WEBHOOK_SECRET` và app setting `functions_url` / `webhook_secret` đã cấu hình cho `send-push` — thiếu thì trigger không gửi gì.
+- Bật: một nhân viên CSKH kết nối Zalo CSKH ở `/admin/zalo` (quét QR) → admin vào `/admin/zalo-settings` → thẻ "Zalo CSKH": chọn tài khoản, tick "Bật tự báo", Lưu. Sửa nội dung ở mục Mẫu tin (hai mẫu "Báo khách…" / "Báo thợ…"). Mặc định tắt.
+- Kết quả từng tin xem ở `/admin/zalo-messages` (trạng thái `sent` / `failed`, lỗi `limit_reached` = hết hạn mức ngày, `zalo_session_expired` = phải quét QR lại). Tin báo tính vào hạn mức ngày của Zalo CSKH; hết lượt thì không gửi, việc chốt vẫn thành công.
+- Tắt khẩn cấp: bỏ tick ở `/admin/zalo-settings` (hoặc SQL `update public.zalo_settings set notify_accepted = false;`).
+
 ### Cron nhắc giờ / hết hạn (pg_cron, tuần 8)
 Hai job tạo bởi migration `20261103100000_group_lifecycle_chat` (lên cùng `supabase db push`, không cần secret / Edge Function):
 - `remind-groups` (`*/15 * * * *`) → `select public.remind_groups()`: `group_reminder` trước giờ diễn ra 60 phút (cửa sổ thực tế 45–60 phút vì chạy 15 phút / lần).

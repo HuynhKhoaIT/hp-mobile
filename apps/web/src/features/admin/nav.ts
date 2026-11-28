@@ -12,8 +12,10 @@ import {
   LayoutDashboard,
   type LucideIcon,
   Megaphone,
+  MessagesSquare,
   ScrollText,
   ShieldCheck,
+  SlidersHorizontal,
   Store,
   Users,
 } from 'lucide-react';
@@ -31,6 +33,8 @@ export type AdminNavKey =
   | 'leads'
   | 'cskh'
   | 'zalo'
+  | 'zalo_log'
+  | 'zalo_settings'
   | 'marketing'
   | 'audit';
 
@@ -46,6 +50,8 @@ export type AdminNavHref =
   | '/admin/leads'
   | '/admin/cskh'
   | '/admin/zalo'
+  | '/admin/zalo-messages'
+  | '/admin/zalo-settings'
   | '/admin/marketing'
   | '/admin/audit';
 
@@ -76,6 +82,10 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   { key: 'cskh', href: '/admin/cskh', Icon: Headset, minRole: 'moderator' },
   // Kết nối Zalo cá nhân bằng QR để gửi tin tự động từ hộp thoại "Nhắn Zalo".
   { key: 'zalo', href: '/admin/zalo', Icon: Link2, minRole: 'moderator' },
+  // Nhật ký mọi tin Zalo đã gửi (tự động + mở Zalo).
+  { key: 'zalo_log', href: '/admin/zalo-messages', Icon: MessagesSquare, minRole: 'moderator' },
+  // Hạn mức gửi tin + mẫu tin soạn sẵn (chỉ admin sửa).
+  { key: 'zalo_settings', href: '/admin/zalo-settings', Icon: SlidersHorizontal, minRole: 'admin' },
   { key: 'marketing', href: '/admin/marketing', Icon: Megaphone, minRole: 'admin' },
   { key: 'audit', href: '/admin/audit', Icon: ScrollText, minRole: 'admin' },
 ];
