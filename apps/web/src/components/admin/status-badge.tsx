@@ -2,7 +2,7 @@
 // Trạng thái tin: tone theo STATUS_TONE của "Tin của tôi"; các loại còn lại: chờ / mở → vàng, xong / duyệt → xanh,
 // từ chối / cấm / huỷ → đỏ, bỏ qua / đã xoá → xám. Chữ do nơi gọi truyền vào (đã qua t()).
 import type { BadgeRequestStatus, KeywordAction, ReportStatus, UserState, VenueStatus } from '@hp/core';
-import type { GroupStatus, LeadStatus, ListingStatus, ModerationStatus } from '@hp/shared';
+import type { CskhStatus, GroupStatus, LeadStatus, ListingStatus, ModerationStatus } from '@hp/shared';
 import { Badge, type BadgeTone } from '@/components/shared/badge';
 import { STATUS_TONE } from '@/features/listing/manage';
 
@@ -19,6 +19,7 @@ const TONES = {
   keyword: { reject: 'danger', review: 'warning' } satisfies Record<KeywordAction, BadgeTone>,
   toggle: { on: 'success', off: 'neutral' } satisfies Record<'on' | 'off', BadgeTone>,
   lead: { new: 'warning', contacted: 'primary', closed: 'neutral' } satisfies Record<LeadStatus, BadgeTone>,
+  cskh: { pending: 'warning', contacted: 'primary', no_answer: 'neutral', done: 'success' } satisfies Record<CskhStatus, BadgeTone>,
 } as const;
 
 type Kinds = typeof TONES;

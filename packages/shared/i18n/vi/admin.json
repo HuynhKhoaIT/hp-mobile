@@ -14,7 +14,8 @@
     "catalog": "Danh mục",
     "marketing": "Marketing",
     "audit": "Nhật ký",
-    "leads": "Lead"
+    "leads": "Lead",
+    "cskh": "Chăm sóc khách hàng"
   },
   "brand": {
     "area": "Quản trị",
@@ -49,7 +50,8 @@
       "leads_one": "{{count}} lead mới",
       "leads_other": "{{count}} lead mới"
     },
-    "leads": "Lead"
+    "leads": "Lead",
+    "cskh": "CSKH"
   },
   "role": {
     "user": "Người dùng",
@@ -1014,9 +1016,13 @@
       "lead_reply": "Phản hồi lead",
       "listing_notice": "Thông báo tin đăng",
       "warning": "Nhắc nhở / cảnh báo",
-      "custom": "Tin khác"
+      "custom": "Tin khác",
+      "service_followup": "Hỏi thăm sau dịch vụ",
+      "rating_request": "Mời đánh giá"
     },
     "template": {
+      "service_followup": "Chào {{name}}, mình bên {{app}}. Đơn \"{{title}}\" của bạn đã hoàn thành, bạn thấy dịch vụ thế nào ạ? Có gì chưa ưng mình hỗ trợ ngay nhé.",
+      "rating_request": "Chào {{name}}, cảm ơn bạn đã dùng dịch vụ trên {{app}}. Bạn dành 30 giây đánh giá giúp đơn \"{{title}}\" trong ứng dụng nhé, cảm ơn bạn!",
       "lead_reply": "Chào {{name}}, cảm ơn bạn đã quan tâm đến {{app}}. Bạn cần mình hỗ trợ thêm gì không ạ?",
       "listing_notice": "Chào {{name}}, tin đăng của bạn trên {{app}} đang được xem xét. Bạn kiểm tra lại ảnh và mô tả giúp mình nhé.",
       "warning": "Chào {{name}}, nội dung của bạn trên {{app}} chưa phù hợp với quy định cộng đồng. Bạn vui lòng chỉnh sửa giúp mình nhé, cảm ơn bạn.",
@@ -1046,5 +1052,82 @@
     "history_by": "Bởi {{name}}",
     "user_title": "Nhắn Zalo",
     "user_hint": "Soạn tin gửi qua Zalo cá nhân của bạn tới người dùng này. Mỗi tin được ghi vào nhật ký, không lưu số điện thoại."
+  },
+  "cskh": {
+    "title": "Chăm sóc khách hàng",
+    "subtitle": "Đơn Gọi thợ đã hoàn thành: gọi hoặc nhắn Zalo để hỏi thăm và xin đánh giá, rồi ghi lại kết quả.",
+    "table_label": "Hàng chờ chăm sóc khách hàng",
+    "filter": {
+      "q": "Tìm tên hoặc tiêu đề đơn",
+      "status": "Trạng thái",
+      "party": "Bên"
+    },
+    "col": {
+      "order": "Đơn",
+      "party": "Bên",
+      "person": "Người",
+      "rating": "Đánh giá trong app",
+      "status": "Trạng thái",
+      "result": "Kết quả",
+      "actions": "Thao tác"
+    },
+    "party": {
+      "customer": "Khách",
+      "pro": "Thợ"
+    },
+    "status": {
+      "pending": "Chưa liên hệ",
+      "contacted": "Đã liên hệ",
+      "no_answer": "Không nghe máy",
+      "done": "Hoàn tất"
+    },
+    "channel": {
+      "call": "Gọi điện",
+      "zalo": "Zalo"
+    },
+    "completed": "Hoàn thành {{time}}",
+    "rated_yes": "Đã đánh giá",
+    "rated_no": "Chưa đánh giá",
+    "score": "Hài lòng {{score}}/5",
+    "no_result": "Chưa có kết quả",
+    "handled_by": "Bởi {{name}} · {{time}}",
+    "unknown_user": "Không rõ",
+    "no_phone": "Người này chưa có số điện thoại",
+    "action": {
+      "call": "Gọi",
+      "zalo": "Nhắn Zalo",
+      "result": "Ghi kết quả",
+      "open_request": "Xem đơn",
+      "actions_for": "Thao tác cho {{name}}"
+    },
+    "call": {
+      "title": "Gọi {{name}}",
+      "hint": "Số điện thoại chỉ hiện khi bạn bấm gọi và việc xem số được ghi vào nhật ký.",
+      "number": "Số điện thoại",
+      "call_now": "Gọi ngay",
+      "copy": "Sao chép số",
+      "copied": "Đã sao chép số điện thoại",
+      "copy_failed": "Không sao chép được, hãy chọn và copy tay",
+      "after": "Gọi xong, hãy ghi kết quả chăm sóc.",
+      "record": "Ghi kết quả",
+      "close": "Đóng"
+    },
+    "result": {
+      "title": "Kết quả chăm sóc · {{name}}",
+      "hint": "Điểm là ghi chép của bạn theo lời khách, không thay đổi đánh giá thật trong ứng dụng.",
+      "status_label": "Trạng thái",
+      "channel_label": "Đã liên hệ bằng",
+      "channel_none": "Chưa rõ",
+      "score_label": "Điểm hài lòng (theo lời khách)",
+      "score_none": "Chưa có",
+      "note_label": "Ghi chú",
+      "note_hint": "Không ghi số điện thoại hay thông tin nhạy cảm.",
+      "save": "Lưu kết quả"
+    },
+    "toast": {
+      "saved": "Đã lưu kết quả chăm sóc"
+    },
+    "empty": "Chưa có đơn hoàn thành nào cần chăm sóc",
+    "empty_filtered": "Không có đơn phù hợp với bộ lọc"
   }
 }
