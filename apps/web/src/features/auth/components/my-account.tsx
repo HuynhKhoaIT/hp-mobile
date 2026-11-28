@@ -9,7 +9,7 @@
 // Nút "Xem hồ sơ" (trong mờ, như app ProfileHero) → hồ sơ công khai /u/[id] — người khác thấy gì.
 import { needsOnboarding } from '@hp/core';
 import { formatDate } from '@hp/shared';
-import { Check, ChevronRight, Eye, FileText, LogIn, MapPin, Plus, Settings, ShieldCheck, UserRoundPen, Users } from 'lucide-react';
+import { Check, ChevronRight, Eye, FileText, LayoutDashboard, LogIn, MapPin, Plus, Settings, ShieldCheck, UserRoundPen, Users } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import type { ReactNode } from 'react';
 import { EmptyState } from '@/components/shared/empty-state';
@@ -171,6 +171,24 @@ export async function MyAccount() {
           </span>
           <ChevronRight aria-hidden strokeWidth={1.75} className="size-5 shrink-0 text-primary" />
         </Link>
+
+        {/* Lối vào khu quản trị cho staff (moderator / admin) — điện thoại không có thanh địa chỉ tiện để gõ /admin.
+            Chỉ là giao diện: proxy.ts vẫn kiểm vai trò + MFA ở server, người không phải staff gõ /admin vẫn bị 403. */}
+        {me.role === 'moderator' || me.role === 'admin' ? (
+          <Link
+            href="/admin"
+            className="flex min-h-16 items-center gap-3 rounded-lg border border-border bg-surface p-4 shadow-card outline-none transition-colors hover:border-primary/30 focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary-light text-primary">
+              <LayoutDashboard strokeWidth={1.75} className="size-6" />
+            </span>
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="text-md font-bold text-fg">{t('web.me.admin_title')}</span>
+              <span className="line-clamp-2 text-sm text-muted">{t('web.me.admin_hint')}</span>
+            </span>
+            <ChevronRight aria-hidden strokeWidth={1.75} className="size-5 shrink-0 text-primary" />
+          </Link>
+        ) : null}
 
         <Shortcuts
           items={[

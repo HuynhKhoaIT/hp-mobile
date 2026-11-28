@@ -59,7 +59,9 @@
     "guest_body": "Đăng nhập để đăng tin, lưu tin và nhắn tin với người khác.",
     "settings": "Cài đặt",
     "theme": "Giao diện",
-    "about": "Thông tin"
+    "about": "Thông tin",
+    "admin_title": "Khu quản trị",
+    "admin_hint": "Kiểm duyệt, lead, chăm sóc khách hàng và nhiều hơn nữa"
   },
   "listing": {
     "all": {
