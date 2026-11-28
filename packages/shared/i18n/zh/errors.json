@@ -59,5 +59,6 @@
   "request_not_completed": "需求完成后才能评价。",
   "quote_not_pending": "这条报价已不在等待选择的状态。",
   "already_quoted": "你已对该需求报过价。",
-  "cannot_quote_own": "这是你自己的需求，不能自己报价。"
+  "cannot_quote_own": "这是你自己的需求，不能自己报价。",
+  "no_phone": "此用户没有可用于 Zalo 的手机号。"
 }

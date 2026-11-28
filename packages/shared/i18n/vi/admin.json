@@ -1002,6 +1002,49 @@
     "export": "Xuất CSV",
     "export_hint": "Xuất theo trạng thái đang lọc (tối đa 10.000 dòng). File chứa liên hệ, việc xuất được ghi vào nhật ký.",
     "empty": "Chưa có lead nào",
-    "empty_filtered": "Không có lead phù hợp với bộ lọc"
+    "empty_filtered": "Không có lead phù hợp với bộ lọc",
+    "zalo_email_only": "Lead chỉ có email, không nhắn Zalo được"
+  },
+  "zalo": {
+    "open": "Nhắn Zalo",
+    "dialog_title": "Nhắn Zalo · {{name}}",
+    "hint": "Zalo cá nhân không cho gửi tự động: hệ thống ghi nhận tin, sao chép và mở Zalo tới người nhận — bạn dán tin rồi bấm Gửi.",
+    "kind_label": "Loại tin",
+    "kind": {
+      "lead_reply": "Phản hồi lead",
+      "listing_notice": "Thông báo tin đăng",
+      "warning": "Nhắc nhở / cảnh báo",
+      "custom": "Tin khác"
+    },
+    "template": {
+      "lead_reply": "Chào {{name}}, cảm ơn bạn đã quan tâm đến {{app}}. Bạn cần mình hỗ trợ thêm gì không ạ?",
+      "listing_notice": "Chào {{name}}, tin đăng của bạn trên {{app}} đang được xem xét. Bạn kiểm tra lại ảnh và mô tả giúp mình nhé.",
+      "warning": "Chào {{name}}, nội dung của bạn trên {{app}} chưa phù hợp với quy định cộng đồng. Bạn vui lòng chỉnh sửa giúp mình nhé, cảm ơn bạn.",
+      "custom": "Chào {{name}}, "
+    },
+    "content_label": "Nội dung tin",
+    "quota_title": "Zalo hôm nay",
+    "quota_count": "{{sent}}/{{quota}} tin",
+    "quota_loading": "Đang tải hạn mức…",
+    "reason": {
+      "waiting": "Nghỉ {{seconds}} giây trước tin tiếp theo để tránh Zalo hạn chế tài khoản",
+      "limit_reached": "Hôm nay đã gửi đủ {{quota}} tin Zalo, mai gửi tiếp nhé"
+    },
+    "cta": "Ghi nhận và mở Zalo",
+    "cta_waiting": "Nghỉ {{seconds}} giây nữa",
+    "cta_blocked": "Chưa gửi được",
+    "recorded": "Đã ghi nhận tin {{sent}}/{{quota}} hôm nay.",
+    "copied": "Tin đã được sao chép.",
+    "copy_on_open": "Bấm mở Zalo, tin sẽ được sao chép.",
+    "open_zalo": "Mở Zalo chat với người nhận",
+    "copy_again": "Sao chép lại",
+    "copied_toast": "Đã sao chép tin",
+    "copy_failed": "Không sao chép được, hãy chọn và copy tay",
+    "done": "Xong",
+    "history_title": "Tin đã ghi nhận",
+    "history_empty": "Chưa có tin nào cho người này",
+    "history_by": "Bởi {{name}}",
+    "user_title": "Nhắn Zalo",
+    "user_hint": "Soạn tin gửi qua Zalo cá nhân của bạn tới người dùng này. Mỗi tin được ghi vào nhật ký, không lưu số điện thoại."
   }
 }

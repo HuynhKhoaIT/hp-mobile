@@ -59,5 +59,6 @@
   "request_not_completed": "Chỉ đánh giá được sau khi yêu cầu hoàn thành.",
   "quote_not_pending": "Báo giá này không còn ở trạng thái chờ chọn.",
   "already_quoted": "Bạn đã có báo giá cho yêu cầu này.",
-  "cannot_quote_own": "Đây là yêu cầu của bạn nên không tự báo giá được."
+  "cannot_quote_own": "Đây là yêu cầu của bạn nên không tự báo giá được.",
+  "no_phone": "Người này chưa có số điện thoại để nhắn Zalo."
 }

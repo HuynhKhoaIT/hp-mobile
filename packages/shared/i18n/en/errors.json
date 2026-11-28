@@ -59,5 +59,6 @@
   "request_not_completed": "You can rate once the request is completed.",
   "quote_not_pending": "This quote is no longer waiting to be chosen.",
   "already_quoted": "You already have a quote on this request.",
-  "cannot_quote_own": "This is your own request, so you can’t quote it."
+  "cannot_quote_own": "This is your own request, so you can’t quote it.",
+  "no_phone": "This person has no phone number to message on Zalo."
 }

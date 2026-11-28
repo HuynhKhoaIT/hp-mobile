@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import type { StaffRole } from '../../roles';
 import { useAdminAction } from '../../lib/use-admin-action';
+import { ZaloSendDialog } from '../../zalo/components/zalo-send-dialog';
 import { setUserBadgesAction, setUserBannedAction, setUserRoleAction, suspendUserAction } from '../actions';
 
 type Confirm =
@@ -30,9 +31,11 @@ export function UserActions({ user, viewer }: { user: AdminUserDetail; viewer: {
   const t = useTranslations('admin.users');
   const tRole = useTranslations('admin.role');
   const tBadge = useTranslations('listing.owner_badge');
+  const tZalo = useTranslations('admin.zalo');
   const id = useId();
   const { pending, run } = useAdminAction();
   const [confirm, setConfirm] = useState<Confirm>(null);
+  const [zaloOpen, setZaloOpen] = useState(false);
   const [days, setDays] = useState<SuspendDays>(7);
   const [role, setRole] = useState<Role>(user.role);
   const [badges, setBadges] = useState<ReadonlySet<Badge>>(new Set(user.badges));
@@ -153,6 +156,17 @@ export function UserActions({ user, viewer }: { user: AdminUserDetail; viewer: {
         </fieldset>
       </Section>
 
+      {/* Nhắn Zalo bán tự động: chỉ người dùng có SĐT (đăng nhập Google không có). SĐT không hiện ở đây, chỉ qua link zalo.me. */}
+      {user.phone_masked ? (
+        <Section title={tZalo('user_title')} hint={tZalo('user_hint')}>
+          <div>
+            <Button variant="outline" disabled={pending} onClick={() => setZaloOpen(true)}>
+              {tZalo('open')}
+            </Button>
+          </div>
+        </Section>
+      ) : null}
+
       {/* Chỉ admin */}
       {isAdmin ? (
         <>
@@ -201,6 +215,8 @@ export function UserActions({ user, viewer }: { user: AdminUserDetail; viewer: {
         pending={pending}
         onConfirm={() => confirm && execute(confirm)}
       />
+
+      <ZaloSendDialog open={zaloOpen} onOpenChange={setZaloOpen} recipient={{ type: 'user', id: user.id, name }} defaultKind="custom" />
     </div>
   );
 }

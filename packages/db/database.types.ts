@@ -1037,6 +1037,58 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
+                },"zalo_messages": {
+                  Row: {
+                    "content": string,"created_at": string,"id": string,"kind": string,"staff_id": string,"target_id": string,"target_type": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content": string,"created_at"?: string,"id"?: string,"kind": string,"staff_id": string,"target_id": string,"target_type": string
+                  }
+                  Update: {
+                    "content"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"staff_id"?: string,"target_id"?: string,"target_type"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_messages_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_messages_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"zalo_quota": {
+                  Row: {
+                    "day": string,"last_sent_at": string | null,"next_allowed_at": string | null,"quota": number,"sent": number,"staff_id": string,"zalo_present": Json | null
+                  }
+                  ComputedFields: "zalo_present"
+                  Insert: {
+                    "day": string,"last_sent_at"?: string | null,"next_allowed_at"?: string | null,"quota": number,"sent"?: number,"staff_id": string
+                  }
+                  Update: {
+                    "day"?: string,"last_sent_at"?: string | null,"next_allowed_at"?: string | null,"quota"?: number,"sent"?: number,"staff_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_quota_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_quota_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -1696,6 +1748,9 @@ isOneToOne: false
 "request_badge_tx":
 { Args: { "p_badge": string,"p_document_path": string }; Returns: string
                            },
+"reserve_zalo_message":
+{ Args: { "p_content": string,"p_kind": string,"p_target_id": string,"p_target_type": string }; Returns: Json
+                           },
 "respond_join_tx":
 { Args: { "p_accept": boolean,"p_group_id": string,"p_user_id": string }; Returns: Database["public"]['Enums']["member_status"]
                            },
@@ -1917,7 +1972,28 @@ isOneToOne: false
                            },
 "withdraw_quote":
 { Args: { "p_quote_id": string }; Returns: undefined
-                           }
+                           },
+"zalo_present":
+{ Args: { "p_row": Omit<Database["public"]['Tables']["zalo_quota"]['Row'], Database["public"]['Tables']["zalo_quota"]['ComputedFields']> }; Returns: Json
+                           },
+"zalo_status":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"zalo_today":
+{ Args: { "p_staff": string }; Returns: {
+              "day": string,
+"last_sent_at": string | null,
+"next_allowed_at": string | null,
+"quota": number,
+"sent": number,
+"staff_id": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "zalo_quota"
+        isOneToOne: true
+        isSetofReturn: false
+      } }
           }
           Enums: {
             "group_kind": "ride"|"sport","group_status": "open"|"full"|"in_progress"|"completed"|"cancelled","listing_category": "pass_electronics"|"pass_vehicle"|"pass_ppe"|"pass_home"|"room_rent"|"room_share"|"job_main"|"job_parttime"|"lost"|"found"|"pass_appliance"|"pass_fashion"|"pass_sport"|"pass_tools"|"pass_baby"|"pass_other"|"room_house"|"room_apartment","listing_status": "draft"|"pending_review"|"active"|"sold"|"closed"|"expired"|"rejected","member_status": "requested"|"accepted"|"declined"|"left"|"kicked","service_quote_status": "submitted"|"accepted"|"declined"|"withdrawn","service_request_status": "open"|"assigned"|"completed"|"cancelled"|"expired","service_trade": "electric_plumbing"|"cleaning"|"welding"|"hvac"|"other","service_urgency": "today"|"this_week"|"flexible"

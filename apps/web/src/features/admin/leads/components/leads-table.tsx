@@ -4,8 +4,9 @@
 // Đánh dấu đã liên hệ / đóng / mở lại từng dòng. Xuất CSV chỉ hiện với admin (route tự kiểm lại).
 import type { AdminLead, AdminPage } from '@hp/core';
 import { formatDate, type LeadStatus } from '@hp/shared';
-import { Download, Inbox } from 'lucide-react';
+import { Download, Inbox, MessageCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { DataTable, type DataColumn } from '@/components/admin/data-table';
 import { Pagination, useRangeSummary } from '@/components/admin/pagination';
 import { StatusBadge } from '@/components/admin/status-badge';
@@ -15,6 +16,7 @@ import { asLocale } from '@/features/listing/display';
 import { getPathname } from '@/i18n/navigation';
 import type { Query } from '../../lib/params';
 import { useAdminAction } from '../../lib/use-admin-action';
+import { ZaloSendDialog } from '../../zalo/components/zalo-send-dialog';
 import { updateLeadAction } from '../actions';
 
 const BASE = '/admin/leads';
@@ -26,9 +28,11 @@ const NEXT_STEPS: Record<LeadStatus, LeadStatus[]> = {
 
 export function LeadsTable({ data, query, canExport }: { data: AdminPage<AdminLead>; query: Query; canExport: boolean }) {
   const t = useTranslations('admin.leads');
+  const tZalo = useTranslations('admin.zalo');
   const locale = asLocale(useLocale());
   const summary = useRangeSummary();
   const { pending, run } = useAdminAction();
+  const [zaloLead, setZaloLead] = useState<AdminLead | null>(null);
   const filtered = Boolean(query.status || query.kind || query.q);
   const exportHref = getPathname({
     href: { pathname: '/admin/leads/export', query: query.status ? { status: query.status } : {} },
@@ -99,6 +103,17 @@ export function LeadsTable({ data, query, canExport }: { data: AdminPage<AdminLe
               {t(`to.${status}`)}
             </Button>
           ))}
+          {/* Nhắn Zalo bán tự động: chỉ lead có SĐT (lead email không có Zalo để nhắn). */}
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={l.contact_type !== 'phone'}
+            title={l.contact_type !== 'phone' ? t('zalo_email_only') : undefined}
+            onClick={() => setZaloLead(l)}
+          >
+            <MessageCircle strokeWidth={1.75} aria-hidden />
+            {tZalo('open')}
+          </Button>
         </span>
       ),
     },
@@ -128,6 +143,14 @@ export function LeadsTable({ data, query, canExport }: { data: AdminPage<AdminLe
         empty={<EmptyState icon={Inbox} title={filtered ? t('empty_filtered') : t('empty')} />}
       />
       <Pagination basePath={BASE} query={query} page={data.page} pageCount={data.pageCount} />
+      {zaloLead ? (
+        <ZaloSendDialog
+          open
+          onOpenChange={(o) => !o && setZaloLead(null)}
+          recipient={{ type: 'lead', id: zaloLead.id, name: zaloLead.name || zaloLead.contact }}
+          defaultKind="lead_reply"
+        />
+      ) : null}
     </div>
   );
 }

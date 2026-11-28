@@ -5,6 +5,7 @@
 // Luật: .claude/rules/be-shared-packages.md.
 export { appOnly, isAppOnly, type AppOnlyFeature } from './capabilities';
 export * from './admin';
+export * from './zalo';
 export * from './auth';
 export * from './badges';
 export * from './chat';
