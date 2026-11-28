@@ -189,7 +189,8 @@ select tests.authenticate_as('pro1');
 select lives_ok(format($$ select public.rate_service_request('%s', 4) $$, (select id from t_r where name = 'main')), 'pro1: chấm lại chủ yêu cầu');
 
 reset role;
-select is((select count(*)::int from public.ratings where context_type = 'service_request'), 2, 'ratings: hai chiều đã ghi');
+select is((select count(*)::int from public.ratings where context_type = 'service_request' and context_id = (select id from t_r where name = 'main')), 2,
+  'ratings: hai chiều đã ghi (chỉ đếm đơn của test, không tính dữ liệu mẫu)');
 select is((select rating_avg from public.profiles where id = tests.get_uid('pro1')), 5.00::numeric, 'ratings: điểm của thợ được cập nhật');
 select is((select count(*)::int from public.notifications where user_id = tests.get_uid('cust') and type = 'quote_received'), 3,
   'thông báo: chủ nhận quote_received cho báo giá mới / gửi lại (sửa giá không báo lại)');
