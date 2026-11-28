@@ -1002,6 +1002,49 @@
     "export": "Export CSV",
     "export_hint": "Exports the current status filter (up to 10,000 rows). The file contains contact details and the export is logged.",
     "empty": "No leads yet",
-    "empty_filtered": "No leads match the filters"
+    "empty_filtered": "No leads match the filters",
+    "zalo_email_only": "This lead only has an email, so it can’t be messaged on Zalo"
+  },
+  "zalo": {
+    "open": "Message on Zalo",
+    "dialog_title": "Message on Zalo · {{name}}",
+    "hint": "Personal Zalo can’t send automatically: the system records the message, copies it and opens Zalo to the recipient — paste it and press Send.",
+    "kind_label": "Message type",
+    "kind": {
+      "lead_reply": "Reply to a lead",
+      "listing_notice": "Listing notice",
+      "warning": "Reminder / warning",
+      "custom": "Other"
+    },
+    "template": {
+      "lead_reply": "Hi {{name}}, thanks for your interest in {{app}}. Is there anything else we can help you with?",
+      "listing_notice": "Hi {{name}}, your listing on {{app}} is under review. Could you please check the photos and description?",
+      "warning": "Hi {{name}}, your content on {{app}} doesn’t fit our community rules. Please edit it, thank you.",
+      "custom": "Hi {{name}}, "
+    },
+    "content_label": "Message",
+    "quota_title": "Zalo today",
+    "quota_count": "{{sent}}/{{quota}} messages",
+    "quota_loading": "Loading the daily limit…",
+    "reason": {
+      "waiting": "Wait {{seconds}} seconds before the next message so Zalo doesn’t restrict the account",
+      "limit_reached": "You’ve sent all {{quota}} Zalo messages for today, continue tomorrow"
+    },
+    "cta": "Record and open Zalo",
+    "cta_waiting": "Wait {{seconds}} s",
+    "cta_blocked": "Can’t send yet",
+    "recorded": "Recorded message {{sent}}/{{quota}} today.",
+    "copied": "The message was copied.",
+    "copy_on_open": "Open Zalo and the message will be copied.",
+    "open_zalo": "Open Zalo chat with the recipient",
+    "copy_again": "Copy again",
+    "copied_toast": "Message copied",
+    "copy_failed": "Couldn’t copy, select the text and copy it by hand",
+    "done": "Done",
+    "history_title": "Recorded messages",
+    "history_empty": "No messages for this person yet",
+    "history_by": "By {{name}}",
+    "user_title": "Message on Zalo",
+    "user_hint": "Write a message to send from your personal Zalo to this user. Each message is logged; the phone number is not stored."
   }
 }
