@@ -6,4 +6,6 @@ export const routing = defineRouting({
   locales: LOCALES,
   defaultLocale: DEFAULT_LOCALE,
   localePrefix: 'as-needed',
+  // Luôn mở tiếng Việt: không tự chuyển sang /en, /zh theo Accept-Language hay cookie cũ của trình duyệt; đổi ngôn ngữ bằng bộ chọn.
+  localeDetection: false,
 });
