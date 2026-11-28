@@ -16,7 +16,9 @@
     "audit": "Nhật ký",
     "leads": "Lead",
     "cskh": "Chăm sóc khách hàng",
-    "zalo": "Kết nối Zalo"
+    "zalo": "Kết nối Zalo",
+    "zalo_log": "Tin Zalo đã gửi",
+    "zalo_settings": "Cấu hình Zalo"
   },
   "brand": {
     "area": "Quản trị",
@@ -54,7 +56,9 @@
     },
     "leads": "Lead",
     "cskh": "CSKH",
-    "zalo": "Kết nối Zalo"
+    "zalo": "Kết nối Zalo",
+    "zalo_log": "Tin Zalo đã gửi",
+    "zalo_settings": "Cấu hình Zalo"
   },
   "role": {
     "user": "Người dùng",
@@ -1022,9 +1026,13 @@
       "warning": "Nhắc nhở / cảnh báo",
       "custom": "Tin khác",
       "service_followup": "Hỏi thăm sau dịch vụ",
-      "rating_request": "Mời đánh giá"
+      "rating_request": "Mời đánh giá",
+      "accepted_customer": "Báo khách: đã chốt thợ (tự động)",
+      "accepted_pro": "Báo thợ: báo giá được chọn (tự động)"
     },
     "template": {
+      "accepted_customer": "Chào {{name}}, bạn đã chọn thợ cho yêu cầu \"{{title}}\" trên {{app}}. Thợ sẽ liên hệ với bạn qua tin nhắn trong ứng dụng. Cần hỗ trợ bạn cứ nhắn lại tin này nhé.",
+      "accepted_pro": "Chào {{name}}, báo giá của bạn cho yêu cầu \"{{title}}\" đã được chọn trên {{app}}. Bạn mở ứng dụng để nhắn tin với khách và hẹn giờ nhé.",
       "service_followup": "Chào {{name}}, mình bên {{app}}. Đơn \"{{title}}\" của bạn đã hoàn thành, bạn thấy dịch vụ thế nào ạ? Có gì chưa ưng mình hỗ trợ ngay nhé.",
       "rating_request": "Chào {{name}}, cảm ơn bạn đã dùng dịch vụ trên {{app}}. Bạn dành 30 giây đánh giá giúp đơn \"{{title}}\" trong ứng dụng nhé, cảm ơn bạn!",
       "lead_reply": "Chào {{name}}, cảm ơn bạn đã quan tâm đến {{app}}. Bạn cần mình hỗ trợ thêm gì không ạ?",
@@ -1185,5 +1193,89 @@
     },
     "empty": "Chưa có đơn hoàn thành nào cần chăm sóc",
     "empty_filtered": "Không có đơn phù hợp với bộ lọc"
+  },
+  "zalo_log": {
+    "title": "Tin Zalo đã gửi",
+    "subtitle": "Mọi tin Zalo gửi cho lead và người dùng (tự động và mở Zalo), ai gửi, gửi cho ai, kết quả.",
+    "table_label": "Danh sách tin Zalo đã gửi",
+    "filter": {
+      "q": "Tìm người nhận, người gửi hoặc nội dung",
+      "status": "Trạng thái",
+      "mode": "Kiểu gửi",
+      "kind": "Loại tin",
+      "target": "Người nhận",
+      "from": "Từ ngày",
+      "to": "Đến ngày"
+    },
+    "col": {
+      "to": "Người nhận",
+      "message": "Nội dung",
+      "staff": "Người gửi",
+      "kind": "Loại tin",
+      "status": "Kết quả",
+      "time": "Thời gian"
+    },
+    "target": {
+      "lead": "Lead",
+      "user": "Người dùng"
+    },
+    "unknown_target": "Không rõ tên",
+    "unknown_staff": "Không rõ",
+    "error_label": "Lý do lỗi: {{error}}",
+    "empty": "Chưa có tin Zalo nào được gửi.",
+    "empty_filtered": "Không có tin nào khớp bộ lọc."
+  },
+  "zalo_settings": {
+    "title": "Cấu hình Zalo",
+    "subtitle": "Hạn mức gửi tin và mẫu tin soạn sẵn cho nhân viên. Chỉ quản trị viên được sửa.",
+    "limits": {
+      "title": "Hạn mức gửi tin",
+      "hint": "Mỗi nhân viên mỗi ngày có một hạn mức ngẫu nhiên trong khoảng này, giữa hai tin phải nghỉ một khoảng ngẫu nhiên. Đặt thấp để tài khoản Zalo ít bị hạn chế.",
+      "daily_min": "Tin mỗi ngày, tối thiểu",
+      "daily_max": "Tin mỗi ngày, tối đa",
+      "delay_min": "Nghỉ giữa 2 tin, tối thiểu (giây)",
+      "delay_max": "Nghỉ giữa 2 tin, tối đa (giây)",
+      "bounds": "Cho phép {{dailyMin}}–{{dailyMax}} tin mỗi ngày và nghỉ {{delayMin}}–{{delayMax}} giây.",
+      "applies": "Có hiệu lực ngay: lượt hôm nay của mọi nhân viên được điều chỉnh theo khoảng mới.",
+      "save": "Lưu cấu hình",
+      "saved": "Đã lưu cấu hình Zalo",
+      "invalid": "Giá trị chưa hợp lệ: cần số nguyên trong khoảng cho phép và giá trị tối thiểu không lớn hơn tối đa.",
+      "updated": "Cập nhật lần cuối {{time}}"
+    },
+    "auto": {
+      "title": "Zalo CSKH — tự báo khi chốt thợ",
+      "hint": "Khi khách chốt một báo giá, hệ thống tự nhắn Zalo cho khách và cho thợ được chọn bằng tài khoản Zalo CSKH bên dưới (nội dung theo mẫu ở dưới). Lỗi gửi không ảnh hưởng việc chốt; xem kết quả ở trang Tin Zalo đã gửi.",
+      "sender": "Tài khoản Zalo CSKH",
+      "sender_none": "— Chưa chọn —",
+      "no_accounts": "Chưa có tài khoản Zalo nào được kết nối. Nhân viên CSKH cần quét QR ở trang Kết nối Zalo trước.",
+      "sender_lost": "Tài khoản đã chọn không còn kết nối (phiên hết hạn hoặc đã ngắt). Hãy kết nối lại hoặc chọn tài khoản khác, nếu không tin sẽ không gửi được.",
+      "enabled": "Bật tự báo khi khách chốt thợ",
+      "limits_note": "Tin báo tính vào hạn mức ngày của tài khoản này (dùng chung với nhắn tay). Mỗi lần chốt gửi 2 tin (khách và thợ), hết lượt thì không gửi. Chỉ gửi cho người có số điện thoại hợp lệ trong hồ sơ.",
+      "save": "Lưu",
+      "saved": "Đã lưu cấu hình tự báo",
+      "invalid": "Cần chọn tài khoản Zalo CSKH trước khi bật."
+    },
+    "templates": {
+      "title": "Mẫu tin",
+      "hint": "Nội dung soạn sẵn khi nhân viên chọn từng loại tin; nhân viên vẫn sửa được trước khi gửi. Biến dùng được: {{vars}}.",
+      "var": {
+        "name": "tên người nhận",
+        "app": "tên ứng dụng",
+        "title": "tiêu đề đơn (chăm sóc sau dịch vụ)"
+      },
+      "custom": "Đã tuỳ chỉnh",
+      "default": "Mặc định",
+      "content": "Nội dung mẫu",
+      "preview": "Xem trước",
+      "sample_name": "Anh Nam",
+      "sample_title": "Sửa ống nước",
+      "save": "Lưu mẫu",
+      "saved": "Đã lưu mẫu tin",
+      "reset": "Khôi phục mặc định",
+      "reset_done": "Đã khôi phục mẫu mặc định",
+      "reset_title": "Khôi phục mẫu mặc định cho \"{{kind}}\"?",
+      "reset_body": "Nội dung đã sửa của loại tin này sẽ bị bỏ, nhân viên sẽ thấy lại mẫu có sẵn.",
+      "unknown_vars": "Biến không dùng được (sẽ hiện nguyên văn): {{vars}}"
+    }
   }
 }

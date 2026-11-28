@@ -425,6 +425,10 @@ verify_jwt = false
 [functions.purge-files]
 verify_jwt = false
 
+# zalo-notify: DB webhook (trg_service_requests_zalo_notice) — không có JWT người dùng; handler tự kiểm x-webhook-secret.
+[functions.zalo-notify]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

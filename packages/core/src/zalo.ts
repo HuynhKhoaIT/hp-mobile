@@ -4,13 +4,19 @@
 //   getZaloStatus        — hạn mức hôm nay (RPC zalo_status)
 //   reserveZaloMessage   — ghi nhận 1 tin + trừ hạn mức → { ok: true, zalo_url } | { ok: false, reason } (hết lượt / đang nghỉ)
 //   listZaloMessages     — lịch sử tin của một đối tượng (staff đọc bảng zalo_messages)
+//   getZaloSettings / saveZaloSettings, listZaloTemplates / saveZaloTemplate / resetZaloTemplate — cấu hình + mẫu tin (admin ghi)
 // Lỗi: forbidden (không phải staff), invalid_input, not_found, no_phone.
 import type { Json } from '@hp/db';
 import {
   ListZaloMessagesInput,
   ReserveZaloMessageInput,
+  ResetZaloTemplateInput,
+  SaveZaloAutoInput,
+  SaveZaloSettingsInput,
+  SaveZaloTemplateInput,
   ZALO_ACCOUNT_STATUSES,
   ZALO_BLOCK_REASONS,
+  ZALO_KINDS,
   ZALO_LIMITS,
   ZALO_QR_STATUSES,
   type ZaloAccountStatus,
@@ -214,4 +220,94 @@ export async function listZaloMessages(client: Client, input: ListZaloMessagesIn
       created_at: m.created_at,
     })),
   );
+}
+
+// ── Cấu hình hạn mức + mẫu tin (migration 20261129130000_zalo_settings) ──────────────────────────────────────────────────
+// Staff đọc cấu hình và mẫu tin (RLS staff); chỉ admin ghi qua RPC (audit `zalo.settings` / `zalo.template`).
+// Lỗi: forbidden (không phải admin), invalid_input.
+
+/** Hạn mức ngày [daily_min, daily_max] tin và thời gian nghỉ [delay_min, delay_max] giây đang áp dụng. */
+export type ZaloSettings = {
+  daily_min: number;
+  daily_max: number;
+  delay_min: number;
+  delay_max: number;
+  /** Zalo CSKH: staff có Zalo đã kết nối dùng gửi tin báo tự động (null = chưa chọn). */
+  auto_sender_id: string | null;
+  /** Bật: khi khách chốt báo giá, tự nhắn Zalo cho khách và thợ bằng Zalo CSKH. */
+  notify_accepted: boolean;
+  updated_at: string;
+};
+
+export async function getZaloSettings(client: Client): Promise<Result<ZaloSettings>> {
+  const res = await client
+    .from('zalo_settings')
+    .select('daily_min, daily_max, delay_min, delay_max, auto_sender_id, notify_accepted, updated_at')
+    .maybeSingle();
+  if (res.error) return fromSupabase<ZaloSettings>({ data: null, error: res.error });
+  return res.data ? ok(res.data) : fail('not_found');
+}
+
+/** Admin đổi cấu hình (RPC save_zalo_settings): lượt hôm nay của staff được kẹp vào khoảng mới. */
+export async function saveZaloSettings(client: Client, input: SaveZaloSettingsInput): Promise<Result<null>> {
+  const parsed = SaveZaloSettingsInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const v = parsed.data;
+  const res = await client.rpc('save_zalo_settings', {
+    p_daily_min: v.dailyMin,
+    p_daily_max: v.dailyMax,
+    p_delay_min: v.delayMin,
+    p_delay_max: v.delayMax,
+  });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
+/** Tài khoản Zalo đã kết nối của một staff (admin chọn làm Zalo CSKH). Không có SĐT / phiên. */
+export type ZaloSender = { staff_id: string; display_name: string | null; staff_name: string | null; status: ZaloAccountStatus };
+
+/** Admin: các tài khoản Zalo đã kết nối của mọi staff (RPC zalo_sender_options). */
+export async function listZaloSenders(client: Client): Promise<Result<ZaloSender[]>> {
+  const res = await client.rpc('zalo_sender_options');
+  if (res.error) return fromSupabase<ZaloSender[]>({ data: null, error: res.error });
+  return ok(
+    res.data.map((r) => ({
+      staff_id: r.staff_id,
+      display_name: r.display_name,
+      staff_name: r.staff_name,
+      status: (ZALO_ACCOUNT_STATUSES as readonly string[]).includes(r.status) ? (r.status as ZaloAccountStatus) : 'expired',
+    })),
+  );
+}
+
+/** Admin chọn Zalo CSKH + bật / tắt tự báo khi chốt báo giá (RPC save_zalo_auto; audit zalo.settings). Bật thì phải có tài khoản gửi. */
+export async function saveZaloAuto(client: Client, input: SaveZaloAutoInput): Promise<Result<null>> {
+  const parsed = SaveZaloAutoInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const res = await client.rpc('save_zalo_auto', { p_sender: parsed.data.senderId ?? undefined, p_enabled: parsed.data.enabled });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
+/** Mẫu tin tuỳ chỉnh theo loại tin (loại chưa có dòng = dùng bản mặc định ở i18n). */
+export type ZaloTemplate = { kind: ZaloKind; content: string; updated_at: string };
+
+export async function listZaloTemplates(client: Client): Promise<Result<ZaloTemplate[]>> {
+  const res = await client.from('zalo_templates').select('kind, content, updated_at');
+  if (res.error) return fromSupabase<ZaloTemplate[]>({ data: null, error: res.error });
+  return ok(res.data.flatMap((r): ZaloTemplate[] => (ZALO_KINDS.some((k) => k === r.kind) ? [{ kind: r.kind as ZaloKind, content: r.content, updated_at: r.updated_at }] : [])));
+}
+
+/** Admin lưu mẫu cho một loại tin (RPC save_zalo_template). */
+export async function saveZaloTemplate(client: Client, input: SaveZaloTemplateInput): Promise<Result<null>> {
+  const parsed = SaveZaloTemplateInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const res = await client.rpc('save_zalo_template', { p_kind: parsed.data.kind, p_content: parsed.data.content });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
+/** Admin bỏ mẫu tuỳ chỉnh, quay về bản mặc định (RPC reset_zalo_template). */
+export async function resetZaloTemplate(client: Client, input: ResetZaloTemplateInput): Promise<Result<null>> {
+  const parsed = ResetZaloTemplateInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const res = await client.rpc('reset_zalo_template', { p_kind: parsed.data.kind });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
 }

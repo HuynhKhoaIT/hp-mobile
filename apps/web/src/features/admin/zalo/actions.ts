@@ -10,8 +10,13 @@ import {
   getZaloAccount,
   getZaloStatus,
   listZaloMessages,
+  listZaloTemplates,
   ok,
   reserveZaloMessage,
+  resetZaloTemplate,
+  saveZaloAuto,
+  saveZaloSettings,
+  saveZaloTemplate,
   sendZaloMessage,
   startZaloConnect,
   type ReserveZaloResult,
@@ -20,8 +25,17 @@ import {
   type ZaloQrSession,
   type ZaloSendResult,
   type ZaloStatus,
+  type ZaloTemplate,
 } from '@hp/core';
-import type { ListZaloMessagesInput, ReserveZaloMessageInput, ZaloQrStatus } from '@hp/shared';
+import type {
+  ListZaloMessagesInput,
+  ReserveZaloMessageInput,
+  ResetZaloTemplateInput,
+  SaveZaloAutoInput,
+  SaveZaloSettingsInput,
+  SaveZaloTemplateInput,
+  ZaloQrStatus,
+} from '@hp/shared';
 import type { ActionResult } from '@/lib/action-result';
 import { asRecord, refreshAdmin, withStaff } from '../lib/server';
 
@@ -69,4 +83,43 @@ export async function reserveZaloMessageAction(raw: unknown): Promise<ActionResu
 export async function listZaloMessagesAction(raw: unknown): Promise<ActionResult<ZaloMessage[]>> {
   const v = asRecord(raw);
   return withStaff('moderator', (s) => listZaloMessages(s.supabase, { targetType: v.targetType, targetId: v.targetId } as ListZaloMessagesInput));
+}
+
+// ── Cấu hình hạn mức + mẫu tin (admin ghi; moderator chỉ đọc mẫu để soạn tin) ────────────────────────────────────────────
+// RPC save_zalo_settings / save_zalo_template / reset_zalo_template kiểm is_admin() và ghi audit trong cùng transaction.
+
+/** Mẫu tin tuỳ chỉnh (hộp thoại Nhắn Zalo dùng để soạn sẵn). */
+export async function getZaloTemplatesAction(): Promise<ActionResult<ZaloTemplate[]>> {
+  return withStaff('moderator', (s) => listZaloTemplates(s.supabase));
+}
+
+export async function saveZaloSettingsAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  const r = await withStaff('admin', (s) =>
+    saveZaloSettings(s.supabase, { dailyMin: v.dailyMin, dailyMax: v.dailyMax, delayMin: v.delayMin, delayMax: v.delayMax } as SaveZaloSettingsInput),
+  );
+  if (r.ok) refreshAdmin();
+  return r;
+}
+
+/** Chọn Zalo CSKH + bật / tắt tự báo khi chốt báo giá (RPC save_zalo_auto kiểm is_admin() và ghi audit). */
+export async function saveZaloAutoAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  const r = await withStaff('admin', (s) => saveZaloAuto(s.supabase, { enabled: v.enabled, senderId: v.senderId } as SaveZaloAutoInput));
+  if (r.ok) refreshAdmin();
+  return r;
+}
+
+export async function saveZaloTemplateAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  const r = await withStaff('admin', (s) => saveZaloTemplate(s.supabase, { kind: v.kind, content: v.content } as SaveZaloTemplateInput));
+  if (r.ok) refreshAdmin();
+  return r;
+}
+
+export async function resetZaloTemplateAction(raw: unknown): Promise<ActionResult<null>> {
+  const v = asRecord(raw);
+  const r = await withStaff('admin', (s) => resetZaloTemplate(s.supabase, { kind: v.kind } as ResetZaloTemplateInput));
+  if (r.ok) refreshAdmin();
+  return r;
 }

@@ -16,7 +16,9 @@
     "audit": "Audit log",
     "leads": "Leads",
     "cskh": "Customer care",
-    "zalo": "Connect Zalo"
+    "zalo": "Connect Zalo",
+    "zalo_log": "Sent Zalo messages",
+    "zalo_settings": "Zalo settings"
   },
   "brand": {
     "area": "Admin",
@@ -54,7 +56,9 @@
     },
     "leads": "Leads",
     "cskh": "Customer care",
-    "zalo": "Connect Zalo"
+    "zalo": "Connect Zalo",
+    "zalo_log": "Sent Zalo messages",
+    "zalo_settings": "Zalo settings"
   },
   "role": {
     "user": "User",
@@ -1022,9 +1026,13 @@
       "warning": "Reminder / warning",
       "custom": "Other",
       "service_followup": "Follow-up after the job",
-      "rating_request": "Ask for a rating"
+      "rating_request": "Ask for a rating",
+      "accepted_customer": "Notify customer: pro chosen (automatic)",
+      "accepted_pro": "Notify pro: quote chosen (automatic)"
     },
     "template": {
+      "accepted_customer": "Hi {{name}}, you chose a pro for request \"{{title}}\" on {{app}}. The pro will contact you through in-app messages. Reply to this message if you need help.",
+      "accepted_pro": "Hi {{name}}, your quote for request \"{{title}}\" was chosen on {{app}}. Open the app to message the customer and set a time.",
       "service_followup": "Hi {{name}}, this is {{app}}. Your request \"{{title}}\" is complete, how was the service? Tell us if anything was off and we’ll help right away.",
       "rating_request": "Hi {{name}}, thanks for using {{app}}. Could you spend 30 seconds rating request \"{{title}}\" in the app? Thank you!",
       "lead_reply": "Hi {{name}}, thanks for your interest in {{app}}. Is there anything else we can help you with?",
@@ -1185,5 +1193,89 @@
     },
     "empty": "No completed requests need care yet",
     "empty_filtered": "No requests match the filters"
+  },
+  "zalo_log": {
+    "title": "Sent Zalo messages",
+    "subtitle": "Every Zalo message sent to leads and users (automatic and open-Zalo), who sent it, to whom, and the result.",
+    "table_label": "List of sent Zalo messages",
+    "filter": {
+      "q": "Search recipient, sender or text",
+      "status": "Status",
+      "mode": "Sent how",
+      "kind": "Message type",
+      "target": "Recipient",
+      "from": "From",
+      "to": "To"
+    },
+    "col": {
+      "to": "Recipient",
+      "message": "Message",
+      "staff": "Sent by",
+      "kind": "Type",
+      "status": "Result",
+      "time": "Time"
+    },
+    "target": {
+      "lead": "Lead",
+      "user": "User"
+    },
+    "unknown_target": "Unknown name",
+    "unknown_staff": "Unknown",
+    "error_label": "Error: {{error}}",
+    "empty": "No Zalo messages have been sent yet.",
+    "empty_filtered": "No messages match the filters."
+  },
+  "zalo_settings": {
+    "title": "Zalo settings",
+    "subtitle": "Message limits and ready-made message templates for staff. Only administrators can edit.",
+    "limits": {
+      "title": "Sending limits",
+      "hint": "Each staff member gets a random daily limit in this range, and must wait a random pause between two messages. Keep it low so Zalo accounts are less likely to be restricted.",
+      "daily_min": "Messages per day, minimum",
+      "daily_max": "Messages per day, maximum",
+      "delay_min": "Pause between messages, minimum (seconds)",
+      "delay_max": "Pause between messages, maximum (seconds)",
+      "bounds": "Allowed: {{dailyMin}}–{{dailyMax}} messages a day and a {{delayMin}}–{{delayMax}} second pause.",
+      "applies": "Takes effect immediately: today's limit for every staff member is adjusted to the new range.",
+      "save": "Save settings",
+      "saved": "Zalo settings saved",
+      "invalid": "Invalid values: use whole numbers within the allowed range, with each minimum not above its maximum.",
+      "updated": "Last updated {{time}}"
+    },
+    "auto": {
+      "title": "Customer-care Zalo: auto notice when a pro is chosen",
+      "hint": "When a customer chooses a quote, the system messages the customer and the chosen pro on Zalo from the customer-care account below (text from the templates below). A failed send never affects the choice; see results on the Sent Zalo messages page.",
+      "sender": "Customer-care Zalo account",
+      "sender_none": "— Not chosen —",
+      "no_accounts": "No Zalo account is connected yet. A customer-care staff member must scan the QR on the Connect Zalo page first.",
+      "sender_lost": "The chosen account is no longer connected (session expired or disconnected). Reconnect it or pick another one, otherwise messages cannot be sent.",
+      "enabled": "Send automatically when a customer chooses a pro",
+      "limits_note": "These messages count toward this account's daily limit (shared with manual messages). Each choice sends 2 messages (customer and pro); when the limit is reached nothing is sent. Only people with a valid phone number on their profile are messaged.",
+      "save": "Save",
+      "saved": "Automatic notice settings saved",
+      "invalid": "Pick the customer-care Zalo account before turning it on."
+    },
+    "templates": {
+      "title": "Message templates",
+      "hint": "The text prefilled when staff pick each message type; staff can still edit it before sending. Variables you can use: {{vars}}.",
+      "var": {
+        "name": "recipient's name",
+        "app": "app name",
+        "title": "request title (after-service care)"
+      },
+      "custom": "Customised",
+      "default": "Default",
+      "content": "Template text",
+      "preview": "Preview",
+      "sample_name": "Nam",
+      "sample_title": "Fix a water pipe",
+      "save": "Save template",
+      "saved": "Template saved",
+      "reset": "Restore default",
+      "reset_done": "Default template restored",
+      "reset_title": "Restore the default template for \"{{kind}}\"?",
+      "reset_body": "The edited text for this message type is discarded and staff will see the built-in template again.",
+      "unknown_vars": "Unsupported variables (shown as typed): {{vars}}"
+    }
   }
 }

@@ -1203,6 +1203,64 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"zalo_settings": {
+                  Row: {
+                    "auto_sender_id": string | null,"daily_max": number,"daily_min": number,"delay_max": number,"delay_min": number,"id": boolean,"notify_accepted": boolean,"updated_at": string,"updated_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "auto_sender_id"?: string | null,"daily_max"?: number,"daily_min"?: number,"delay_max"?: number,"delay_min"?: number,"id"?: boolean,"notify_accepted"?: boolean,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "auto_sender_id"?: string | null,"daily_max"?: number,"daily_min"?: number,"delay_max"?: number,"delay_min"?: number,"id"?: boolean,"notify_accepted"?: boolean,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_settings_auto_sender_id_fkey"
+      columns: ["auto_sender_id"]
+isOneToOne: false
+      referencedRelation: "zalo_accounts"
+      referencedColumns: ["staff_id"]
+    },{
+      foreignKeyName: "zalo_settings_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_settings_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"zalo_templates": {
+                  Row: {
+                    "content": string,"kind": string,"updated_at": string,"updated_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content": string,"kind": string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Update: {
+                    "content"?: string,"kind"?: string,"updated_at"?: string,"updated_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_templates_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_templates_updated_by_fkey"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
@@ -1469,6 +1527,26 @@ isOneToOne: false
                          }
                         Relationships: [
                     
+                  ]
+                },"zalo_message_log": {
+                  Row: {
+                    "content": string,"created_at": string,"error": string | null,"id": string,"kind": string,"mode": string,"staff_id": string,"staff_name": string | null,"status": string,"target_id": string,"target_name": string | null,"target_type": string
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_messages_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_messages_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
                   ]
                 }
           }
@@ -1882,6 +1960,12 @@ isOneToOne: false
 "reserve_zalo_message":
 { Args: { "p_content": string,"p_kind": string,"p_target_id": string,"p_target_type": string }; Returns: Json
                            },
+"reserve_zalo_notice":
+{ Args: { "p_content": string,"p_kind": string,"p_staff": string,"p_target_id": string }; Returns: Json
+                           },
+"reset_zalo_template":
+{ Args: { "p_kind": string }; Returns: undefined
+                           },
 "respond_join_tx":
 { Args: { "p_accept": boolean,"p_group_id": string,"p_user_id": string }; Returns: Database["public"]['Enums']["member_status"]
                            },
@@ -1899,6 +1983,15 @@ isOneToOne: false
                            },
 "save_cskh_case":
 { Args: { "p_channel"?: string,"p_note"?: string,"p_party": string,"p_request_id": string,"p_score"?: number,"p_status": string }; Returns: undefined
+                           },
+"save_zalo_auto":
+{ Args: { "p_enabled": boolean,"p_sender"?: string }; Returns: undefined
+                           },
+"save_zalo_settings":
+{ Args: { "p_daily_max": number,"p_daily_min": number,"p_delay_max": number,"p_delay_min": number }; Returns: undefined
+                           },
+"save_zalo_template":
+{ Args: { "p_content": string,"p_kind": string }; Returns: undefined
                            },
 "search_groups":
 { Args: { "p_cursor_id"?: string,"p_cursor_starts_at"?: string,"p_dest_lat"?: number,"p_dest_lng"?: number,"p_dest_radius_m"?: number,"p_from"?: string,"p_include_full"?: boolean,"p_kind": Database["public"]['Enums']["group_kind"],"p_lat"?: number,"p_limit"?: number,"p_lng"?: number,"p_query"?: string,"p_radius_m"?: number,"p_site"?: string,"p_sub_kinds"?: (string)[],"p_to"?: string }; Returns: {
@@ -2110,11 +2203,28 @@ isOneToOne: false
 "withdraw_quote":
 { Args: { "p_quote_id": string }; Returns: undefined
                            },
+"zalo_accept_targets":
+{ Args: { "p_request_id": string }; Returns: Json
+                           },
 "zalo_is_staff":
 { Args: { "p_user": string }; Returns: boolean
                            },
 "zalo_present":
 { Args: { "p_row": Omit<Database["public"]['Tables']["zalo_quota"]['Row'], Database["public"]['Tables']["zalo_quota"]['ComputedFields']> }; Returns: Json
+                           },
+"zalo_random_daily":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
+"zalo_random_delay":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
+"zalo_sender_options":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "display_name": string,"staff_id": string,"staff_name": string,"status": string
+            }[]
+                           },
+"zalo_short_name":
+{ Args: { "p_user": string }; Returns: string
                            },
 "zalo_status":
 { Args: Record<PropertyKey, never>; Returns: Json
