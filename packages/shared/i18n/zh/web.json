@@ -59,7 +59,9 @@
     "guest_body": "登录后即可发布信息、收藏信息并与他人聊天。",
     "settings": "设置",
     "theme": "外观",
-    "about": "关于"
+    "about": "关于",
+    "admin_title": "管理后台",
+    "admin_hint": "审核、潜在客户、客户关怀等"
   },
   "listing": {
     "all": {

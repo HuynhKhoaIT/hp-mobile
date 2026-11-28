@@ -58,7 +58,7 @@ export function AuditTable({ data, query }: { data: AdminPage<AuditEntry>; query
           <span className="text-sm text-muted">{t('system')}</span>
         ),
     },
-    { id: 'action', header: t('col.action'), cell: (e) => <Badge className="font-mono">{e.action}</Badge> },
+    { id: 'action', primary: true, header: t('col.action'), cell: (e) => <Badge className="font-mono">{e.action}</Badge> },
     {
       id: 'target',
       header: t('col.target'),

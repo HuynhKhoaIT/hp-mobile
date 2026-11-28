@@ -59,7 +59,9 @@
     "guest_body": "Sign in to post, save listings and message others.",
     "settings": "Settings",
     "theme": "Appearance",
-    "about": "About"
+    "about": "About",
+    "admin_title": "Admin area",
+    "admin_hint": "Moderation, leads, customer care and more"
   },
   "listing": {
     "all": {

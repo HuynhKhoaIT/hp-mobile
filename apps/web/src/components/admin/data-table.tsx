@@ -4,7 +4,8 @@
 // - Cột: header + cell (render), `sort` = tên cột server nhận (bấm tiêu đề → ?sort=col | -col, về trang 1).
 // - Chọn nhiều (ô đầu dòng + chọn cả trang) → thanh hành động hàng loạt `bulkActions(ids, clear)`.
 // - Bàn phím: J / K chuyển dòng, X chọn / bỏ chọn dòng đang đứng, Enter mở dòng (`onOpen`). Không bắt phím khi đang gõ.
-// - < 640px: bảng cuộn ngang trong khung (trang không tràn ngang).
+// - < 768px: danh sách THẺ như app (cột chính làm tiêu đề thẻ, các cột còn lại thành cặp nhãn / giá trị, cột thao tác ở chân thẻ)
+//   thay vì bảng cuộn ngang; ≥ 768px: bảng (cột `desktopOnly` ẩn dưới 1024px).
 // Không dùng TanStack Table (chưa cài — xem docs/plan/web.md 3l); API giữ gần để thay sau không đổi nơi gọi.
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -23,7 +24,69 @@ export type DataColumn<T> = {
   className?: string;
   /** Ẩn cột dưới 1024px (thông tin phụ). */
   desktopOnly?: boolean;
+  /** Dạng thẻ (< 768px): cột làm tiêu đề thẻ. Mặc định cột đầu tiên. */
+  primary?: boolean;
+  /** Dạng thẻ: cột thao tác, đặt ở chân thẻ (cột có id `actions` tự tính là thao tác). */
+  actions?: boolean;
 };
+
+/** Một dòng dạng thẻ cho màn hình nhỏ: tiêu đề (cột chính) → cặp nhãn / giá trị → hàng thao tác. */
+function RowCard<T>({
+  row,
+  columns,
+  checked,
+  selectable,
+  active,
+  checkLabel,
+  onToggle,
+}: {
+  row: T;
+  columns: DataColumn<T>[];
+  checked: boolean;
+  selectable: boolean;
+  active: boolean;
+  checkLabel: string;
+  onToggle: (value: boolean) => void;
+}) {
+  const primary = columns.find((c) => c.primary) ?? columns[0];
+  const rest = columns.filter((c) => c !== primary);
+  // Ô trả về rỗng (null / false) bị bỏ: thẻ không vẽ nhãn trống hay hàng thao tác trống.
+  const filled = (cols: DataColumn<T>[]) =>
+    cols.map((col) => ({ col, node: col.cell(row) })).filter(({ node }) => node !== null && node !== undefined && node !== false);
+  const isAction = (c: DataColumn<T>) => c.actions || c.id === 'actions';
+  const actionCells = filled(rest.filter(isAction));
+  const infoCells = filled(rest.filter((c) => !isAction(c)));
+  return (
+    <li
+      className={cn(
+        'flex flex-col gap-3 rounded-lg border p-4 shadow-card transition-colors duration-150',
+        checked || active ? 'border-primary bg-primary-light/50' : 'border-border bg-surface',
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {selectable ? <Checkbox checked={checked} onCheckedChange={(v) => onToggle(v === true)} aria-label={checkLabel} className="mt-1" /> : null}
+        <div className="min-w-0 flex-1">{primary ? primary.cell(row) : null}</div>
+      </div>
+      {infoCells.length > 0 ? (
+        <dl className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2">
+          {infoCells.map(({ col, node }) => (
+            <div key={col.id} className="flex min-w-0 flex-col gap-1">
+              <dt className="text-xs font-medium text-muted">{col.header}</dt>
+              <dd className="min-w-0 text-sm text-fg">{node}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {actionCells.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          {actionCells.map(({ col, node }) => (
+            <div key={col.id}>{node}</div>
+          ))}
+        </div>
+      ) : null}
+    </li>
+  );
+}
 
 type Props<T> = {
   rows: T[];
@@ -154,7 +217,25 @@ export function DataTable<T>({
       {rows.length === 0 ? (
         <div className="rounded-md border border-border bg-surface">{empty}</div>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-border bg-surface">
+        <>
+        <ul aria-label={label} className="flex flex-col gap-3 md:hidden">
+          {rows.map((row) => {
+            const id = getRowId(row);
+            return (
+              <RowCard
+                key={id}
+                row={row}
+                columns={columns}
+                checked={checked.has(id)}
+                selectable={selectable}
+                active={activeId === id}
+                checkLabel={rowLabel ? rowLabel(row) : t('select_row')}
+                onToggle={(value) => toggle(id, value)}
+              />
+            );
+          })}
+        </ul>
+        <div className="hidden overflow-x-auto rounded-md border border-border bg-surface md:block">
           <table className="w-full min-w-full border-collapse text-left text-md">
             <caption className="sr-only">{label}</caption>
             <thead className="bg-surface-2 text-sm text-muted">
@@ -238,6 +319,7 @@ export function DataTable<T>({
             </tbody>
           </table>
         </div>
+        </>
       )}
     </div>
   );

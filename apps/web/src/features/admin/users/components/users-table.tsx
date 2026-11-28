@@ -77,6 +77,7 @@ export function UsersTable({ data, query, now }: { data: AdminPage<AdminUser>; q
     },
     {
       id: 'open',
+      actions: true,
       header: <span className="sr-only">{t('col.actions')}</span>,
       cell: (u) => (
         <Button asChild size="sm" variant="outline">

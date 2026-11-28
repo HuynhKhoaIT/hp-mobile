@@ -51,6 +51,7 @@ export function LeadsTable({ data, query, canExport }: { data: AdminPage<AdminLe
     },
     {
       id: 'contact',
+      primary: true,
       header: t('col.contact'),
       cell: (l) => (
         <span className="flex flex-col gap-1 text-sm">

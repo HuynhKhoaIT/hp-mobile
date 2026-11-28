@@ -8,6 +8,7 @@ import { Ban } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useRef, useState } from 'react';
 import { AdminConfirmDialog } from '@/components/admin/confirm-dialog';
+import { DataTable, type DataColumn } from '@/components/admin/data-table';
 import { SELECT_CLASS } from '@/components/admin/field-styles';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { Badge } from '@/components/shared/badge';
@@ -25,6 +26,43 @@ export function KeywordsPanel({ keywords, filtered }: { keywords: AdminKeyword[]
   const { pending, run } = useAdminAction();
   const [removing, setRemoving] = useState<AdminKeyword | null>(null);
   const [cats, setCats] = useState<ReadonlySet<ListingCategory>>(new Set());
+
+  // DataTable chung: ≥ 768px là bảng, điện thoại là thẻ (từ khoá làm tiêu đề, nút đổi hành động / gỡ ở chân thẻ).
+  const columns: DataColumn<AdminKeyword>[] = [
+    { id: 'keyword', primary: true, header: t('keyword'), cell: (k) => <span className="font-medium text-fg">{k.keyword}</span> },
+    { id: 'action', header: t('action'), cell: (k) => <StatusBadge kind="keyword" status={k.action} label={t(`actions.${k.action}`)} /> },
+    {
+      id: 'categories',
+      header: t('categories'),
+      cell: (k) => (
+        <div className="flex max-w-md flex-wrap gap-1">
+          {k.categories?.length ? k.categories.map((c) => <Badge key={c}>{tCat(c)}</Badge>) : <span className="text-sm text-muted">{t('all_categories')}</span>}
+        </div>
+      ),
+    },
+    {
+      id: 'actions',
+      header: <span className="sr-only">{t('col_actions')}</span>,
+      cell: (k) => {
+        const other: KeywordAction = k.action === 'reject' ? 'review' : 'reject';
+        return (
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={pending}
+              onClick={() => run(() => updateKeywordAction({ id: k.id, action: other, categories: k.categories }), { success: t('toast.updated') })}
+            >
+              {t(`switch_to.${other}`)}
+            </Button>
+            <Button size="sm" variant="destructive" disabled={pending} onClick={() => setRemoving(k)}>
+              {t('remove')}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -110,60 +148,15 @@ export function KeywordsPanel({ keywords, filtered }: { keywords: AdminKeyword[]
         </details>
       </form>
 
-      {keywords.length === 0 ? (
-        <div className="rounded-md border border-border bg-surface">
-          <EmptyState icon={Ban} title={filtered ? t('empty_filtered') : t('empty')} />
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-md border border-border bg-surface">
-          <table className="w-full border-collapse text-left text-md">
-            <caption className="sr-only">{t('table_label', { count: keywords.length })}</caption>
-            <thead className="bg-surface-2 text-sm text-muted">
-              <tr>
-                <th scope="col" className="px-3 py-3 font-medium">{t('keyword')}</th>
-                <th scope="col" className="px-3 py-3 font-medium">{t('action')}</th>
-                <th scope="col" className="px-3 py-3 font-medium">{t('categories')}</th>
-                <th scope="col" className="px-3 py-3 font-medium"><span className="sr-only">{t('col_actions')}</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {keywords.map((k) => {
-                const other: KeywordAction = k.action === 'reject' ? 'review' : 'reject';
-                return (
-                  <tr key={k.id} className="border-t border-border">
-                    <td className="px-3 py-3 font-medium text-fg">{k.keyword}</td>
-                    <td className="px-3 py-3">
-                      <StatusBadge kind="keyword" status={k.action} label={t(`actions.${k.action}`)} />
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex max-w-md flex-wrap gap-1">
-                        {k.categories?.length ? k.categories.map((c) => <Badge key={c}>{tCat(c)}</Badge>) : <span className="text-sm text-muted">{t('all_categories')}</span>}
-                      </div>
-                    </td>
-                    <td className="px-3 py-3">
-                      <div className="flex flex-wrap justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          disabled={pending}
-                          onClick={() =>
-                            run(() => updateKeywordAction({ id: k.id, action: other, categories: k.categories }), { success: t('toast.updated') })
-                          }
-                        >
-                          {t(`switch_to.${other}`)}
-                        </Button>
-                        <Button size="sm" variant="destructive" disabled={pending} onClick={() => setRemoving(k)}>
-                          {t('remove')}
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        rows={keywords}
+        columns={columns}
+        getRowId={(k) => k.id}
+        label={t('table_label', { count: keywords.length })}
+        basePath="/admin/catalog"
+        query={{}}
+        empty={<EmptyState icon={Ban} title={filtered ? t('empty_filtered') : t('empty')} />}
+      />
 
       <AdminConfirmDialog
         open={removing !== null}
