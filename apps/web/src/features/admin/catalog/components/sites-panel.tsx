@@ -7,6 +7,7 @@ import { MapPin, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 import { AdminConfirmDialog } from '@/components/admin/confirm-dialog';
+import { DataTable, type DataColumn } from '@/components/admin/data-table';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,32 @@ export function SitesPanel({ sites }: { sites: AdminSite[] }) {
   const [editing, setEditing] = useState<AdminSite | 'new' | null>(null);
   const [toggle, setToggle] = useState<AdminSite | null>(null);
 
+  // DataTable chung: ≥ 768px là bảng, điện thoại là thẻ (tên khu làm tiêu đề, nút Sửa / Ẩn ở chân thẻ).
+  const columns: DataColumn<AdminSite>[] = [
+    { id: 'name', primary: true, header: t('col.name'), cell: (s) => <span className="font-medium text-fg">{s.name}</span> },
+    { id: 'code', header: t('col.code'), cell: (s) => <span className="font-mono text-sm text-muted">{s.code}</span> },
+    { id: 'sort', header: t('col.sort'), cell: (s) => <span className="tabular-nums">{s.sort_order}</span> },
+    {
+      id: 'status',
+      header: t('col.status'),
+      cell: (s) => <StatusBadge kind="toggle" status={s.is_active ? 'on' : 'off'} label={s.is_active ? t('active') : t('inactive')} />,
+    },
+    {
+      id: 'actions',
+      header: <span className="sr-only">{t('col.actions')}</span>,
+      cell: (s) => (
+        <div className="flex flex-wrap justify-end gap-2">
+          <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
+            {t('edit')}
+          </Button>
+          <Button size="sm" variant={s.is_active ? 'destructive' : 'outline'} disabled={pending} onClick={() => setToggle(s)}>
+            {s.is_active ? t('hide') : t('show')}
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -31,48 +58,15 @@ export function SitesPanel({ sites }: { sites: AdminSite[] }) {
           {t('add')}
         </Button>
       </div>
-      {sites.length === 0 ? (
-        <div className="rounded-md border border-border bg-surface">
-          <EmptyState icon={MapPin} title={t('empty')} />
-        </div>
-      ) : (
-        <div className="overflow-x-auto rounded-md border border-border bg-surface">
-          <table className="w-full border-collapse text-left text-md">
-            <caption className="sr-only">{t('table_label')}</caption>
-            <thead className="bg-surface-2 text-sm text-muted">
-              <tr>
-                <th scope="col" className="px-3 py-3 font-medium">{t('col.name')}</th>
-                <th scope="col" className="px-3 py-3 font-medium">{t('col.code')}</th>
-                <th scope="col" className="px-3 py-3 font-medium">{t('col.sort')}</th>
-                <th scope="col" className="px-3 py-3 font-medium">{t('col.status')}</th>
-                <th scope="col" className="px-3 py-3 font-medium"><span className="sr-only">{t('col.actions')}</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sites.map((s) => (
-                <tr key={s.code} className="border-t border-border">
-                  <td className="px-3 py-3 font-medium text-fg">{s.name}</td>
-                  <td className="px-3 py-3 font-mono text-sm text-muted">{s.code}</td>
-                  <td className="px-3 py-3 tabular-nums">{s.sort_order}</td>
-                  <td className="px-3 py-3">
-                    <StatusBadge kind="toggle" status={s.is_active ? 'on' : 'off'} label={s.is_active ? t('active') : t('inactive')} />
-                  </td>
-                  <td className="px-3 py-3">
-                    <div className="flex flex-wrap justify-end gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
-                        {t('edit')}
-                      </Button>
-                      <Button size="sm" variant={s.is_active ? 'destructive' : 'outline'} disabled={pending} onClick={() => setToggle(s)}>
-                        {s.is_active ? t('hide') : t('show')}
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <DataTable
+        rows={sites}
+        columns={columns}
+        getRowId={(s) => s.code}
+        label={t('table_label')}
+        basePath="/admin/catalog"
+        query={{}}
+        empty={<EmptyState icon={MapPin} title={t('empty')} />}
+      />
 
       <AdminConfirmDialog
         open={toggle !== null}
