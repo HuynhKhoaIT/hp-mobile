@@ -5,7 +5,7 @@
 // người nhận, staff dán tin rồi bấm Gửi trong Zalo. Thanh hạn mức hôm nay + đếm ngược thời gian nghỉ; lịch sử tin đã ghi nhận.
 // Form mount lại mỗi lần mở (state sạch). SĐT không đi qua client: chỉ nhận link zalo.me sau khi ghi nhận.
 import type { ReserveZaloResult, ZaloMessage, ZaloStatus } from '@hp/core';
-import { APP_NAME, formatDate, ZALO_KINDS, type ZaloKind, type ZaloTarget } from '@hp/shared';
+import { APP_NAME, formatDate, ZALO_GENERAL_KINDS, type ZaloKind, type ZaloTarget } from '@hp/shared';
 import { CircleCheck, Copy, MessageCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useId, useState } from 'react';
@@ -20,9 +20,17 @@ import { cn } from '@/lib/utils';
 import { useAdminAction } from '../../lib/use-admin-action';
 import { getZaloStatusAction, listZaloMessagesAction, reserveZaloMessageAction } from '../actions';
 
-export type ZaloRecipient = { type: ZaloTarget; id: string; name: string };
+/** `context`: tiêu đề đơn (chăm sóc sau dịch vụ) — điền vào tin soạn sẵn có {{title}}. */
+export type ZaloRecipient = { type: ZaloTarget; id: string; name: string; context?: string };
 
-type Props = { recipient: ZaloRecipient; defaultKind: ZaloKind; open: boolean; onOpenChange: (open: boolean) => void };
+type Props = {
+  recipient: ZaloRecipient;
+  defaultKind: ZaloKind;
+  /** Loại tin được chọn (mặc định nhóm chung: lead / người dùng). */
+  kinds?: readonly ZaloKind[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
 
 export function ZaloSendDialog(props: Props) {
   return (
@@ -32,7 +40,7 @@ export function ZaloSendDialog(props: Props) {
   );
 }
 
-function ZaloForm({ recipient, defaultKind, onOpenChange }: Props) {
+function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenChange }: Props) {
   const t = useTranslations('admin.zalo');
   const tCommon = useTranslations('common.actions');
   const locale = asLocale(useLocale());
@@ -40,7 +48,10 @@ function ZaloForm({ recipient, defaultKind, onOpenChange }: Props) {
   const id = useId();
   const { pending, run } = useAdminAction();
 
-  const template = useCallback((k: ZaloKind) => t(`template.${k}`, { name: recipient.name, app: APP_NAME }), [t, recipient.name]);
+  const template = useCallback(
+    (k: ZaloKind) => t(`template.${k}`, { name: recipient.name, app: APP_NAME, title: recipient.context ?? '' }),
+    [t, recipient.name, recipient.context],
+  );
   const [kind, setKind] = useState<ZaloKind>(defaultKind);
   const [text, setText] = useState(() => template(defaultKind));
   const [dirty, setDirty] = useState(false);
@@ -202,7 +213,7 @@ function ZaloForm({ recipient, defaultKind, onOpenChange }: Props) {
                   if (!dirty) setText(template(next));
                 }}
               >
-                {ZALO_KINDS.map((k) => (
+                {kinds.map((k) => (
                   <option key={k} value={k}>
                     {t(`kind.${k}`)}
                   </option>

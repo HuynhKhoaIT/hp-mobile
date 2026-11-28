@@ -8,8 +8,12 @@ export const ZALO_TARGETS = ['lead', 'user'] as const;
 export type ZaloTarget = (typeof ZALO_TARGETS)[number];
 
 /** Loại tin: khung tin soạn sẵn `admin.zalo.template.<kind>` (staff sửa lại trước khi gửi). */
-export const ZALO_KINDS = ['lead_reply', 'listing_notice', 'warning', 'custom'] as const;
+export const ZALO_KINDS = ['lead_reply', 'listing_notice', 'warning', 'custom', 'service_followup', 'rating_request'] as const;
 export type ZaloKind = (typeof ZALO_KINDS)[number];
+
+/** Loại tin theo ngữ cảnh mở hộp thoại: lead / người dùng (chung) và chăm sóc sau đơn Gọi thợ (CSKH). */
+export const ZALO_GENERAL_KINDS = ['lead_reply', 'listing_notice', 'warning', 'custom'] as const satisfies readonly ZaloKind[];
+export const ZALO_CSKH_KINDS = ['service_followup', 'rating_request', 'custom'] as const satisfies readonly ZaloKind[];
 
 /** Lý do chưa gửi được (RPC trả `ok: false`). */
 export const ZALO_BLOCK_REASONS = ['limit_reached', 'waiting'] as const;

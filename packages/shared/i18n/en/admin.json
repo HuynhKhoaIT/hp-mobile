@@ -14,7 +14,8 @@
     "catalog": "Catalog",
     "marketing": "Marketing",
     "audit": "Audit log",
-    "leads": "Leads"
+    "leads": "Leads",
+    "cskh": "Customer care"
   },
   "brand": {
     "area": "Admin",
@@ -49,7 +50,8 @@
       "leads_one": "{{count}} new leads",
       "leads_other": "{{count}} new leads"
     },
-    "leads": "Leads"
+    "leads": "Leads",
+    "cskh": "Customer care"
   },
   "role": {
     "user": "User",
@@ -1014,9 +1016,13 @@
       "lead_reply": "Reply to a lead",
       "listing_notice": "Listing notice",
       "warning": "Reminder / warning",
-      "custom": "Other"
+      "custom": "Other",
+      "service_followup": "Follow-up after the job",
+      "rating_request": "Ask for a rating"
     },
     "template": {
+      "service_followup": "Hi {{name}}, this is {{app}}. Your request \"{{title}}\" is complete, how was the service? Tell us if anything was off and we’ll help right away.",
+      "rating_request": "Hi {{name}}, thanks for using {{app}}. Could you spend 30 seconds rating request \"{{title}}\" in the app? Thank you!",
       "lead_reply": "Hi {{name}}, thanks for your interest in {{app}}. Is there anything else we can help you with?",
       "listing_notice": "Hi {{name}}, your listing on {{app}} is under review. Could you please check the photos and description?",
       "warning": "Hi {{name}}, your content on {{app}} doesn’t fit our community rules. Please edit it, thank you.",
@@ -1046,5 +1052,82 @@
     "history_by": "By {{name}}",
     "user_title": "Message on Zalo",
     "user_hint": "Write a message to send from your personal Zalo to this user. Each message is logged; the phone number is not stored."
+  },
+  "cskh": {
+    "title": "Customer care",
+    "subtitle": "Completed Gọi thợ requests: call or message on Zalo to check in and ask for a rating, then record the result.",
+    "table_label": "Customer care queue",
+    "filter": {
+      "q": "Search name or request title",
+      "status": "Status",
+      "party": "Side"
+    },
+    "col": {
+      "order": "Request",
+      "party": "Side",
+      "person": "Person",
+      "rating": "Rated in the app",
+      "status": "Status",
+      "result": "Result",
+      "actions": "Actions"
+    },
+    "party": {
+      "customer": "Customer",
+      "pro": "Tradesperson"
+    },
+    "status": {
+      "pending": "Not contacted",
+      "contacted": "Contacted",
+      "no_answer": "No answer",
+      "done": "Done"
+    },
+    "channel": {
+      "call": "Phone call",
+      "zalo": "Zalo"
+    },
+    "completed": "Completed {{time}}",
+    "rated_yes": "Rated",
+    "rated_no": "Not rated",
+    "score": "Satisfaction {{score}}/5",
+    "no_result": "No result yet",
+    "handled_by": "By {{name}} · {{time}}",
+    "unknown_user": "Unknown",
+    "no_phone": "This person has no phone number",
+    "action": {
+      "call": "Call",
+      "zalo": "Message on Zalo",
+      "result": "Record result",
+      "open_request": "View request",
+      "actions_for": "Actions for {{name}}"
+    },
+    "call": {
+      "title": "Call {{name}}",
+      "hint": "The phone number is only shown when you press call, and viewing it is logged.",
+      "number": "Phone number",
+      "call_now": "Call now",
+      "copy": "Copy number",
+      "copied": "Phone number copied",
+      "copy_failed": "Couldn’t copy, select the text and copy it by hand",
+      "after": "After the call, record the result.",
+      "record": "Record result",
+      "close": "Close"
+    },
+    "result": {
+      "title": "Care result · {{name}}",
+      "hint": "The score is your note of what the person said; it does not change the real rating in the app.",
+      "status_label": "Status",
+      "channel_label": "Reached by",
+      "channel_none": "Unknown",
+      "score_label": "Satisfaction score (as the person said)",
+      "score_none": "None",
+      "note_label": "Note",
+      "note_hint": "Don’t write phone numbers or sensitive details.",
+      "save": "Save result"
+    },
+    "toast": {
+      "saved": "Care result saved"
+    },
+    "empty": "No completed requests need care yet",
+    "empty_filtered": "No requests match the filters"
   }
 }

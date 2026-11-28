@@ -337,6 +337,68 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"cskh_cases": {
+                  Row: {
+                    "channel": string | null,"created_at": string,"handled_at": string | null,"handled_by": string | null,"id": string,"note": string | null,"party": string,"request_id": string,"score": number | null,"status": string,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "channel"?: string | null,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"note"?: string | null,"party": string,"request_id": string,"score"?: number | null,"status"?: string,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "channel"?: string | null,"created_at"?: string,"handled_at"?: string | null,"handled_by"?: string | null,"id"?: string,"note"?: string | null,"party"?: string,"request_id"?: string,"score"?: number | null,"status"?: string,"updated_at"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "cskh_cases_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_handled_by_fkey"
+      columns: ["handled_by"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "my_service_quotes"
+      referencedColumns: ["request_id"]
+    },{
+      foreignKeyName: "cskh_cases_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "my_service_requests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "public_service_requests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_request_id_fkey"
+      columns: ["request_id"]
+isOneToOne: false
+      referencedRelation: "service_requests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "cskh_cases_user_id_fkey"
+      columns: ["user_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"group_members": {
                   Row: {
                     "group_id": string,"joined_at": string,"note": string | null,"responded_at": string | null,"status": Database["public"]['Enums']["member_status"],"updated_at": string,"user_id": string
@@ -1092,7 +1154,15 @@ isOneToOne: false
                 }
           }
           Views: {
-            "my_groups": {
+            "cskh_queue": {
+                  Row: {
+                    "channel": string | null,"completed_at": string | null,"handled_at": string | null,"handled_by_name": string | null,"has_phone": boolean | null,"note": string | null,"party": string | null,"rated_in_app": boolean | null,"request_id": string | null,"score": number | null,"status": string | null,"title": string | null,"trade": string | null,"user_id": string | null,"user_name": string
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    
+                  ]
+                },"my_groups": {
                   Row: {
                     "attributes": NonNullable<Json>,"created_at": string,"description": string | null,"destination_lat": number | null,"destination_lng": number | null,"destination_text": string | null,"ends_at": string | null,"fee_per_person": number,"host_avatar_url": string | null,"host_badges": (string)[],"host_id": string,"host_name": string | null,"host_rating_avg": number,"host_rating_count": number,"host_since": string,"id": string,"is_past": boolean | null,"is_upcoming": boolean | null,"kind": Database["public"]['Enums']["group_kind"],"lang": string,"members": Json | null,"my_rating": number | null,"my_role": string | null,"origin_lat": number | null,"origin_lng": number | null,"origin_text": string,"requires_approval": boolean,"seats_left": number | null,"seats_taken": number,"seats_total": number,"short_id": string | null,"site": string | null,"site_name": string | null,"slug": string | null,"starts_at": string,"status": Database["public"]['Enums']["group_status"],"sub_kind": string,"title": string,"updated_at": string,"venue_address": string | null,"venue_id": string | null,"venue_name": string | null
                   }
@@ -1386,6 +1456,9 @@ isOneToOne: false
                            },
 "count_unread_conversations":
 { Args: Record<PropertyKey, never>; Returns: number
+                           },
+"cskh_party_user":
+{ Args: { "p_party": string,"p_request_id": string }; Returns: string
                            },
 "custom_access_token_hook":
 { Args: { "event": Json }; Returns: Json
@@ -1757,11 +1830,17 @@ isOneToOne: false
 "reveal_contact":
 { Args: { "p_listing_id": string }; Returns: string
                            },
+"reveal_cskh_phone":
+{ Args: { "p_party": string,"p_request_id": string }; Returns: string
+                           },
 "review_listing":
 { Args: { "p_approve": boolean,"p_listing_id": string,"p_note"?: string }; Returns: undefined
                            },
 "safe_timestamptz":
 { Args: { "p_text": string }; Returns: string
+                           },
+"save_cskh_case":
+{ Args: { "p_channel"?: string,"p_note"?: string,"p_party": string,"p_request_id": string,"p_score"?: number,"p_status": string }; Returns: undefined
                            },
 "search_groups":
 { Args: { "p_cursor_id"?: string,"p_cursor_starts_at"?: string,"p_dest_lat"?: number,"p_dest_lng"?: number,"p_dest_radius_m"?: number,"p_from"?: string,"p_include_full"?: boolean,"p_kind": Database["public"]['Enums']["group_kind"],"p_lat"?: number,"p_limit"?: number,"p_lng"?: number,"p_query"?: string,"p_radius_m"?: number,"p_site"?: string,"p_sub_kinds"?: (string)[],"p_to"?: string }; Returns: {

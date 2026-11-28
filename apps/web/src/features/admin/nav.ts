@@ -6,6 +6,7 @@ import {
   CalendarClock,
   FileText,
   Flag,
+  Headset,
   Inbox,
   LayoutDashboard,
   type LucideIcon,
@@ -27,6 +28,7 @@ export type AdminNavKey =
   | 'groups'
   | 'catalog'
   | 'leads'
+  | 'cskh'
   | 'marketing'
   | 'audit';
 
@@ -40,6 +42,7 @@ export type AdminNavHref =
   | '/admin/groups'
   | '/admin/catalog'
   | '/admin/leads'
+  | '/admin/cskh'
   | '/admin/marketing'
   | '/admin/audit';
 
@@ -66,6 +69,8 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   // Catalog: moderator duyệt sân; tab khu / từ khoá cấm chỉ admin (lọc trong trang).
   { key: 'catalog', href: '/admin/catalog', Icon: Store, minRole: 'moderator', badge: 'venues' },
   { key: 'leads', href: '/admin/leads', Icon: Inbox, minRole: 'moderator', badge: 'leads' },
+  // CSKH: chăm sóc sau đơn Gọi thợ hoàn thành (gọi / nhắn Zalo, ghi kết quả). Chưa có số đếm ở thanh bên.
+  { key: 'cskh', href: '/admin/cskh', Icon: Headset, minRole: 'moderator' },
   { key: 'marketing', href: '/admin/marketing', Icon: Megaphone, minRole: 'admin' },
   { key: 'audit', href: '/admin/audit', Icon: ScrollText, minRole: 'admin' },
 ];

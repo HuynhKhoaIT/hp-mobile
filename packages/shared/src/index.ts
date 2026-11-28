@@ -20,6 +20,7 @@ export * from './chat';
 export * from './schemas/actions/chat';
 export * from './schemas/actions/marketing';
 export * from './schemas/actions/zalo';
+export * from './schemas/actions/cskh';
 export * from './notifications';
 export * from './group-display';
 export * from './schemas/group';

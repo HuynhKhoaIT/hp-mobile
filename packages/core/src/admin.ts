@@ -32,6 +32,14 @@ import {
   type LeadKind,
   type LeadStatus,
   LeadUpdateInput,
+  CSKH_CHANNELS,
+  CSKH_PARTIES,
+  CSKH_STATUSES,
+  type CskhChannel,
+  type CskhParty,
+  type CskhStatus,
+  RevealCskhPhoneInput,
+  SaveCskhCaseInput,
 } from '@hp/shared';
 import { type Client, fail, fromSupabase, ok, type Result } from './result';
 
@@ -1178,6 +1186,92 @@ export function leadsCsv(rows: LeadExportRow[]): string {
       .join(','),
   );
   return `﻿${[header.join(','), ...lines].join('\r\n')}\r\n`;
+}
+
+// ── CSKH: chăm sóc sau đơn Gọi thợ hoàn thành (migration 20261129100000_cskh_care) ─────────────────────────
+// Hàng chờ = view cskh_queue (staff-only, mỗi đơn hoàn thành × (khách, thợ), không SĐT). Ghi kết quả / lấy SĐT qua RPC
+// (audit `cskh.update` / `cskh.reveal`, không chép ghi chú / SĐT). Nhắn Zalo dùng reserveZaloMessage (target user, loại tin CSKH).
+export type CskhItem = {
+  request_id: string;
+  party: CskhParty;
+  user_id: string;
+  trade: string;
+  title: string;
+  completed_at: string | null;
+  user_name: string | null;
+  has_phone: boolean;
+  status: CskhStatus;
+  channel: CskhChannel | null;
+  note: string | null;
+  score: number | null;
+  handled_at: string | null;
+  handled_by_name: string | null;
+  /** Bên này đã chấm bên kia trong app (ratings). */
+  rated_in_app: boolean;
+};
+export type CskhQuery = PageInput & { status?: string; party?: string; q?: string };
+
+/** Hàng chờ CSKH (moderator+). Mới hoàn thành trước; lọc trạng thái / bên / ô tìm (tên hoặc tiêu đề đơn). */
+export async function listCskhQueue(client: Client, input: CskhQuery = {}): Promise<Result<AdminPage<CskhItem>>> {
+  const w = pageWindow(input);
+  let q = client.from('cskh_queue').select('*', { count: 'exact' });
+  if (oneOf(CSKH_STATUSES, input.status)) q = q.eq('status', input.status);
+  if (oneOf(CSKH_PARTIES, input.party)) q = q.eq('party', input.party);
+  const search = sanitizeSearch(input.q);
+  if (search) q = q.or(`user_name.ilike.*${search}*,title.ilike.*${search}*`);
+  const r = rangeResult(
+    await q.order('completed_at', { ascending: false, nullsFirst: false }).order('request_id').order('party').range(w.from, w.to),
+  );
+  if (r.error) return fail(r.error.code, r.error.message);
+  const items = r.data.rows.flatMap((row): CskhItem[] =>
+    row.request_id && row.user_id && oneOf(CSKH_PARTIES, row.party) && row.title
+      ? [
+          {
+            request_id: row.request_id,
+            party: row.party,
+            user_id: row.user_id,
+            trade: row.trade ?? 'other',
+            title: row.title,
+            completed_at: row.completed_at,
+            user_name: row.user_name?.trim() || null,
+            has_phone: row.has_phone === true,
+            status: oneOf(CSKH_STATUSES, row.status) ? row.status : 'pending',
+            channel: oneOf(CSKH_CHANNELS, row.channel) ? row.channel : null,
+            note: row.note,
+            score: row.score,
+            handled_at: row.handled_at,
+            handled_by_name: row.handled_by_name,
+            rated_in_app: row.rated_in_app === true,
+          },
+        ]
+      : [],
+  );
+  return ok(toPage(items, r.data.total, w));
+}
+
+/** Ghi kết quả chăm sóc (RPC save_cskh_case, audit `cskh.update`). Lỗi: invalid_input, not_found (đơn chưa hoàn thành). */
+export async function saveCskhCase(client: Client, input: SaveCskhCaseInput): Promise<Result<null>> {
+  const parsed = SaveCskhCaseInput.safeParse(input);
+  if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'invalid_input');
+  const v = parsed.data;
+  const res = await client.rpc('save_cskh_case', {
+    p_request_id: v.requestId,
+    p_party: v.party,
+    p_status: v.status,
+    ...(v.channel ? { p_channel: v.channel } : {}),
+    ...(v.note ? { p_note: v.note } : {}),
+    ...(v.score !== undefined ? { p_score: v.score } : {}),
+  });
+  return res.error ? fromSupabase<null>({ data: null, error: res.error }) : ok(null);
+}
+
+/** SĐT (0xxxxxxxxx) của một bên để gọi (RPC reveal_cskh_phone: 60 / giờ, audit `cskh.reveal`). Lỗi: not_found, no_phone, rate_limited. */
+export async function revealCskhPhone(client: Client, input: RevealCskhPhoneInput): Promise<Result<string>> {
+  const parsed = RevealCskhPhoneInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const res = await client.rpc('reveal_cskh_phone', { p_request_id: parsed.data.requestId, p_party: parsed.data.party });
+  if (res.error) return fromSupabase<string>({ data: null, error: res.error });
+  return typeof res.data === 'string' && res.data ? ok(res.data) : fail('unknown');
 }
 
 // ── Audit log ────────────────────────────────────────────────────────────────────
