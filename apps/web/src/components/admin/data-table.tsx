@@ -4,10 +4,11 @@
 // - Cột: header + cell (render), `sort` = tên cột server nhận (bấm tiêu đề → ?sort=col | -col, về trang 1).
 // - Chọn nhiều (ô đầu dòng + chọn cả trang) → thanh hành động hàng loạt `bulkActions(ids, clear)`.
 // - Bàn phím: J / K chuyển dòng, X chọn / bỏ chọn dòng đang đứng, Enter mở dòng (`onOpen`). Không bắt phím khi đang gõ.
-// - < 768px: danh sách THẺ như app (cột chính làm tiêu đề thẻ, các cột còn lại thành cặp nhãn / giá trị, cột thao tác ở chân thẻ)
-//   thay vì bảng cuộn ngang; ≥ 768px: bảng (cột `desktopOnly` ẩn dưới 1024px).
+// - < 768px: danh sách THẺ GỌN như app: tiêu đề (cột `primary`, mặc định cột đầu) + nhãn trạng thái (cột `badge` / id status, state)
+//   → 1–2 thông tin chính (`summary`, mặc định 2 cột kế tiếp) → "Xem thêm" (các cột còn lại) → thao tác (`actions`). Thay cho bảng
+//   cuộn ngang; ≥ 768px: bảng (cột `desktopOnly` ẩn dưới 1024px).
 // Không dùng TanStack Table (chưa cài — xem docs/plan/web.md 3l); API giữ gần để thay sau không đổi nơi gọi.
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,9 +29,19 @@ export type DataColumn<T> = {
   primary?: boolean;
   /** Dạng thẻ: cột thao tác, đặt ở chân thẻ (cột có id `actions` tự tính là thao tác). */
   actions?: boolean;
+  /** Dạng thẻ: cột hiện như nhãn trạng thái ở góc phải tiêu đề. Mặc định cột có id `status` / `state`. */
+  badge?: boolean;
+  /** Dạng thẻ: cột hiện ở dòng thông tin chính dưới tiêu đề (tối đa 2 cột). Mặc định 2 cột đầu sau tiêu đề; phần còn lại vào "Xem thêm". */
+  summary?: boolean;
 };
 
-/** Một dòng dạng thẻ cho màn hình nhỏ: tiêu đề (cột chính) → cặp nhãn / giá trị → hàng thao tác. */
+/** Số thông tin chính hiện sẵn trên thẻ (ngoài tiêu đề và nhãn trạng thái). */
+const CARD_SUMMARY_MAX = 2;
+
+/**
+ * Một dòng dạng thẻ gọn cho màn hình nhỏ (như thẻ trong app): tiêu đề (cột chính) + nhãn trạng thái ở góc phải → 1–2 thông tin
+ * chính cùng một dòng → "Xem thêm" (các cột còn lại, mỗi trường một hàng ngang) → hàng thao tác. Ô trả về rỗng bị bỏ.
+ */
 function RowCard<T>({
   row,
   columns,
@@ -38,6 +49,7 @@ function RowCard<T>({
   selectable,
   active,
   checkLabel,
+  moreLabel,
   onToggle,
 }: {
   row: T;
@@ -46,39 +58,63 @@ function RowCard<T>({
   selectable: boolean;
   active: boolean;
   checkLabel: string;
+  moreLabel: string;
   onToggle: (value: boolean) => void;
 }) {
   const primary = columns.find((c) => c.primary) ?? columns[0];
   const rest = columns.filter((c) => c !== primary);
-  // Ô trả về rỗng (null / false) bị bỏ: thẻ không vẽ nhãn trống hay hàng thao tác trống.
   const filled = (cols: DataColumn<T>[]) =>
     cols.map((col) => ({ col, node: col.cell(row) })).filter(({ node }) => node !== null && node !== undefined && node !== false);
   const isAction = (c: DataColumn<T>) => c.actions || c.id === 'actions';
+  const badgeCol = rest.find((c) => !isAction(c) && (c.badge || (!rest.some((x) => x.badge) && (c.id === 'status' || c.id === 'state'))));
+  const middle = rest.filter((c) => c !== badgeCol && !isAction(c));
+  const flagged = middle.filter((c) => c.summary);
+  const summaryCols = (flagged.length > 0 ? flagged : middle).slice(0, CARD_SUMMARY_MAX);
+  const badge = badgeCol ? filled([badgeCol])[0] : undefined;
+  const summary = filled(summaryCols);
+  const details = filled(middle.filter((c) => !summaryCols.includes(c)));
   const actionCells = filled(rest.filter(isAction));
-  const infoCells = filled(rest.filter((c) => !isAction(c)));
   return (
     <li
       className={cn(
-        'flex flex-col gap-3 rounded-lg border p-4 shadow-card transition-colors duration-150',
+        'flex flex-col gap-2 rounded-lg border p-3 shadow-card transition-colors duration-150',
         checked || active ? 'border-primary bg-primary-light/50' : 'border-border bg-surface',
       )}
     >
       <div className="flex items-start gap-3">
         {selectable ? <Checkbox checked={checked} onCheckedChange={(v) => onToggle(v === true)} aria-label={checkLabel} className="mt-1" /> : null}
         <div className="min-w-0 flex-1">{primary ? primary.cell(row) : null}</div>
+        {badge ? <div className="shrink-0">{badge.node}</div> : null}
       </div>
-      {infoCells.length > 0 ? (
-        <dl className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2">
-          {infoCells.map(({ col, node }) => (
-            <div key={col.id} className="flex min-w-0 flex-col gap-1">
-              <dt className="text-xs font-medium text-muted">{col.header}</dt>
-              <dd className="min-w-0 text-sm text-fg">{node}</dd>
-            </div>
+      {summary.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+          {summary.map(({ col, node }, i) => (
+            <span key={col.id} className="inline-flex min-w-0 items-center gap-2">
+              {i > 0 ? <span aria-hidden>·</span> : null}
+              <span className="sr-only">{col.header}: </span>
+              {node}
+            </span>
           ))}
-        </dl>
+        </div>
+      ) : null}
+      {details.length > 0 ? (
+        <details className="group text-sm">
+          <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1 font-medium text-primary outline-none marker:hidden focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+            {moreLabel}
+            <ChevronDown strokeWidth={1.75} className="size-4 transition-transform duration-150 group-open:rotate-180" aria-hidden />
+          </summary>
+          <dl className="mt-1 flex flex-col divide-y divide-border">
+            {details.map(({ col, node }) => (
+              <div key={col.id} className="flex items-start justify-between gap-3 py-2">
+                <dt className="shrink-0 text-muted">{col.header}</dt>
+                <dd className="ml-auto min-w-0 max-w-[70%] text-right text-fg">{node}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
       ) : null}
       {actionCells.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+        <div className="flex flex-wrap items-center gap-2 border-t border-border pt-2">
           {actionCells.map(({ col, node }) => (
             <div key={col.id}>{node}</div>
           ))}
@@ -230,6 +266,7 @@ export function DataTable<T>({
                 selectable={selectable}
                 active={activeId === id}
                 checkLabel={rowLabel ? rowLabel(row) : t('select_row')}
+                moreLabel={t('more_details')}
                 onToggle={(value) => toggle(id, value)}
               />
             );
