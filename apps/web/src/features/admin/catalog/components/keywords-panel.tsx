@@ -30,7 +30,7 @@ export function KeywordsPanel({ keywords, filtered }: { keywords: AdminKeyword[]
   // DataTable chung: ≥ 768px là bảng, điện thoại là thẻ (từ khoá làm tiêu đề, nút đổi hành động / gỡ ở chân thẻ).
   const columns: DataColumn<AdminKeyword>[] = [
     { id: 'keyword', primary: true, header: t('keyword'), cell: (k) => <span className="font-medium text-fg">{k.keyword}</span> },
-    { id: 'action', header: t('action'), cell: (k) => <StatusBadge kind="keyword" status={k.action} label={t(`actions.${k.action}`)} /> },
+    { id: 'action', badge: true, header: t('action'), cell: (k) => <StatusBadge kind="keyword" status={k.action} label={t(`actions.${k.action}`)} /> },
     {
       id: 'categories',
       header: t('categories'),

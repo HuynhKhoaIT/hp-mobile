@@ -33,6 +33,7 @@ export function UsersTable({ data, query, now }: { data: AdminPage<AdminUser>; q
     { id: 'name', header: t('col.name'), sort: 'full_name', cell: (u) => <PersonName person={u} /> },
     {
       id: 'role',
+      summary: true,
       header: t('col.role'),
       cell: (u) => <Badge tone={u.role === 'user' ? 'neutral' : 'primary'}>{tRole(u.role)}</Badge>,
     },
@@ -60,6 +61,7 @@ export function UsersTable({ data, query, now }: { data: AdminPage<AdminUser>; q
     },
     {
       id: 'created',
+      summary: true,
       header: t('col.joined'),
       sort: 'created_at',
       cell: (u) => (

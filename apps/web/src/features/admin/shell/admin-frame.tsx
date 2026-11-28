@@ -4,7 +4,7 @@
 // vai trò, giao diện, ngôn ngữ, đăng xuất). < 1024px: thanh bên thành tấm trượt (Sheet) mở bằng nút menu.
 // Không header / footer marketing, không bottom nav người dùng. Transition 150ms, không animation trang trí.
 import { APP_NAME } from '@hp/shared';
-import { ArrowLeft, Menu, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, MoreHorizontal, PanelLeftClose, PanelLeftOpen, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -100,6 +100,51 @@ function NavList({
   );
 }
 
+/** 4 mục hay dùng nhất trên thanh tab dưới (điện thoại); các mục còn lại nằm trong "Thêm". */
+const TAB_KEYS: readonly AdminNavItem['key'][] = ['overview', 'moderation', 'leads', 'cskh'];
+
+/**
+ * Thanh tab dưới kiểu app (< 1024px): 4 mục chính + "Thêm" mở menu đầy đủ. Cùng kiểu thanh dưới của web người dùng
+ * (nền surface, bóng shadow-bar, chừa vùng an toàn iPhone). Số chờ xử lý hiện như chấm cam trên icon.
+ */
+function BottomTabs({ role, counts, onMore, moreOpen }: { role: StaffRole; counts: AdminNavCounts; onMore: () => void; moreOpen: boolean }) {
+  const t = useTranslations('admin.nav');
+  const pathname = usePathname();
+  const tabs = ADMIN_NAV.filter((item) => TAB_KEYS.includes(item.key) && hasRole(role, item.minRole));
+  const item = 'relative flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
+  return (
+    <nav
+      aria-label={t('label')}
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface/95 pb-safe shadow-bar backdrop-blur-md lg:hidden"
+    >
+      {tabs.map(({ key, href, Icon, badge }) => {
+        const active = isActive(pathname, href);
+        const count = badge ? (counts[badge] ?? 0) : 0;
+        return (
+          <Link key={key} href={href} aria-current={active ? 'page' : undefined} className={cn(item, active ? 'text-primary' : 'text-muted')}>
+            <span className="relative">
+              <Icon strokeWidth={1.75} className="size-6" aria-hidden />
+              {count > 0 ? (
+                <span
+                  aria-label={t(`count.${badge ?? 'pending'}`, { count })}
+                  className="absolute -top-1.5 -right-3 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold text-on-accent"
+                >
+                  {count > 99 ? '99+' : count}
+                </span>
+              ) : null}
+            </span>
+            <span className="max-w-full truncate">{t(key)}</span>
+          </Link>
+        );
+      })}
+      <button type="button" onClick={onMore} aria-expanded={moreOpen} className={cn(item, moreOpen ? 'text-primary' : 'text-muted')}>
+        <MoreHorizontal strokeWidth={1.75} className="size-6" aria-hidden />
+        <span>{t('more')}</span>
+      </button>
+    </nav>
+  );
+}
+
 function BackToSite({ collapsed = false }: { collapsed?: boolean }) {
   const t = useTranslations('admin.nav');
   return (
@@ -178,27 +223,18 @@ export function AdminFrame({ staff, counts, initialCollapsed, children }: Props)
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-surface px-2 sm:px-4 lg:px-6">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            aria-label={t('nav.open_menu')}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu strokeWidth={1.75} />
-          </Button>
-          <div className="lg:hidden">
+          <div className="ml-2 lg:hidden">
             <Brand compact />
           </div>
           <span className="ml-1 truncate text-md font-semibold text-fg lg:hidden">{t('brand.area')}</span>
           <div className="flex-1" />
           <StaffMenu name={staff.name} role={staff.role} />
         </header>
-        <main id="admin-main" className="flex min-w-0 flex-1 flex-col">
+        {/* pb-20: chừa chỗ cho thanh tab dưới trên điện thoại (không che nội dung cuối trang). */}
+        <main id="admin-main" className="flex min-w-0 flex-1 flex-col pb-20 lg:pb-0">
           {children}
         </main>
+        <BottomTabs role={staff.role} counts={counts} onMore={() => setMenuOpen(true)} moreOpen={menuOpen} />
       </div>
     </div>
   );

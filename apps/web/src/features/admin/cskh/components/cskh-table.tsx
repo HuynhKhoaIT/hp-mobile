@@ -61,7 +61,7 @@ export function CskhTable({ data, query }: { data: AdminPage<CskhItem>; query: Q
       id: 'person',
       header: t('col.person'),
       cell: (i) => (
-        <div className="flex flex-col items-start gap-1">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge tone={i.party === 'customer' ? 'primary' : 'neutral'}>{t(`party.${i.party}`)}</Badge>
           <span className="text-sm text-fg">{nameOf(i)}</span>
         </div>
