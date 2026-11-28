@@ -9,6 +9,9 @@ import { AdminPage, TableSkeleton } from '@/components/admin/states';
 import { LeadsTable } from '@/features/admin/leads/components/leads-table';
 import { getLeadsPage } from '@/features/admin/leads/queries';
 
+// Hộp thoại "Nhắn Zalo" gửi tự động (đăng nhập Zalo + gửi tin) có thể mất vài giây: Server Action chạy trong giới hạn của trang.
+export const maxDuration = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin.meta');
   return { title: t('leads') };

@@ -8,6 +8,7 @@ import {
   Flag,
   Headset,
   Inbox,
+  Link2,
   LayoutDashboard,
   type LucideIcon,
   Megaphone,
@@ -29,6 +30,7 @@ export type AdminNavKey =
   | 'catalog'
   | 'leads'
   | 'cskh'
+  | 'zalo'
   | 'marketing'
   | 'audit';
 
@@ -43,6 +45,7 @@ export type AdminNavHref =
   | '/admin/catalog'
   | '/admin/leads'
   | '/admin/cskh'
+  | '/admin/zalo'
   | '/admin/marketing'
   | '/admin/audit';
 
@@ -71,6 +74,8 @@ export const ADMIN_NAV: readonly AdminNavItem[] = [
   { key: 'leads', href: '/admin/leads', Icon: Inbox, minRole: 'moderator', badge: 'leads' },
   // CSKH: chăm sóc sau đơn Gọi thợ hoàn thành (gọi / nhắn Zalo, ghi kết quả). Chưa có số đếm ở thanh bên.
   { key: 'cskh', href: '/admin/cskh', Icon: Headset, minRole: 'moderator' },
+  // Kết nối Zalo cá nhân bằng QR để gửi tin tự động từ hộp thoại "Nhắn Zalo".
+  { key: 'zalo', href: '/admin/zalo', Icon: Link2, minRole: 'moderator' },
   { key: 'marketing', href: '/admin/marketing', Icon: Megaphone, minRole: 'admin' },
   { key: 'audit', href: '/admin/audit', Icon: ScrollText, minRole: 'admin' },
 ];

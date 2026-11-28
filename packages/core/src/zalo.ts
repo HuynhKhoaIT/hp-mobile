@@ -9,12 +9,17 @@ import type { Json } from '@hp/db';
 import {
   ListZaloMessagesInput,
   ReserveZaloMessageInput,
+  ZALO_ACCOUNT_STATUSES,
   ZALO_BLOCK_REASONS,
   ZALO_LIMITS,
+  ZALO_QR_STATUSES,
+  type ZaloAccountStatus,
   type ZaloBlockReason,
   type ZaloKind,
+  type ZaloQrStatus,
   type ZaloTarget,
 } from '@hp/shared';
+import { invokeFunction } from './functions';
 import { type Client, fail, fromSupabase, ok, type Result } from './result';
 
 /** Hạn mức nhắn Zalo hôm nay của staff (giờ VN). */
@@ -41,6 +46,10 @@ export type ZaloMessage = {
   target_id: string;
   kind: ZaloKind;
   content: string;
+  /** manual = staff dán và gửi trong Zalo; auto = gửi tự động bằng Zalo đã kết nối. */
+  mode: 'manual' | 'auto';
+  /** manual luôn `recorded`; auto: sending → sent | failed. */
+  delivery: 'recorded' | 'sending' | 'sent' | 'failed';
   created_at: string;
 };
 
@@ -95,13 +104,90 @@ export async function reserveZaloMessage(client: Client, input: ReserveZaloMessa
   return reason ? ok({ ok: false, reason, status }) : fail('unknown');
 }
 
+// ── Gửi tự động (migration 20261129110000_zalo_auto; Edge Function zalo-connect / zalo-send) ──────────────────────────────
+// Staff kết nối Zalo cá nhân bằng QR (zca-js, API không chính thức) rồi gửi thẳng từ hộp thoại. Client chỉ đọc cột công khai
+// (credentials_enc không nằm trong grant). Lỗi: zalo_not_connected, zalo_session_expired, zalo_user_not_found, zalo_send_failed,
+// zalo_unavailable, rate_limited, forbidden, no_phone, not_found.
+
+/** Tài khoản Zalo đã kết nối của người đang đăng nhập (null = chưa kết nối). */
+export type ZaloAccount = {
+  staff_id: string;
+  zalo_uid: string | null;
+  display_name: string | null;
+  avatar: string | null;
+  status: ZaloAccountStatus;
+  connected_at: string;
+  last_error: string | null;
+};
+
+/** Lần quét QR gần nhất (trang Kết nối Zalo hỏi lại trạng thái). */
+export type ZaloQrSession = {
+  id: string;
+  status: ZaloQrStatus;
+  image: string | null;
+  display_name: string | null;
+  avatar: string | null;
+  error: string | null;
+  created_at: string;
+};
+
+export async function getZaloAccount(client: Client): Promise<Result<ZaloAccount | null>> {
+  const res = await client
+    .from('zalo_accounts')
+    .select('staff_id, zalo_uid, display_name, avatar, status, connected_at, last_error')
+    .maybeSingle();
+  if (res.error) return fromSupabase<ZaloAccount | null>({ data: null, error: res.error });
+  if (!res.data) return ok(null);
+  const status = (ZALO_ACCOUNT_STATUSES as readonly string[]).includes(res.data.status) ? (res.data.status as ZaloAccountStatus) : 'expired';
+  return ok({ ...res.data, status });
+}
+
+export async function getLatestZaloQr(client: Client): Promise<Result<ZaloQrSession | null>> {
+  const res = await client
+    .from('zalo_qr_sessions')
+    .select('id, status, image, display_name, avatar, error, created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (res.error) return fromSupabase<ZaloQrSession | null>({ data: null, error: res.error });
+  if (!res.data) return ok(null);
+  const status = (ZALO_QR_STATUSES as readonly string[]).includes(res.data.status) ? (res.data.status as ZaloQrStatus) : 'error';
+  return ok({ ...res.data, status });
+}
+
+/** Tạo mã QR kết nối (zalo-connect start): trả ảnh QR; phần chờ quét chạy tiếp ở nền, theo dõi bằng getLatestZaloQr. */
+export async function startZaloConnect(client: Client): Promise<Result<{ qrId: string; status: ZaloQrStatus; image: string }>> {
+  return invokeFunction(client, 'zalo-connect', { action: 'start' });
+}
+
+/** Ngắt kết nối Zalo (xoá phiên đã lưu). */
+export async function disconnectZalo(client: Client): Promise<Result<null>> {
+  const res = await invokeFunction<{ ok: boolean }>(client, 'zalo-connect', { action: 'disconnect' });
+  return res.error ? res : ok(null);
+}
+
+export type ZaloSendResult = { ok: true; status: ZaloStatus } | { ok: false; reason: ZaloBlockReason; status: ZaloStatus };
+
+/** Gửi tin ngay bằng Zalo đã kết nối (zalo-send). `ok: false` = hết lượt / đang nghỉ (không phải lỗi, không gửi gì). */
+export async function sendZaloMessage(client: Client, input: ReserveZaloMessageInput): Promise<Result<ZaloSendResult>> {
+  const parsed = ReserveZaloMessageInput.safeParse(input);
+  if (!parsed.success) return fail('invalid_input');
+  const res = await invokeFunction<{ ok: boolean; reason?: string; status?: Json }>(client, 'zalo-send', parsed.data);
+  if (res.error) return res;
+  const status = toStatus(res.data.status);
+  if (!status) return fail('unknown');
+  if (res.data.ok) return ok({ ok: true, status });
+  const reason = asReason(res.data.reason);
+  return reason ? ok({ ok: false, reason, status }) : fail('unknown');
+}
+
 /** Tin đã ghi nhận cho một lead / người dùng (mới nhất trước, ≤ ZALO_LIMITS.historyLimit), kèm tên staff gửi. */
 export async function listZaloMessages(client: Client, input: ListZaloMessagesInput): Promise<Result<ZaloMessage[]>> {
   const parsed = ListZaloMessagesInput.safeParse(input);
   if (!parsed.success) return fail('invalid_input');
   const res = await client
     .from('zalo_messages')
-    .select('id, staff_id, target_type, target_id, kind, content, created_at')
+    .select('id, staff_id, target_type, target_id, kind, content, mode, status, created_at')
     .eq('target_type', parsed.data.targetType)
     .eq('target_id', parsed.data.targetId)
     .order('created_at', { ascending: false })
@@ -123,6 +209,8 @@ export async function listZaloMessages(client: Client, input: ListZaloMessagesIn
       target_id: m.target_id,
       kind: m.kind as ZaloKind,
       content: m.content,
+      mode: m.mode === 'auto' ? 'auto' : 'manual',
+      delivery: (['recorded', 'sending', 'sent', 'failed'] as const).find((d) => d === m.status) ?? 'recorded',
       created_at: m.created_at,
     })),
   );

@@ -60,5 +60,10 @@
   "quote_not_pending": "这条报价已不在等待选择的状态。",
   "already_quoted": "你已对该需求报过价。",
   "cannot_quote_own": "这是你自己的需求，不能自己报价。",
-  "no_phone": "此用户没有可用于 Zalo 的手机号。"
+  "no_phone": "此用户没有可用于 Zalo 的手机号。",
+  "zalo_not_connected": "你还没有连接 Zalo，请先在“连接 Zalo”中连接后再自动发送。",
+  "zalo_session_expired": "Zalo 登录已过期，请用二维码重新连接。",
+  "zalo_user_not_found": "该手机号未使用 Zalo，或不允许通过手机号搜索。",
+  "zalo_send_failed": "Zalo 消息发送失败，请稍后重试。今日额度未被扣除。",
+  "zalo_unavailable": "暂时无法连接 Zalo，请一分钟后再试。"
 }

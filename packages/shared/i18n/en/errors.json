@@ -60,5 +60,10 @@
   "quote_not_pending": "This quote is no longer waiting to be chosen.",
   "already_quoted": "You already have a quote on this request.",
   "cannot_quote_own": "This is your own request, so you can’t quote it.",
-  "no_phone": "This person has no phone number to message on Zalo."
+  "no_phone": "This person has no phone number to message on Zalo.",
+  "zalo_not_connected": "You haven’t connected Zalo yet. Connect it under Connect Zalo before sending automatically.",
+  "zalo_session_expired": "Your Zalo session has expired. Reconnect with a QR code.",
+  "zalo_user_not_found": "This phone number isn’t on Zalo or doesn’t allow search by phone number.",
+  "zalo_send_failed": "The Zalo message couldn’t be sent, please try again later. Your daily quota was not used.",
+  "zalo_unavailable": "Couldn’t reach Zalo, please try again in a minute."
 }

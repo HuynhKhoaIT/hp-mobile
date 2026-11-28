@@ -41,6 +41,16 @@ export const ReserveZaloMessageInput = z.object({
 });
 export type ReserveZaloMessageInput = z.input<typeof ReserveZaloMessageInput>;
 
+/** Trạng thái quét QR kết nối Zalo (bảng zalo_qr_sessions) và trạng thái tài khoản Zalo đã kết nối (zalo_accounts). */
+export const ZALO_QR_STATUSES = ['waiting_scan', 'scanned', 'confirmed', 'expired', 'declined', 'error'] as const;
+export type ZaloQrStatus = (typeof ZALO_QR_STATUSES)[number];
+export const ZALO_ACCOUNT_STATUSES = ['connected', 'expired'] as const;
+export type ZaloAccountStatus = (typeof ZALO_ACCOUNT_STATUSES)[number];
+
+/** Edge Function zalo-connect: tạo phiên QR (`start`) hoặc ngắt kết nối (`disconnect`). */
+export const ZaloConnectInput = z.object({ action: z.enum(['start', 'disconnect'], 'invalid_input') });
+export type ZaloConnectInput = z.input<typeof ZaloConnectInput>;
+
 /** Lịch sử tin đã ghi nhận cho một đối tượng. */
 export const ListZaloMessagesInput = z.object({
   targetType: z.enum(ZALO_TARGETS, 'invalid_input'),

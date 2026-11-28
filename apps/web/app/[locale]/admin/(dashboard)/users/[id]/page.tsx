@@ -15,6 +15,9 @@ import { getUserDetail } from '@/features/admin/users/queries';
 import { asLocale } from '@/features/listing/display';
 import { Link } from '@/i18n/navigation';
 
+// Hộp thoại "Nhắn Zalo" gửi tự động (đăng nhập Zalo + gửi tin) có thể mất vài giây: Server Action chạy trong giới hạn của trang.
+export const maxDuration = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin.meta');
   return { title: t('user') };

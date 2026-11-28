@@ -15,7 +15,8 @@
     "marketing": "Marketing",
     "audit": "Nhật ký",
     "leads": "Lead",
-    "cskh": "Chăm sóc khách hàng"
+    "cskh": "Chăm sóc khách hàng",
+    "zalo": "Kết nối Zalo"
   },
   "brand": {
     "area": "Quản trị",
@@ -52,7 +53,8 @@
       "leads_other": "{{count}} lead mới"
     },
     "leads": "Lead",
-    "cskh": "CSKH"
+    "cskh": "CSKH",
+    "zalo": "Kết nối Zalo"
   },
   "role": {
     "user": "Người dùng",
@@ -1053,7 +1055,59 @@
     "history_empty": "Chưa có tin nào cho người này",
     "history_by": "Bởi {{name}}",
     "user_title": "Nhắn Zalo",
-    "user_hint": "Soạn tin gửi qua Zalo cá nhân của bạn tới người dùng này. Mỗi tin được ghi vào nhật ký, không lưu số điện thoại."
+    "user_hint": "Soạn tin gửi qua Zalo cá nhân của bạn tới người dùng này. Mỗi tin được ghi vào nhật ký, không lưu số điện thoại.",
+    "send_now": "Gửi ngay",
+    "sending": "Đang gửi…",
+    "sent_ok": "Đã gửi tin qua Zalo của bạn. Hôm nay đã dùng {{sent}}/{{quota}} lượt.",
+    "auto_from": "Gửi bằng Zalo: {{name}}",
+    "connect_hint": "Kết nối Zalo để gửi tự động, không cần mở Zalo.",
+    "connect_link": "Kết nối Zalo",
+    "expired_hint": "Phiên Zalo đã hết hạn, cần kết nối lại.",
+    "or_manual": "Hoặc mở Zalo để tự dán và gửi",
+    "delivery": {
+      "recorded": "Đã ghi nhận",
+      "sending": "Đang gửi",
+      "sent": "Đã gửi",
+      "failed": "Gửi lỗi"
+    },
+    "mode": {
+      "auto": "Tự động",
+      "manual": "Mở Zalo"
+    },
+    "connect": {
+      "title": "Kết nối Zalo",
+      "subtitle": "Kết nối Zalo cá nhân của bạn bằng mã QR để gửi tin tự động từ hộp thoại Nhắn Zalo.",
+      "status": "Trạng thái",
+      "connected": "Đã kết nối",
+      "not_connected": "Chưa kết nối",
+      "expired": "Hết hạn, cần quét lại",
+      "connected_as": "Đang dùng Zalo: {{name}}",
+      "connected_at": "Kết nối lúc {{time}}",
+      "unknown_name": "Zalo của bạn",
+      "start": "Tạo mã QR",
+      "restart": "Tạo mã QR mới",
+      "disconnect": "Ngắt kết nối",
+      "starting": "Đang tạo mã QR…",
+      "steps_title": "Cách kết nối",
+      "step_1": "Bấm Tạo mã QR.",
+      "step_2": "Mở Zalo trên điện thoại, chạm biểu tượng quét mã QR ở thanh tìm kiếm.",
+      "step_3": "Quét mã rồi xác nhận đăng nhập trên điện thoại.",
+      "qr_alt": "Mã QR đăng nhập Zalo",
+      "qr": {
+        "waiting_scan": "Đang chờ quét mã…",
+        "scanned": "Đã quét, hãy xác nhận đăng nhập trên điện thoại",
+        "confirmed": "Kết nối thành công",
+        "expired": "Mã đã hết hạn, hãy tạo mã mới",
+        "declined": "Bạn đã từ chối trên điện thoại",
+        "error": "Kết nối không thành công, thử lại sau một phút"
+      },
+      "risk_title": "Lưu ý quan trọng",
+      "risk_body": "Đây là kết nối Zalo không chính thức (không do Zalo cung cấp). Gửi nhiều tin có thể khiến Zalo hạn chế tài khoản cá nhân của bạn. Hạn mức 15–30 tin mỗi ngày và thời gian nghỉ giữa hai tin giúp giảm rủi ro.",
+      "confirm_disconnect_title": "Ngắt kết nối Zalo?",
+      "confirm_disconnect_body": "Phiên đã lưu sẽ bị xoá. Muốn gửi tự động lại, bạn cần quét mã QR lần nữa.",
+      "confirm_disconnect_cta": "Ngắt kết nối",
+      "toast_disconnected": "Đã ngắt kết nối Zalo"
+    }
   },
   "cskh": {
     "title": "Chăm sóc khách hàng",
