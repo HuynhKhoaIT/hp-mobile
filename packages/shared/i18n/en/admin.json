@@ -15,7 +15,8 @@
     "marketing": "Marketing",
     "audit": "Audit log",
     "leads": "Leads",
-    "cskh": "Customer care"
+    "cskh": "Customer care",
+    "zalo": "Connect Zalo"
   },
   "brand": {
     "area": "Admin",
@@ -52,7 +53,8 @@
       "leads_other": "{{count}} new leads"
     },
     "leads": "Leads",
-    "cskh": "Customer care"
+    "cskh": "Customer care",
+    "zalo": "Connect Zalo"
   },
   "role": {
     "user": "User",
@@ -1053,7 +1055,59 @@
     "history_empty": "No messages for this person yet",
     "history_by": "By {{name}}",
     "user_title": "Message on Zalo",
-    "user_hint": "Write a message to send from your personal Zalo to this user. Each message is logged; the phone number is not stored."
+    "user_hint": "Write a message to send from your personal Zalo to this user. Each message is logged; the phone number is not stored.",
+    "send_now": "Send now",
+    "sending": "Sending…",
+    "sent_ok": "Sent from your Zalo. {{sent}}/{{quota}} of today’s quota used.",
+    "auto_from": "Sending from Zalo: {{name}}",
+    "connect_hint": "Connect Zalo to send automatically without opening Zalo.",
+    "connect_link": "Connect Zalo",
+    "expired_hint": "Your Zalo session has expired, reconnect it.",
+    "or_manual": "Or open Zalo to paste and send it yourself",
+    "delivery": {
+      "recorded": "Recorded",
+      "sending": "Sending",
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "mode": {
+      "auto": "Automatic",
+      "manual": "Open Zalo"
+    },
+    "connect": {
+      "title": "Connect Zalo",
+      "subtitle": "Connect your personal Zalo with a QR code to send messages automatically from the Message on Zalo dialog.",
+      "status": "Status",
+      "connected": "Connected",
+      "not_connected": "Not connected",
+      "expired": "Expired, scan again",
+      "connected_as": "Using Zalo: {{name}}",
+      "connected_at": "Connected {{time}}",
+      "unknown_name": "Your Zalo",
+      "start": "Create QR code",
+      "restart": "Create a new QR code",
+      "disconnect": "Disconnect",
+      "starting": "Creating the QR code…",
+      "steps_title": "How to connect",
+      "step_1": "Press Create QR code.",
+      "step_2": "Open Zalo on your phone and tap the QR scan icon in the search bar.",
+      "step_3": "Scan the code and confirm the login on your phone.",
+      "qr_alt": "Zalo login QR code",
+      "qr": {
+        "waiting_scan": "Waiting for the scan…",
+        "scanned": "Scanned, confirm the login on your phone",
+        "confirmed": "Connected",
+        "expired": "The code expired, create a new one",
+        "declined": "You declined on your phone",
+        "error": "Couldn’t connect, try again in a minute"
+      },
+      "risk_title": "Important",
+      "risk_body": "This is an unofficial Zalo connection (not provided by Zalo). Sending many messages can get your personal Zalo account restricted. A quota of 15–30 messages a day and a rest between messages reduce the risk.",
+      "confirm_disconnect_title": "Disconnect Zalo?",
+      "confirm_disconnect_body": "The saved session will be deleted. To send automatically again you’ll need to scan a QR code again.",
+      "confirm_disconnect_cta": "Disconnect",
+      "toast_disconnected": "Zalo disconnected"
+    }
   },
   "cskh": {
     "title": "Customer care",

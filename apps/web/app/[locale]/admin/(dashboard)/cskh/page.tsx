@@ -9,6 +9,9 @@ import { AdminPage, TableSkeleton } from '@/components/admin/states';
 import { CskhTable } from '@/features/admin/cskh/components/cskh-table';
 import { getCskhPage } from '@/features/admin/cskh/queries';
 
+// Hộp thoại "Nhắn Zalo" gửi tự động (đăng nhập Zalo + gửi tin) có thể mất vài giây: Server Action chạy trong giới hạn của trang.
+export const maxDuration = 60;
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('admin.meta');
   return { title: t('cskh') };

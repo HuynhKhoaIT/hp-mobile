@@ -4,9 +4,9 @@
 // tự động, nên: server ghi nhận tin + trừ hạn mức (hết lượt / đang nghỉ thì chưa cho), web sao chép tin và mở link zalo.me tới
 // người nhận, staff dán tin rồi bấm Gửi trong Zalo. Thanh hạn mức hôm nay + đếm ngược thời gian nghỉ; lịch sử tin đã ghi nhận.
 // Form mount lại mỗi lần mở (state sạch). SĐT không đi qua client: chỉ nhận link zalo.me sau khi ghi nhận.
-import type { ReserveZaloResult, ZaloMessage, ZaloStatus } from '@hp/core';
+import type { ReserveZaloResult, ZaloMessage, ZaloSendResult, ZaloStatus } from '@hp/core';
 import { APP_NAME, formatDate, ZALO_GENERAL_KINDS, type ZaloKind, type ZaloTarget } from '@hp/shared';
-import { CircleCheck, Copy, MessageCircle } from 'lucide-react';
+import { CircleCheck, Copy, MessageCircle, Send } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { SELECT_CLASS } from '@/components/admin/field-styles';
@@ -16,9 +16,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { asLocale } from '@/features/listing/display';
+import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { useAdminAction } from '../../lib/use-admin-action';
-import { getZaloStatusAction, listZaloMessagesAction, reserveZaloMessageAction } from '../actions';
+import {
+  getZaloConnectionAction,
+  getZaloStatusAction,
+  listZaloMessagesAction,
+  reserveZaloMessageAction,
+  sendZaloAutoAction,
+  type ZaloConnection,
+} from '../actions';
 
 /** `context`: tiêu đề đơn (chăm sóc sau dịch vụ) — điền vào tin soạn sẵn có {{title}}. */
 export type ZaloRecipient = { type: ZaloTarget; id: string; name: string; context?: string };
@@ -61,6 +69,8 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
   const [history, setHistory] = useState<ZaloMessage[] | null>(null);
   const [url, setUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [conn, setConn] = useState<ZaloConnection | null>(null);
+  const [sentOk, setSentOk] = useState(false);
 
   const applyStatus = useCallback((s: ZaloStatus) => {
     const at = Date.now();
@@ -82,6 +92,9 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
     });
     void listZaloMessagesAction({ targetType: recipient.type, targetId: recipient.id }).then((r) => {
       if (alive) setHistory(r.ok ? r.data : []);
+    });
+    void getZaloConnectionAction().then((r) => {
+      if (alive && r.ok) setConn(r.data);
     });
     return () => {
       alive = false;
@@ -122,6 +135,25 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
         } else {
           toast.show(reasonText(r.status) ?? t('cta_blocked'), 'error');
         }
+      },
+    });
+
+  // Gửi tự động bằng Zalo đã kết nối (Edge Function zalo-send); lỗi phiên → tải lại trạng thái kết nối để hiện "hết hạn".
+  const sendNow = () =>
+    run(() => sendZaloAutoAction({ targetType: recipient.type, targetId: recipient.id, kind, content: trimmed }), {
+      onDone: (r: ZaloSendResult) => {
+        applyStatus(r.status);
+        if (r.ok) {
+          setSentOk(true);
+          void loadHistory();
+        } else {
+          toast.show(reasonText(r.status) ?? t('cta_blocked'), 'error');
+        }
+      },
+      onError: () => {
+        void getZaloConnectionAction().then((r) => {
+          if (r.ok) setConn(r.data);
+        });
       },
     });
 
@@ -169,7 +201,17 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
           {note ? <p className={cn('text-sm', canSend ? 'text-muted' : 'text-warning')}>{note}</p> : null}
         </div>
 
-        {url ? (
+        {sentOk ? (
+          <div className="flex flex-col gap-3">
+            <p role="status" className="flex items-start gap-2 rounded-md bg-primary-light p-3 text-md text-primary">
+              <CircleCheck strokeWidth={1.75} className="mt-0.5 size-5 shrink-0" aria-hidden />
+              <span>{t('sent_ok', { sent: status?.sent ?? 0, quota: status?.quota ?? 0 })}</span>
+            </p>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {t('done')}
+            </Button>
+          </div>
+        ) : url ? (
           <div className="flex flex-col gap-3">
             <p role="status" className="flex items-start gap-2 rounded-md bg-primary-light p-3 text-md text-primary">
               <CircleCheck strokeWidth={1.75} className="mt-0.5 size-5 shrink-0" aria-hidden />
@@ -233,11 +275,36 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
                 }}
               />
             </div>
-            <DialogFooter>
-              <Button type="submit" disabled={pending || !canSend || !trimmed}>
-                <MessageCircle strokeWidth={1.75} aria-hidden />
-                {label}
-              </Button>
+            <DialogFooter className="flex-col gap-2 sm:flex-col sm:items-stretch sm:justify-start">
+              {conn?.account?.status === 'connected' ? (
+                <>
+                  {/* Gửi tự động bằng Zalo đã kết nối; mở zalo.me tự dán là lựa chọn phụ. */}
+                  <Button type="button" disabled={pending || !canSend || !trimmed} onClick={sendNow}>
+                    <Send strokeWidth={1.75} aria-hidden />
+                    {pending ? t('sending') : label === t('cta') ? t('send_now') : label}
+                  </Button>
+                  <p className="text-center text-sm text-muted">{t('auto_from', { name: conn.account.display_name || t('connect.unknown_name') })}</p>
+                  <Button type="submit" variant="outline" disabled={pending || !canSend || !trimmed}>
+                    <MessageCircle strokeWidth={1.75} aria-hidden />
+                    {t('or_manual')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button type="submit" disabled={pending || !canSend || !trimmed}>
+                    <MessageCircle strokeWidth={1.75} aria-hidden />
+                    {label}
+                  </Button>
+                  {conn ? (
+                    <p className="text-sm text-muted">
+                      {conn.account?.status === 'expired' ? t('expired_hint') : t('connect_hint')}{' '}
+                      <Link href="/admin/zalo" className="font-medium text-primary underline-offset-4 hover:underline">
+                        {t('connect_link')}
+                      </Link>
+                    </p>
+                  ) : null}
+                </>
+              )}
             </DialogFooter>
           </form>
         )}
@@ -255,6 +322,9 @@ function ZaloForm({ recipient, defaultKind, kinds = ZALO_GENERAL_KINDS, onOpenCh
                   <span className="flex flex-wrap items-center gap-x-2 text-muted">
                     <time dateTime={m.created_at}>{formatDate(m.created_at, locale, 'datetime')}</time>
                     <span>{t(`kind.${m.kind}`)}</span>
+                    <span>
+                      {t(`mode.${m.mode}`)} · {t(`delivery.${m.delivery}`)}
+                    </span>
                     {m.staff_name ? <span>{t('history_by', { name: m.staff_name })}</span> : null}
                   </span>
                   <span className="whitespace-pre-wrap text-fg">{m.content}</span>

@@ -60,5 +60,10 @@
   "quote_not_pending": "Báo giá này không còn ở trạng thái chờ chọn.",
   "already_quoted": "Bạn đã có báo giá cho yêu cầu này.",
   "cannot_quote_own": "Đây là yêu cầu của bạn nên không tự báo giá được.",
-  "no_phone": "Người này chưa có số điện thoại để nhắn Zalo."
+  "no_phone": "Người này chưa có số điện thoại để nhắn Zalo.",
+  "zalo_not_connected": "Bạn chưa kết nối Zalo. Hãy kết nối ở mục Kết nối Zalo trước khi gửi tự động.",
+  "zalo_session_expired": "Phiên Zalo đã hết hạn. Hãy kết nối lại bằng mã QR.",
+  "zalo_user_not_found": "Số điện thoại này chưa dùng Zalo hoặc không cho tìm theo số điện thoại.",
+  "zalo_send_failed": "Gửi tin Zalo không thành công, vui lòng thử lại sau. Lượt gửi chưa bị trừ.",
+  "zalo_unavailable": "Chưa kết nối được tới Zalo, vui lòng thử lại sau một phút."
 }

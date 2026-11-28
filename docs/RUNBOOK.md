@@ -96,6 +96,13 @@ Không cần secret mới (gọi RPC bằng JWT người dùng). Deploy khi đư
 - Kiểm tra / chạy tay: `curl -X POST <functions_url>/purge-files -H "x-cron-secret: <CRON_SECRET>" -d '{}'` → `{ documents, accounts, files }`. Tài khoản chỉ bị xoá hẳn khi `deleted_at` quá 30 ngày; xoá hẳn là không khôi phục được (ngoài PITR).
 - Google Cloud Translation: bật API "Cloud Translation API" trong project, tạo API key giới hạn chỉ API đó; chi phí theo ký tự — rate limit 30 lượt dịch mới / người / giờ, bản dịch được cache trong `listing_translations`.
 
+### Gửi Zalo tự động — Edge Function `zalo-connect`, `zalo-send` (staging / prod)
+- CI chỉ `db push` (migration `20261129110000_zalo_auto`); function và secret làm tay, khi được yêu cầu bằng tên môi trường.
+- Secret: `supabase secrets set --project-ref <ref> ZALO_SESSION_KEY=$(openssl rand -hex 32)` (64 ký tự hex; lưu bản sao ở nơi an toàn — mất / đổi khoá thì mọi staff phải quét QR lại). Thiếu → function trả 503 `zalo_unavailable`, hộp thoại "Nhắn Zalo" vẫn dùng cách sao chép + mở zalo.me.
+- Deploy: `supabase functions deploy zalo-connect zalo-send --project-ref <ref>` (giữ `verify_jwt = true`).
+- Dùng: staff vào `/admin/zalo` quét QR bằng app Zalo trên điện thoại → hộp thoại "Nhắn Zalo" có nút "Gửi ngay". Phiên Zalo có thể bị Zalo thu hồi (đổi IP / thiết bị) → trang báo "hết hạn", quét lại.
+- Rủi ro: `zca-js` là API không chính thức, tài khoản Zalo có thể bị hạn chế; luôn giữ hạn mức 15–30 tin / ngày, nghỉ 60–180 giây. Mạng nội bộ chặn `id.zalo.me` thì không thử QR được ở local.
+
 ### Cron nhắc giờ / hết hạn (pg_cron, tuần 8)
 Hai job tạo bởi migration `20261103100000_group_lifecycle_chat` (lên cùng `supabase db push`, không cần secret / Edge Function):
 - `remind-groups` (`*/15 * * * *`) → `select public.remind_groups()`: `group_reminder` trước giờ diễn ra 60 phút (cửa sổ thực tế 45–60 phút vì chạy 15 phút / lần).

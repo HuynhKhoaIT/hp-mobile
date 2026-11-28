@@ -1099,16 +1099,42 @@ isOneToOne: false
       referencedColumns: ["code"]
     }
                   ]
-                },"zalo_messages": {
+                },"zalo_accounts": {
                   Row: {
-                    "content": string,"created_at": string,"id": string,"kind": string,"staff_id": string,"target_id": string,"target_type": string
+                    "avatar": string | null,"connected_at": string,"credentials_enc": string,"display_name": string | null,"last_error": string | null,"staff_id": string,"status": string,"updated_at": string,"zalo_uid": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "content": string,"created_at"?: string,"id"?: string,"kind": string,"staff_id": string,"target_id": string,"target_type": string
+                    "avatar"?: string | null,"connected_at"?: string,"credentials_enc": string,"display_name"?: string | null,"last_error"?: string | null,"staff_id": string,"status"?: string,"updated_at"?: string,"zalo_uid"?: string | null
                   }
                   Update: {
-                    "content"?: string,"created_at"?: string,"id"?: string,"kind"?: string,"staff_id"?: string,"target_id"?: string,"target_type"?: string
+                    "avatar"?: string | null,"connected_at"?: string,"credentials_enc"?: string,"display_name"?: string | null,"last_error"?: string | null,"staff_id"?: string,"status"?: string,"updated_at"?: string,"zalo_uid"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_accounts_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: true
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_accounts_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: true
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"zalo_messages": {
+                  Row: {
+                    "content": string,"created_at": string,"error": string | null,"id": string,"kind": string,"mode": string,"staff_id": string,"status": string,"target_id": string,"target_type": string,"zalo_msg_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content": string,"created_at"?: string,"error"?: string | null,"id"?: string,"kind": string,"mode"?: string,"staff_id": string,"status"?: string,"target_id": string,"target_type": string,"zalo_msg_id"?: string | null
+                  }
+                  Update: {
+                    "content"?: string,"created_at"?: string,"error"?: string | null,"id"?: string,"kind"?: string,"mode"?: string,"staff_id"?: string,"status"?: string,"target_id"?: string,"target_type"?: string,"zalo_msg_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -1119,6 +1145,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "zalo_messages_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "public_profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"zalo_qr_sessions": {
+                  Row: {
+                    "avatar": string | null,"created_at": string,"display_name": string | null,"error": string | null,"id": string,"image": string | null,"staff_id": string,"status": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "avatar"?: string | null,"created_at"?: string,"display_name"?: string | null,"error"?: string | null,"id"?: string,"image"?: string | null,"staff_id": string,"status"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "avatar"?: string | null,"created_at"?: string,"display_name"?: string | null,"error"?: string | null,"id"?: string,"image"?: string | null,"staff_id"?: string,"status"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "zalo_qr_sessions_staff_id_fkey"
+      columns: ["staff_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "zalo_qr_sessions_staff_id_fkey"
       columns: ["staff_id"]
 isOneToOne: false
       referencedRelation: "public_profiles"
@@ -1485,6 +1537,9 @@ isOneToOne: false
 "f_unaccent":
 { Args: { "p_text": string }; Returns: string
                            },
+"finish_zalo_auto":
+{ Args: { "p_error"?: string,"p_message_id": string,"p_ok": boolean,"p_zalo_msg_id"?: string }; Returns: undefined
+                           },
 "gen_short_id":
 { Args: { "p_length"?: number }; Returns: string
                            },
@@ -1821,6 +1876,9 @@ isOneToOne: false
 "request_badge_tx":
 { Args: { "p_badge": string,"p_document_path": string }; Returns: string
                            },
+"reserve_zalo_auto":
+{ Args: { "p_content": string,"p_kind": string,"p_staff": string,"p_target_id": string,"p_target_type": string }; Returns: Json
+                           },
 "reserve_zalo_message":
 { Args: { "p_content": string,"p_kind": string,"p_target_id": string,"p_target_type": string }; Returns: Json
                            },
@@ -2051,6 +2109,9 @@ isOneToOne: false
                            },
 "withdraw_quote":
 { Args: { "p_quote_id": string }; Returns: undefined
+                           },
+"zalo_is_staff":
+{ Args: { "p_user": string }; Returns: boolean
                            },
 "zalo_present":
 { Args: { "p_row": Omit<Database["public"]['Tables']["zalo_quota"]['Row'], Database["public"]['Tables']["zalo_quota"]['ComputedFields']> }; Returns: Json
